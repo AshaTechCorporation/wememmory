@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wememmory/constants.dart';
+import 'package:wememmory/profile/albumHistoryPage.dart';
 import 'package:wememmory/profile/couponPage.dart';
 import 'package:wememmory/profile/orderHistoryPage.dart';
 import 'widgets/index.dart';
@@ -131,14 +132,19 @@ class ProfilePage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10),
                     Expanded(
-                      child: _SmallInfoCard(
-                        bgColor: const Color(0xFFE9F6FF),
-                        value: '10',
-                        title: 'อัลบั้มของฉัน',
-                        iconPath: 'assets/icons/iconb2.png',
-                        textColor: const Color(0xFF5AAEE5),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => AlbumHistoryPage()));
+                        },
+                        child: _SmallInfoCard(
+                          bgColor: const Color(0xFFE9F6FF),
+                          value: '10',
+                          title: 'อัลบั้มของฉัน',
+                          iconPath: 'assets/icons/iconb2.png',
+                          textColor: const Color(0xFF5AAEE5),
+                        ),
                       ),
                     ),
                   ],
