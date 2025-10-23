@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wememmory/constants.dart';
 import 'package:wememmory/profile/couponPage.dart';
+import 'package:wememmory/profile/orderHistoryPage.dart';
 import 'widgets/index.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -117,12 +118,17 @@ class ProfilePage extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: _SmallInfoCard(
-                        bgColor: const Color(0xFFFFF3E8),
-                        value: '10',
-                        title: 'สินค้าของฉัน',
-                        iconPath: 'assets/icons/iconb1.png',
-                        textColor: const Color(0xFFF08336),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => OrderHistoryPage()));
+                        },
+                        child: _SmallInfoCard(
+                          bgColor: const Color(0xFFFFF3E8),
+                          value: '10',
+                          title: 'สินค้าของฉัน',
+                          iconPath: 'assets/icons/iconb1.png',
+                          textColor: const Color(0xFFF08336),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
