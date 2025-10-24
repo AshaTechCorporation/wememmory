@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:wememmory/constants.dart';
+import 'package:wememmory/profile/addressPage.dart';
 import 'package:wememmory/profile/albumHistoryPage.dart';
+import 'package:wememmory/profile/bankInfoPage.dart';
 import 'package:wememmory/profile/couponPage.dart';
 import 'package:wememmory/profile/orderHistoryPage.dart';
+import 'package:wememmory/profile/personalSecurityPage.dart';
 import 'widgets/index.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -173,13 +176,13 @@ class ProfilePage extends StatelessWidget {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => CouponPage()));
                         break;
                       case 1: // ข้อมูลส่วนบุคคลและความปลอดภัย
-                        // Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacyPage()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => PersonalSecurityPage()));
                         break;
                       case 2: // ที่อยู่ของฉัน
-                        // Navigator.push(context, MaterialPageRoute(builder: (context) => AddressPage()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => AddressPage()));
                         break;
                       case 3: // ข้อมูลบัญชีธนาคาร/บัตรเครดิต
-                        // Navigator.push(context, MaterialPageRoute(builder: (context) => BankingPage()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => BankInfoPage()));
                         break;
                       case 4: // ภาษา
                         // Navigator.push(context, MaterialPageRoute(builder: (context) => LanguagePage()));
