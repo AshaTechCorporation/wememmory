@@ -8,7 +8,7 @@ class ReminderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [ccardGradient1, ccardGradient2], begin: Alignment.centerLeft, end: Alignment.centerRight),
+        gradient: LinearGradient(colors: [const Color.fromARGB(255, 29, 28, 25), const Color.fromARGB(255, 194, 194, 194)], begin: Alignment.centerLeft, end: Alignment.centerRight),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(.06), blurRadius: 10, offset: const Offset(0, 4))],
       ),
@@ -32,7 +32,7 @@ class ReminderCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18.5, // ↑ ใหญ่กว่าข้อความรองชัด
                     fontWeight: FontWeight.w800, // หนาชัดตามภาพ
-                    color: Color(0xFFF6AE42), // ส้มอ่อนแบบภาพต้นฉบับ
+                    color: Color.fromARGB(255, 252, 252, 252), // ส้มอ่อนแบบภาพต้นฉบับ
                     height: 1.05,
                   ),
                 ),
