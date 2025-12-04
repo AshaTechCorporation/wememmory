@@ -10,7 +10,6 @@ class BankInfoPage extends StatelessWidget {
     const orange = Color(0xFFF29C64);
     const divider = Color(0xFFEFEFEF);
     const textGray = Color(0xFF5F5F5F);
-
     return Scaffold(
       backgroundColor: kBackgroundColor, // พื้นหลังส้มด้านบน
       appBar: AppBar(
