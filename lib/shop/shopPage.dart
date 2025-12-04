@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:wememmory/constants.dart';
+import 'package:wememmory/shop/albumGifePage.dart';
+import 'package:wememmory/shop/termsAndServicesPage.dart';
+import 'package:wememmory/shop/faqPage.dart';
 
 class ShopPage extends StatelessWidget {
   const ShopPage({super.key});
@@ -7,7 +9,7 @@ class ShopPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBackgroundColor,
+      backgroundColor: Colors.white,
       appBar: PreferredSize(preferredSize: const Size.fromHeight(96), child: _ShopAppBar()),
       body: const _ShopBody(),
     );
@@ -22,46 +24,21 @@ class _ShopAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: kBackgroundColor,
+      backgroundColor: Colors.white,
       elevation: 0,
       titleSpacing: 0,
-      title: Padding(padding: const EdgeInsets.fromLTRB(12, 8, 12, 8), child: _SearchBar()),
+      title: const Padding(
+        padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
+        child: Text('Shop', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+      ),
+      foregroundColor: Colors.black,
+      iconTheme: const IconThemeData(color: Colors.black),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 12),
           child: GestureDetector(onTap: () {}, child: Image.asset('assets/icons/Cart.png', height: 26)),
         ),
       ],
-    );
-  }
-}
-
-class _SearchBar extends StatelessWidget {
-  const _SearchBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(color: Colors.white, border: Border.all(color: const Color(0xFFE6E6E6)), borderRadius: BorderRadius.circular(10)),
-      child: Row(
-        children: [
-          const SizedBox(width: 10),
-          const Icon(Icons.search, size: 18, color: Colors.grey),
-          const SizedBox(width: 6),
-          const Expanded(child: Text('ค้นหาผลิตภัณฑ์…', style: TextStyle(color: Colors.grey, fontSize: 14))),
-          Container(
-            height: double.infinity,
-            margin: const EdgeInsets.all(4),
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFF8A3D), // ปุ่มส้มตามรูป
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.camera_alt, size: 18, color: Colors.white),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -74,65 +51,39 @@ class _ShopBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
+      primary: false,
       slivers: [
-        const SliverToBoxAdapter(child: _SectionPadding(child: _BannerCarousel())),
+        const SliverToBoxAdapter(child: _BannerCarousel()),
 
         // ส่วนลด (horizontal scroll)
-        const SliverToBoxAdapter(child: _SectionHeader(title: 'ส่วนลด', actionText: 'ดูทั้งหมด')),
         SliverToBoxAdapter(
-          child: _SectionPadding(
-            child: SizedBox(
-              height: 92,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: 6,
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
-                itemBuilder: (_, i) => const _PromoCard(),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: _SectionPadding(
+              child: SizedBox(
+                height: 170,
+                child: ListView.separated(
+                  primary: false,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 6,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (_, i) => const _PromoCard(),
+                ),
               ),
             ),
           ),
         ),
-
-        // ประเภทสินค้า (horizontal scroll)
-        const SliverToBoxAdapter(child: _SectionHeader(title: 'ประเภทสินค้า', actionText: 'ดูทั้งหมด')),
-        SliverToBoxAdapter(
-          child: _SectionPadding(
-            child: SizedBox(
-              height: 120,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: _catImages.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
-                itemBuilder: (_, i) => _CategoryTile(image: _catImages[i], title: 'อัลบั้มรูป'),
-              ),
-            ),
-          ),
-        ),
-
-        // สินค้าแนะนำ (grid 2 คอลัมน์)
-        const SliverToBoxAdapter(child: _SectionHeader(title: 'สินค้าแนะนำ', actionText: '')),
-        _ProductGrid(
-          images: const [
-            'assets/images/Rectangle0.png',
-            'assets/images/Rectangle3.png',
-            'assets/images/Rectangle2.png',
-            'assets/images/Rectangle1.png',
-          ],
-        ),
-
-        // สินค้าทั้งหมด (grid 2 คอลัมน์)
-        const SliverToBoxAdapter(child: _SectionHeader(title: 'สินค้าทั้งหมด', actionText: '')),
-        _ProductGrid(
-          images: const [
-            'assets/images/Rectangle4.png',
-            'assets/images/Rectangle5.png',
-            'assets/images/Rectangle6.png',
-            'assets/images/Rectangle7.png',
-            'assets/images/Rectangle0.png',
-            'assets/images/Rectangle3.png',
-          ],
-        ),
-        const SliverToBoxAdapter(child: SizedBox(height: 20)),
+        const SliverToBoxAdapter(child: _MemoriesSection()),
+        const SliverToBoxAdapter(child: _KeepsakeCallout()),
+        const SliverToBoxAdapter(child: SizedBox(height: 32)),
+        const SliverToBoxAdapter(child: _SecondaryBanner()),
+        const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        const SliverToBoxAdapter(child: _GiftCardBanner()),
+        const SliverToBoxAdapter(child: SizedBox(height: 16)),
+        const SliverToBoxAdapter(child: _GiftCardBanner(type: GiftCardType.photoFrame)),
+        const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        const SliverToBoxAdapter(child: _SupportLinks()),
+        const SliverToBoxAdapter(child: SizedBox(height: 24)),
       ],
     );
   }
@@ -151,10 +102,7 @@ class _BannerCarouselState extends State<_BannerCarousel> {
   final _controller = PageController();
   int _idx = 0;
 
-  final _banners = const [
-    'assets/images/banner.png',
-    // ใส่ได้หลายภาพถ้ามี
-  ];
+  final _banners = const ['assets/images/banner.png'];
 
   @override
   void dispose() {
@@ -167,14 +115,15 @@ class _BannerCarouselState extends State<_BannerCarousel> {
     return Column(
       children: [
         AspectRatio(
-          aspectRatio: 16 / 6.2,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: PageView.builder(
-              controller: _controller,
-              itemCount: _banners.length,
-              onPageChanged: (i) => setState(() => _idx = i),
-              itemBuilder: (_, i) => Image.asset(_banners[i], fit: BoxFit.cover),
+          aspectRatio: 16 / 8,
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: _banners.length,
+            onPageChanged: (i) => setState(() => _idx = i),
+            itemBuilder: (_, i) => Image.asset(
+              _banners[i],
+              fit: BoxFit.cover,
+              width: MediaQuery.of(context).size.width,
             ),
           ),
         ),
@@ -198,39 +147,13 @@ class _BannerCarouselState extends State<_BannerCarousel> {
 
 /* ============================ SECTION WIDGETS =========================== */
 
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final String actionText;
-  const _SectionHeader({required this.title, required this.actionText});
-
-  @override
-  Widget build(BuildContext context) {
-    return _SectionPadding(
-      child: Row(
-        children: [
-          Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-          const Spacer(),
-          if (actionText.isNotEmpty)
-            Row(
-              children: [
-                Text(actionText, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-                const SizedBox(width: 2),
-                const Icon(Icons.chevron_right, size: 18, color: Colors.grey),
-              ],
-            ),
-        ],
-      ),
-    );
-  }
-}
-
 class _SectionPadding extends StatelessWidget {
   final Widget child;
   const _SectionPadding({required this.child});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), child: child);
+    return Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), child: child);
   }
 }
 
@@ -241,144 +164,360 @@ class _PromoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.asset('assets/images/Rectangle1.png', width: 320, height: double.infinity, fit: BoxFit.cover),
+    );
+  }
+}
+
+/* ============================== MEMORIES =============================== */
+
+class _MemoriesSection extends StatelessWidget {
+  const _MemoriesSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 40, 16, 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: const [
+          _PolaroidStack(),
+          SizedBox(height: 60),
+          Text('คุณมีเรื่องราวที่น่าจดจำมากมาย', style: TextStyle(color: Colors.grey, fontSize: 24, fontWeight: FontWeight.w600)),
+          SizedBox(height: 8),
+          Text('88', style: TextStyle(fontSize: 72, fontWeight: FontWeight.w800, color: Color(0xFFFF8A3D))),
+        ],
+      ),
+    );
+  }
+}
+
+class _PolaroidStack extends StatelessWidget {
+  const _PolaroidStack();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 160,
+      child: Stack(
+        alignment: Alignment.center,
+        children: const [
+          _PolaroidImage(image: 'assets/images/Rectangle5.png', rotation: -0.17, offset: Offset(-80, 18)),
+          _PolaroidImage(image: 'assets/images/Rectangle3.png', rotation: 0.15, offset: Offset(80, 18)),
+          _PolaroidImage(image: 'assets/images/Rectangle0.png', rotation: 0, offset: Offset(0, -4), isPrimary: true),
+        ],
+      ),
+    );
+  }
+}
+
+class _PolaroidImage extends StatelessWidget {
+  final String image;
+  final double rotation;
+  final Offset offset;
+  final bool isPrimary;
+  const _PolaroidImage({required this.image, required this.rotation, required this.offset, this.isPrimary = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.translate(
+      offset: offset,
+      child: Transform.rotate(
+        angle: rotation,
+        child: Container(
+          width: isPrimary ? 130 : 120,
+          height: isPrimary ? 170 : 160,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 16, offset: Offset(0, 10))],
+          ),
+          padding: const EdgeInsets.fromLTRB(8, 10, 8, 18),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Image.asset(image, fit: BoxFit.cover),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+/* ============================= KEEPSAKE CARD ============================ */
+
+class _KeepsakeCallout extends StatelessWidget {
+  const _KeepsakeCallout();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: SizedBox(
+        height: 380,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(26),
+          child: Stack(
+            children: [
+              Image.asset('assets/images/Rectangle4.png', height: 380, width: double.infinity, fit: BoxFit.cover),
+              Container(
+                height: 380,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xCC2D2D2D), Color(0x442D2D2D)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(26),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text('ให้เราช่วยเก็บรักษาไว้', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 24),
+                    Expanded(
+                      child: Center(
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                  
+                            _KeepsakePhoto('assets/images/Rectangle1.png'),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 44),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AlbumGiftPage()));
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF8A3D),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          elevation: 0,
+                        ),
+                        child: const Text('ส่งของขวัญ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _KeepsakePhoto extends StatelessWidget {
+  final String image;
+  const _KeepsakePhoto(this.image);
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: 260,
-      decoration: _cardDecoration(),
-      padding: const EdgeInsets.all(10),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset('assets/images/Rectangle1.png', width: 64, height: 64, fit: BoxFit.cover),
-          ),
-          const SizedBox(width: 10),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('ส่วนลด', style: TextStyle(fontWeight: FontWeight.w700)),
-                SizedBox(height: 2),
-                Text('ส่วนลดเมื่อซื้ออัลบั้มรูปนรก', maxLines: 1, overflow: TextOverflow.ellipsis),
-                SizedBox(height: 2),
-                Text('เมื่อเดือนนี้เท่านั้น', style: TextStyle(color: Colors.grey, fontSize: 12)),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right, color: Colors.grey),
-        ],
+      height: 320,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 20, offset: Offset(0, 10))],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.asset(image, fit: BoxFit.cover),
       ),
     );
   }
 }
 
-/* ============================== CATEGORIES ============================= */
-
-const _catImages = [
-  'assets/images/Rectangle2.png',
-  'assets/images/Rectangle0.png',
-  'assets/images/Rectangle3.png',
-  'assets/images/Rectangle4.png',
-  'assets/images/Rectangle5.png',
-  'assets/images/Rectangle6.png',
-  'assets/images/Rectangle7.png',
-];
-
-class _CategoryTile extends StatelessWidget {
-  final String image;
-  final String title;
-  const _CategoryTile({required this.image, required this.title});
+class _SecondaryBanner extends StatelessWidget {
+  const _SecondaryBanner();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Column(
+      children: [
+        AspectRatio(
+          aspectRatio: 16 / 8,
+          child: PageView.builder(
+            itemCount: 1,
+            itemBuilder: (_, __) => Image.asset(
+              'assets/images/banner.png',
+              fit: BoxFit.cover,
+              width: MediaQuery.of(context).size.width,
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            1,
+            (i) => Container(
+              width: 20,
+              height: 4,
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              decoration: BoxDecoration(color: const Color(0xFFFF8A3D), borderRadius: BorderRadius.circular(4)),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+enum GiftCardType { charm, photoFrame }
+
+class _GiftCardBanner extends StatelessWidget {
+  final GiftCardType type;
+  const _GiftCardBanner({this.type = GiftCardType.charm});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 18, offset: Offset(0, 10))],
+        ),
+        child: Row(
+          children: type == GiftCardType.charm
+              ? [
+                  _giftImages(),
+                  const SizedBox(width: 16),
+                  Expanded(child: _textBlock(context)),
+                ]
+              : [
+                  Expanded(child: _textBlock(context)),
+                  const SizedBox(width: 16),
+                  _giftImages(),
+                ],
+        ),
+      ),
+    );
+  }
+
+  Widget _giftImages() {
+    return SizedBox(
       width: 140,
-      decoration: _cardDecoration(),
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      height: 120,
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          ClipRRect(borderRadius: BorderRadius.circular(6), child: Image.asset(image, width: double.infinity, height: 70, fit: BoxFit.cover)),
-          const SizedBox(height: 6),
-          Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 2),
-          const Text('อัปเดตผลงานกรอบรูป', style: TextStyle(color: Colors.grey, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Positioned(left: 14, top: 8, child: _GiftPhotoFrame(image: type == GiftCardType.charm ? 'assets/images/Rectangle3.png' : 'assets/images/Rectangle0.png')),
+          _GiftPhotoFrame(image: type == GiftCardType.charm ? 'assets/images/Rectangle1.png' : 'assets/images/Rectangle4.png'),
         ],
       ),
     );
   }
-}
 
-/* =============================== PRODUCTS ============================== */
-
-class _ProductGrid extends StatelessWidget {
-  final List<String> images;
-  const _ProductGrid({required this.images});
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-      sliver: SliverGrid(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisExtent: 248, // คุมสัดส่วนให้เหมือนภาพ
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 12,
+  Widget _textBlock(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          type == GiftCardType.charm ? 'เก็บช่วงเวลาที่รักไว้ติดตัวไปทุกที่' : 'ให้ภาพของคุณเล่าเรื่องอีกครั้ง',
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
         ),
-        delegate: SliverChildBuilderDelegate(
-          (context, i) => _ProductCard(
-            image: images[i % images.length],
-            outlined: i.isOdd, // ให้ใบขวา ๆ มีกรอบส้มคล้ายในภาพ
+        const SizedBox(height: 6),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: 150,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AlbumGiftPage()));
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF8CD1E8),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              elevation: 0,
+            ),
+            child: const Text('ส่งของขวัญ'),
           ),
-          childCount: images.length,
         ),
-      ),
+      ],
     );
   }
 }
 
-class _ProductCard extends StatelessWidget {
+class _GiftPhotoFrame extends StatelessWidget {
   final String image;
-  final bool outlined;
-  const _ProductCard({required this.image, this.outlined = false});
+  const _GiftPhotoFrame({required this.image});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: _cardDecoration(border: outlined ? Border.all(color: const Color(0xFFFF8A3D), width: 2) : null),
+      width: 96,
+      height: 96,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: const [BoxShadow(color: Color(0x20000000), blurRadius: 10, offset: Offset(0, 4))],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: Image.asset(image, fit: BoxFit.cover),
+      ),
+    );
+  }
+}
+
+class _SupportLinks extends StatelessWidget {
+  const _SupportLinks();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ภาพสินค้า
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-            child: AspectRatio(aspectRatio: 1.25, child: Image.asset(image, fit: BoxFit.cover)),
-          ),
-          // ชื่อ + ราคา
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('อัลบั้มรูป', style: TextStyle(fontWeight: FontWeight.w600)),
-                SizedBox(height: 2),
-                Text('฿ 599', style: TextStyle(color: Color(0xFFFF8A3D), fontWeight: FontWeight.w700)),
-              ],
-            ),
-          ),
+        children: const [
+          _SupportTile(title: 'ข้อตกลงและเงื่อนไขการใช้บริการ', goToTerms: true),
+          Divider(height: 1),
+          _SupportTile(title: 'คำถามที่พบบ่อย', goToFAQ: true),
         ],
       ),
     );
   }
 }
 
-/* ============================== DECORATION ============================= */
+class _SupportTile extends StatelessWidget {
+  final String title;
+  final bool goToTerms;
+  final bool goToFAQ;
+  const _SupportTile({required this.title, this.goToTerms = false, this.goToFAQ = false});
 
-BoxDecoration _cardDecoration({Border? border}) {
-  return BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(10),
-    border: border ?? Border.all(color: const Color(0xFFE6E6E6)),
-    boxShadow: const [BoxShadow(color: Color(0x11000000), blurRadius: 4, offset: Offset(0, 1))],
-  );
+  void _handleTap(BuildContext context) {
+    if (goToTerms) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TermsAndServicesPage()));
+    } else if (goToFAQ) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FAQPage()));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        title: Text(title, style: const TextStyle(fontSize: 15, color: Color(0xFF5B5B5B))),
+        trailing: const Icon(Icons.chevron_right, color: Color(0xFFBDBDBD)),
+        onTap: () => _handleTap(context),
+      ),
+    );
+  }
 }
