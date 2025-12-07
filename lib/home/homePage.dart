@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:wememmory/constants.dart';
-import 'package:wememmory/home/widgets/LastYearThisMonthCard.dart';
-import 'package:wememmory/home/widgets/MemoryTipCard.dart';
-import 'package:wememmory/home/widgets/RecommendedForYouCard.dart';
-import 'package:wememmory/home/widgets/WeMemoryList.dart';
+import 'package:wememmory/home/widgets/AchievementLayout.dart';
+import 'package:wememmory/home/widgets/Recommended.dart';
 import 'package:wememmory/home/widgets/summary_strip.dart';
-import 'widgets/index.dart' hide SummaryStrip;
+// import 'widgets/index.dart' hide SummaryStrip;
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -16,32 +13,28 @@ class HomePage extends StatelessWidget {
       backgroundColor: const Color.fromARGB(255, 239, 239, 239),
       appBar: AppBar(
         // 1. ปรับสีพื้นหลังให้เหมือนภาพ (สีส้มพีช)
-        backgroundColor: const Color(0xFFFFB085), 
+        backgroundColor: const Color(0xFFFFB085),
         elevation: 0,
-        
+
         // 2. ปรับความสูงให้พอเหมาะกับข้อความ 2 บรรทัด + ขอบโค้ง
-        toolbarHeight: 120, 
-        
+        toolbarHeight: 120,
+
         // 3. คงขอบโค้งด้านล่างไว้ตามเดิม
         shape: const RoundedRectangleBorder(
-    borderRadius: BorderRadius.vertical(
-      // เปลี่ยนจาก Radius.circular เป็น Radius.elliptical
-      bottom: Radius.elliptical(
-        420, // ตัวแรก (X): ความกว้างของความโค้ง (ใส่ค่าเยอะๆ เช่น 300-500 เพื่อให้โค้งกว้างกินพื้นที่ทั้งจอ)
-        70   // ตัวที่สอง (Y): ความลึกของความโค้ง (ยิ่งเยอะ พื้นหลังยิ่งย้อยลงมาต่ำ)
-      ),
-    ),
-  ),
-        
+          borderRadius: BorderRadius.vertical(
+            // เปลี่ยนจาก Radius.circular เป็น Radius.elliptical
+            bottom: Radius.elliptical(
+              420, // ตัวแรก (X): ความกว้างของความโค้ง (ใส่ค่าเยอะๆ เช่น 300-500 เพื่อให้โค้งกว้างกินพื้นที่ทั้งจอ)
+              70, // ตัวที่สอง (Y): ความลึกของความโค้ง (ยิ่งเยอะ พื้นหลังยิ่งย้อยลงมาต่ำ)
+            ),
+          ),
+        ),
+
         // ส่วนรูปโปรไฟล์ด้านซ้าย (คงไว้จากโค้ดเดิมของคุณ)
         leadingWidth: 70,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16),
-          
-        ),
-        
+        leading: Padding(padding: const EdgeInsets.only(left: 16)),
+
         titleSpacing: 0, // ลดช่องว่างระหว่างรูปโปรไฟล์กับข้อความ
-        
         // 4. *** จุดสำคัญ: ใช้ Column เพื่อทำข้อความ 2 บรรทัด ***
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start, // จัดชิดซ้าย
@@ -67,7 +60,7 @@ class HomePage extends StatelessWidget {
             ),
           ],
         ),
-        
+
         // 5. ไอคอนกระดิ่งด้านขวา
         actions: [
           Stack(
@@ -76,7 +69,11 @@ class HomePage extends StatelessWidget {
               IconButton(
                 onPressed: () {},
                 // ใช้ Icon ของ Flutter หรือ Image.asset ตามที่คุณมี
-                icon: const Icon(Icons.notifications, color: Colors.white, size: 28), 
+                icon: const Icon(
+                  Icons.notifications,
+                  color: Colors.white,
+                  size: 28,
+                ),
               ),
               // จุดสีแดงแจ้งเตือน (ถ้าต้องการให้เหมือนเป๊ะ)
               Positioned(
@@ -90,7 +87,7 @@ class HomePage extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                 ),
-              )
+              ),
             ],
           ),
           const SizedBox(width: 12),
@@ -110,10 +107,6 @@ class HomePage extends StatelessWidget {
               SizedBox(height: 30),
               AchievementLayout(),
               // MemoryTipCard(),
-              // SizedBox(height: 16),
-              // // Recommended(), // ⬅️ การ์ดใหม่ตามภาพ
-              // // SizedBox(height: 16),
-              // LastYearThisMonthCard(), // ⬅️ การ์ดใหม่ตามภาพ
               // SizedBox(height: 16),
               // Image.asset('assets/images/image2.png', fit: BoxFit.cover),
               // SizedBox(height: 16),
