@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-// import 'dart:math' as math;
+import 'dart:math' as math;
 
-// --- Palette สี ---
-const Color _bgOrange = Color.fromARGB(255, 255, 169, 90); // สีพื้นหลังเลเยอร์หลังสุด (ส้มอ่อน)
-const Color _bgWhite = Colors.white;       // สีพื้นหลังการ์ด (เลเยอร์หน้า)
-const Color _textOrange = Color(0xFFE86A33); 
-const Color _flameColor = Color(0xFFFFA726); 
-const Color _cardDark = Color(0xFF333333);   
-const Color _accentGreen = Color(0xFF4CAF50); 
-const Color _ringOrange = Color(0xFFFF9800); 
+// --- Palette สี (ปรับใหม่ตามภาพ Reference) ---
+const Color _bgOrange = Color(0xFFFFAB91); // สีพื้นหลังด้านหลังสุด (ส้มพีช)
+const Color _bgWhite = Colors.white; // สีพื้นหลังการ์ดหลัก
+const Color _textOrange = Color(0xFFE65100); // สีหัวข้อ "ความสำเร็จของปีนี้"
+const Color _flameColor = Color(0xFFFF9800); // สีเปลวไฟ
+const Color _cardTeal = Color(
+  0xFF64A6BD,
+); // **สีใหม่** พื้นหลังการ์ด (ฟ้าน้ำทะเล)
+const Color _accentGreen = Color(0xFF66BB6A); // สีไอคอนพลุ
+const Color _ringOrange = Color(0xFFFF7043); // สีวงแหวน Progress
 
 // -----------------------------------------------------------------
 // 📌 AchievementLayout (Main Layout)
@@ -19,22 +21,23 @@ class AchievementLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Layer 1: พื้นหลังสีส้ม (_bgOrange) ขยายเต็มจอ
     return Container(
-      width: double.infinity, // ขยายความกว้างเต็มจอ
-      color: _bgOrange,       // สีพื้นหลังเลเยอร์หลังสุด
-      padding: const EdgeInsets.all(16.0), // เว้นระยะขอบเพื่อให้เห็นสีส้ม
-      
-      // Layer 2: การ์ดสีขาว (_bgWhite)
+      width: double.infinity,
+      color: _bgOrange,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 40.0,
+      ), // ปรับ padding ให้สมดุล
+
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24.0), // มุมโค้งมนของการ์ดขาว
+        borderRadius: BorderRadius.circular(30.0), // มุมโค้งมนมากขึ้น
         child: Container(
           color: _bgWhite,
-          child: SingleChildScrollView( // เพิ่ม ScrollView เผื่อเนื้อหายาวเกินการ์ด
+          child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                // 1. ส่วนหัว: ไอคอนเปลวไฟ + ข้อความสีส้ม
+                // 1. ส่วนหัว
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24.0, 32.0, 24.0, 20.0),
                   child: Row(
@@ -45,57 +48,57 @@ class AchievementLayout extends StatelessWidget {
                       Text(
                         'ความสำเร็จของปีนี้',
                         style: TextStyle(
-                          fontSize: 26,
+                          fontSize: 24, // ปรับขนาดให้พอดี
                           fontWeight: FontWeight.bold,
                           color: _textOrange,
-                          letterSpacing: 0.5,
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                // 2. การ์ดเดือนเมษายน
+                // 2. การ์ดเดือนเมษายน (แบบวงกลม Progress)
                 const AchievementCard(
                   monthTitle: 'เมษายนของคุณ',
-                  progressPercentage: 76,
-                  isProgressCard: true,
+                  type: CardType.progressCircle,
+                  progressValue: 76,
                   descriptionText: 'คุณได้อธิบายภาพในเดือนนี้',
                   footerText: 'อีกมากกว่า 23+ เพิ่มรูปภาพแล้ว',
                 ),
 
-                const SizedBox(height: 24.0),
+                const SizedBox(height: 20.0),
 
-                // 3. การ์ดเดือนมีนาคม
+                // 3. การ์ดเดือนมีนาคม (แบบไอคอนพลุ)
                 const AchievementCard(
                   monthTitle: 'มีนาคมของคุณ',
-                  isProgressCard: false,
+                  type: CardType.icon,
                   descriptionText: 'อัพรูปภาพคนแรกในเดือนนี้',
                   footerText: 'อีกมากกว่า 23+ เพิ่มรูปภาพเดือนนี้',
                 ),
 
-                const SizedBox(height: 24.0),
+                const SizedBox(height: 20.0),
 
-                // 4. การ์ดเดือนกุมภาพันธ์
+                // 4. การ์ดเดือนกุมภาพันธ์ (แบบเกจครึ่งวงกลม - ตามภาพ)
                 const AchievementCard(
                   monthTitle: 'กุมภาพันธ์ของคุณ',
-                  progressPercentage: 92,
-                  isProgressCard: true,
-                  descriptionText: 'ทำตามเป้าหมายครบถ้วน',
-                  footerText: 'สำเร็จ 44+ รูปภาพก่อนกำหนด',
+                  type: CardType.gauge,
+                  progressValue: 15, // ใช้เป็นค่านาที หรือเปอร์เซ็นต์
+                  descriptionText: 'ใช้เวลาเพียง 15 นาที',
+                  subDescriptionText: 'ในการสร้างอัลบั้มเดือนนี้',
+                  footerText: 'อีกมากกว่า 23+ เพิ่มรูปภาพเดือนนี้',
                 ),
 
-                const SizedBox(height: 24.0),
+                const SizedBox(height: 20.0),
 
-                // 5. การ์ดเดือนมกราคม
+                // 5. การ์ดเดือนมกราคม (ตัวอย่างเพิ่มเติม)
                 const AchievementCard(
                   monthTitle: 'มกราคมของคุณ',
-                  isProgressCard: false,
+                  type: CardType.icon,
                   descriptionText: 'เริ่มต้นปีใหม่อย่างสดใส',
                   footerText: 'อีกมากกว่า 10+ ความทรงจำ',
                 ),
 
-                const SizedBox(height: 40.0), // พื้นที่ด้านล่างสุดในการ์ดขาว
+                const SizedBox(height: 40.0),
               ],
             ),
           ),
@@ -105,119 +108,158 @@ class AchievementLayout extends StatelessWidget {
   }
 }
 
+// Enum เพื่อกำหนดประเภทของการ์ด
+enum CardType { progressCircle, icon, gauge }
+
 // -----------------------------------------------------------------
-// 📌 AchievementCard (การ์ดรายการย่อยสีดำ)
+// 📌 AchievementCard (การ์ดสีฟ้า)
 // -----------------------------------------------------------------
 
 class AchievementCard extends StatelessWidget {
   final String monthTitle;
-  final int progressPercentage;
-  final bool isProgressCard;
+  final CardType type;
+  final int progressValue; // ใช้เป็น % หรือ ค่าตัวเลข
   final String descriptionText;
+  final String? subDescriptionText; // ข้อความบรรทัดที่ 2 (ถ้ามี)
   final String footerText;
 
   const AchievementCard({
     super.key,
     required this.monthTitle,
-    this.progressPercentage = 0,
-    this.isProgressCard = true,
+    required this.type,
+    this.progressValue = 0,
     required this.descriptionText,
+    this.subDescriptionText,
     required this.footerText,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Container(
+        height: 190, // กำหนดความสูงให้ใกล้เคียงภาพ
         decoration: BoxDecoration(
-          color: _cardDark,
+          color: _cardTeal, // สีฟ้าตามภาพ
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: _cardTeal.withOpacity(0.4),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
+          children: [
+            // Background Decoration (Optional: ลายน้ำจางๆ ถ้าต้องการ)
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
+                  // --- Top Row: Header + Photo Stack ---
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
                         monthTitle,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ),
+                      const _HeaderPhotoStack(),
+                    ],
                   ),
-                  const _HeaderPhotoStack(),
-                ],
-              ),
-              
-              const SizedBox(height: 24.0),
 
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 70, 
-                    height: 70,
-                    child: isProgressCard
-                        ? _ProgressRing(percentage: progressPercentage)
-                        : const _CelebrationIcon(),
-                  ),
-                  const SizedBox(width: 16.0),
+                  // --- Middle Row: Content ---
                   Expanded(
-                    child: Text(
-                      descriptionText,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18, 
-                        height: 1.3,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Left: Icon / Progress / Gauge
+                        SizedBox(
+                          width: 80,
+                          height: 80,
+                          child: Center(child: _buildLeftContent()),
+                        ),
+                        const SizedBox(width: 16.0),
+
+                        // Right: Text Description
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                descriptionText,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 2,
+                              ),
+                              if (subDescriptionText != null) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  subDescriptionText!,
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.8),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
+
+                  // --- Bottom Row: Footer + Avatars ---
+                  Row(
+                    children: [
+                      Text(
+                        footerText,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 12,
+                        ),
+                      ),
+                      const Spacer(),
+                      const StackedAvatars(),
+                    ],
                   ),
                 ],
               ),
-
-              const SizedBox(height: 24.0),
-
-              Row(
-                children: [
-                  Text(
-                    footerText,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
-                      fontSize: 13,
-                    ),
-                  ),
-                  const Spacer(),
-                  const StackedAvatars(),
-                ],
-              )
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
+
+  Widget _buildLeftContent() {
+    switch (type) {
+      case CardType.progressCircle:
+        return _ProgressRing(percentage: progressValue);
+      case CardType.gauge:
+        return _SemiCircleGauge(
+          value: progressValue,
+        ); // สร้าง Widget ใหม่สำหรับเกจ
+      case CardType.icon:
+      default:
+        return const _CelebrationIcon();
+    }
+  }
 }
 
 // -----------------------------------------------------------------
-// 📌 Helper Widgets
+// 📌 Helper Widgets (ปรับแก้สีและรูปทรง)
 // -----------------------------------------------------------------
 
 class _HeaderPhotoStack extends StatelessWidget {
@@ -226,43 +268,76 @@ class _HeaderPhotoStack extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 100,
-      height: 60,
+      width: 90,
+      height: 40, // ปรับความสูงให้ compact ขึ้นตามภาพ
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.centerRight,
         children: [
-          _rotatedImage(angle: -0.2, right: 40, color: Colors.blue.shade200),
-          _rotatedImage(angle: -0.1, right: 20, color: Colors.pink.shade200),
-          _rotatedImage(angle: 0.1, right: 0, color: Colors.amber.shade200),
+          _rotatedPhoto(
+            angle: -0.15,
+            right: 40,
+            imgUrl: 'https://picsum.photos/id/101/100',
+          ),
+          _rotatedPhoto(
+            angle: -0.05,
+            right: 20,
+            imgUrl: 'https://picsum.photos/id/102/100',
+          ),
+          _rotatedPhoto(
+            angle: 0.05,
+            right: 0,
+            imgUrl: 'https://picsum.photos/id/103/100',
+          ),
         ],
       ),
     );
   }
 
-  Widget _rotatedImage({required double angle, required double right, required Color color}) {
+  Widget _rotatedPhoto({
+    required double angle,
+    required double right,
+    required String imgUrl,
+  }) {
     return Positioned(
       right: right,
       top: 0,
       child: Transform.rotate(
         angle: angle,
         child: Container(
-          width: 50, height: 40,
+          width: 45,
+          height: 35,
           decoration: BoxDecoration(
-            color: color,
+            color: Colors.grey[300],
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: Colors.white, width: 2),
-            boxShadow: [
-              BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
             ],
+            // ใช้ Image.network หรือ Colors เพื่อจำลองภาพ
+            image: const DecorationImage(
+              image: NetworkImage(
+                'https://via.placeholder.com/100',
+              ), // Placeholder
+              fit: BoxFit.cover,
+            ),
           ),
-          child: Icon(Icons.person, size: 20, color: Colors.white.withOpacity(0.8)),
+          child: const Icon(
+            Icons.photo,
+            size: 16,
+            color: Colors.white54,
+          ), // Icon สำรอง
         ),
       ),
     );
   }
 }
 
+// 1. วงกลม Progress (เหมือนเดิมแต่ปรับสี)
 class _ProgressRing extends StatelessWidget {
   final int percentage;
   const _ProgressRing({required this.percentage});
@@ -273,18 +348,22 @@ class _ProgressRing extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         SizedBox(
-          width: 70, height: 70,
+          width: 70,
+          height: 70,
           child: CircularProgressIndicator(
             value: 1.0,
-            strokeWidth: 6.0,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white.withOpacity(0.1)),
+            strokeWidth: 8.0,
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Colors.black.withOpacity(0.1),
+            ),
           ),
         ),
         SizedBox(
-          width: 70, height: 70,
+          width: 70,
+          height: 70,
           child: CircularProgressIndicator(
             value: percentage / 100,
-            strokeWidth: 6.0,
+            strokeWidth: 8.0,
             strokeCap: StrokeCap.round,
             valueColor: const AlwaysStoppedAnimation<Color>(_ringOrange),
           ),
@@ -302,40 +381,124 @@ class _ProgressRing extends StatelessWidget {
   }
 }
 
+// 2. [NEW] เกจครึ่งวงกลม (สำหรับเดือนกุมภาพันธ์)
+class _SemiCircleGauge extends StatelessWidget {
+  final int value;
+  const _SemiCircleGauge({required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        CustomPaint(
+          size: const Size(80, 40), // ครึ่งวงกลม
+          painter: _GaugePainter(),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '$value.00 นาที',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GaugePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint =
+        Paint()
+          ..color = Colors.black.withOpacity(0.1)
+          ..strokeWidth = 8
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round;
+
+    final center = Offset(size.width / 2, size.height);
+    final radius = size.width / 2;
+
+    // Draw background arc (Gray)
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      math.pi, // Start at 180 degrees
+      math.pi, // Sweep 180 degrees
+      false,
+      paint,
+    );
+
+    // Draw Active arc (Orange)
+    final activePaint =
+        Paint()
+          ..color = _ringOrange
+          ..strokeWidth = 8
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round;
+
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      math.pi,
+      math.pi * 0.7, // Sweep 70%
+      false,
+      activePaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// 3. ไอคอนพลุ (ปรับสีให้เข้ากับธีม)
 class _CelebrationIcon extends StatelessWidget {
   const _CelebrationIcon();
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 60,
+      height: 60,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            _accentGreen.withOpacity(0.2),
-            Colors.transparent,
-          ],
-        ),
+        color: Colors.transparent, // โปร่งใสหรือใส่ gradient ตามต้องการ
       ),
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Container(
-            width: 50, height: 50,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: _accentGreen.withOpacity(0.2),
-              boxShadow: [
-                BoxShadow(color: _accentGreen.withOpacity(0.4), blurRadius: 20)
-              ],
+          // แสงวิ้งๆ ด้านหลัง
+          Icon(
+            Icons.star,
+            color: Colors.yellowAccent.withOpacity(0.6),
+            size: 12,
+          ),
+          Positioned(
+            top: 10,
+            left: 10,
+            child: Icon(
+              Icons.star,
+              color: Colors.white.withOpacity(0.4),
+              size: 8,
             ),
           ),
-          const Icon(
-            Icons.celebration,
-            color: Color(0xFF81C784),
-            size: 36,
+
+          // ตัวพลุ
+          Transform.rotate(
+            angle: -0.5,
+            child: const Icon(
+              Icons.celebration,
+              color: _accentGreen, // สีเขียวอ่อน
+              size: 40,
+            ),
           ),
         ],
       ),
@@ -343,40 +506,36 @@ class _CelebrationIcon extends StatelessWidget {
   }
 }
 
+// --- ส่วนประกอบเดิม (FlameIcon, Avatars) ไม่เปลี่ยนแปลง logic มาก ---
+
 class FlameIcon extends StatelessWidget {
   const FlameIcon({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(42, 50),
-      painter: _FlamePainter(),
-    );
+    return CustomPaint(size: const Size(32, 40), painter: _FlamePainter());
   }
 }
 
 class _FlamePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = _flameColor
-      ..style = PaintingStyle.fill;
-
+    final Paint paint =
+        Paint()
+          ..color = _flameColor
+          ..style = PaintingStyle.fill;
     final Path path = Path();
+    // วาดรูปทรงหยดน้ำ/ไฟ อย่างง่าย
     path.moveTo(size.width / 2, 0);
-    path.cubicTo(size.width * 1.1, size.height * 0.5, size.width, size.height, size.width / 2, size.height);
-    path.cubicTo(0, size.height, -size.width * 0.1, size.height * 0.5, size.width / 2, 0);
+    path.quadraticBezierTo(
+      size.width,
+      size.height * 0.6,
+      size.width / 2,
+      size.height,
+    );
+    path.quadraticBezierTo(0, size.height * 0.6, size.width / 2, 0);
     path.close();
-
-    canvas.drawShadow(path, Colors.orangeAccent, 8.0, true);
     canvas.drawPath(path, paint);
-
-    final Paint innerPaint = Paint()..color = Colors.amberAccent;
-    final Path innerPath = Path();
-    innerPath.moveTo(size.width / 2, size.height * 0.3);
-    innerPath.cubicTo(size.width * 0.8, size.height * 0.6, size.width * 0.7, size.height * 0.9, size.width / 2, size.height * 0.9);
-    innerPath.cubicTo(size.width * 0.3, size.height * 0.9, size.width * 0.2, size.height * 0.6, size.width / 2, size.height * 0.3);
-    canvas.drawPath(innerPath, innerPaint);
   }
 
   @override
@@ -389,13 +548,14 @@ class StackedAvatars extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 60, height: 24,
+      width: 60,
+      height: 24,
       child: Stack(
         alignment: Alignment.centerRight,
         children: [
-          _avatarCircle(Colors.purpleAccent, 0),
-          _avatarCircle(Colors.orangeAccent, 14),
-          _avatarCircle(Colors.redAccent, 28),
+          _avatarCircle(Colors.purple[200]!, 0),
+          _avatarCircle(Colors.orange[300]!, 14),
+          _avatarCircle(Colors.red[300]!, 28),
         ],
       ),
     );
@@ -405,13 +565,17 @@ class StackedAvatars extends StatelessWidget {
     return Positioned(
       right: rightPadding,
       child: Container(
-        width: 24, height: 24,
+        width: 24,
+        height: 24,
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
-          border: Border.all(color: _cardDark, width: 2),
+          border: Border.all(
+            color: _cardTeal,
+            width: 1.5,
+          ), // ขอบสีเดียวกับการ์ด
         ),
-        child: Icon(Icons.person, size: 14, color: Colors.white),
+        child: const Icon(Icons.person, size: 14, color: Colors.white),
       ),
     );
   }

@@ -5,65 +5,218 @@ class SummaryStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        height: 160,
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              // Left: photo stack
-              const _PhotoStack(),
-              const SizedBox(width: 18),
-
-              // Right: text / count
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'เรื่องราวที่น่าจดจำ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      '88',
-                      style: TextStyle(
-                        fontSize: 56,
-                        fontWeight: FontWeight.w900,
-                        color: Color(0xFF5AB6D8),
-                        height: 1.0,
-                      ),
-                    ),
-                  ],
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // ---------------------------------------------------------
+        // 1. ส่วนการ์ดด้านบน (แก้ไขให้เลื่อนซ้ายขวาได้ด้วย PageView)
+        // ---------------------------------------------------------
+        SizedBox(
+          height: 180, // กำหนดความสูงพื้นที่สำหรับการ์ด + เงา
+          child: PageView(
+            // controller: viewportFraction 0.92 เพื่อให้เห็นขอบการ์ดถัดไปเล็กน้อย
+            controller: PageController(viewportFraction: 0.92),
+            padEnds:
+                false, // จัดให้เริ่มที่ซ้ายสุด หรือ true ถ้าอยากให้เริ่มตรงกลาง
+            children: const [
+              // กล่องที่ 1
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                child: InfoCard(
+                  title: 'เรื่องราวที่น่าจดจำ',
+                  count: '88',
+                  countColor: Color(0xFF5AB6D8), // สีฟ้า
+                ),
+              ),
+              // กล่องที่ 2 (กล่องใหม่ที่เลื่อนมาเจอ)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                child: InfoCard(
+                  title: 'ทริปต่างประเทศ',
+                  count: '12',
+                  countColor: Color(0xFFFF8C66), // สีส้ม
+                ),
+              ),
+              // กล่องที่ 3
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                child: InfoCard(
+                  title: 'ร้านอาหารโปรด',
+                  count: '34',
+                  countColor: Color(0xFF8BC34A), // สีเขียว
                 ),
               ),
             ],
           ),
+        ),
+
+        const SizedBox(height: 12), // เว้นระยะห่าง
+
+        // ---------------------------------------------------------
+        // 2. ส่วนแถบเลื่อนแนวนอน (Horizontal Strip ตัวล่าง)
+        // ---------------------------------------------------------
+      ],
+    );
+  }
+}
+
+/// ✅ Widget การ์ดข้อมูล (ดัดแปลงจาก _TopCard เดิมให้รับค่าได้)
+class InfoCard extends StatelessWidget {
+  final String title;
+  final String count;
+  final Color countColor;
+
+  const InfoCard({
+    super.key,
+    required this.title,
+    required this.count,
+    this.countColor = const Color(0xFF5AB6D8),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      // ตัด margin ออก เพราะเราใช้ padding ใน PageView แทนแล้ว
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            const _PhotoStack(), // รูป Stack ด้านซ้าย
+            const SizedBox(width: 18),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    title, // แสดงชื่อเรื่อง
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    count, // แสดงตัวเลข
+                    style: TextStyle(
+                      fontSize: 56,
+                      fontWeight: FontWeight.w900,
+                      color: countColor, // ใช้สีที่ส่งเข้ามา
+                      height: 1.0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-/// Photo stack: three slightly rotated/offset cards
+// -----------------------------------------------------------
+// ส่วนประกอบอื่นๆ (HorizontalStatsStrip, SummaryItem, PhotoStack...)
+// คงเดิมตามโค้ดก่อนหน้านี้
+// -----------------------------------------------------------
+
+class SummaryItem extends StatelessWidget {
+  final String value;
+  final String label;
+  final String icon;
+  final String? watermark;
+
+  const SummaryItem({
+    super.key,
+    required this.value,
+    required this.label,
+    required this.icon,
+    this.watermark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 80,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          if (watermark != null)
+            Positioned(
+              top: 4,
+              right: 0,
+              child: Image.asset(
+                watermark!,
+                width: 42,
+                height: 42,
+                color: Colors.white.withOpacity(0.2),
+                errorBuilder: (context, error, stackTrace) => const SizedBox(),
+              ),
+            ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Image.asset(
+                    icon,
+                    width: 16,
+                    height: 16,
+                    errorBuilder:
+                        (context, error, stackTrace) => const Icon(
+                          Icons.star,
+                          size: 16,
+                          color: Color(0xFF5AB6D8),
+                        ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  height: 1,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 10.5,
+                  color: Colors.white,
+                  height: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _PhotoStack extends StatelessWidget {
   const _PhotoStack();
 
@@ -153,26 +306,16 @@ class _PhotoCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // mock image area
             Container(
               height: height * 0.66,
-              decoration: BoxDecoration(
-                color: const Color(0xFFD3E7ED),
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(8),
-                ),
-                image: const DecorationImage(
-                  fit: BoxFit.cover,
-                  image: AssetImage(
-                    'assets/images/Hobby1.png',
-                  ), // replace with real image or keep as placeholder
-                ),
+              decoration: const BoxDecoration(
+                color: Color(0xFFD3E7ED),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
               ),
               child: const Center(
                 child: Icon(Icons.photo, color: Colors.white70, size: 28),
               ),
             ),
-            // caption
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -207,102 +350,22 @@ class _PhotoCard extends StatelessWidget {
   }
 }
 
-/// ✅ แถบสรุปล่าง (Container เดียว)
-class SummaryItem extends StatelessWidget {
-  final String value;
-  final String label;
-  final String icon;
-  final String? watermark;
-
-  const SummaryItem({
-    super.key,
-    required this.value,
-    required this.label,
-    required this.icon,
-    this.watermark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          if (watermark != null)
-            Positioned(
-              top: 4,
-              right: 0,
-              child: Image.asset(
-                watermark!,
-                width: 42,
-                height: 42,
-                color: Colors.white.withOpacity(0.2),
-              ),
-            ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 28,
-                height: 28,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(child: Image.asset(icon, width: 16, height: 16)),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  height: 1,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 10.5,
-                  color: Colors.white,
-                  height: 1.2,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// New: full-screen orange background wrapper that centers the existing card.
-// Use SummaryStripBackground() instead of SummaryStrip() where you want the orange full-screen backdrop.
 class SummaryStripBackground extends StatelessWidget {
-  final Widget?
-  child; // optional to allow custom card, defaults to SummaryStrip
+  final Widget? child;
   const SummaryStripBackground({super.key, this.child});
 
   @override
   Widget build(BuildContext context) {
     final Widget card = child ?? const SummaryStrip();
     return Container(
-      // Fill the available viewport area with the orange background
       width: double.infinity,
       height: MediaQuery.of(context).size.height,
-      color: const Color(0xFFFFB085), // orange background (peach)
+      color: const Color(0xFFFFB085),
       child: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            // ensure content can scroll if needed (avoids overflow on small screens)
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 24.0,
-                horizontal: 0,
-              ),
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
               child: card,
             ),
           ),
