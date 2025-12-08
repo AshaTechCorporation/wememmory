@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wememmory/shop/albumGifePage.dart';
 import 'package:wememmory/shop/termsAndServicesPage.dart';
 import 'package:wememmory/shop/faqPage.dart';
+import 'package:wememmory/shop/cartPage.dart';
 
 class ShopPage extends StatelessWidget {
   const ShopPage({super.key});
@@ -36,7 +37,15 @@ class _ShopAppBar extends StatelessWidget {
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 12),
-          child: GestureDetector(onTap: () {}, child: Image.asset('assets/icons/Cart.png', height: 26)),
+          child: GestureDetector(
+            // 💡 โค้ดที่เพิ่ม/ปรับแก้: นำทางไปยัง CartPage
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const CartPage()),
+              );
+            }, 
+            child: Image.asset('assets/icons/Cart.png', height: 26)
+          ),
         ),
       ],
     );

@@ -129,8 +129,6 @@ class CustomBottomNavBar extends StatelessWidget {
               child: Container(
                 width: 65, // ปรับขนาด
                 height: 65,
-                // 💡 เลื่อนปุ่มบวกขึ้นด้านบน
-                transform: Matrix4.translationValues(0.0, -15.0, 0.0), 
                 decoration: BoxDecoration(
                   color: centerButtonColor,
                   shape: BoxShape.circle,
