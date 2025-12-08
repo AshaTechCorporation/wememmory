@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:wememmory/constants.dart';
 import 'package:wememmory/home/homePage.dart';
 import 'package:wememmory/collection/collectionPage.dart';
-import 'package:wememmory/shop/shopPage.dart'; 
-import 'package:wememmory/journey/journeyPage.dart';
+
+import 'package:wememmory/shop/shopPage.dart'; // ✅ Import หน้าร้านค้า
+
 import 'package:wememmory/profile/profilePage.dart';
 
 class FirstPage extends StatefulWidget {
@@ -18,11 +19,13 @@ class _FirstPageState extends State<FirstPage> {
 
   // ⚠️ จัดลำดับหน้าให้ตรงกับไอคอนใน BottomNavigationBar
   final List<Widget> _pages = const [
-    HomePage(),       // Index 0: หน้าหลัก
+    HomePage(), // Index 0: หน้าหลัก
     CollectionPage(), // Index 1: สมุดภาพ
-    SizedBox(),       // Index 2: ปุ่มบวก (Add Button - Placeholder)
-    ShopPage(),       // Index 3: ร้านค้า 
-    ProfilePage()     // Index 4: บัญชี
+
+    SizedBox(), // Index 2: ปุ่มบวก (Add Button - Placeholder)
+    ShopPage(), // Index 3: ร้านค้า (เชื่อมโยงกับปุ่มที่ 4) ✅
+    ProfilePage(), // Index 4: บัญชี
+
   ];
 
   @override
@@ -33,8 +36,8 @@ class _FirstPageState extends State<FirstPage> {
     return Scaffold(
       backgroundColor: kBackgroundColor,
       // ให้เนื้อหาไหลไปอยู่ใต้ Navbar เพื่อความสวยงาม
-      extendBody: true, 
-      
+      extendBody: true,
+
       // แสดงหน้าที่ตรงกับ Index ปัจจุบัน
       body: _pages[_currentIndex],
 
@@ -195,11 +198,7 @@ class CustomBottomNavBar extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            color: isActive ? activeColor : inactiveColor,
-            size: 28,
-          ),
+          Icon(icon, color: isActive ? activeColor : inactiveColor, size: 28),
           const SizedBox(height: 4),
           Text(
             label,
