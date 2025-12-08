@@ -22,8 +22,21 @@ class CollectionPage extends StatelessWidget {
           ),
         ),
         titleSpacing: 1,
-        title: Text('korakrit', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
-        actions: [IconButton(onPressed: () {}, icon: Image.asset('assets/icons/icon.png', width: 22, height: 22)), const SizedBox(width: 12)],
+        title: Text(
+          'korakrit',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+            fontSize: 18,
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Image.asset('assets/icons/icon.png', width: 22, height: 22),
+          ),
+          const SizedBox(width: 12),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -34,7 +47,6 @@ class CollectionPage extends StatelessWidget {
               // 🔎 Search bar ตามภาพ
               _SearchBar(),
               const SizedBox(height: 24), // เว้นระยะห่าง
-
               // 2. Tab Selector (ปุ่ม ปี / เดือน) ✅ เพิ่มตรงนี้
               const _TabSelector(),
 
@@ -46,15 +58,39 @@ class CollectionPage extends StatelessWidget {
               _PhotoGridLayout(
                 leftTitle: "ตุลาคม",
                 imageColors: [
-                  Colors.green.shade200, Colors.blue.shade200, 
-                  Colors.orange.shade200, Colors.purple.shade200, 
-                  Colors.red.shade200, Colors.teal.shade200,
-                  Colors.amber.shade200, Colors.pink.shade200,
-                  Colors.indigo.shade200, Colors.brown.shade200,
-                  Colors.cyan.shade200
+                  Colors.green.shade200,
+                  Colors.blue.shade200,
+                  Colors.orange.shade200,
+                  Colors.purple.shade200,
+                  Colors.red.shade200,
+                  Colors.teal.shade200,
+                  Colors.amber.shade200,
+                  Colors.pink.shade200,
+                  Colors.indigo.shade200,
+                  Colors.brown.shade200,
+                  Colors.cyan.shade200,
                 ],
               ),
-             
+              SizedBox(height: 20),
+              const _MonthSectionHeader(title: "มีนาคม 2025"),
+              const SizedBox(height: 12),
+              _PhotoGridLayout(
+                leftTitle: "ตุลาคม",
+                imageColors: [
+                  Colors.green.shade200,
+                  Colors.blue.shade200,
+                  Colors.orange.shade200,
+                  Colors.purple.shade200,
+                  Colors.red.shade200,
+                  Colors.teal.shade200,
+                  Colors.amber.shade200,
+                  Colors.pink.shade200,
+                  Colors.indigo.shade200,
+                  Colors.brown.shade200,
+                  Colors.cyan.shade200,
+                ],
+              ),
+
               // เพิ่มวิดเจ็ตอื่น ๆ ของหน้า Collection ต่อจากนี้ได้เลย…
             ],
           ),
@@ -70,7 +106,12 @@ class _SearchBar extends StatelessWidget {
     return Container(
       height: 44,
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 192, 192, 192).withOpacity(0.25), // โปร่งเหมือนภาพ
+        color: const Color.fromARGB(
+          255,
+          192,
+          192,
+          192,
+        ).withOpacity(0.25), // โปร่งเหมือนภาพ
         borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -81,7 +122,10 @@ class _SearchBar extends StatelessWidget {
           Expanded(
             child: TextField(
               cursorColor: const Color.fromARGB(255, 0, 0, 0),
-              style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontSize: 14.5),
+              style: const TextStyle(
+                color: Color.fromARGB(255, 0, 0, 0),
+                fontSize: 14.5,
+              ),
               decoration: InputDecoration(
                 hintText: 'ค้นหาความทรงจำตามแท็กและโน้ต.....',
                 // hintStyle: TextStyle(color: Colors.white.withOpacity(0.95), fontSize: 14.5),
@@ -112,7 +156,7 @@ class _TabSelector extends StatelessWidget {
             color: Colors.black.withOpacity(0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
-          )
+          ),
         ],
       ),
       child: Row(
@@ -120,7 +164,9 @@ class _TabSelector extends StatelessWidget {
           // ปุ่ม "ปี" (Selected - สีส้ม)
           Expanded(
             child: Container(
-              margin: const EdgeInsets.all(4), // เว้นขอบเล็กน้อยเพื่อให้ดูเหมือนปุ่มลอย
+              margin: const EdgeInsets.all(
+                4,
+              ), // เว้นขอบเล็กน้อยเพื่อให้ดูเหมือนปุ่มลอย
               decoration: BoxDecoration(
                 color: Colors.orange, // สีส้มตามภาพ
                 borderRadius: BorderRadius.circular(8),
@@ -129,24 +175,21 @@ class _TabSelector extends StatelessWidget {
               child: const Text(
                 "ปี",
                 style: TextStyle(
-                  color: Colors.white, 
-                  fontWeight: FontWeight.bold, 
-                  fontSize: 16
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
             ),
           ),
-          
+
           // ปุ่ม "เดือน" (Unselected - สีขาว)
           Expanded(
             child: Container(
               alignment: Alignment.center,
               child: Text(
                 "เดือน",
-                style: TextStyle(
-                  color: Colors.grey.shade700, 
-                  fontSize: 16
-                ),
+                style: TextStyle(color: Colors.grey.shade700, fontSize: 16),
               ),
             ),
           ),
@@ -170,7 +213,11 @@ class _MonthSectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
         ),
         Row(
           children: [
@@ -178,14 +225,15 @@ class _MonthSectionHeader extends StatelessWidget {
             const SizedBox(width: 8),
             _buildIconButton(Icons.share_outlined),
           ],
-        )
+        ),
       ],
     );
   }
 
   Widget _buildIconButton(IconData icon) {
     return Container(
-      width: 40, height: 40,
+      width: 40,
+      height: 40,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(8),
@@ -202,10 +250,7 @@ class _PhotoGridLayout extends StatelessWidget {
   final String leftTitle;
   final List<Color> imageColors;
 
-  const _PhotoGridLayout({
-    required this.leftTitle,
-    required this.imageColors,
-  });
+  const _PhotoGridLayout({required this.leftTitle, required this.imageColors});
 
   @override
   Widget build(BuildContext context) {
@@ -289,7 +334,11 @@ class _PhotoGridLayout extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           text,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black87,
+          ),
         ),
       ),
     );
