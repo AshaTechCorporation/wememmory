@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wememmory/constants.dart';
 import 'package:wememmory/home/homePage.dart';
 import 'package:wememmory/collection/collectionPage.dart';
-import 'package:wememmory/shop/shopPage.dart'; // ✅ Import หน้าร้านค้า
+import 'package:wememmory/shop/shopPage.dart'; 
 import 'package:wememmory/journey/journeyPage.dart';
 import 'package:wememmory/profile/profilePage.dart';
 
@@ -21,12 +21,15 @@ class _FirstPageState extends State<FirstPage> {
     HomePage(),       // Index 0: หน้าหลัก
     CollectionPage(), // Index 1: สมุดภาพ
     SizedBox(),       // Index 2: ปุ่มบวก (Add Button - Placeholder)
-    ShopPage(),       // Index 3: ร้านค้า (เชื่อมโยงกับปุ่มที่ 4) ✅
+    ShopPage(),       // Index 3: ร้านค้า 
     ProfilePage()     // Index 4: บัญชี
   ];
 
   @override
   Widget build(BuildContext context) {
+    // สมมติ kBackgroundColor ถูกกำหนดใน constants.dart
+    const Color kBackgroundColor = Color(0xFFF5F5F5); 
+
     return Scaffold(
       backgroundColor: kBackgroundColor,
       // ให้เนื้อหาไหลไปอยู่ใต้ Navbar เพื่อความสวยงาม
@@ -40,7 +43,7 @@ class _FirstPageState extends State<FirstPage> {
         onTap: (index) {
           if (index == 2) {
             // Logic สำหรับปุ่มบวก (+) ตรงกลาง
-            print("กดปุ่มเพิ่มความทรงจำ");
+            debugPrint("กดปุ่มเพิ่มความทรงจำ");
           } else {
             // เปลี่ยนหน้าโดยการเปลี่ยน Index
             setState(() => _currentIndex = index);
@@ -52,7 +55,7 @@ class _FirstPageState extends State<FirstPage> {
 }
 
 // ---------------------------------------------------------------------------
-//  CustomBottomNavBar Widget
+//  CustomBottomNavBar Widget (Adjusted Alignment)
 // ---------------------------------------------------------------------------
 
 class CustomBottomNavBar extends StatelessWidget {
@@ -73,12 +76,13 @@ class CustomBottomNavBar extends StatelessWidget {
     const Color centerButtonColor = Color(0xFFFFB085);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+      // 💡 ปรับ Padding ด้านล่างให้ลดลง
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       child: Container(
-        height: 80,
+        height: 70, // 💡 ลดความสูงลงเล็กน้อย
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(35), 
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -88,34 +92,45 @@ class CustomBottomNavBar extends StatelessWidget {
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          // 💡 ใช้ spaceBetween เพื่อแยกกลุ่มซ้าย-ขวาออกจากกัน
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // 1. หน้าหลัก (Home) - Index 0
-            _buildNavItem(
-              icon: Icons.home_rounded,
-              label: 'หน้าหลัก',
-              index: 0,
-              isActive: currentIndex == 0,
-              activeColor: activeColor,
-              inactiveColor: inactiveColor,
-            ),
-
-            // 2. สมุดภาพ (Collection) - Index 1
-            _buildNavItem(
-              icon: Icons.photo_library_rounded,
-              label: 'สมุดภาพ',
-              index: 1,
-              isActive: currentIndex == 1,
-              activeColor: activeColor,
-              inactiveColor: inactiveColor,
+            // --- กลุ่มซ้าย: หน้าหลักและสมุดภาพ (ใช้ Expanded เพื่อให้กินพื้นที่เท่ากับฝั่งขวา) ---
+            Expanded(
+              child: Row(
+                // 💡 ใช้ spaceEvenly เพื่อกระจายปุ่มในกลุ่มซ้าย
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // 1. หน้าหลัก (Home) - Index 0
+                  _buildNavItem(
+                    icon: Icons.home_rounded,
+                    label: 'หน้าหลัก',
+                    index: 0,
+                    isActive: currentIndex == 0,
+                    activeColor: activeColor,
+                    inactiveColor: inactiveColor,
+                  ),
+                  // 2. สมุดภาพ (Collection) - Index 1
+                  _buildNavItem(
+                    icon: Icons.photo_library_rounded,
+                    label: 'สมุดภาพ',
+                    index: 1,
+                    isActive: currentIndex == 1,
+                    activeColor: activeColor,
+                    inactiveColor: inactiveColor,
+                  ),
+                ],
+              ),
             ),
 
             // 3. ปุ่มบวกตรงกลาง (Add) - Index 2
             GestureDetector(
               onTap: () => onTap(2),
               child: Container(
-                width: 60,
-                height: 60,
+                width: 65, // ปรับขนาด
+                height: 65,
+                // 💡 เลื่อนปุ่มบวกขึ้นด้านบน
+                transform: Matrix4.translationValues(0.0, -15.0, 0.0), 
                 decoration: BoxDecoration(
                   color: centerButtonColor,
                   shape: BoxShape.circle,
@@ -131,24 +146,33 @@ class CustomBottomNavBar extends StatelessWidget {
               ),
             ),
 
-            // 4. ร้านค้า (Shop) - Index 3 ✅
-            _buildNavItem(
-              icon: Icons.shopping_bag_rounded,
-              label: 'ร้านค้า',
-              index: 3, // กำหนด index เป็น 3
-              isActive: currentIndex == 3,
-              activeColor: activeColor,
-              inactiveColor: inactiveColor,
-            ),
+            // --- กลุ่มขวา: ร้านค้าและบัญชี (ใช้ Expanded เพื่อให้กินพื้นที่เท่ากับฝั่งซ้าย) ---
+            Expanded(
+              child: Row(
+                // 💡 ใช้ spaceEvenly เพื่อกระจายปุ่มในกลุ่มขวา
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // 4. ร้านค้า (Shop) - Index 3 
+                  _buildNavItem(
+                    icon: Icons.shopping_bag_rounded,
+                    label: 'ร้านค้า',
+                    index: 3, 
+                    isActive: currentIndex == 3,
+                    activeColor: activeColor,
+                    inactiveColor: inactiveColor,
+                  ),
 
-            // 5. บัญชี (Profile) - Index 4
-            _buildNavItem(
-              icon: Icons.person_rounded,
-              label: 'บัญชี',
-              index: 4,
-              isActive: currentIndex == 4,
-              activeColor: activeColor,
-              inactiveColor: inactiveColor,
+                  // 5. บัญชี (Profile) - Index 4
+                  _buildNavItem(
+                    icon: Icons.person_rounded,
+                    label: 'บัญชี',
+                    index: 4,
+                    isActive: currentIndex == 4,
+                    activeColor: activeColor,
+                    inactiveColor: inactiveColor,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -156,6 +180,7 @@ class CustomBottomNavBar extends StatelessWidget {
     );
   }
 
+  // โค้ด _buildNavItem เดิม
   Widget _buildNavItem({
     required IconData icon,
     required String label,

@@ -110,10 +110,6 @@ class _PhotoCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFFD3E7ED),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                image: const DecorationImage(
-                  fit: BoxFit.cover,
-                  image: AssetImage('assets/images/mock_photo.png'), // replace with real image or keep as placeholder
-                ),
               ),
               child: const Center(child: Icon(Icons.photo, color: Colors.white70, size: 28)),
             ),
