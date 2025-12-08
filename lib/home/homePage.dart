@@ -100,11 +100,11 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // CustomSearchBar(),
-              SizedBox(height: 15),
+              SizedBox(height: 13),
               Recommended(),
-              SizedBox(height: 20),
+              SizedBox(height: 7),
               SummaryStrip(), // ✅ ใช้แท่งเดียว ไม่ล้น ไม่แยก
-              SizedBox(height: 30),
+              SizedBox(height: 35),
               AchievementLayout(),
               // MemoryTipCard(),
               // SizedBox(height: 16),

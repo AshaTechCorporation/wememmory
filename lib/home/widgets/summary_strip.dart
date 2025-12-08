@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// --- Widget หลักสำหรับแสดงผล ---
 class SummaryStrip extends StatelessWidget {
   const SummaryStrip({super.key});
 
@@ -9,37 +10,36 @@ class SummaryStrip extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         // ---------------------------------------------------------
-        // 1. ส่วนการ์ดด้านบน (แก้ไขให้เลื่อนซ้ายขวาได้ด้วย PageView)
+        // 1. ส่วนการ์ดด้านบน (PageView แบบ Full Width)
         // ---------------------------------------------------------
         SizedBox(
-          height: 180, // กำหนดความสูงพื้นที่สำหรับการ์ด + เงา
+          height: 200, // ⬆️ เพิ่มความสูงเล็กน้อย (จาก 180 เป็น 200)
           child: PageView(
-            // controller: viewportFraction 0.92 เพื่อให้เห็นขอบการ์ดถัดไปเล็กน้อย
-            controller: PageController(viewportFraction: 0.92),
-            padEnds:
-                false, // จัดให้เริ่มที่ซ้ายสุด หรือ true ถ้าอยากให้เริ่มตรงกลาง
+            // 🔹 viewportFraction: 1.0 แสดงทีละการ์ดเต็มพื้นที่
+            controller: PageController(viewportFraction: 1.0),
             children: const [
-              // กล่องที่ 1
+              // การ์ดที่ 1
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                // 🔹 เพิ่ม Padding แนวนอนเพื่อให้การ์ดไม่ชิดขอบจอเกินไป และดูสมดุล
+                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
                 child: InfoCard(
                   title: 'เรื่องราวที่น่าจดจำ',
                   count: '88',
                   countColor: Color(0xFF5AB6D8), // สีฟ้า
                 ),
               ),
-              // กล่องที่ 2 (กล่องใหม่ที่เลื่อนมาเจอ)
+              // การ์ดที่ 2
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
                 child: InfoCard(
                   title: 'ทริปต่างประเทศ',
                   count: '12',
                   countColor: Color(0xFFFF8C66), // สีส้ม
                 ),
               ),
-              // กล่องที่ 3
+              // การ์ดที่ 3
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
                 child: InfoCard(
                   title: 'ร้านอาหารโปรด',
                   count: '34',
@@ -50,17 +50,18 @@ class SummaryStrip extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 12), // เว้นระยะห่าง
-
-        // ---------------------------------------------------------
-        // 2. ส่วนแถบเลื่อนแนวนอน (Horizontal Strip ตัวล่าง)
-        // ---------------------------------------------------------
+        const SizedBox(height: 12),
+        
+        // (ส่วนอื่นๆ ของ UI ต่อด้านล่าง...)
       ],
     );
   }
 }
 
-/// ✅ Widget การ์ดข้อมูล (ดัดแปลงจาก _TopCard เดิมให้รับค่าได้)
+// ---------------------------------------------------------
+// ส่วน InfoCard และ Widget ย่อยอื่นๆ คงเดิม
+// ---------------------------------------------------------
+
 class InfoCard extends StatelessWidget {
   final String title;
   final String count;
@@ -76,44 +77,44 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // ตัด margin ออก เพราะเราใช้ padding ใน PageView แทนแล้ว
+      width: double.infinity, 
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20), // ⬆️ ปรับมุมโค้งเพิ่มขึ้นเล็กน้อยให้ดูนุ่มนวล
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            blurRadius: 16, // ⬆️ เพิ่ม blur ให้เงาฟุ้งขึ้น
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20), // ⬆️ เพิ่ม Padding ภายในให้เนื้อหาดูโปร่ง
         child: Row(
           children: [
-            const _PhotoStack(), // รูป Stack ด้านซ้าย
-            const SizedBox(width: 18),
+            const _PhotoStack(), 
+            const SizedBox(width: 24), // ⬆️ เพิ่มระยะห่างระหว่างรูปกับข้อความ
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    title, // แสดงชื่อเรื่อง
+                    title,
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 16, // ⬆️ เพิ่มขนาดตัวหนังสือหัวข้อ
+                      fontWeight: FontWeight.w600,
                       color: Colors.grey[700],
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Text(
-                    count, // แสดงตัวเลข
+                    count,
                     style: TextStyle(
-                      fontSize: 56,
+                      fontSize: 64, // ⬆️ เพิ่มขนาดตัวเลขให้เด่นขึ้น
                       fontWeight: FontWeight.w900,
-                      color: countColor, // ใช้สีที่ส่งเข้ามา
+                      color: countColor,
                       height: 1.0,
                     ),
                   ),
@@ -127,96 +128,8 @@ class InfoCard extends StatelessWidget {
   }
 }
 
-// -----------------------------------------------------------
-// ส่วนประกอบอื่นๆ (HorizontalStatsStrip, SummaryItem, PhotoStack...)
-// คงเดิมตามโค้ดก่อนหน้านี้
-// -----------------------------------------------------------
-
-class SummaryItem extends StatelessWidget {
-  final String value;
-  final String label;
-  final String icon;
-  final String? watermark;
-
-  const SummaryItem({
-    super.key,
-    required this.value,
-    required this.label,
-    required this.icon,
-    this.watermark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 80,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          if (watermark != null)
-            Positioned(
-              top: 4,
-              right: 0,
-              child: Image.asset(
-                watermark!,
-                width: 42,
-                height: 42,
-                color: Colors.white.withOpacity(0.2),
-                errorBuilder: (context, error, stackTrace) => const SizedBox(),
-              ),
-            ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 28,
-                height: 28,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Image.asset(
-                    icon,
-                    width: 16,
-                    height: 16,
-                    errorBuilder:
-                        (context, error, stackTrace) => const Icon(
-                          Icons.star,
-                          size: 16,
-                          color: Color(0xFF5AB6D8),
-                        ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  height: 1,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 10.5,
-                  color: Colors.white,
-                  height: 1.2,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
+// (คง Widget อื่นๆ ไว้เหมือนเดิม: _PhotoStack, _PhotoCard, SummaryStripBackground)
+// ... [ส่วนท้ายของโค้ดเดิม] ...
 class _PhotoStack extends StatelessWidget {
   const _PhotoStack();
 
