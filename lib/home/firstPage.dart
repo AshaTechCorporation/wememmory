@@ -113,8 +113,8 @@ class CustomBottomNavBar extends StatelessWidget {
             GestureDetector(
               onTap: () => onTap(2),
               child: Container(
-                width: 60,
-                height: 60,
+                width: 65, // ปรับขนาด
+                height: 65,
                 decoration: BoxDecoration(
                   color: centerButtonColor,
                   shape: BoxShape.circle,
