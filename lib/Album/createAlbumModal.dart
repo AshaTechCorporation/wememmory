@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wememmory/Album/upload_photo_page.dart';
+
 
 class CreateAlbumModal extends StatelessWidget {
   const CreateAlbumModal({super.key});
@@ -120,7 +122,7 @@ class CreateAlbumModal extends StatelessWidget {
 class _AlbumOptionItem extends StatelessWidget {
   final String month;
   final String statusText;
-  final bool isDone; 
+  final bool isDone;
 
   const _AlbumOptionItem({
     required this.month,
@@ -128,45 +130,47 @@ class _AlbumOptionItem extends StatelessWidget {
     required this.isDone,
   });
 
+  // ฟังก์ชันสำหรับเปิด Bottom Sheet หน้าอัพโหลดรูป
+  void _showUploadPhotoSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // 🟢 สำคัญ: ให้ขยายความสูงได้เกือบเต็มจอ
+      backgroundColor: Colors.transparent, // เพื่อให้เห็นมุมโค้ง
+      builder: (context) => UploadPhotoPage(selectedMonth: month),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: isDone ? null : () {
-        print("เลือกสร้างอัลบั้มเดือน $month");
+        // 1. ปิด Modal เลือกเดือนก่อน (ถ้าต้องการ)
         Navigator.pop(context); 
+        
+        // 2. เปิด Modal อัพโหลดรูปขึ้นมาใหม่
+        // ใช้ Future.delayed เล็กน้อยเพื่อให้ Modal แรกปิดสนิทก่อน Modal สองจะเด้งขึ้นมา
+        // เพื่อความสวยงามของ Animation
+        Future.delayed(const Duration(milliseconds: 150), () {
+          if (context.mounted) {
+            _showUploadPhotoSheet(context); 
+          }
+        });
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18), 
+        // ... (UI เดิม) ...
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  month,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: isDone ? Colors.grey[600] : Colors.black87,
-                  ),
-                ),
+                Text(month, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: isDone ? Colors.grey[600] : Colors.black87)),
                 const SizedBox(height: 4),
-                Text(
-                  statusText,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: isDone ? const Color(0xFF66BB6A) : Colors.grey[600], 
-                  ),
-                ),
+                Text(statusText, style: TextStyle(fontSize: 13, color: isDone ? const Color(0xFF66BB6A) : Colors.grey[600])),
               ],
             ),
-            if (isDone)
-              const Icon(
-                Icons.check_circle,
-                color: Color(0xFF66BB6A), 
-                size: 24,
-              ),
+            if (isDone) const Icon(Icons.check_circle, color: Color(0xFF66BB6A), size: 24),
           ],
         ),
       ),
