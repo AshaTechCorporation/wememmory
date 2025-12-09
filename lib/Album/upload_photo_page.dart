@@ -133,16 +133,18 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     });
   }
 
-  // ✅ แก้ไขฟังก์ชันนี้: ไปหน้า AlbumLayoutPage
+  // ใน class _UploadPhotoPageState
+
   void _onNextPressed() {
     if (selectedItems.isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AlbumLayoutPage(
-            selectedItems: selectedItems, // ส่งรูปที่เลือกไป
-            monthName: widget.selectedMonth, // ส่งชื่อเดือนไป
-          ),
+      // ใช้ showModalBottomSheet แทน Navigator.push
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true, // สำคัญ: เพื่อให้กำหนดความสูงของ Sheet ได้อิสระ (เช่น 90%)
+        backgroundColor: Colors.transparent, // โปร่งใสเพื่อให้เห็นมุมโค้งของ AlbumLayoutPage
+        builder: (context) => AlbumLayoutPage(
+          selectedItems: selectedItems,
+          monthName: widget.selectedMonth,
         ),
       );
     }
@@ -349,7 +351,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: selectedItems.isNotEmpty ? const Color(0xFF5AB6D8) : Colors.grey[400],
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(1),
                   ),
                   elevation: 0,
                 ),
