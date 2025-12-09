@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wememmory/shop/paymentSuccessPage.dart';
 import 'package:wememmory/shop/addCardPage.dart';
 import 'package:wememmory/shop/addressSelectionPage.dart';
+import 'package:wememmory/shop/couponPage.dart';
 
 const _accentColor = Color(0xFFFF8A3D);
 
@@ -125,7 +126,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   SizedBox(
                     height: 34,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CouponSelectionPage())),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         backgroundColor: _accentColor,

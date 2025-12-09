@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:wememmory/constants.dart';
 import 'package:wememmory/profile/addressPage.dart';
 import 'package:wememmory/profile/albumHistoryPage.dart';
@@ -9,7 +10,9 @@ import 'package:wememmory/profile/personalSecurityPage.dart';
 import 'package:wememmory/shop/faqPage.dart';
 import 'package:wememmory/shop/termsAndServicesPage.dart';
 import 'package:wememmory/profile/languagePage.dart';
-import 'widgets/index.dart'; // ตรวจสอบว่าไฟล์นี้มี MenuSection อยู่จริง
+import 'package:wememmory/profile/membershipPackage.dart';
+import 'package:wememmory/profile/historyPayment.dart';
+import 'widgets/index.dart'; 
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -17,157 +20,174 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // พื้นหลังสีขาว
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Container(
           width: double.infinity,
           color: Colors.white,
           child: SingleChildScrollView(
-            // ✅ ปรับ Padding ด้านข้างเป็น 24 เพื่อไม่ให้ชิดขอบ
-            padding: const EdgeInsets.fromLTRB(32, 32, 32, 32),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 50),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 20),
-
-                // 1. ส่วนหัว (รูปโปรไฟล์ + คะแนนรวม)
+                const SizedBox(height: 10),
                 const _HeaderSection(),
-
-                // 2. กราฟแท่งแสดงสถิติ (ความสม่ำเสมอ ฯลฯ)
+                
                 const _MetricBarChart(),
+                
                 const SizedBox(height: 16),
+                _ProgressCard(),
+                const SizedBox(height: 70), 
 
-                // 3. การ์ดวงกลมสีฟ้า (Progress Card)
-                _ProgressCard(), // ❌ ไม่มี const เพื่อแก้ปัญหาขนาดไม่อัปเดต
-                const SizedBox(height: 40),
-
-                // 4. ส่วนสถิติการใช้งาน (รูปภาพปีนี้, คะแนนเฉลี่ย, ฯลฯ)
                 const _UsageStatsSection(),
-                const SizedBox(height: 40),
 
-                // 5. การ์ดเครดิต (สีส้ม)
+                const SizedBox(height: 70), 
+
+                // --- ส่วนการ์ดเครดิต ---
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 0),
-                  child: SizedBox(
-                    height: 132,
-                    child: Stack(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFF49B3E), Color(0xFFF5B067)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF000000).withOpacity(.10),
-                                blurRadius: 14,
-                                offset: const Offset(0, 6),
-                              )
-                            ],
-                          ),
-                        ),
-                        Positioned(
-                          right: -40,
-                          bottom: -40,
-                          child: Container(
-                            width: 180,
-                            height: 180,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: RadialGradient(
-                                colors: [Colors.white.withOpacity(.22), Colors.white.withOpacity(0)],
-                                radius: .9,
+                  width: double.infinity,
+                  height: 180,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFDBCA0),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text(
+                              'เครดิตของฉัน',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
+                            Text(
+                              '10',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 64,
+                                fontWeight: FontWeight.bold,
+                                height: 1.0,
+                              ),
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    Text('ที่ใช้งานได้', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-                                    SizedBox(height: 4),
-                                    Text('10', style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.w800, height: 1.0)),
-                                    SizedBox(height: 6),
-                                    Text('เติมเงินล่าสุด : 12/12/2025', style: TextStyle(color: Colors.white, fontSize: 12)),
-                                  ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const MembershipPackagePage()));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFEF703F),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              icon: const Icon(Icons.account_balance_wallet_outlined, size: 20),
+                              label: const Text(
+                                'เติมเครดิต',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  const Text('เครดิต', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-                                  const Spacer(),
-                                  ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                      elevation: 0,
-                                      backgroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                                    ),
-                                    child: const Text(
-                                      'เติมเงิน',
-                                      style: TextStyle(color: Color(0xFFF08336), fontWeight: FontWeight.w800, fontSize: 14),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const MembershipHistoryPage()));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black87,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              icon: const Icon(Icons.history, size: 20, color: Colors.black87),
+                              label: const Text(
+                                'ดูประวัติทั้งหมด',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
 
                 const SizedBox(height: 14),
 
-                // 6. การ์ดเล็ก 2 ใบ (สินค้าของฉัน / อัลบั้มของฉัน)
+                // ✅ --- ส่วนเมนูแบบการ์ด Progress (แก้ไขใหม่) ---
                 Row(
                   children: [
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => OrderHistoryPage()));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => OrderHistoryPage()));
                         },
-                        child: _SmallInfoCard(
-                          bgColor: const Color(0xFFFFF3E8),
-                          value: '10',
+                        child: const _OrderStatusCard(
                           title: 'สินค้าของฉัน',
-                          iconPath: 'assets/icons/iconb1.png',
-                          textColor: const Color(0xFFF08336),
+                          completed: 9,
+                          total: 10,
+                          themeColor: Color(0xFFEF703F), // สีส้ม
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => AlbumHistoryPage()));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AlbumHistoryPage()));
                         },
-                        child: _SmallInfoCard(
-                          bgColor: const Color(0xFFE9F6FF),
-                          value: '10',
+                        child: const _OrderStatusCard(
                           title: 'อัลบั้มของฉัน',
-                          iconPath: 'assets/icons/iconb2.png',
-                          textColor: const Color(0xFF5AAEE5),
+                          completed: 9,
+                          total: 10,
+                          themeColor: Color(0xFF5AAEE5), // สีฟ้า
                         ),
                       ),
                     ),
                   ],
                 ),
+                // --------------------------------------------------------
 
                 const SizedBox(height: 16),
 
-                // 7. เมนูรายการ
+                // --- เมนูรายการ ---
                 MenuSection(
                   items: const [
                     'ส่วนลด',
@@ -179,28 +199,47 @@ class ProfilePage extends StatelessWidget {
                     'คำถามที่พบบ่อย',
                   ],
                   onItemTap: (item, index) {
-                    debugPrint('Tapped on: $item (index: $index)');
                     switch (index) {
                       case 0:
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => CouponPage()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CouponPage()));
                         break;
                       case 1:
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => PersonalSecurityPage()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PersonalSecurityPage()));
                         break;
                       case 2:
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => AddressPage()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddressPage()));
                         break;
                       case 3:
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => BankInfoPage()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BankInfoPage()));
                         break;
                       case 4:
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => LanguageSelectionScreen()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    LanguageSelectionScreen()));
                         break;
                       case 5:
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => TermsAndServicesPage()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TermsAndServicesPage()));
                         break;
                       case 6:
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => FAQPage()));
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => FAQPage()));
                         break;
                     }
                   },
@@ -231,16 +270,29 @@ class _HeaderSection extends StatelessWidget {
           backgroundColor: Colors.grey.shade200,
         ),
         const SizedBox(height: 12),
-        const Text('korakrit', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w800, fontSize: 22)),
+        const Text('korakrit',
+            style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w800,
+                fontSize: 22)),
         const SizedBox(height: 2),
-        const Text('รหัสผู้แนะนำ 1234', style: TextStyle(color: Color(0xFF5A5A5A), fontWeight: FontWeight.w500, fontSize: 14)),
+        const Text('รหัสผู้แนะนำ 1234',
+            style: TextStyle(
+                color: Color(0xFF5A5A5A),
+                fontWeight: FontWeight.w500,
+                fontSize: 14)),
         const SizedBox(height: 20),
-        const Text('100 คะแนน', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 36)),
+        const Text('100 คะแนน',
+            style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w900,
+                fontSize: 36)),
         const SizedBox(height: 10),
         const Text(
           '100 คะแนนรวมเรื่องราวของคุณ\nสะสมเรื่องราวหลายเดือนตลอดที่ผ่านมา',
           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500, fontSize: 18),
+          style: TextStyle(
+              color: Colors.black, fontWeight: FontWeight.w500, fontSize: 18),
         ),
         const SizedBox(height: 16),
         SizedBox(
@@ -278,116 +330,105 @@ class _MetricBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double chartHeight = 300.0;
-    const double barWidth = 75.0; // กว้างขึ้น
-    const double maxValue = 100.0;
     const Color barColor = Color(0xFFF08336);
-
-    const List<Map<String, dynamic>> chartData = [
-      {'value': 50.0, 'label': 'ความสม่ำเสมอ'},
-      {'value': 25.0, 'label': 'ตรงตามเวลา'},
-      {'value': 25.0, 'label': 'อัพรูปครบ'},
-    ];
-    const List<double> yMarkers = [0, 25, 50, 100];
+    const Color gridColor = Color(0xFFEEEEEE);
+    const TextStyle labelStyle = TextStyle(
+      color: Colors.grey,
+      fontSize: 10,
+      fontWeight: FontWeight.w600,
+    );
 
     return Container(
-      padding: const EdgeInsets.only(top: 8, bottom: 8),
+      height: 320, 
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.grey.shade200),
       ),
-      child: Column(
-        children: [
-          SizedBox(
-            height: chartHeight,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(
-                  width: 48,
-                  child: Stack(
-                    children: yMarkers.map((value) {
-                      double position = chartHeight * (1 - (value / maxValue));
-                      return Positioned(
-                        top: position.clamp(0, chartHeight - 10),
-                        child: Text(
-                          value.toInt().toString(),
-                          style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                Expanded(
-                  child: Stack(
-                    children: [
-                      ...yMarkers.map((value) {
-                        double position = chartHeight * (1 - (value / maxValue));
-                        return Positioned(
-                          top: position,
-                          left: 0,
-                          right: 0,
-                          child: Container(
-                            height: 1,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(color: Colors.grey.shade300, width: 1),
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10, right: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: chartData.map((data) {
-                            final double barHeight = chartHeight * (data['value'] / maxValue);
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Container(
-                                  width: barWidth,
-                                  height: barHeight,
-                                  decoration: BoxDecoration(
-                                    color: barColor,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+      child: BarChart(
+        BarChartData(
+          alignment: BarChartAlignment.spaceAround,
+          maxY: 100,
+          borderData: FlBorderData(show: false),
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            getDrawingHorizontalLine: (value) => FlLine(
+              color: gridColor,
+              strokeWidth: 1,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0, left: 48, right: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: chartData.map((data) {
-                return SizedBox(
-                  width: barWidth,
-                  child: Text(
-                    data['label'],
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 11.0, fontWeight: FontWeight.w600, color: Colors.black87),
-                  ),
-                );
-              }).toList(),
+          titlesData: FlTitlesData(
+            show: true,
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 30,
+                interval: 25,
+                getTitlesWidget: (value, meta) {
+                  if (value == 75) return const SizedBox.shrink();
+                  return Text(
+                    value.toInt().toString(),
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 10,
+                    ),
+                  );
+                },
+              ),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 30,
+                getTitlesWidget: (value, meta) {
+                  String text = '';
+                  switch (value.toInt()) {
+                    case 0:
+                      text = 'ความสม่ำเสมอ';
+                      break;
+                    case 1:
+                      text = 'ตรงตามเวลา';
+                      break;
+                    case 2:
+                      text = 'อัพรูปครบ';
+                      break;
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(text, style: labelStyle),
+                  );
+                },
+              ),
             ),
           ),
-        ],
+          barGroups: [
+            _makeBarGroup(0, 50, barColor),
+            _makeBarGroup(1, 25, barColor),
+            _makeBarGroup(2, 25, barColor),
+          ],
+        ),
       ),
+    );
+  }
+
+  BarChartGroupData _makeBarGroup(int x, double y, Color color) {
+    return BarChartGroupData(
+      x: x,
+      barRods: [
+        BarChartRodData(
+          toY: y,
+          color: color,
+          width: 40,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(4),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -399,13 +440,16 @@ class _ProgressCard extends StatelessWidget {
     const double progressValue = 0.66;
 
     return Container(
-      height: 180, // ✅ ปรับความสูงเพื่อให้รับกับวงกลมใหญ่
+      height: 150,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.10), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.10),
+              blurRadius: 10,
+              offset: const Offset(0, 4)),
         ],
       ),
       child: Row(
@@ -415,14 +459,22 @@ class _ProgressCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
-                Text('8/12', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w500)),
+                Text('8/12',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500)),
                 SizedBox(height: 4),
-                Text('เหลือ 4 เดือนสุดท้ายของปีนี้', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                Text('เหลือ 4 เดือนสุดท้ายของปีนี้',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600)),
               ],
             ),
           ),
           SizedBox(
-            width: 100, // ✅ วงกลมขนาดใหญ่
+            width: 100,
             height: 100,
             child: Stack(
               alignment: Alignment.center,
@@ -430,12 +482,17 @@ class _ProgressCard extends StatelessWidget {
                 SizedBox.expand(
                   child: CircularProgressIndicator(
                     value: progressValue,
-                    strokeWidth: 8, // หนาขึ้น
+                    strokeWidth: 8,
                     backgroundColor: Colors.white.withOpacity(0.3),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
                 ),
-                const Text('66%', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800)),
+                const Text('66%',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800)),
               ],
             ),
           ),
@@ -445,185 +502,297 @@ class _ProgressCard extends StatelessWidget {
   }
 }
 
+class _ChartContent extends StatelessWidget {
+  const _ChartContent({required this.themeColor});
+  final Color themeColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Text('100',
+                      style: TextStyle(
+                          fontSize: 9,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500)),
+                  Text('50',
+                      style: TextStyle(
+                          fontSize: 9,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500)),
+                  Text('0',
+                      style: TextStyle(
+                          fontSize: 9,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500)),
+                ],
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Stack(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Divider(height: 1, color: Colors.grey.shade200),
+                        Divider(height: 1, color: Colors.grey.shade200),
+                        Divider(height: 1, color: Colors.grey.shade200),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        _buildBar(0.8, 'ความสม่ำเสมอ'),
+                        _buildBar(0.5, 'ตรงเวลา'),
+                        _buildBar(0.5, 'ครบ'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBar(double heightFactor, String label) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          width: 14,
+          height: 70 * heightFactor,
+          decoration: BoxDecoration(
+            color: themeColor,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        const SizedBox(height: 4),
+        SizedBox(
+          width: 24,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(label,
+                style: const TextStyle(
+                    fontSize: 8,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500)),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _UsageStatsSection extends StatelessWidget {
   const _UsageStatsSection();
+
+  Widget _buildStackedImages(Widget frontWidget) {
+    return Transform.translate(
+      offset: const Offset(-15, 0),
+      child: SizedBox(
+        width: 180, 
+        height: 200,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Transform.rotate(
+              angle: 0.30, 
+              child: Container(
+                width: 130, height: 140,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.10), blurRadius: 10, offset: const Offset(6, 6))],
+                ),
+              ),
+            ),
+            Transform.rotate(
+              angle: -0.30, 
+              child: Container(
+                width: 130, height: 140,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 8, offset: const Offset(-4, 4))],
+                ),
+              ),
+            ),
+            Container(
+              width: 130, height: 160,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 16, offset: const Offset(0, 8))],
+              ),
+              padding: const EdgeInsets.all(8),
+              child: frontWidget,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     const Color themeColor = Color(0xFF5AAEE5);
+    const TextStyle labelStyle = TextStyle(
+        fontSize: 16, color: Colors.grey, fontWeight: FontWeight.w600);
+    const TextStyle valueStyle = TextStyle(
+        fontSize: 60,
+        fontWeight: FontWeight.bold,
+        color: themeColor,
+        height: 1.0);
+
+    const double spacing = 10.0;
 
     return Column(
       children: [
-        // 1. รูปภาพของปีนี้ (88)
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 120,
-              height: 140,
-              child: Stack(
+            _buildStackedImages(
+              Column(
                 children: [
-                  Transform.rotate(angle: -0.1, child: Container(color: Colors.white, margin: const EdgeInsets.all(4), child: Container(decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade200), color: Colors.white)))),
-                  Transform.rotate(angle: 0.1, child: Container(color: Colors.white, margin: const EdgeInsets.all(4), child: Container(decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade200), color: Colors.white)))),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, 2))],
-                    ),
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      children: [
-                        Expanded(child: Container(color: Colors.grey[200])), // Placeholder Image
-                        const SizedBox(height: 4),
-                        const Text('อากาศดี วิวสวย', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                        const Text('#ครอบครัว #ความรัก', style: TextStyle(fontSize: 8, color: themeColor)),
-                      ],
-                    ),
+                  Expanded(
+                    child: Image.asset('assets/images/sample_photo_1.jpg',
+                        fit: BoxFit.cover,
+                        errorBuilder: (c, o, s) =>
+                            Container(color: Colors.grey[200])),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text('อากาศดี วิวสวย',
+                      style:
+                          TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  const Text('#ครอบครัว #ความรัก',
+                      style: TextStyle(fontSize: 10, color: themeColor)),
+                ],
+              ),
+            ),
+            SizedBox(width: spacing),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text('รูปภาพของปีนี้', style: labelStyle),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text('88', style: valueStyle),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 40),
-            Column(
-              children: const [
-                Text('รูปภาพของปีนี้', style: TextStyle(fontSize: 16, color: Colors.grey)),
-                Text('88', style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold, color: themeColor)),
-              ],
-            ),
           ],
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 30),
 
-        // 2. คะแนนเฉลี่ย (10)
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('คะแนนเฉลี่ยแต่ละเดือน', style: TextStyle(fontSize: 16, color: Colors.grey)),
-                Text('10', style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold, color: themeColor)),
-              ],
-            ),
-            Container(
-              width: 140,
-              height: 100,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(width: 20, height: 60, decoration: BoxDecoration(color: themeColor, borderRadius: BorderRadius.circular(4))),
-                  Container(width: 20, height: 30, decoration: BoxDecoration(color: themeColor, borderRadius: BorderRadius.circular(4))),
-                  Container(width: 20, height: 30, decoration: BoxDecoration(color: themeColor, borderRadius: BorderRadius.circular(4))),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text('คะแนนเฉลี่ยแต่ละเดือน', style: labelStyle),
+                  Text('10', style: valueStyle),
                 ],
               ),
             ),
+            SizedBox(width: spacing),
+            _buildStackedImages(
+              const _ChartContent(themeColor: themeColor),
+            ),
           ],
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 30),
 
-        // 3. วันที่สร้างมากที่สุด (อาทิตย์)
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 120,
-              height: 140,
-              child: Stack(
+            _buildStackedImages(
+              Image.asset('assets/images/sample_photo_2.jpg',
+                  fit: BoxFit.cover,
+                  errorBuilder: (c, o, s) =>
+                      Container(color: Colors.grey[200])),
+            ),
+            SizedBox(width: spacing),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Transform.rotate(angle: 0.05, child: Container(decoration: BoxDecoration(color: Colors.white, border: Border.all(color: Colors.grey.shade200)))),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, 2))],
-                    ),
-                    padding: const EdgeInsets.all(8),
-                    child: Container(color: Colors.grey[200]), // Placeholder Image
+                  const Text('วันที่สร้างมากที่สุด', style: labelStyle),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child:
+                        Text('อาทิตย์', style: valueStyle.copyWith(fontSize: 50)),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 30),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: const [
-                Text('วันที่สร้างมากที่สุด', style: TextStyle(fontSize: 16, color: Colors.grey)),
-                Text('อาทิตย์', style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: themeColor)),
-              ],
-            ),
           ],
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 30),
 
-        // 4. แท็กทั้งหมด (15)
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
-                Text('แท็กทั้งหมด', style: TextStyle(fontSize: 16, color: Colors.grey)),
-                Text('15', style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold, color: themeColor)),
+                Text('แท็กทั้งหมด', style: labelStyle),
+                Text('15', style: valueStyle),
               ],
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: spacing),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              child: Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                alignment: WrapAlignment.end,
                 children: [
                   _buildChip('moment ที่อยากจำ', themeColor, true),
-                  const SizedBox(height: 8),
                   _buildChip('Wemory Moment', Colors.grey, false),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      _buildChip('บันทึกความรักในรูป', themeColor, true),
-                      const SizedBox(width: 8),
-                      _buildChip('วันสุข', Colors.grey, false),
-                    ],
-                  )
+                  _buildChip('บันทึกความรักในรูป', themeColor, true),
+                  _buildChip('วันสุข', Colors.grey, false),
                 ],
               ),
             )
           ],
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 30),
 
-        // 5. สร้างอัลบั้มจากคุณ (10)
         Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Container(
-              width: 140,
-              height: 140,
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10, offset: const Offset(2, 4))],
-              ),
-              child: GridView.count(
-                crossAxisCount: 3,
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
-                physics: const NeverScrollableScrollPhysics(),
-                children: List.generate(9, (index) => Container(color: Colors.grey[300])),
+            _buildStackedImages(
+              Image.asset(
+                'assets/images/open_album.png',
+                fit: BoxFit.contain,
+                errorBuilder: (c, o, s) => Container(
+                    color: Colors.grey[200],
+                    child: const Center(child: Text('Album'))),
               ),
             ),
-            const Spacer(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: const [
-                Text('สร้างอัลบั้มจากคุณ', style: TextStyle(fontSize: 16, color: Colors.grey)),
-                Text('10', style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold, color: themeColor)),
-              ],
+            SizedBox(width: spacing),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  const Text('สร้างอัลบั้มจากคุณ', style: labelStyle),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text('10', style: valueStyle.copyWith(fontSize: 50)),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -633,55 +802,106 @@ class _UsageStatsSection extends StatelessWidget {
 
   Widget _buildChip(String label, Color color, bool isFilled) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         color: isFilled ? color : Colors.transparent,
         border: isFilled ? null : Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Text(
         label,
         style: TextStyle(
           color: isFilled ? Colors.white : Colors.black54,
-          fontSize: 12,
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
   }
 }
 
-class _SmallInfoCard extends StatelessWidget {
-  const _SmallInfoCard({required this.bgColor, required this.value, required this.title, required this.iconPath, required this.textColor});
-
-  final Color bgColor;
-  final String value;
+// ✅ Widget ใหม่: การ์ดแสดงสถานะแบบมี Progress Bar (เหมือนรูปที่ 2)
+class _OrderStatusCard extends StatelessWidget {
   final String title;
-  final String iconPath;
-  final Color textColor;
+  final int completed;
+  final int total;
+  final Color themeColor;
+
+  const _OrderStatusCard({
+    required this.title,
+    required this.completed,
+    required this.total,
+    required this.themeColor,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final double percent = total == 0 ? 0 : completed / total;
+    final int percentText = (percent * 100).toInt();
+
     return Container(
-      height: 86,
-      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(14)),
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
-            alignment: Alignment.center,
-            child: Image.asset(iconPath, width: 20, height: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
-          const SizedBox(width: 10),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: themeColor,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          Row(
             children: [
-              Text(value, style: TextStyle(color: textColor, fontWeight: FontWeight.w800, fontSize: 16)),
-              Text(title, style: TextStyle(color: textColor, fontWeight: FontWeight.w600, fontSize: 13.5)),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: LinearProgressIndicator(
+                    value: percent,
+                    minHeight: 10, 
+                    backgroundColor: Colors.grey.shade300,
+                    color: themeColor,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '$percentText%',
+                style: TextStyle(
+                  color: themeColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
+          ),
+          
+          const SizedBox(height: 12),
+          Divider(height: 1, color: themeColor.withOpacity(0.3)),
+          const SizedBox(height: 8),
+          
+          Text(
+            'จัดส่งสำเร็จ $completed/$total รายการ',
+            style: TextStyle(
+              color: themeColor,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
