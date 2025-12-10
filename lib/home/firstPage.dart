@@ -2,22 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:wememmory/Album/createAlbumModal.dart';
 import 'package:wememmory/constants.dart';
 import 'package:wememmory/home/homePage.dart';
-// ✅ ตรวจสอบ path ของ CollectionPage ให้ถูกต้องตามโปรเจคของคุณ
-// เช่น import 'package:wememmory/Album/collection_page.dart'; 
 import 'package:wememmory/collection/collectionPage.dart'; 
 import 'package:wememmory/shop/shopPage.dart';
 import 'package:wememmory/profile/profilePage.dart';
-import 'package:wememmory/models/media_item.dart'; // ✅ Import Model
+import 'package:wememmory/models/media_item.dart';
 
 class FirstPage extends StatefulWidget {
-  // ✅ 1. เพิ่มตัวแปรรับค่า
   final int initialIndex;
   final List<MediaItem>? newAlbumItems;
   final String? newAlbumMonth;
 
   const FirstPage({
     super.key, 
-    this.initialIndex = 0, // ค่าเริ่มต้นคือหน้าแรก (0)
+    this.initialIndex = 0,
     this.newAlbumItems,
     this.newAlbumMonth,
   });
@@ -32,11 +29,9 @@ class _FirstPageState extends State<FirstPage> {
   @override
   void initState() {
     super.initState();
-    // ✅ 2. กำหนดหน้าเริ่มต้นตามที่ส่งมา
     _currentIndex = widget.initialIndex;
   }
 
-  // 📌 ฟังก์ชันแสดง Modal Bottom Sheet
   void _showCreateAlbumModal() {
     showModalBottomSheet(
       context: context,
@@ -48,15 +43,13 @@ class _FirstPageState extends State<FirstPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ 3. ย้าย List Pages มาไว้ใน build เพื่อให้เข้าถึง widget.xxx ได้
     final List<Widget> pages = [
       const HomePage(),
-      // ส่งข้อมูลอัลบั้มใหม่ไปที่ CollectionPage
       CollectionPage(
         newAlbumItems: widget.newAlbumItems,
         newAlbumMonth: widget.newAlbumMonth,
       ),
-      const SizedBox(), // Placeholder ปุ่มบวก
+      const SizedBox(), // Placeholder
       const ShopPage(),
       const ProfilePage(),
     ];
@@ -64,7 +57,6 @@ class _FirstPageState extends State<FirstPage> {
     return Scaffold(
       backgroundColor: kBackgroundColor,
       extendBody: true,
-      // ✅ 4. ใช้ pages[_currentIndex] ที่สร้างใหม่
       body: pages[_currentIndex], 
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _currentIndex,
@@ -80,7 +72,10 @@ class _FirstPageState extends State<FirstPage> {
   }
 }
 
-// ... (CustomBottomNavBar คงเดิม ไม่ต้องแก้) ...
+// ---------------------------------------------------------------------------
+//  CustomBottomNavBar Widget (ปรับปรุงใหม่: ใช้ Expanded และปุ่มใหญ่)
+// ---------------------------------------------------------------------------
+
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
@@ -113,29 +108,59 @@ class CustomBottomNavBar extends StatelessWidget {
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          // ใช้ Expanded ดังนั้น MainAxisAlignment ไม่ค่อยมีผล แต่ใส่ไว้เพื่อความเรียบร้อย
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildNavItem(icon: Icons.home_rounded, label: 'หน้าหลัก', index: 0, isActive: currentIndex == 0, activeColor: activeColor, inactiveColor: inactiveColor),
-            _buildNavItem(icon: Icons.photo_library_rounded, label: 'สมุดภาพ', index: 1, isActive: currentIndex == 1, activeColor: activeColor, inactiveColor: inactiveColor),
+            // ✅ ใช้ Expanded ครอบทุกปุ่ม เพื่อแบ่งพื้นที่ 5 ส่วนเท่ากันเป๊ะๆ
             
-            // ปุ่มบวกตรงกลาง
-            GestureDetector(
-              onTap: () => onTap(2),
-              child: Container(
+            // 1. หน้าหลัก
+            Expanded(
+              child: _buildNavItem(icon: Icons.home_rounded, label: 'หน้าหลัก', index: 0, isActive: currentIndex == 0, activeColor: activeColor, inactiveColor: inactiveColor),
+            ),
 
-                decoration: BoxDecoration(
-                  color: centerButtonColor,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(color: centerButtonColor.withOpacity(0.4), blurRadius: 10, offset: const Offset(0, 4)),
-                  ],
+            // 2. สมุดภาพ
+            Expanded(
+              child: _buildNavItem(icon: Icons.photo_library_rounded, label: 'สมุดภาพ', index: 1, isActive: currentIndex == 1, activeColor: activeColor, inactiveColor: inactiveColor),
+            ),
+            
+            // 3. ปุ่มบวกตรงกลาง (Add)
+            Expanded(
+              child: Center( // ใช้ Center เพื่อจัดปุ่มให้อยู่กลางพื้นที่ Expanded
+                child: GestureDetector(
+                  onTap: () => onTap(2),
+                  child: Container(
+                    // ✅ กำหนดขนาดปุ่มให้ใหญ่ขึ้น (64x64)
+                    width: 64, 
+                    height: 64,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: centerButtonColor,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: centerButtonColor.withOpacity(0.4), 
+                          blurRadius: 15, // เพิ่ม blur ให้ดูนุ่มขึ้น
+                          offset: const Offset(0, 6)
+                        ),
+                      ],
+                    ),
+                    // ✅ เพิ่มขนาดไอคอน (40)
+                    child: const Icon(Icons.add, color: Colors.white, size: 40),
+                  ),
                 ),
-                child: const Icon(Icons.add, color: Colors.white, size: 36),
               ),
             ),
 
-            _buildNavItem(icon: Icons.shopping_bag_rounded, label: 'ร้านค้า', index: 3, isActive: currentIndex == 3, activeColor: activeColor, inactiveColor: inactiveColor),
-            _buildNavItem(icon: Icons.person_rounded, label: 'บัญชี', index: 4, isActive: currentIndex == 4, activeColor: activeColor, inactiveColor: inactiveColor),
+            // 4. ร้านค้า
+            Expanded(
+              child: _buildNavItem(icon: Icons.shopping_bag_rounded, label: 'ร้านค้า', index: 3, isActive: currentIndex == 3, activeColor: activeColor, inactiveColor: inactiveColor),
+            ),
+
+            // 5. บัญชี
+            Expanded(
+              child: _buildNavItem(icon: Icons.person_rounded, label: 'บัญชี', index: 4, isActive: currentIndex == 4, activeColor: activeColor, inactiveColor: inactiveColor),
+            ),
           ],
         ),
       ),
@@ -145,13 +170,22 @@ class CustomBottomNavBar extends StatelessWidget {
   Widget _buildNavItem({required IconData icon, required String label, required int index, required bool isActive, required Color activeColor, required Color inactiveColor}) {
     return GestureDetector(
       onTap: () => onTap(index),
-      behavior: HitTestBehavior.opaque,
+      behavior: HitTestBehavior.opaque, // เพื่อให้กดได้ทั่วพื้นที่ Expanded
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, color: isActive ? activeColor : inactiveColor, size: 28),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: isActive ? activeColor : inactiveColor, fontSize: 12, fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
+          Text(
+            label, 
+            style: TextStyle(
+              color: isActive ? activeColor : inactiveColor, 
+              fontSize: 12, 
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
