@@ -1,0 +1,341 @@
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:photo_manager/photo_manager.dart';
+import 'package:wememmory/Album/print_sheet.dart'; 
+import 'package:wememmory/models/media_item.dart';
+
+class FinalPreviewSheet extends StatefulWidget {
+  final List<MediaItem> items;
+  final String monthName;
+
+  const FinalPreviewSheet({
+    super.key,
+    required this.items,
+    required this.monthName,
+  });
+
+  @override
+  State<FinalPreviewSheet> createState() => _FinalPreviewSheetState();
+}
+
+class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
+  bool _withCaption = false;
+  bool _withDate = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.95, // เกือบเต็มจอ
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        children: [
+          // 1. Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'พรีวิวสุดท้าย & ยืนยัน',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close, size: 28, color: Colors.black54),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // 2. Steps Indicator (Step 3 Active)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.0),
+            child: Row(
+              children: [
+                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true),
+                _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true),
+                _StepItem(label: 'พรีวิวสุดท้าย', isActive: true, isLast: true), // Active สีฟ้า
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // 3. Toggle Options
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              children: [
+                _buildToggleOption("พิมพ์พร้อมคำบรรยาย", _withCaption, (val) => setState(() => _withCaption = val)),
+                const SizedBox(height: 12),
+                _buildToggleOption("พิมพ์พร้อมวันที่", _withDate, (val) => setState(() => _withDate = val)),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // 4. Preview Text
+          Text(
+            "คอลเลกชัน${widget.monthName}ของคุณจะออกมาเป็นแบบนี้..\nพร้อมที่จะสร้างความทรงจำที่จับต้องได้แล้วหรือยัง?",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          ),
+
+          const SizedBox(height: 16),
+
+          // 5. Album Preview Area (The Book)
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // ใช้ Layout เดิมมาแสดงผล
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF555555), // สีเทาเข้ม
+                          ),
+                          child: IntrinsicWidth(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // หน้าซ้าย
+                                _buildPageContainer(
+                                  child: GridView.count(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 3,
+                                    mainAxisSpacing: 3,
+                                    childAspectRatio: 1.0,
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    children: [
+                                      // Slot 0: ชื่อเดือน
+                                      Container(
+                                        decoration: const BoxDecoration(color: Colors.white),
+                                        child: Center(
+                                          child: Text(
+                                            widget.monthName,
+                                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+                                      // Slot 1-5: รูปภาพ
+                                      for (int i = 0; i < 5; i++)
+                                        if (i < widget.items.length)
+                                          _StaticPhotoSlot(item: widget.items[i])
+                                        else
+                                          const SizedBox(),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 20),
+                                // หน้าขวา
+                                _buildPageContainer(
+                                  child: GridView.count(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 3,
+                                    mainAxisSpacing: 3,
+                                    childAspectRatio: 1.0,
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    children: [
+                                      // Slots 6-11: รูปภาพ
+                                      for (int i = 0; i < 6; i++)
+                                        if ((i + 5) < widget.items.length)
+                                          _StaticPhotoSlot(item: widget.items[i + 5])
+                                        else
+                                          const SizedBox(),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // กล่องข้อความสีฟ้าอ่อน
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE0F2F7), // สีฟ้าอ่อน
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFB3E0EE)),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          "พร้อมแบ่งปันความทรงจำแล้วหรือยัง?",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "สร้างภาพสวยๆ เพื่อแชร์ลงโซเชียลมีเดียได้เลย!",
+                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+
+          // 6. Bottom Buttons
+        Container(
+            padding: const EdgeInsets.all(20),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide(color: Colors.black12)),
+            ),
+            child: Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // ✅ เปิดหน้า PrintSheet (สั่งพิมพ์) และส่งข้อมูลรูปภาพไป
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => PrintSheet(
+                          items: widget.items,
+                          monthName: widget.monthName,
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFED7D31), // สีส้ม
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
+                      elevation: 0,
+                    ),
+                    child: const Text('ยืนยัน', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+// ...
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.grey[300],
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
+                    ),
+                    child: const Text('ย้อนกลับ', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToggleOption(String label, bool value, Function(bool) onChanged) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+        Switch(
+          value: value,
+          onChanged: onChanged,
+          activeColor: Color.fromARGB(255, 255, 255, 255),  
+          activeTrackColor:  Color(0xFFED7D31).withOpacity(0.4),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPageContainer({required Widget child}) {
+    return SizedBox(width: 160, height: 245, child: child);
+  }
+}
+
+// Widget แสดงรูปภาพแบบนิ่ง (ไม่ต้องลากได้)
+class _StaticPhotoSlot extends StatelessWidget {
+  final MediaItem item;
+  const _StaticPhotoSlot({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(color: Colors.white),
+      padding: const EdgeInsets.all(4.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(6.0),
+        child: Container(
+          color: Colors.grey[200],
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              FutureBuilder<Uint8List?>(
+                future: item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) return Image.memory(snapshot.data!, fit: BoxFit.cover);
+                  return Container(color: Colors.grey[200]);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Widget Step Indicator (Copy มาเพื่อให้เหมือนกัน)
+class _StepItem extends StatelessWidget {
+  final String label;
+  final bool isActive;
+  final bool isFirst;
+  final bool isLast;
+
+  const _StepItem({
+    required this.label,
+    required this.isActive,
+    this.isFirst = false,
+    this.isLast = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(child: Container(height: 2, color: isFirst ? Colors.transparent : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]))),
+              Container(width: 10, height: 10, decoration: BoxDecoration(shape: BoxShape.circle, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300])),
+              Expanded(child: Container(height: 2, color: isLast ? Colors.transparent : Colors.grey[300])),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(label, textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400], fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
+        ],
+      ),
+    );
+  }
+}

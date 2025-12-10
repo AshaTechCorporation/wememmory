@@ -17,7 +17,7 @@ class HomePage extends StatelessWidget {
         elevation: 0,
 
         // 2. ปรับความสูงให้พอเหมาะกับข้อความ 2 บรรทัด + ขอบโค้ง
-        toolbarHeight: 120,
+        toolbarHeight: 110,
 
         // 3. คงขอบโค้งด้านล่างไว้ตามเดิม
         shape: const RoundedRectangleBorder(
@@ -100,7 +100,6 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // CustomSearchBar(),
-              SizedBox(height: 13),
               Recommended(),
               SizedBox(height: 7),
               SummaryStrip(), // ✅ ใช้แท่งเดียว ไม่ล้น ไม่แยก
