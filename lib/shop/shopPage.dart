@@ -183,7 +183,7 @@ class _PromoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: Image.asset('assets/images/Rectangle1.png', width: 320, height: double.infinity, fit: BoxFit.cover),
+      child: Image.asset('assets/images/Hobby3.png', width: 380, height: double.infinity, fit: BoxFit.cover),
     );
   }
 }
