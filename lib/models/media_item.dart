@@ -8,7 +8,17 @@ enum MediaType { image, video }
 class MediaItem {
   final AssetEntity asset;
   final MediaType type;
-  MediaItem({required this.asset, required this.type});
+  String caption; 
+  List<String> tags;
+  Uint8List? capturedImage;
+
+  MediaItem({
+    required this.asset,
+    required this.type,
+    this.caption = '',     // ค่าเริ่มต้นว่าง
+    this.tags = const [],
+    this.capturedImage,  // ค่าเริ่มต้น list ว่าง
+  });
 }
 
 class AlbumPhoto {

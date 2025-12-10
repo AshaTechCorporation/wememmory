@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:wememmory/Album/order_success_page.dart';
 import 'package:wememmory/models/media_item.dart';
 
 class PrintSheet extends StatefulWidget {
@@ -55,7 +56,7 @@ class _PrintSheetState extends State<PrintSheet> {
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Column(
+              child: Column( 
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // หัวข้ออัลบั้ม
@@ -102,8 +103,8 @@ class _PrintSheetState extends State<PrintSheet> {
                       Switch(
                         value: _isGift,
                         onChanged: (val) => setState(() => _isGift = val),
-                        activeColor: const Color(0xFFED7D31),
-                        activeTrackColor: const Color(0xFFED7D31).withOpacity(0.4),
+                        activeColor: Color.fromARGB(255, 255, 255, 255),  
+                        activeTrackColor:  Color(0xFFED7D31).withOpacity(0.4),
                         inactiveThumbColor: Colors.white,
                         inactiveTrackColor: Colors.grey[300],
                       ),
@@ -173,42 +174,75 @@ class _PrintSheetState extends State<PrintSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: const BoxDecoration(
               color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.black12)),
+              border: Border(top: BorderSide(color: Colors.black12)), // เส้นขอบบนบางๆ
             ),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, // ดันซ้าย-ขวาสุดขอบ
               children: [
-                Expanded(
-                child: Row( // ✅ เปลี่ยนจาก Column เป็น Row
-                  crossAxisAlignment: CrossAxisAlignment.center, // จัดให้อยู่กึ่งกลางแนวตั้ง
+                // --- ส่วนแสดงเครดิต (ซ้าย) ---
+                Row(
                   children: [
-                    Text(
-                      "เครดิตที่ต้องใช้", 
-                      style: TextStyle(color: Colors.grey, fontSize: 14)
-                    ), 
-                    SizedBox(width: 8), // ✅ เว้นระยะห่างแนวนอน
-                    Icon(Icons.monetization_on, size: 20, color: Color(0xFFFBC02D)),
-                    SizedBox(width: 4),
-                     Text(
-                      "10", 
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)
+                    const Text(
+                      "เครดิตที่ต้องใช้",
+                      style: TextStyle(
+                        fontSize: 14, 
+                        color: Colors.black87, // สีเทาเข้มเกือบดำ
+                        fontWeight: FontWeight.normal
+                      ),
+                    ),
+                    const SizedBox(width: 8), // เว้นระยะห่าง
+                    
+                    // ไอคอนเหรียญ (สีเหลือง)
+                    const Icon(
+                      Icons.monetization_on, // หรือใช้ Icons.paid
+                      size: 24, 
+                      color: Color(0xFFFFC107), // สีเหลืองทอง
+                    ),
+                    
+                    const SizedBox(width: 6), // เว้นระยะห่าง
+                    
+                    const Text(
+                      "10",
+                      style: TextStyle(
+                        fontSize: 18, 
+                        fontWeight: FontWeight.bold, 
+                        color: Colors.black87
+                      ),
                     ),
                   ],
                 ),
-              ),
+
+                // --- ปุ่มสั่งพิมพ์ (ขวา) ---
                 SizedBox(
-                  width: 140,
-                  height: 48,
+                  width: 140, // ความกว้างปุ่ม
+                  height: 48, // ความสูงปุ่ม
                   child: ElevatedButton(
                     onPressed: () {
-                      print("สั่งพิมพ์เรียบร้อย");
-                      Navigator.popUntil(context, (route) => route.isFirst);
+                      // ✅ ฟังก์ชันเดิม: ส่งข้อมูลไปยังหน้า Success
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderSuccessPage(
+                            items: widget.items,
+                            monthName: widget.monthName,
+                          ),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFED7D31),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
-                      elevation: 0,
+                      backgroundColor: const Color(0xFFED7D31), // สีส้มตามภาพ
+                      shape: RoundedRectangleBorder(      
+                      ),
+                      elevation: 0, // ไม่มีเงา
                     ),
-                    child: const Text("สั่งพิมพ์", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      "สั่งพิมพ์",
+                      style: TextStyle(
+                        color: Colors.white, 
+                        fontSize: 16, 
+                        fontWeight: FontWeight.bold 
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -267,7 +301,7 @@ class _PrintSheetState extends State<PrintSheet> {
                   ),
                 ),
 
-                const SizedBox(width: 8), // สันหนังสือ
+                const SizedBox(width: 20), // สันหนังสือ
 
                 // หน้าขวา
                 _buildPageContainer(

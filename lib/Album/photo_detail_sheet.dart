@@ -3,15 +3,60 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/models/media_item.dart';
 
-class PhotoDetailSheet extends StatelessWidget {
+// ✅ เปลี่ยนเป็น StatefulWidget เพื่อจัดการข้อมูล
+class PhotoDetailSheet extends StatefulWidget {
   final MediaItem item;
 
   const PhotoDetailSheet({super.key, required this.item});
 
   @override
+  State<PhotoDetailSheet> createState() => _PhotoDetailSheetState();
+}
+
+class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
+  // ตัวควบคุมช่องข้อความ
+  late TextEditingController _captionController;
+  // ตัวเก็บ Tags ที่ถูกเลือก
+  late List<String> _selectedTags;
+
+  // รายชื่อ Tags ทั้งหมดที่มีให้เลือก
+  final List<String> _allTags = ["family", "kid", "home", "lover", "favor"];
+
+  @override
+  void initState() {
+    super.initState();
+    // ✅ โหลดข้อมูลเดิมมาแสดง (ถ้ามี)
+    _captionController = TextEditingController(text: widget.item.caption);
+    _selectedTags = List.from(widget.item.tags);
+  }
+
+  @override
+  void dispose() {
+    _captionController.dispose();
+    super.dispose();
+  }
+
+  // ✅ ฟังก์ชันสลับการเลือก Tag
+  void _toggleTag(String tag) {
+    setState(() {
+      if (_selectedTags.contains(tag)) {
+        _selectedTags.remove(tag);
+      } else {
+        _selectedTags.add(tag);
+      }
+    });
+  }
+
+  // ✅ ฟังก์ชันบันทึกข้อมูลกลับไปที่ Item
+  void _saveData() {
+    widget.item.caption = _captionController.text;
+    widget.item.tags = List.from(_selectedTags);
+    Navigator.pop(context); // ปิดหน้า Sheet
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      // ทำให้ Sheet สูงเกือบเต็มจอ
       height: MediaQuery.of(context).size.height * 0.92,
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -20,7 +65,7 @@ class PhotoDetailSheet extends StatelessWidget {
       child: Column(
         children: [
           // -------------------------------------------------------
-          // 1. Header (เหมือนในภาพ)
+          // 1. Header
           // -------------------------------------------------------
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -55,7 +100,7 @@ class PhotoDetailSheet extends StatelessWidget {
           const SizedBox(height: 16),
 
           // -------------------------------------------------------
-          // 2. Steps Indicator (เหมือนหน้าก่อนหน้า)
+          // 2. Steps Indicator
           // -------------------------------------------------------
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 24.0),
@@ -71,7 +116,7 @@ class PhotoDetailSheet extends StatelessWidget {
           const SizedBox(height: 24),
 
           // -------------------------------------------------------
-          // 3. Image Area with Grid Overlay
+          // 3. Content Area
           // -------------------------------------------------------
           Expanded(
             child: SingleChildScrollView(
@@ -83,14 +128,13 @@ class PhotoDetailSheet extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Container(
-                      height: 350, // กำหนดความสูงให้ใกล้เคียงภาพตัวอย่าง
+                      height: 350,
                       color: Colors.grey[200],
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          // รูปภาพจริง
                           FutureBuilder<Uint8List?>(
-                            future: item.asset.thumbnailDataWithSize(const ThumbnailSize(800, 800)),
+                            future: widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(800, 800)),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
                                 return Image.memory(snapshot.data!, fit: BoxFit.cover);
@@ -98,7 +142,7 @@ class PhotoDetailSheet extends StatelessWidget {
                               return const Center(child: CircularProgressIndicator());
                             },
                           ),
-                          // เส้นตาราง 3x3 (Grid Overlay) สีขาวบางๆ
+                          // Grid Overlay
                           Column(
                             children: [
                               Expanded(child: Container(decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
@@ -120,7 +164,7 @@ class PhotoDetailSheet extends StatelessWidget {
 
                   const SizedBox(height: 10),
 
-                  // ปุ่มขยายภาพเต็มจอ (สีฟ้า)
+                  // ปุ่มขยายภาพ
                   SizedBox(
                     height: 45,
                     child: ElevatedButton(
@@ -128,8 +172,8 @@ class PhotoDetailSheet extends StatelessWidget {
                         // TODO: Logic ขยายภาพเต็มจอ
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF67A5BA), // สีฟ้าหม่นๆ ตามภาพ
-                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero), // สี่เหลี่ยม
+                        backgroundColor: const Color(0xFF67A5BA),
+                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                         elevation: 0,
                       ),
                       child: const Text("ขยายภาพเต็มจอ", style: TextStyle(color: Colors.white, fontSize: 14)),
@@ -138,13 +182,14 @@ class PhotoDetailSheet extends StatelessWidget {
 
                   const SizedBox(height: 10),
 
-                  // ช่องกรอกข้อความ (Caption)
+                  // ✅ ช่องกรอกข้อความ (ผูกกับ Controller)
                   Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey[200]!),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: TextField(
+                      controller: _captionController, // ผูกตัวแปร
                       maxLines: 4,
                       decoration: InputDecoration(
                         hintText: "เขียนความรู้สึกหรือเรื่องราวเล็ก ๆ ที่ซ่อนอยู่หลังภาพนี้.....",
@@ -157,17 +202,11 @@ class PhotoDetailSheet extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // Tags (ปุ่มเล็กๆ)
+                  // ✅ Tags (สร้างจาก Loop)
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: [
-                      _buildTagChip("family"),
-                      _buildTagChip("kid"),
-                      _buildTagChip("home"),
-                      _buildTagChip("lover"),
-                      _buildTagChip("favor"),
-                    ],
+                    children: _allTags.map((tag) => _buildTagChip(tag)).toList(),
                   ),
 
                   const SizedBox(height: 20),
@@ -182,23 +221,20 @@ class PhotoDetailSheet extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.transparent)), // ไม่มีเส้นขอบบน
+              border: Border(top: BorderSide(color: Colors.transparent)),
             ),
             child: SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                onPressed: () {
-                  // TODO: บันทึกข้อมูล
-                  Navigator.pop(context);
-                },
+                onPressed: _saveData, // ✅ เรียกฟังก์ชันบันทึก
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFED7D31), // สีส้ม
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)), // เหลี่ยมมนน้อยๆ
+                  backgroundColor: const Color(0xFFED7D31),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
                   elevation: 0,
                 ),
                 child: const Text(
-                  "บันทึก", 
+                  "บันทึก",
                   style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -209,24 +245,37 @@ class PhotoDetailSheet extends StatelessWidget {
     );
   }
 
-  // Widget สร้างปุ่ม Tag เล็กๆ
+  // ✅ Widget สร้างปุ่ม Tag ที่เปลี่ยนสีได้
   Widget _buildTagChip(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(20),
-        color: Colors.white,
-      ),
-      child: Text(
-        label,
-        style: TextStyle(color: Colors.grey[600], fontSize: 13),
+    bool isSelected = _selectedTags.contains(label);
+    
+    return GestureDetector(
+      onTap: () => _toggleTag(label),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isSelected ? const Color(0xFFED7D31) : Colors.grey[300]!, // ขอบสีส้มเมื่อเลือก
+          ),
+          borderRadius: BorderRadius.circular(20),
+          // ✅ เปลี่ยนสีพื้นหลังเป็นสีส้มเมื่อเลือก
+          color: isSelected ? const Color(0xFFED7D31) : Colors.white,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            // ✅ เปลี่ยนสีตัวอักษรเป็นสีขาวเมื่อเลือก
+            color: isSelected ? Colors.white : Colors.grey[600],
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
       ),
     );
   }
 }
 
-// Widget Step Indicator (Copy มาจากไฟล์เดิมเพื่อให้เหมือนกัน)
 class _StepItem extends StatelessWidget {
   final String label;
   final bool isActive;
