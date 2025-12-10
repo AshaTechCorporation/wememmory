@@ -1,197 +1,365 @@
 import 'package:flutter/material.dart';
+import 'package:wememmory/profile/albumDetailPage.dart'; // อย่าลืม Import ไฟล์หน้ารายละเอียดเข้ามา
 
 class AlbumHistoryPage extends StatelessWidget {
   const AlbumHistoryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const orange = Color(0xFFF29C64);
+    // กำหนดสีธีม
+    const kOrangeColor = Color(0xFFF05A28);
+    const kGreenColor = Color(0xFF28C668);
+    const kPeachColor = Color(0xFFFDCB9E);   
+    const kPeachIconColor = Color(0xFFFDB67F); 
 
-    return DefaultTabController(
-      length: 5,
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.black87), onPressed: () => Navigator.pop(context)),
-          title: const Text('ประวัติอัลบัม', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w800)),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(46),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: TabBar(
-                isScrollable: true,
-                labelColor: orange,
-                unselectedLabelColor: const Color(0xFF888888),
-                indicator: UnderlineTabIndicator(
-                  borderSide: const BorderSide(width: 3, color: orange),
-                  insets: const EdgeInsets.symmetric(horizontal: 8),
-                ),
-                labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
-                unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                tabs: const [
-                  Tab(text: 'อยู่ในระหว่างส่งพิมพ์'),
-                  Tab(text: 'เตรียมจัดส่ง'),
-                  Tab(text: 'ที่ต้องได้รับ'),
-                  Tab(text: 'สำเร็จ'),
-                  Tab(text: 'คืนสินค้า'),
-                ],
-              ),
-            ),
-          ),
+        elevation: 0,
+        centerTitle: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () => Navigator.pop(context),
         ),
-        body: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          child: TabBarView(
-            children: [
-              _PrintingTab(),
-              _EmptyTab(text: 'ยังไม่มีรายการเตรียมจัดส่ง'),
-              _EmptyTab(text: 'ยังไม่มีรายการที่ต้องได้รับ'),
-              _EmptyTab(text: 'ยังไม่มีรายการสำเร็จ'),
-              _EmptyTab(text: 'ยังไม่มีรายการคืนสินค้า'),
-            ],
-          ),
+        title: const Text(
+          'ประวัติอัลบั้ม',
+          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w800),
         ),
+      ),
+      body: ListView(
+        padding: EdgeInsets.zero,
+        // เอา const ออก เพราะเรามีการใส่ฟังก์ชัน onTap
+        children: [
+          // 1. Banner ส่วนหัว
+          const _HeaderBanner(),
+
+          const SizedBox(height: 20),
+
+          // --- รายการที่ 1: สั่งพิมพ์ ---
+          _HistoryCard(
+            title: 'อัลบั้ม',
+            statusText: 'สั่งพิมพ์',
+            barCount: 2,
+            isGift: true,
+            mainColor: kOrangeColor,
+            iconData: Icons.local_shipping_outlined,
+            // กดแล้วไปหน้ารายละเอียด "สั่งพิมพ์"
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const AlbumDetailPage(
+                statusTitle: 'สั่งพิมพ์',
+                statusText: 'รอชำระ', // ข้อความสถานะย่อย
+                dateText: 'วันที่ 20 มิถุนายน 2568',
+                barCount: 2,
+                mainColor: kOrangeColor,
+                iconData: Icons.local_shipping_outlined,
+              )));
+            },
+          ),
+
+          // --- รายการที่ 2: ที่ต้องได้รับ ---
+          _HistoryCard(
+            title: 'อัลบั้ม',
+            statusText: 'ที่ต้องได้รับ',
+            barCount: 3,
+            mainColor: kOrangeColor,
+            iconData: Icons.local_shipping_outlined,
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const AlbumDetailPage(
+                statusTitle: 'สั่งพิมพ์', // หัวข้อหลักยังคงเป็นสั่งพิมพ์ หรือเปลี่ยนตามต้องการ
+                statusText: 'เตรียมจัดส่ง',
+                dateText: 'วันที่ 22 มิถุนายน 2568',
+                barCount: 3,
+                mainColor: kOrangeColor,
+                iconData: Icons.local_shipping_outlined,
+              )));
+            },
+          ),
+
+          // --- รายการที่ 3: สำเร็จ ---
+          _HistoryCard(
+            title: 'อัลบั้ม',
+            statusText: 'สำเร็จ',
+            barCount: 4,
+            mainColor: kGreenColor,
+            iconData: Icons.check,
+            isCompleted: true,
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const AlbumDetailPage(
+                statusTitle: 'สั่งพิมพ์',
+                statusText: 'สำเร็จ',
+                dateText: 'วันที่ 25 มิถุนายน 2568',
+                barCount: 4,
+                mainColor: kGreenColor,
+                iconData: Icons.check,
+              )));
+            },
+          ),
+
+          // --- รายการที่ 4: คืนสินค้า ---
+          _HistoryCard(
+            title: 'อัลบั้ม',
+            statusText: 'คืนสินค้า',
+            barCount: 3,
+            mainColor: kPeachColor,
+            iconData: Icons.cached,
+            overrideIconBgColor: kPeachIconColor,
+            iconColor: Colors.white,
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const AlbumDetailPage(
+                statusTitle: 'สั่งพิมพ์',
+                statusText: 'คืนสินค้า',
+                dateText: 'วันที่ 26 มิถุนายน 2568',
+                barCount: 3,
+                mainColor: kPeachColor,
+                iconData: Icons.cached,
+                overrideIconBgColor: kPeachIconColor,
+              )));
+            },
+          ),
+
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }
 }
 
-// -------------------- แท็บ: อยู่ในระหว่างส่งพิมพ์ --------------------
-
-class _PrintingTab extends StatelessWidget {
-  const _PrintingTab();
+// -------------------------------------------------------------------
+// WIDGET: Banner ด้านบน (เหมือนเดิม)
+// -------------------------------------------------------------------
+class _HeaderBanner extends StatelessWidget {
+  const _HeaderBanner();
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.only(top: 8),
-      children: const [
-        _AlbumRow(title: 'สั่งพิมพ์รูปของคุณ', dateText: 'มิถุนายน 2568', qty: 1, showGift: false),
-        Divider(height: 24, color: Color(0xFFEDEDED)),
-        _AlbumRow(title: 'ส่งของขวัญอัลบัม', dateText: 'เมษายน 2568', qty: 1, showGift: true),
-        Divider(height: 24, color: Color(0xFFEDEDED)),
-      ],
+    return Container(
+      width: double.infinity,
+      height: 160,
+      decoration: const BoxDecoration(
+        color: Colors.grey,
+        image: DecorationImage(
+          image: AssetImage('assets/images/Hobby.png'), // เปลี่ยน Path รูปตามจริง
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+              ),
+            ),
+          ),
+          const Positioned(
+            bottom: 16,
+            right: 16,
+            child: Text(
+              "เพราะเราเข้าใจว่า ‘ภาพหนึ่งใบ’\nมีค่ามากกว่าที่เห็น",
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                height: 1.4,
+                shadows: [Shadow(offset: Offset(0, 1), blurRadius: 4, color: Colors.black54)],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _AlbumRow extends StatelessWidget {
-  const _AlbumRow({required this.title, required this.dateText, required this.qty, required this.showGift});
-
+// -------------------------------------------------------------------
+// WIDGET: การ์ดประวัติ (แก้ไขเพิ่ม onTap)
+// -------------------------------------------------------------------
+class _HistoryCard extends StatelessWidget {
   final String title;
-  final String dateText;
-  final int qty;
-  final bool showGift;
+  final String statusText;
+  final int barCount;
+  final int totalBars;
+  final Color mainColor;
+  final IconData iconData;
+  final bool isCompleted;
+  final Color? iconColor;
+  final Color? overrideIconBgColor;
+  final bool isGift;
+  final VoidCallback? onTap; // เพิ่มตัวแปรรับการกด
+
+  const _HistoryCard({
+    required this.title,
+    required this.statusText,
+    required this.barCount,
+    this.totalBars = 4,
+    required this.mainColor,
+    required this.iconData,
+    this.isCompleted = false,
+    this.iconColor,
+    this.overrideIconBgColor,
+    this.isGift = false,
+    this.onTap, // รับค่า
+  });
 
   @override
   Widget build(BuildContext context) {
-    const coinColor = Color(0xFFFFE2A5);
-    const gray = Color(0xFF9B9B9B);
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // ซ้าย: คอลัมน์รูปตัวอย่าง (เหมือนภาพ)
-        _PreviewThumbs(),
-        const SizedBox(width: 10),
-
-        // กลาง: ชื่อ + วันที่ + ชิป "ของขวัญ" (ถ้ามี)
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5)),
-              const SizedBox(height: 2),
-              Text(dateText, style: const TextStyle(color: gray, fontSize: 12.5)),
-              if (showGift) ...[const SizedBox(height: 8), _GiftChip()],
-            ],
-          ),
-        ),
-
-        // ขวา: จำนวน + ไอคอนเหรียญ
-        Row(
-          children: [
-            Text('$qty', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5, color: Colors.black87)),
-            const SizedBox(width: 6),
-            Container(
-              width: 22,
-              height: 22,
-              decoration: const BoxDecoration(color: coinColor, shape: BoxShape.circle),
-              alignment: Alignment.center,
-              child: Image.asset('assets/icons/dollar-circle.png', width: 14, height: 14, fit: BoxFit.contain),
-            ),
+    // ใช้ GestureDetector หรือ InkWell เพื่อให้กดได้
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFEEEEEE)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
           ],
         ),
-      ],
-    );
-  }
-}
+        child: Column(
+          children: [
+            // ส่วนหัวการ์ด
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                    if (isGift) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFF0EB), 
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Row(
+                          children: const [
+                            Icon(Icons.card_giftcard, size: 14, color: Color(0xFFF05A28)),
+                            SizedBox(width: 4),
+                            Text('ของขวัญ', style: TextStyle(color: Color(0xFFF05A28), fontSize: 12, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      )
+                    ]
+                  ],
+                ),
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF5B9DA9),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                )
+              ],
+            ),
+            
+            const SizedBox(height: 12),
 
-// กลุ่มรูปตัวอย่างซ้าย: 1 รูปใหญ่ + 2 รูปเล็กตามภาพ
-class _PreviewThumbs extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 62,
-      child: Column(
-        children: [
-          ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.asset('assets/images/People.png', width: 62, height: 36, fit: BoxFit.cover)),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.asset('assets/images/Hobby2.png', height: 20, fit: BoxFit.cover),
+            // ส่วนเนื้อหา
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    'assets/images/People.png', // เปลี่ยน Path รูปตามจริง
+                    width: 80, 
+                    height: 80, 
+                    fit: BoxFit.cover,
+                    errorBuilder: (c, o, s) => Container(width: 80, height: 80, color: Colors.grey[200]),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.asset('assets/images/Hobby3.png', height: 20, fit: BoxFit.cover),
-                ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        statusText,
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Progress Bar 4 ช่อง
+                      SizedBox(
+                        height: 40,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            double totalWidth = constraints.maxWidth;
+                            double iconSize = 36.0;
+                            double rightPadding = 20.0;
+                            double barAreaWidth = totalWidth - rightPadding;
+                            double singleBarWidth = barAreaWidth / totalBars;
+                            double iconLeftPos = (singleBarWidth * barCount) - (iconSize / 2);
+
+                            if (barCount == totalBars) {
+                               iconLeftPos = barAreaWidth - (iconSize / 2);
+                            } else if (barCount == 1) {
+                               iconLeftPos = singleBarWidth - (iconSize / 2);
+                            }
+
+                            return Stack(
+                              alignment: Alignment.centerLeft,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(right: rightPadding),
+                                  child: Row(
+                                    children: List.generate(totalBars, (index) {
+                                      bool isActive = index < barCount;
+                                      return Expanded(
+                                        child: Container(
+                                          margin: const EdgeInsets.only(right: 2),
+                                          height: 16,
+                                          decoration: BoxDecoration(
+                                            color: isActive ? mainColor : const Color(0xFFE0E0E0),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: iconLeftPos,
+                                  child: Container(
+                                    width: iconSize,
+                                    height: iconSize,
+                                    decoration: BoxDecoration(
+                                      color: overrideIconBgColor ?? mainColor,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 2.5),
+                                      boxShadow: [
+                                        BoxShadow(color: (overrideIconBgColor ?? mainColor).withOpacity(0.4), blurRadius: 4, offset: const Offset(0, 3))
+                                      ],
+                                    ),
+                                    child: Icon(iconData, color: iconColor ?? Colors.white, size: 18),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
-  }
-}
-
-// ชิป "ของขวัญ"
-class _GiftChip extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    const bg = Color(0xFFFFE2D3);
-    const text = Color(0xFFF08336);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(20)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset('assets/icons/gift.png', width: 14, height: 14),
-          const SizedBox(width: 6),
-          const Text('ของขวัญ', style: TextStyle(color: text, fontWeight: FontWeight.w800, fontSize: 12.5)),
-        ],
-      ),
-    );
-  }
-}
-
-// -------------------- แท็บว่างอื่น ๆ --------------------
-
-class _EmptyTab extends StatelessWidget {
-  const _EmptyTab({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text(text, style: const TextStyle(color: Color(0xFF9B9B9B))));
   }
 }
