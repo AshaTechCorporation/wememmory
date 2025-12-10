@@ -210,8 +210,8 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                 Switch(
                   value: showThisMonthOnly,
                   onChanged: _toggleThisMonth,
-                  activeColor: const Color(0xFF5AB6D8),
-                  activeTrackColor: const Color(0xFF5AB6D8).withOpacity(0.4),
+                  activeColor: Color.fromARGB(255, 255, 255, 255),  
+                  activeTrackColor:  Color(0xFFED7D31).withOpacity(0.4),
                 ),
               ],
             ),
@@ -351,7 +351,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: selectedItems.isNotEmpty ? const Color(0xFF5AB6D8) : Colors.grey[400],
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(1),
                   ),
                   elevation: 0,
                 ),

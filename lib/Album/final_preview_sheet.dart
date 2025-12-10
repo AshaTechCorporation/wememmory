@@ -262,8 +262,8 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: const Color(0xFF5AB6D8),
-          activeTrackColor: const Color(0xFF5AB6D8).withOpacity(0.4),
+          activeColor: Color.fromARGB(255, 255, 255, 255),  
+          activeTrackColor:  Color(0xFFED7D31).withOpacity(0.4),
         ),
       ],
     );

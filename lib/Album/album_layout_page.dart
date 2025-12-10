@@ -5,7 +5,7 @@ import 'package:wememmory/models/media_item.dart';
 // 📌 Import หน้า Sheet ทั้งหมด
 import 'package:wememmory/Album/photo_detail_sheet.dart'; 
 import 'package:wememmory/Album/video_detail_sheet.dart';
-import 'package:wememmory/Album/final_preview_sheet.dart'; // 👈 Import หน้า Final Preview
+import 'package:wememmory/Album/final_preview_sheet.dart'; 
 
 // --- Data Model สำหรับการลากย้าย ---
 class PhotoDragData {
@@ -31,7 +31,6 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
   late List<MediaItem> _items;
   bool _isDragging = false;
 
-  // กำหนดค่าความโค้ง
   final double _imageRadius = 6.0; 
   final double _frameRadius = 0.0; 
 
@@ -50,11 +49,11 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
     });
   }
 
-  // ✅ ฟังก์ชันตรวจสอบและเปิด Sheet ตามประเภทไฟล์ (Photo/Video Detail)
+  // ✅ เพิ่ม await และ setState
   Future<void> _handlePhotoTap(int index) async {
     final selectedItem = _items[index];
     
-    // ตรวจสอบประเภทไฟล์
+    // รอจนกว่า Sheet จะถูกปิด
     if (selectedItem.type == MediaType.video) {
       await showModalBottomSheet(
         context: context,
@@ -70,6 +69,9 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
         builder: (context) => PhotoDetailSheet(item: selectedItem),
       );
     }
+
+    // เมื่อ Sheet ปิดลง ให้รีเฟรชหน้า
+    setState(() {});
   }
 
   @override
@@ -144,7 +146,6 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // Wrapper พื้นหลังสีเทาเข้ม
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Center(
@@ -152,8 +153,8 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                         fit: BoxFit.scaleDown,
                         child: Container(
                           padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF555555), // สีเทาเข้ม
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF555555),
                           ),
                           child: IntrinsicWidth(
                             child: Row(
@@ -172,7 +173,7 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                                     children: [
                                       // Slot 0: ชื่อเดือน
                                       Container(
-                                        decoration: BoxDecoration(
+                                        decoration: const BoxDecoration(
                                           color: Colors.white,
                                         ),
                                         child: Center(
@@ -190,6 +191,7 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                                       for (int i = 0; i < 5; i++)
                                         if (i < _items.length)
                                           _ReorderableSlot(
+                                            key: ObjectKey(_items[i]), 
                                             item: _items[i],
                                             index: i,
                                             onDrop: _handlePhotoDrop,
@@ -221,6 +223,7 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                                       for (int i = 0; i < 6; i++)
                                         if ((i + 5) < _items.length)
                                           _ReorderableSlot(
+                                            key: ObjectKey(_items[i + 5]),
                                             item: _items[i + 5],
                                             index: i + 5,
                                             onDrop: _handlePhotoDrop,
@@ -243,7 +246,6 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                     ),
                   ),
 
-                  // ข้อความเชิญชวนด้านล่าง
                   Padding(
                     padding: const EdgeInsets.fromLTRB(30, 24, 30, 10),
                     child: Text(
@@ -276,7 +278,6 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      // ✅ แก้ไข: เมื่อกดปุ่มบันทึก ให้ไปหน้า FinalPreviewSheet
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
@@ -325,7 +326,7 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
   }
 }
 
-// ... (ReorderableSlot, PhotoSlot, StepItem เหมือนเดิม ไม่ต้องแก้) ...
+// ... _ReorderableSlot ...
 class _ReorderableSlot extends StatelessWidget {
   final MediaItem item;
   final int index;
@@ -337,6 +338,7 @@ class _ReorderableSlot extends StatelessWidget {
   final double frameRadius;
 
   const _ReorderableSlot({
+    super.key,
     required this.item,
     required this.index,
     required this.onDrop,
@@ -349,7 +351,12 @@ class _ReorderableSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final photoWidget = _PhotoSlot(item: item, frameRadius: frameRadius, imageRadius: imageRadius);
+    final photoWidget = _PhotoSlot(
+      key: ValueKey(item), 
+      item: item, 
+      frameRadius: frameRadius, 
+      imageRadius: imageRadius
+    );
 
     return DragTarget<PhotoDragData>(
       onWillAcceptWithDetails: (details) => details.data.index != index,
@@ -386,43 +393,79 @@ class _ReorderableSlot extends StatelessWidget {
   }
 }
 
-class _PhotoSlot extends StatelessWidget {
+// ✅ แก้ไข: ลบโค้ดแสดงไอคอนวิดีโอออกแล้ว
+class _PhotoSlot extends StatefulWidget {
   final MediaItem item;
   final double frameRadius;
   final double imageRadius;
 
   const _PhotoSlot({
-    required this.item, 
-    required this.frameRadius, 
-    required this.imageRadius
+    super.key,
+    required this.item,
+    required this.frameRadius,
+    required this.imageRadius,
   });
+
+  @override
+  State<_PhotoSlot> createState() => _PhotoSlotState();
+}
+
+class _PhotoSlotState extends State<_PhotoSlot> {
+  Uint8List? _thumbnailData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadThumbnail();
+  }
+
+  @override
+  void didUpdateWidget(covariant _PhotoSlot oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.item != widget.item || oldWidget.item.capturedImage != widget.item.capturedImage) {
+      _loadThumbnail();
+    }
+  }
+
+  void _loadThumbnail() {
+    if (widget.item.capturedImage != null) {
+      if (mounted) setState(() {}); 
+      return;
+    }
+
+    widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)).then((data) {
+      if (mounted && data != null) {
+        setState(() {
+          _thumbnailData = data;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white, 
-        // borderRadius: BorderRadius.circular(frameRadius), 
+        color: Colors.white,
       ),
-      padding: const EdgeInsets.all(4.0), 
+      padding: const EdgeInsets.all(4.0),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(imageRadius), 
+        borderRadius: BorderRadius.circular(widget.imageRadius),
         child: Container(
           color: Colors.grey[200],
           child: Stack(
             fit: StackFit.expand,
             children: [
-              FutureBuilder<Uint8List?>(
-                future: item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
-                    return Image.memory(snapshot.data!, fit: BoxFit.cover);
-                  }
-                  return Container(color: Colors.grey[200]);
-                },
-              ),
-              if (item.type == MediaType.video)
-                const Center(child: Icon(Icons.play_circle_fill, color: Colors.white70, size: 24)),
+              if (widget.item.capturedImage != null)
+                Image.memory(widget.item.capturedImage!, fit: BoxFit.cover)
+              else if (_thumbnailData != null)
+                Image.memory(_thumbnailData!, fit: BoxFit.cover)
+              else
+                Container(color: Colors.grey[200]),
+
+              // ❌ ลบส่วนนี้ออกเพื่อไม่ให้แสดงไอคอนวิดีโอ
+              // if (widget.item.type == MediaType.video)
+              //   const Center(child: Icon(Icons.play_circle_fill, color: Colors.white70, size: 24)),
             ],
           ),
         ),

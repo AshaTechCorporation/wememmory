@@ -2,50 +2,75 @@ import 'package:flutter/material.dart';
 import 'package:wememmory/Album/createAlbumModal.dart';
 import 'package:wememmory/constants.dart';
 import 'package:wememmory/home/homePage.dart';
-import 'package:wememmory/collection/collectionPage.dart';
+// ✅ ตรวจสอบ path ของ CollectionPage ให้ถูกต้องตามโปรเจคของคุณ
+// เช่น import 'package:wememmory/Album/collection_page.dart'; 
+import 'package:wememmory/collection/collectionPage.dart'; 
 import 'package:wememmory/shop/shopPage.dart';
 import 'package:wememmory/profile/profilePage.dart';
-// 📌 1. Import ไฟล์ใหม่ที่นี่
+import 'package:wememmory/models/media_item.dart'; // ✅ Import Model
 
 class FirstPage extends StatefulWidget {
-  const FirstPage({super.key});
+  // ✅ 1. เพิ่มตัวแปรรับค่า
+  final int initialIndex;
+  final List<MediaItem>? newAlbumItems;
+  final String? newAlbumMonth;
+
+  const FirstPage({
+    super.key, 
+    this.initialIndex = 0, // ค่าเริ่มต้นคือหน้าแรก (0)
+    this.newAlbumItems,
+    this.newAlbumMonth,
+  });
 
   @override
   State<FirstPage> createState() => _FirstPageState();
 }
 
 class _FirstPageState extends State<FirstPage> {
-  int _currentIndex = 0;
+  late int _currentIndex;
 
-  final List<Widget> _pages = const [
-    HomePage(),
-    CollectionPage(),
-    SizedBox(), // Placeholder
-    ShopPage(),
-    ProfilePage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // ✅ 2. กำหนดหน้าเริ่มต้นตามที่ส่งมา
+    _currentIndex = widget.initialIndex;
+  }
 
-  // 📌 2. ฟังก์ชันแสดง Modal Bottom Sheet
+  // 📌 ฟังก์ชันแสดง Modal Bottom Sheet
   void _showCreateAlbumModal() {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // ให้ขยายความสูงได้เต็มที่
-      backgroundColor: Colors.transparent, // เพื่อให้เห็นมุมโค้งมน
-      builder: (context) => const CreateAlbumModal(), // เรียกใช้ Widget ใหม่
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const CreateAlbumModal(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    // ✅ 3. ย้าย List Pages มาไว้ใน build เพื่อให้เข้าถึง widget.xxx ได้
+    final List<Widget> pages = [
+      const HomePage(),
+      // ส่งข้อมูลอัลบั้มใหม่ไปที่ CollectionPage
+      CollectionPage(
+        newAlbumItems: widget.newAlbumItems,
+        newAlbumMonth: widget.newAlbumMonth,
+      ),
+      const SizedBox(), // Placeholder ปุ่มบวก
+      const ShopPage(),
+      const ProfilePage(),
+    ];
+
     return Scaffold(
       backgroundColor: kBackgroundColor,
       extendBody: true,
-      body: _pages[_currentIndex],
+      // ✅ 4. ใช้ pages[_currentIndex] ที่สร้างใหม่
+      body: pages[_currentIndex], 
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _currentIndex,
         onTap: (index) {
           if (index == 2) {
-            _showCreateAlbumModal(); // 📌 3. เรียกฟังก์ชันเมื่อกดปุ่มบวก
+            _showCreateAlbumModal();
           } else {
             setState(() => _currentIndex = index);
           }
@@ -55,7 +80,7 @@ class _FirstPageState extends State<FirstPage> {
   }
 }
 
-// ... (ส่วน CustomBottomNavBar คงเดิม ไม่ต้องแก้) ...
+// ... (CustomBottomNavBar คงเดิม ไม่ต้องแก้) ...
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
