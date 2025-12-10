@@ -71,7 +71,18 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
   }
 
   Future<void> _captureFrame() async {
+    // ✅ เพิ่มโค้ดส่วนนี้: สั่งหยุดวิดีโอก่อนทำการแคป
+    if (_controller != null && _controller!.value.isPlaying) {
+      await _controller!.pause();
+      setState(() {
+        _isPlaying = false; // อัปเดตสถานะปุ่ม Play ให้ถูกต้อง
+      });
+    }
+
     try {
+      // รอให้ UI วาดทับ frame ที่หยุดนิ่งก่อนเล็กน้อย (Optional แต่ช่วยให้ชัวร์ขึ้น)
+      await Future.delayed(const Duration(milliseconds: 100));
+
       RenderRepaintBoundary boundary = _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
       ui.Image image = await boundary.toImage(pixelRatio: 2.0);
       ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
@@ -397,5 +408,5 @@ class _StepItem extends StatelessWidget {
         ],
       ),
     );
-  }
+  } 
 }
