@@ -1,81 +1,109 @@
 import 'package:flutter/material.dart';
+import 'package:wememmory/collection/collectionPage.dart';
 import 'package:wememmory/home/widgets/AchievementLayout.dart';
 import 'package:wememmory/home/widgets/Recommended.dart';
 import 'package:wememmory/home/widgets/summary_strip.dart';
-// import 'widgets/index.dart' hide SummaryStrip;
+import 'package:wememmory/models/media_item.dart';
+// ✅ Import CollectionPage
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class HomePage extends StatefulWidget {
+  final List<MediaItem>? albumItems;
+  final String? albumMonth;
+
+  const HomePage({
+    super.key,
+    this.albumItems,
+    this.albumMonth,
+  });
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<MediaItem>? _currentAlbumItems;
+  String? _currentAlbumMonth;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentAlbumItems = widget.albumItems;
+    _currentAlbumMonth = widget.albumMonth;
+  }
+
+  // ✅ ฟังก์ชันสำหรับไปหน้า CollectionPage และรับข้อมูลกลับมา
+  Future<void> _navigateToCollection() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CollectionPage(
+          newAlbumItems: _currentAlbumItems,
+          newAlbumMonth: _currentAlbumMonth,
+        ),
+      ),
+    );
+
+    // ✅ ถ้ามีข้อมูลกลับมา ให้อัปเดต State
+    if (result != null && result is Map) {
+      setState(() {
+        _currentAlbumItems = result['items'] as List<MediaItem>?;
+        _currentAlbumMonth = result['month'] as String?;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 239, 239, 239),
       appBar: AppBar(
-        // 1. ปรับสีพื้นหลังให้เหมือนภาพ (สีส้มพีช)
         backgroundColor: const Color(0xFFFFB085),
         elevation: 0,
-
-        // 2. ปรับความสูงให้พอเหมาะกับข้อความ 2 บรรทัด + ขอบโค้ง
         toolbarHeight: 110,
-
-        // 3. คงขอบโค้งด้านล่างไว้ตามเดิม
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
-            // เปลี่ยนจาก Radius.circular เป็น Radius.elliptical
-            bottom: Radius.elliptical(
-              420, // ตัวแรก (X): ความกว้างของความโค้ง (ใส่ค่าเยอะๆ เช่น 300-500 เพื่อให้โค้งกว้างกินพื้นที่ทั้งจอ)
-              70, // ตัวที่สอง (Y): ความลึกของความโค้ง (ยิ่งเยอะ พื้นหลังยิ่งย้อยลงมาต่ำ)
-            ),
+            bottom: Radius.elliptical(420, 70),
           ),
         ),
-
-        // ส่วนรูปโปรไฟล์ด้านซ้าย (คงไว้จากโค้ดเดิมของคุณ)
         leadingWidth: 70,
-        leading: Padding(padding: const EdgeInsets.only(left: 16)),
-
-        titleSpacing: 0, // ลดช่องว่างระหว่างรูปโปรไฟล์กับข้อความ
-        // 4. *** จุดสำคัญ: ใช้ Column เพื่อทำข้อความ 2 บรรทัด ***
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // จัดชิดซ้าย
+        leading: const Padding(padding: EdgeInsets.only(left: 16)),
+        titleSpacing: 0,
+        title: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Text(
-              'ยินดีต้อนรับ', // บรรทัดบน
+              'ยินดีต้อนรับ',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 14, // ขนาดเล็กกว่า
+                fontSize: 14,
                 fontWeight: FontWeight.w400,
                 height: 1.2,
               ),
             ),
             Text(
-              'korakrit', // บรรทัดล่าง (ชื่อ)
+              'korakrit',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 22, // ขนาดใหญ่กว่า
-                fontWeight: FontWeight.w700, // ตัวหนา
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
                 height: 1.2,
               ),
             ),
           ],
         ),
-
-        // 5. ไอคอนกระดิ่งด้านขวา
         actions: [
           Stack(
             alignment: Alignment.center,
             children: [
               IconButton(
                 onPressed: () {},
-                // ใช้ Icon ของ Flutter หรือ Image.asset ตามที่คุณมี
                 icon: const Icon(
                   Icons.notifications,
                   color: Colors.white,
                   size: 28,
                 ),
               ),
-              // จุดสีแดงแจ้งเตือน (ถ้าต้องการให้เหมือนเป๊ะ)
               Positioned(
                 top: 10,
                 right: 12,
@@ -95,22 +123,19 @@ class HomePage extends StatelessWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          // padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // CustomSearchBar(),
-              Recommended(),
-              SizedBox(height: 7),
-              SummaryStrip(), // ✅ ใช้แท่งเดียว ไม่ล้น ไม่แยก
-              SizedBox(height: 35),
-              AchievementLayout(),
-              // MemoryTipCard(),
-              // SizedBox(height: 16),
-              // Image.asset('assets/images/image2.png', fit: BoxFit.cover),
-              // SizedBox(height: 16),
-              // // ✅ แสดงการ์ดตามข้อมูล wedata
-              // WeMemoryList(data: wedata),
+              // ✅ ส่งข้อมูลและ callback ไปให้ Recommended
+              Recommended(
+                albumItems: _currentAlbumItems,
+                albumMonth: _currentAlbumMonth,
+                onCardTap: _navigateToCollection, // ✅ ส่ง callback สำหรับคลิกการ์ด
+              ),
+              const SizedBox(height: 7),
+              const SummaryStrip(),
+              const SizedBox(height: 35),
+              const AchievementLayout(),
             ],
           ),
         ),

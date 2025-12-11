@@ -3,24 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wememmory/Album/album_layout_page.dart';
-import 'package:wememmory/models/media_item.dart'; // 👈 เพิ่มบรรทัดนี้
-// 📌 อย่าลืม import หน้านี้
-
-// // --- Models ---
-// enum MediaType { image, video }
-
-// class MediaItem {
-//   final AssetEntity asset;
-//   final MediaType type;
-//   MediaItem({required this.asset, required this.type});
-// }
-
-// class AlbumPhoto {
-//   final MediaItem mediaItem;
-//   final Uint8List? imageBytes;
-//   AlbumPhoto({required this.mediaItem, this.imageBytes});
-// }
-// // ----------------
+import 'package:wememmory/models/media_item.dart'; 
 
 class UploadPhotoPage extends StatefulWidget {
   final String selectedMonth;
@@ -210,8 +193,12 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                 Switch(
                   value: showThisMonthOnly,
                   onChanged: _toggleThisMonth,
-                  activeColor: Color.fromARGB(255, 255, 255, 255),  
-                  activeTrackColor:  Color(0xFFED7D31).withOpacity(0.4),
+                  // สีปุ่มตอนเปิด (ON)
+                  activeColor: Colors.white, // สีของหัวปุ่ม (Thumb) เป็นสีขาว
+                  activeTrackColor: const Color(0xFFED7D31), // สีของราง (Track) เป็นสีส้ม
+                  // สีปุ่มตอนปิด (OFF)
+                  inactiveThumbColor: Colors.grey, // สีของหัวปุ่ม (Thumb) เป็นสีเทา
+                  inactiveTrackColor: const Color(0xFFE0E0E0), // สีของราง (Track) เป็นสีเทาอ่อน
                 ),
               ],
             ),

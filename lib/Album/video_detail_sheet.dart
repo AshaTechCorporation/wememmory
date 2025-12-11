@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:flutter/gestures.dart'; // สำหรับ PointerScrollEvent (เผื่อใช้เมาส์)
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -18,13 +19,24 @@ class VideoDetailSheet extends StatefulWidget {
 
 class _VideoDetailSheetState extends State<VideoDetailSheet> {
   VideoPlayerController? _controller;
-  final GlobalKey _globalKey = GlobalKey();
+  
+  // ✅ Key สำหรับจับภาพ และ Controller สำหรับ Zoom/Pan
+  final GlobalKey _captureKey = GlobalKey();
+  final TransformationController _transformationController = TransformationController();
+  
   bool _isPlaying = false;
   bool _isInitialized = false;
+  
+  // ✅ ตัวแปรเก็บภาพที่แคปไว้ชั่วคราว (ยังไม่บันทึกลง item จนกว่าจะกด Save)
+  Uint8List? _tempCapturedImage;
 
   @override
   void initState() {
     super.initState();
+    // ถ้าเคยมีภาพแคปไว้แล้ว ให้เอามาโชว์ก่อน
+    if (widget.item.capturedImage != null) {
+      _tempCapturedImage = widget.item.capturedImage;
+    }
     _initializeVideo();
   }
 
@@ -33,7 +45,6 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
     if (file != null) {
       _controller = VideoPlayerController.file(file)
         ..initialize().then((_) {
-          // เพิ่ม Listener เพื่ออัปเดต UI ตามเวลาวิดีโอ
           _controller!.addListener(() {
             if (mounted) setState(() {});
           });
@@ -47,10 +58,18 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
   @override
   void dispose() {
     _controller?.dispose();
+    _transformationController.dispose();
     super.dispose();
   }
 
   void _togglePlayPause() {
+    // ถ้ามีภาพแคปอยู่ ให้เคลียร์ภาพออกก่อนเล่นวิดีโอ
+    if (_tempCapturedImage != null) {
+      setState(() {
+        _tempCapturedImage = null; 
+      });
+    }
+
     setState(() {
       if (_controller!.value.isPlaying) {
         _controller!.pause();
@@ -62,7 +81,6 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
     });
   }
 
-  // ฟังก์ชันแปลงเวลา Duration เป็น String (เช่น 01:25)
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     final String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
@@ -70,28 +88,48 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
     return "$twoDigitMinutes:$twoDigitSeconds";
   }
 
+  // ✅ ฟังก์ชันช่วย Zoom ด้วย Mouse Wheel (สำหรับ Emulator)
+  void _onPointerSignal(PointerSignalEvent event) {
+    if (event is PointerScrollEvent) {
+      final double scaleChange = event.scrollDelta.dy < 0 ? 1.1 : 0.9;
+      final Matrix4 matrix = _transformationController.value.clone();
+      matrix.scale(scaleChange);
+      final currentScale = matrix.entry(0, 0);
+      if (currentScale >= 1.0 && currentScale <= 4.0) {
+        setState(() {
+          _transformationController.value = matrix;
+        });
+      }
+    }
+  }
+
+  // ✅ ฟังก์ชันจับภาพหน้าจอ (Capture Frame + Zoom/Pan)
   Future<void> _captureFrame() async {
-    // ✅ เพิ่มโค้ดส่วนนี้: สั่งหยุดวิดีโอก่อนทำการแคป
+    // 1. หยุดวิดีโอก่อน
     if (_controller != null && _controller!.value.isPlaying) {
       await _controller!.pause();
-      setState(() {
-        _isPlaying = false; // อัปเดตสถานะปุ่ม Play ให้ถูกต้อง
-      });
+      setState(() => _isPlaying = false);
     }
 
     try {
-      // รอให้ UI วาดทับ frame ที่หยุดนิ่งก่อนเล็กน้อย (Optional แต่ช่วยให้ชัวร์ขึ้น)
+      // รอให้ UI วาดเฟรมสุดท้ายนิ่งๆ ก่อน
       await Future.delayed(const Duration(milliseconds: 100));
 
-      RenderRepaintBoundary boundary = _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      ui.Image image = await boundary.toImage(pixelRatio: 2.0);
+      // 2. จับภาพจาก RepaintBoundary (ภาพที่เห็นในกรอบขณะนั้น)
+      RenderRepaintBoundary boundary = _captureKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0); // High Quality
       ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
 
       if (byteData != null) {
         Uint8List pngBytes = byteData.buffer.asUint8List();
+        
+        // 3. แสดงภาพที่แคปได้ทันที
         setState(() {
-          widget.item.capturedImage = pngBytes;
+          _tempCapturedImage = pngBytes;
+          // ✅ รีเซ็ต Zoom กลับมาเป็นปกติ เพื่อให้เห็นภาพที่แคปมาแบบ "เต็มเฟรม"
+          _transformationController.value = Matrix4.identity();
         });
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("บันทึกภาพหน้าจอเรียบร้อย"), duration: Duration(seconds: 1)),
@@ -103,9 +141,29 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
     }
   }
 
+  // ✅ ฟังก์ชันบันทึกข้อมูลและปิดหน้า
+  void _saveAndClose() {
+    // ถ้ามีภาพแคปใหม่ (ที่อยู่ในตัวแปรชั่วคราว) ให้บันทึกลง Item จริงๆ
+    if (_tempCapturedImage != null) {
+      widget.item.capturedImage = _tempCapturedImage;
+    }
+    
+    // หยุดวิดีโอ
+    if (_controller != null) _controller!.pause();
+    
+    Navigator.pop(context);
+  }
+
+  // ✅ ฟังก์ชันยกเลิกภาพแคป (กลับไปดูวิดีโอ)
+  void _undoCapture() {
+    setState(() {
+      _tempCapturedImage = null;
+      _transformationController.value = Matrix4.identity(); // รีเซ็ตซูมด้วย
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // คำนวณเวลาปัจจุบันและเวลาทั้งหมด
     final duration = _controller?.value.duration ?? Duration.zero;
     final position = _controller?.value.position ?? Duration.zero;
 
@@ -133,7 +191,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                     ),
                     const SizedBox(width: 12),
                     const Text(
-                      "รายละเอียดรูปภาพ (2/11)", 
+                      "รายละเอียดรูปภาพ", 
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
                     ),
                   ],
@@ -155,7 +213,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
             padding: EdgeInsets.symmetric(horizontal: 24.0),
             child: Row(
               children: [
-                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true),
+                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true, isCompleted: true),
                 _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true),
                 _StepItem(label: 'พรีวิวสุดท้าย', isActive: false, isLast: true),
               ],
@@ -167,41 +225,61 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
           // 3. Content Area
           Expanded(
             child: SingleChildScrollView(
+              // ป้องกันการแย่ง Gesture กับการซูม
+              physics: const ClampingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  // --- ส่วนแสดงวิดีโอ (สี่เหลี่ยมจัตุรัส) ---
+                  // --- ส่วนแสดงวิดีโอ (Interactive & Capture) ---
                   RepaintBoundary(
-                    key: _globalKey,
+                    key: _captureKey, // Key สำคัญสำหรับจับภาพ
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
-                        // กำหนดความสูงให้เป็นสี่เหลี่ยม (เช่น 350x350 หรือ AspectRatio 1:1)
                         height: 350, 
                         width: double.infinity,
                         color: Colors.black,
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            if (_isInitialized && _controller != null)
-                              AspectRatio(
-                                aspectRatio: _controller!.value.aspectRatio, // หรือใช้ 1.0 ถ้าต้องการบังคับ crop
-                                child: VideoPlayer(_controller!),
-                              )
-                            else
-                              // Thumbnail ระหว่างรอ
-                              FutureBuilder<Uint8List?>(
-                                future: widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(800, 800)),
-                                builder: (context, snapshot) {
-                                  if (snapshot.data != null) {
-                                    return Image.memory(snapshot.data!, fit: BoxFit.cover, width: double.infinity, height: double.infinity);
-                                  }
-                                  return const Center(child: CircularProgressIndicator());
-                                },
+                            // 1. เนื้อหา (วิดีโอ หรือ ภาพที่แคปแล้ว)
+                            Listener(
+                              onPointerSignal: _onPointerSignal, // รองรับ Mouse Wheel Zoom
+                              child: InteractiveViewer(
+                                transformationController: _transformationController,
+                                minScale: 1.0,
+                                maxScale: 4.0,
+                                panEnabled: true,
+                                scaleEnabled: true,
+                                trackpadScrollCausesScale: true,
+                                child: _tempCapturedImage != null
+                                    // ถ้ามีภาพแคป ให้โชว์ภาพนั้นเต็มกรอบ
+                                    ? Image.memory(
+                                        _tempCapturedImage!, 
+                                        fit: BoxFit.cover, 
+                                        width: double.infinity, 
+                                        height: double.infinity
+                                      )
+                                    // ถ้าไม่มี ให้โชว์วิดีโอหรือ Thumbnail
+                                    : (_isInitialized && _controller != null)
+                                        ? AspectRatio(
+                                            aspectRatio: _controller!.value.aspectRatio,
+                                            child: VideoPlayer(_controller!),
+                                          )
+                                        : FutureBuilder<Uint8List?>(
+                                            future: widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(800, 800)),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.data != null) {
+                                                return Image.memory(snapshot.data!, fit: BoxFit.cover, width: double.infinity, height: double.infinity);
+                                              }
+                                              return const Center(child: CircularProgressIndicator());
+                                            },
+                                          ),
                               ),
+                            ),
                             
-                            // Grid Overlay (เส้นขาว)
-                            _buildGridOverlay(),
+                            // 2. Grid Overlay (วาดทับ ไม่ขยับตาม Zoom)
+                            IgnorePointer(child: _buildGridOverlay()),
                           ],
                         ),
                       ),
@@ -210,104 +288,124 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
 
                   const SizedBox(height: 12),
 
-                  // --- ส่วน Timeline (เวลาซ้าย-ขวา & Progress Bar) ---
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(_formatDuration(position), style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                      Text(_formatDuration(duration), style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  // Progress Bar สีส้ม
-                  if (_isInitialized && _controller != null)
-                    VideoProgressIndicator(
-                      _controller!,
-                      allowScrubbing: true,
-                      colors: const VideoProgressColors(
-                        playedColor: Color(0xFFED7D31), // สีส้ม
-                        bufferedColor: Color(0xFFEEEEEE),
-                        backgroundColor: Color(0xFFE0E0E0),
+                  // --- ส่วน Timeline ---
+                  // แสดงเฉพาะเมื่อยังไม่ได้แคปภาพ หรือกำลังดูวิดีโออยู่
+                  if (_tempCapturedImage == null) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(_formatDuration(position), style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                        Text(_formatDuration(duration), style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    if (_isInitialized && _controller != null)
+                      VideoProgressIndicator(
+                        _controller!,
+                        allowScrubbing: true,
+                        colors: const VideoProgressColors(
+                          playedColor: Color(0xFFED7D31),
+                          bufferedColor: Color(0xFFEEEEEE),
+                          backgroundColor: Color(0xFFE0E0E0),
+                        ),
+                      ),
+                  ] else ...[
+                    // ถ้าแคปภาพแล้ว แสดงข้อความแจ้งเตือน
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Text(
+                        "นี่คือภาพที่คุณเลือกจากวิดีโอ",
+                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
                       ),
                     ),
+                  ],
 
                   const SizedBox(height: 20),
 
-                  // --- ส่วนปุ่มควบคุม (Previous, Play/Pause, Next) ---
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.skip_previous, size: 36, color: Colors.black54),
-                        onPressed: () {
-                          // Logic ย้อนกลับ (ถ้าต้องการ)
-                        },
-                      ),
-                      const SizedBox(width: 30),
-                      
-                      // ปุ่ม Play/Pause วงกลมสีส้ม
-                      GestureDetector(
-                        onTap: _togglePlayPause,
-                        child: Container(
-                          width: 64, 
-                          height: 64,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFED7D31), // สีส้ม
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
-                            ],
-                          ),
-                          child: Icon(
-                            _controller != null && _controller!.value.isPlaying 
-                                ? Icons.pause 
-                                : Icons.play_arrow_rounded, // ใช้ play_arrow_rounded ให้ดูนมนวลขึ้น
-                            color: Colors.white, 
-                            size: 40,
+                  // --- ส่วนปุ่มควบคุม (Play/Pause) ---
+                  // ซ่อนปุ่มควบคุม ถ้าแคปภาพแล้ว
+                  if (_tempCapturedImage == null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.skip_previous, size: 36, color: Colors.black54),
+                          onPressed: () {}, 
+                        ),
+                        const SizedBox(width: 30),
+                        
+                        GestureDetector(
+                          onTap: _togglePlayPause,
+                          child: Container(
+                            width: 64, 
+                            height: 64,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFED7D31),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+                              ],
+                            ),
+                            child: Icon(
+                              _controller != null && _controller!.value.isPlaying 
+                                  ? Icons.pause 
+                                  : Icons.play_arrow_rounded,
+                              color: Colors.white, 
+                              size: 40,
+                            ),
                           ),
                         ),
-                      ),
-                      
-                      const SizedBox(width: 30),
-                      IconButton(
-                        icon: const Icon(Icons.skip_next, size: 36, color: Colors.black54),
-                        onPressed: () {
-                          // Logic ถัดไป (ถ้าต้องการ)
-                        },
-                      ),
-                    ],
-                  ),
+                        
+                        const SizedBox(width: 30),
+                        IconButton(
+                          icon: const Icon(Icons.skip_next, size: 36, color: Colors.black54),
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
 
                   const SizedBox(height: 30),
 
-                  // --- ปุ่ม Action (แคปหน้าจอ & บันทึก) ---
+                  // --- ปุ่ม Action ---
                   
-                  // ปุ่มแคปหน้าจอ (สีฟ้าอมเทา)
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _isInitialized ? _captureFrame : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF67A5BA), 
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
-                        elevation: 0,
+                  // 1. ปุ่มแคปหน้าจอ (ซ่อนถ้ามีภาพแคปแล้ว)
+                  if (_tempCapturedImage == null)
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _isInitialized ? _captureFrame : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF67A5BA), 
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
+                          elevation: 0,
+                        ),
+                        child: const Text("แคปหน้าจอ", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
-                      child: const Text("แคปหน้าจอ", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    )
+                  else
+                  // 2. ปุ่มยกเลิกภาพแคป (แสดงถ้ามีภาพแคปแล้ว)
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: OutlinedButton(
+                        onPressed: _undoCapture,
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFFED7D31)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
+                        ),
+                        child: const Text("ยกเลิกภาพนี้", style: TextStyle(color: Color(0xFFED7D31), fontSize: 16, fontWeight: FontWeight.bold)),
+                      ),
                     ),
-                  ),
                   
                   const SizedBox(height: 10),
 
-                  // ปุ่มบันทึก & ถัดไป (สีส้ม)
+                  // 3. ปุ่มบันทึก
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {
-                        if (_controller != null) _controller!.pause();
-                        Navigator.pop(context);
-                      },
+                      onPressed: _saveAndClose,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFED7D31), 
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
@@ -327,49 +425,22 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
     );
   }
 
-  // เส้น Grid สีขาวทับวิดีโอ
   Widget _buildGridOverlay() {
     return Stack(
-      fit: StackFit.expand, // ให้ Grid ขยายเต็มพื้นที่
+      fit: StackFit.expand,
       children: [
-        // เส้นแนวนอน (Column)
         Column(
           children: [
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1)),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1)),
-                ),
-              ),
-            ),
-            Expanded(child: Container()), // ช่องล่างสุดไม่มีเส้นขอบล่าง
+            Expanded(child: Container(decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
+            Expanded(child: Container(decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
+            Expanded(child: Container()),
           ],
         ),
-        // เส้นแนวตั้ง (Row)
         Row(
           children: [
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1)),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1)),
-                ),
-              ),
-            ),
-            Expanded(child: Container()), // ช่องขวาสุดไม่มีเส้นขอบขวา
+            Expanded(child: Container(decoration: BoxDecoration(border: Border(right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
+            Expanded(child: Container(decoration: BoxDecoration(border: Border(right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
+            Expanded(child: Container()),
           ],
         ),
       ],
@@ -377,36 +448,68 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
   }
 }
 
-// Widget Step Item (ตัวบอกขั้นตอน)
 class _StepItem extends StatelessWidget {
   final String label;
   final bool isActive;
   final bool isFirst;
   final bool isLast;
+  final bool isCompleted;
 
   const _StepItem({
     required this.label,
     required this.isActive,
     this.isFirst = false,
     this.isLast = false,
+    this.isCompleted = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    const activeColor = Color(0xFF5AB6D8); 
+
     return Expanded(
       child: Column(
         children: [
           Row(
             children: [
-              Expanded(child: Container(height: 2, color: isFirst ? Colors.transparent : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]))),
-              Container(width: 10, height: 10, decoration: BoxDecoration(shape: BoxShape.circle, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300])),
-              Expanded(child: Container(height: 2, color: isLast ? Colors.transparent : Colors.grey[300])),
+              Expanded(
+                child: Container(
+                  height: 2, 
+                  color: isFirst 
+                      ? Colors.transparent 
+                      : (isActive ? activeColor : Colors.grey[300]),
+                ),
+              ),
+              Container(
+                width: 10, 
+                height: 10, 
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle, 
+                  color: isActive ? activeColor : Colors.grey[300],
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  height: 2, 
+                  color: isLast 
+                      ? Colors.transparent 
+                      : (isCompleted ? activeColor : Colors.grey[300]),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),
-          Text(label, textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400], fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
+          Text(
+            label, 
+            textAlign: TextAlign.center, 
+            style: TextStyle(
+              fontSize: 10, 
+              color: isActive ? activeColor : Colors.grey[400], 
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
         ],
       ),
     );
-  } 
+  }
 }
