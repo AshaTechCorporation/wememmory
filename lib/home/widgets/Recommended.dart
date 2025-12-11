@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/models/media_item.dart';
 
-// ==========================================
-// 1. Recommended Widget
-// ==========================================
+// ... (Recommended Widget and _RecommendedState remain unchanged)
+
 class Recommended extends StatefulWidget {
   final List<MediaItem>? albumItems;
   final String? albumMonth;
-  final VoidCallback? onCardTap; // ✅ เพิ่ม callback สำหรับคลิกการ์ด
+  final VoidCallback? onCardTap;
 
   const Recommended({
     Key? key,
@@ -42,13 +41,13 @@ class _RecommendedState extends State<Recommended> {
   }
 
   void _initData() {
-    // ข้อมูล Default
+    // Default Data
     _items = [
       MemoryCardData(
         topTitle: 'เติมเรื่องราวครึ่งปีแรกด้วยอัลบั้มใหม่กัน',
         mainTitle: 'พฤษภาคมของฉัน',
         subTitle: 'เพิ่มความทรงจำ',
-        footerText: 'อีกมากกว่า 23+ ที่เพิ่มรูปภาพเดือนนี้',
+        footerText: 'อีกมากกว่า 23+\nที่เพิ่มรูปภาพเดือนนี้', 
         gradientColors: [const Color(0xFF424242), const Color(0xFF212121)],
         accentColor: const Color(0xFFFF7043),
       ),
@@ -56,7 +55,7 @@ class _RecommendedState extends State<Recommended> {
         topTitle: 'บันทึกความสำเร็จของคุณ',
         mainTitle: 'เมษายนของฉัน',
         subTitle: 'ความทรงจำที่ผ่านมา',
-        footerText: 'คุณได้อธิบายภาพในเดือนนี้แล้ว 76%',
+        footerText: 'คุณได้อธิบายภาพ\nในเดือนนี้แล้ว 76%',
         gradientColors: [const Color(0xFF37474F), const Color(0xFF102027)],
         accentColor: const Color(0xFF42A5F5),
       ),
@@ -64,30 +63,28 @@ class _RecommendedState extends State<Recommended> {
         topTitle: 'เริ่มต้นเดือนใหม่',
         mainTitle: 'มิถุนายนนี้',
         subTitle: 'วางแผนล่วงหน้า',
-        footerText: 'เพื่อน 5 คนเพิ่มรูปภาพแล้ว',
+        footerText: 'เพื่อน 5 คน\nเพิ่มรูปภาพแล้ว',
         gradientColors: [const Color(0xFF33691E), const Color(0xFF1B5E20)],
         accentColor: const Color(0xFF66BB6A),
       ),
     ];
 
-    // ✅ ถ้ามีข้อมูลอัลบั้มจริงส่งมา ให้แทนที่การ์ดใบแรก
     if (widget.albumItems != null && widget.albumItems!.isNotEmpty) {
       String displayTitle = widget.albumMonth ?? 'เดือนล่าสุด';
-      
       _items[0] = MemoryCardData(
-        topTitle: 'อัลบั้มล่าสุดของคุณ ✨',
+        topTitle: 'เติมเรื่องราวด้วยอัลบั้มใหม่กัน',
         mainTitle: displayTitle, 
-        subTitle: 'ความทรงจำที่เพิ่งสร้าง',
-        footerText: 'มี ${widget.albumItems!.length} รูปภาพในรายการนี้',
+        subTitle: 'เพิ่มความทรงจำ',
+        footerText: 'อีกมากกว่า 23+\nที่เพิ่มรูปภาพเดือนนี้',
         gradientColors: [const Color(0xFF424242), const Color(0xFF212121)],
         accentColor: const Color(0xFFFF7043),
-        imageItems: widget.albumItems, // ✅ ส่งรูปภาพเข้าไป (จะใช้เฉพาะ 3 รูปแรกใน _PhotoStack)
+        imageItems: widget.albumItems,
       );
     }
     
     if (mounted) setState(() {});
   }
-
+// ... (_nextCard, _previousCard, build remain unchanged)
   void _nextCard() {
     if (_currentIndex < _items.length - 1) {
       setState(() => _currentIndex++);
@@ -134,10 +131,7 @@ class _RecommendedState extends State<Recommended> {
             child: SizedBox(
               width: cardWidth,
               height: cardHeight,
-              child: MemoryCard(
-                data: item,
-                onTap: widget.onCardTap, // ✅ ส่ง callback
-              ),
+              child: MemoryCard(data: item, onTap: widget.onCardTap),
             ),
           ),
         ),
@@ -172,10 +166,7 @@ class _RecommendedState extends State<Recommended> {
                 height: cardHeight,
                 child: AbsorbPointer(
                   absorbing: relativeIndex > 0,
-                  child: MemoryCard(
-                    data: item,
-                    onTap: widget.onCardTap, // ✅ ส่ง callback
-                  ),
+                  child: MemoryCard(data: item, onTap: widget.onCardTap),
                 ),
               ),
             ),
@@ -186,9 +177,6 @@ class _RecommendedState extends State<Recommended> {
   }
 }
 
-// ==========================================
-// 2. MemoryCardData
-// ==========================================
 class MemoryCardData {
   final String topTitle;
   final String mainTitle;
@@ -209,12 +197,10 @@ class MemoryCardData {
   });
 }
 
-// ==========================================
-// 3. MemoryCard
-// ==========================================
+// ... (MemoryCard remains unchanged)
 class MemoryCard extends StatelessWidget {
   final MemoryCardData data;
-  final VoidCallback? onTap; // ✅ เพิ่ม callback
+  final VoidCallback? onTap;
 
   const MemoryCard({
     Key? key,
@@ -225,10 +211,10 @@ class MemoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap, // ✅ เรียก callback เมื่อคลิกการ์ด
+      onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28), 
+          borderRadius: BorderRadius.circular(28),
           gradient: LinearGradient(
             colors: data.gradientColors,
             begin: Alignment.topLeft,
@@ -248,6 +234,7 @@ class MemoryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(26),
           child: Stack(
             children: [
+              // Background Circle (Optional decoration)
               Positioned(
                 top: -70, left: -70,
                 child: Container(
@@ -261,62 +248,92 @@ class MemoryCard extends StatelessWidget {
                   ),
                 ),
               ),
+              
+              // เนื้อหาหลัก (จัด Layout ตามภาพ)
               Padding(
-                padding: const EdgeInsets.all(24.0), 
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center, // จัดกึ่งกลางแนวนอน
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 44, height: 44, 
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: Colors.white.withOpacity(0.2)),
-                          ),
-                          child: Center(child: Icon(Icons.map_rounded, color: data.accentColor, size: 24)),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Text(data.topTitle, style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13), maxLines: 2),
-                        ),
-                      ],
+                    // 1. ข้อความด้านบน (Top Title)
+                    Text(
+                      data.topTitle,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9), 
+                        fontSize: 13,
+                        fontWeight: FontWeight.w300
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(data.subTitle, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13)),
-                        const SizedBox(height: 4),
-                        Text(data.mainTitle, style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
-                      ],
+                    
+                    const SizedBox(height: 8),
+                    
+                    // 2. ชื่อเดือน (Main Title)
+                    Text(
+                      data.mainTitle,
+                      style: const TextStyle(
+                        color: Colors.white, 
+                        fontSize: 26, // ใหญ่ขึ้นนิดนึงเพื่อให้เด่น
+                        fontWeight: FontWeight.bold,
+                        height: 1.1
+                      ),
+                      textAlign: TextAlign.center,
                     ),
+
+                    const Spacer(), // ดันรูปภาพให้อยู่กลาง
+
+                    // 3. รูปภาพ 3 ใบ (Photo Stack)
+                    // ใช้ Container กำหนดขนาดให้รูปอยู่ตรงกลางสวยๆ
+                    SizedBox(
+                      height: 100, // ความสูงพื้นที่แสดงรูป
+                      width: 200,  // ความกว้างพื้นที่แสดงรูป
+                      child: _PhotoStack(items: data.imageItems),
+                    ),
+
+                    const Spacer(), // ดันข้อความล่างลงไป
+
+                    // 4. ข้อความด้านล่างซ้าย (ปุ่มส้ม) และ ขวา (Footer Text)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end, // จัดให้ตรงกันด้านล่าง
                       children: [
-                        Expanded(
-                          child: SizedBox(
-                            height: 60,
-                            child: _PhotoStack(items: data.imageItems), // ✅ ส่งรูปเข้าไป
-                          ),
-                        ),
+                        // ปุ่มสีส้ม "เพิ่มความทรงจำ" (ทำเป็น Container ธรรมดา ไม่ใช่ปุ่มกด เพราะกดทั้งการ์ดได้)
                         Container(
-                          width: 64, height: 64, 
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
                             color: data.accentColor,
-                            shape: BoxShape.circle,
-                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 6))],
-                            border: Border.all(color: Colors.white.withOpacity(0.25)),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 4)),
+                            ],
                           ),
-                          child: const Icon(Icons.add, color: Color(0xFF1E1E1E), size: 36),
+                          child: const Text(
+                            "เพิ่มความทรงจำ",
+                            style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        
+                        // ข้อความฝั่งขวา
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 12.0, bottom: 4),
+                            child: Text(
+                              data.footerText, // "อีกมากกว่า 23+ ..."
+                              style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11),
+                              textAlign: TextAlign.right,
+                              maxLines: 2,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    Text(data.footerText, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
                   ],
                 ),
               ),
+
+              // 5. ปุ่มบวก (+) ลอยตัว (Floating Button) - ถ้าต้องการเอาออกตามภาพ ให้ลบส่วนนี้ทิ้ง
+              // แต่ถ้าต้องการคงฟังก์ชันเดิมไว้ ก็สามารถเก็บไว้ได้ครับ
+              // Positioned(...) 
             ],
           ),
         ),
@@ -326,79 +343,96 @@ class MemoryCard extends StatelessWidget {
 }
 
 // ==========================================
-// 4. _PhotoStack (แสดง 3 รูปแรก)
+// 4. Helper Widgets (_PhotoStack Updated)
 // ==========================================
 class _PhotoStack extends StatelessWidget {
-  final List<MediaItem>? items; 
+  final List<MediaItem>? items;
 
   const _PhotoStack({Key? key, this.items}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // ✅ ดึงเฉพาะ 3 รูปแรก
+    // Determine items to display
     final item1 = (items != null && items!.isNotEmpty) ? items![0] : null;
     final item2 = (items != null && items!.length > 1) ? items![1] : null;
     final item3 = (items != null && items!.length > 2) ? items![2] : null;
 
     return Stack(
+      alignment: Alignment.center,
       clipBehavior: Clip.none,
-      alignment: Alignment.centerLeft,
       children: [
-        _buildPolaroid(angle: -0.15, left: 0, color: const Color(0xFF757575), item: item3),
-        _buildPolaroid(angle: -0.08, left: 30, color: const Color(0xFFBDBDBD), item: item2),
-        _buildPolaroid(angle: 0.05, left: 60, color: Colors.white, isFront: true, item: item1),
+        // Left (rotated)
+        _buildPolaroid(
+          angle: -0.26, 
+          offset: const Offset(-65, 10), 
+          item: item3
+        ),
+        // Right (rotated)
+        _buildPolaroid(
+          angle: 0.26,
+          offset: const Offset(65, 10), 
+          item: item2
+        ),
+        // Center (front)
+        _buildPolaroid(
+          angle: 0.0, 
+          offset: const Offset(0, -5), 
+          item: item1,
+          isFront: true
+        ),
       ],
     );
   }
 
   Widget _buildPolaroid({
     required double angle,
-    required double left,
-    required Color color,
+    required Offset offset,
     bool isFront = false,
     MediaItem? item,
   }) {
-    return Positioned(
-      left: left,
-      top: 8,
+    // Polaroid Size - Slightly larger
+    const double polaroidWidth = 85; 
+    const double polaroidHeight = 95;
+
+    return Transform.translate(
+      offset: offset,
       child: Transform.rotate(
         angle: angle,
         child: Container(
-          width: 48,
-          height: 58, 
-          padding: const EdgeInsets.all(3),
+          width: polaroidWidth,
+          height: polaroidHeight,
+          padding: const EdgeInsets.fromLTRB(5, 5, 5, 15), // Thicker bottom padding
           decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(5),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(2),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 3,
-                offset: const Offset(2, 2),
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(3),
-            child: Container(
-              color: Colors.blueGrey[100],
-              child: item != null
-                  ? FutureBuilder<Uint8List?>(
-                      future: item.capturedImage != null
-                          ? Future.value(item.capturedImage)
-                          : item.asset.thumbnailDataWithSize(const ThumbnailSize(200, 200)),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData && snapshot.data != null) {
-                          return Image.memory(
-                            snapshot.data!,
-                            fit: BoxFit.cover,
-                          );
-                        }
-                        return Container(color: Colors.grey[300]);
-                      },
-                    )
-                  : (isFront ? Icon(Icons.image, color: Colors.grey[400], size: 20) : null),
-            ),
+          child: Container(
+            color: Colors.grey[200],
+            child: item != null
+                ? FutureBuilder<Uint8List?>(
+                    future: item.capturedImage != null
+                        ? Future.value(item.capturedImage)
+                        : item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return Image.memory(
+                          snapshot.data!,
+                          fit: BoxFit.cover,
+                        );
+                      }
+                      return Container(color: Colors.grey[300]);
+                    },
+                  )
+                : (isFront 
+                    ? const Center(child: Icon(Icons.photo_library, color: Colors.grey, size: 30))
+                    : null),
           ),
         ),
       ),
