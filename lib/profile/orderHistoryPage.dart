@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wememmory/profile/orderDetailPage.dart'; // 1. อย่าลืม Import หน้ารายละเอียด
+import 'package:wememmory/profile/orderDetailPage.dart';
+import 'package:wememmory/shop/paymentPage.dart'; // 1. อย่าลืม Import หน้ารายละเอียด
 
 class OrderHistoryPage extends StatelessWidget {
   const OrderHistoryPage({super.key});
@@ -44,9 +45,9 @@ class OrderHistoryPage extends StatelessWidget {
             mainColor: kOrangeColor,
             iconData: Icons.payment,
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) => const OrderDetailPage(status: OrderStatus.waitingPayment),
-              ));
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const PaymentPage()),
+              );
             },
           ),
 
