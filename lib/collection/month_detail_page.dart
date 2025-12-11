@@ -42,8 +42,10 @@ class MonthDetailPage extends StatelessWidget {
                       colors: [Color(0xFF8E8E8E), Color(0xFF4A4A4A)],
                     ),
                   ),
+                  // ✅ แสดงรูปพื้นหลังถ้ามี
                   child: bgItem != null
                       ? FutureBuilder<Uint8List?>(
+                          // เช็คว่ามีรูปแคปไหม ถ้าไม่มีก็โหลด Thumbnail ใหญ่ๆ
                           future: bgItem.capturedImage != null 
                               ? Future.value(bgItem.capturedImage) 
                               : bgItem.asset.thumbnailDataWithSize(const ThumbnailSize(800, 800)),
@@ -52,7 +54,7 @@ class MonthDetailPage extends StatelessWidget {
                               return Image.memory(
                                 snapshot.data!,
                                 fit: BoxFit.cover,
-                                color: Colors.black.withOpacity(0.3), // ปรับให้มืดลงนิดหน่อย
+                                color: Colors.black.withOpacity(0.3), // ปรับให้มืดลงนิดหน่อยเพื่อให้ตัวหนังสือชัด
                                 colorBlendMode: BlendMode.darken,
                               );
                             }
@@ -111,7 +113,7 @@ class MonthDetailPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 2. Action Buttons & Status
+            // 2. Action Buttons & Status (ส่วนนี้เพิ่มเข้ามาเพื่อให้ Layout สมบูรณ์ตามภาพเดิม)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Row(
@@ -144,19 +146,19 @@ class MonthDetailPage extends StatelessWidget {
 
             const SizedBox(height: 40),
 
-            // 4. Bottom Cards (แท็กทั้งหมด, การแชร์)
+            // 4. Bottom Cards (ส่วนล่าง)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Card 1: แท็กทั้งหมด
+                  // Card 1
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildSmallCard(
-                          // ส่งรูปแรกไปแสดง
+                          // ส่งรูปแรกไปแสดง (ถ้ามี)
                           images: items.isNotEmpty ? [items[0]] : [],
                           title: "อากาศดี วิวสวย",
                           subtitle: "#ครอบครัว #ความรัก",
@@ -169,7 +171,7 @@ class MonthDetailPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 20),
-                  // Card 2: การแชร์
+                  // Card 2
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,9 +201,8 @@ class MonthDetailPage extends StatelessWidget {
     );
   }
 
-  // --- Layout Helper Methods ---
+  // --- Layout Helper Methods (คัดลอกมาจาก FinalPreviewSheet เพื่อให้ Layout เหมือนกัน) ---
 
-  // 1. Album Layout Grid (Book Style)
   Widget _buildFullAlbumPreview() {
     return FittedBox(
       fit: BoxFit.scaleDown,
@@ -215,7 +216,6 @@ class MonthDetailPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // หน้าซ้าย
               _buildPageContainer(
                 child: GridView.count(
                   crossAxisCount: 2,
@@ -226,26 +226,21 @@ class MonthDetailPage extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.zero,
                   children: [
-                    // Slot 0: ชื่อเดือน
                     Container(
                       decoration: const BoxDecoration(color: Colors.white),
                       child: Center(
                         child: Text(
-                          monthName.split(' ')[0],
+                          monthName.split(' ')[0], // เอาแค่ชื่อเดือน
                           style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
-                    // Slots 1-5
                     for (int i = 0; i < 5; i++)
                       if (i < items.length) _StaticPhotoSlot(item: items[i]) else const SizedBox(),
                   ],
                 ),
               ),
-
-              const SizedBox(width: 20), // สันหนังสือ
-
-              // หน้าขวา
+              const SizedBox(width: 20),
               _buildPageContainer(
                 child: GridView.count(
                   crossAxisCount: 2,
@@ -256,7 +251,6 @@ class MonthDetailPage extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.zero,
                   children: [
-                    // Slots 6-11
                     for (int i = 0; i < 6; i++)
                       if ((i + 5) < items.length) _StaticPhotoSlot(item: items[i + 5]) else const SizedBox(),
                   ],
@@ -273,7 +267,6 @@ class MonthDetailPage extends StatelessWidget {
     return SizedBox(width: 160, height: 245, child: child);
   }
 
-  // 2. Action Button (Print/Share)
   Widget _buildActionButton(IconData icon) {
     return Container(
       width: 40,
@@ -286,7 +279,6 @@ class MonthDetailPage extends StatelessWidget {
     );
   }
 
-  // 3. Small Card (Polaroid Style & Pile Effect)
   Widget _buildSmallCard({
     required List<MediaItem> images,
     required String title,
@@ -298,9 +290,8 @@ class MonthDetailPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ส่วนแสดงรูปภาพ (Card ตัวจริง)
           Container(
-            height: 140, // กำหนดความสูง
+            height: 140,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
@@ -316,25 +307,22 @@ class MonthDetailPage extends StatelessWidget {
                 ? Stack(
                     alignment: Alignment.center,
                     children: [
-                      // รูปซ้อนหลัง (ซ้าย)
                       if (images.length > 1)
                         Positioned(
                           left: 20, top: 15, bottom: 25,
                           child: Transform.rotate(
-                            angle: -0.2, // เอียงซ้าย
+                            angle: -0.2,
                             child: _buildPolaroidImage(images[1], width: 80, height: 80),
                           ),
                         ),
-                      // รูปซ้อนหลัง (ขวา)
                       if (images.length > 2)
                         Positioned(
                           right: 20, top: 15, bottom: 25,
                           child: Transform.rotate(
-                            angle: 0.2, // เอียงขวา
+                            angle: 0.2,
                             child: _buildPolaroidImage(images[2], width: 80, height: 80),
                           ),
                         ),
-                      // รูปหน้า (ตรงกลาง)
                       if (images.isNotEmpty)
                         Positioned(
                           top: 10, bottom: 10,
@@ -343,11 +331,10 @@ class MonthDetailPage extends StatelessWidget {
                     ],
                   )
                 : Column(
-                    // กรณีการ์ดปกติ (แท็ก)
                     children: [
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.all(12.0), // ขอบขาวรอบรูป
+                          padding: const EdgeInsets.all(12.0),
                           child: AspectRatio(
                             aspectRatio: 1.0,
                             child: ClipRRect(
@@ -364,19 +351,9 @@ class MonthDetailPage extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
                           child: Column(
                             children: [
-                              Text(
-                                title,
-                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black87),
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                              ),
+                              Text(title, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black87), textAlign: TextAlign.center, maxLines: 1),
                               const SizedBox(height: 2),
-                              Text(
-                                subtitle,
-                                style: const TextStyle(fontSize: 9, color: Color(0xFF67A5BA)),
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                              ),
+                              Text(subtitle, style: const TextStyle(fontSize: 9, color: Color(0xFF67A5BA)), textAlign: TextAlign.center, maxLines: 1),
                             ],
                           ),
                         )
@@ -388,12 +365,11 @@ class MonthDetailPage extends StatelessWidget {
     );
   }
 
-  // Helper สร้างกรอบรูปโพลารอยด์เล็กๆ สำหรับ Pile
   Widget _buildPolaroidImage(MediaItem item, {required double width, required double height}) {
     return Container(
       width: width,
-      height: height + 25, // เพิ่มความสูงเผื่อพื้นที่ด้านล่าง
-      padding: const EdgeInsets.all(4), // ขอบขาว
+      height: height + 25,
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(4),
@@ -413,13 +389,12 @@ class MonthDetailPage extends StatelessWidget {
               child: _buildImage(item),
             ),
           ),
-          const SizedBox(height: 8), // พื้นที่ขาวด้านล่าง (สไตล์โพลารอยด์)
+          const SizedBox(height: 8),
         ],
       ),
     );
   }
 
-  // Helper โหลดรูปภาพ
   Widget _buildImage(MediaItem item) {
     if (item.capturedImage != null) {
       return Image.memory(item.capturedImage!, fit: BoxFit.cover);
@@ -437,7 +412,6 @@ class MonthDetailPage extends StatelessWidget {
   }
 }
 
-// Widget แสดงรูปภาพใน Grid Album
 class _StaticPhotoSlot extends StatelessWidget {
   final MediaItem item;
   const _StaticPhotoSlot({required this.item});
