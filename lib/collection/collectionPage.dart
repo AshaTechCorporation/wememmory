@@ -1,13 +1,11 @@
-import 'dart:typed_data'; // ✅ import นี้จำเป็นสำหรับ Uint8List
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:photo_manager/photo_manager.dart'; // ✅ import นี้จำเป็น
+import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/collection/month_detail_page.dart';
 import 'package:wememmory/constants.dart';
-import 'package:wememmory/models/media_item.dart'; // ✅ import นี้จำเป็น
-// ✅ 1. Import ไฟล์ Detail
+import 'package:wememmory/models/media_item.dart';
 
 class CollectionPage extends StatelessWidget {
-  // ✅ เพิ่มตัวแปรรับค่า (Optional)
   final List<MediaItem>? newAlbumItems;
   final String? newAlbumMonth;
 
@@ -21,32 +19,6 @@ class CollectionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-      appBar: AppBar(
-        backgroundColor: kBackgroundColor,
-        elevation: 0,
-        toolbarHeight: 72,
-        leadingWidth: 68,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16),
-          child: CircleAvatar(
-            radius: 22,
-            backgroundImage: const AssetImage('assets/images/userpic.png'),
-            backgroundColor: Colors.white.withOpacity(.25),
-          ),
-        ),
-        titleSpacing: 1,
-        title: const Text(
-          'korakrit',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Image.asset('assets/icons/icon.png', width: 22, height: 22),
-          ),
-          const SizedBox(width: 12),
-        ],
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
@@ -58,15 +30,14 @@ class CollectionPage extends StatelessWidget {
               const _TabSelector(),
               const SizedBox(height: 30),
 
-              // ✅ ส่วนหัวข้อเดือน (ใช้เดือนที่ส่งมา หรือ Default)
               _MonthSectionHeader(title: newAlbumMonth ?? "เมษายน 2025"),
               const SizedBox(height: 12),
 
-              // ✅ แสดงอัลบั้ม ถ้ามีข้อมูลส่งมา
               if (newAlbumItems != null && newAlbumItems!.isNotEmpty)
-                GestureDetector( // ✅ 2. เพิ่ม GestureDetector เพื่อให้กดได้
+                GestureDetector(
                   onTap: () {
-                    // ไปยังหน้า Detail เมื่อกด
+                    // ✅ แก้ไข: ลบโค้ด async/await และ Navigator.pop ด้านล่างออก
+                    // เพื่อให้เมื่อกดกลับจาก MonthDetailPage แล้วยังอยู่ที่หน้านี้
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -77,20 +48,32 @@ class CollectionPage extends StatelessWidget {
                       ),
                     );
                   },
-                  child: _buildFullAlbumPreview(newAlbumItems!, newAlbumMonth ?? ""),
+                  child: _AlbumPreviewSection(
+                    items: newAlbumItems!,
+                    monthTitle: newAlbumMonth ?? "",
+                  ),
                 )
               else
-                const Center(child: Text("ยังไม่มีคอลเลกชัน", style: TextStyle(color: Colors.grey))),
-                
+                const Center(
+                    child: Text("ยังไม่มีคอลเลกชัน",
+                        style: TextStyle(color: Colors.grey))),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  // --- 🎨 ส่วน Layout อัลบั้ม (ยกมาจาก PrintSheet) ---
-  Widget _buildFullAlbumPreview(List<MediaItem> items, String monthTitle) {
+// ... (Widget อื่นๆ _AlbumPreviewSection, _StaticPhotoSlot, _SearchBar ฯลฯ ใช้โค้ดเดิมได้เลยครับ)
+class _AlbumPreviewSection extends StatelessWidget {
+  final List<MediaItem> items;
+  final String monthTitle;
+
+  const _AlbumPreviewSection({required this.items, required this.monthTitle});
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: FittedBox(
         fit: BoxFit.scaleDown,
@@ -104,7 +87,6 @@ class CollectionPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // หน้าซ้าย
                 _buildPageContainer(
                   child: GridView.count(
                     crossAxisCount: 2,
@@ -114,17 +96,16 @@ class CollectionPage extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
-                      // Slot 0: ชื่อเดือน
                       Container(
                         decoration: const BoxDecoration(color: Colors.white),
                         child: Center(
                           child: Text(
                             monthTitle,
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                                fontSize: 13, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
-                      // Slots 1-5
                       for (int i = 0; i < 5; i++)
                         if (i < items.length)
                           _StaticPhotoSlot(item: items[i])
@@ -133,10 +114,7 @@ class CollectionPage extends StatelessWidget {
                     ],
                   ),
                 ),
-
-                const SizedBox(width: 20), // สันหนังสือ
-
-                // หน้าขวา
+                const SizedBox(width: 20),
                 _buildPageContainer(
                   child: GridView.count(
                     crossAxisCount: 2,
@@ -146,7 +124,6 @@ class CollectionPage extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
-                      // Slots 6-11
                       for (int i = 0; i < 6; i++)
                         if ((i + 5) < items.length)
                           _StaticPhotoSlot(item: items[i + 5])
@@ -168,10 +145,40 @@ class CollectionPage extends StatelessWidget {
   }
 }
 
-// ✅ Widget แสดงรูปภาพแบบนิ่ง (ยกมาจาก PrintSheet)
-class _StaticPhotoSlot extends StatelessWidget {
+class _StaticPhotoSlot extends StatefulWidget {
   final MediaItem item;
   const _StaticPhotoSlot({required this.item});
+
+  @override
+  State<_StaticPhotoSlot> createState() => _StaticPhotoSlotState();
+}
+
+class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
+  Uint8List? _imageData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadImage();
+  }
+
+  Future<void> _loadImage() async {
+    if (widget.item.capturedImage != null) {
+      if (mounted) {
+        setState(() {
+          _imageData = widget.item.capturedImage;
+        });
+      }
+    } else {
+      final data = await widget.item.asset
+          .thumbnailDataWithSize(const ThumbnailSize(300, 300));
+      if (mounted) {
+        setState(() {
+          _imageData = data;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -185,20 +192,10 @@ class _StaticPhotoSlot extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // ถ้ามีรูปที่แคปจากวิดีโอ ให้แสดงรูปนั้น
-              if (item.capturedImage != null)
-                 Image.memory(item.capturedImage!, fit: BoxFit.cover)
+              if (_imageData != null)
+                Image.memory(_imageData!, fit: BoxFit.cover)
               else
-              // ถ้าไม่มี ให้โหลด Thumbnail
-                FutureBuilder<Uint8List?>(
-                  future: item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData && snapshot.data != null) {
-                      return Image.memory(snapshot.data!, fit: BoxFit.cover);
-                    }
-                    return Container(color: Colors.grey[200]);
-                  },
-                ),
+                Container(color: Colors.grey[200]),
             ],
           ),
         ),
@@ -250,7 +247,10 @@ class _TabSelector extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade300),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2)),
         ],
       ),
       child: Row(
@@ -263,13 +263,18 @@ class _TabSelector extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               alignment: Alignment.center,
-              child: const Text("ปี", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              child: const Text("ปี",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16)),
             ),
           ),
           Expanded(
             child: Container(
               alignment: Alignment.center,
-              child: Text("เดือน", style: TextStyle(color: Colors.grey.shade700, fontSize: 16)),
+              child: Text("เดือน",
+                  style: TextStyle(color: Colors.grey.shade700, fontSize: 16)),
             ),
           ),
         ],
@@ -286,7 +291,11 @@ class _MonthSectionHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)),
+        Text(title,
+            style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87)),
         Row(
           children: [
             _buildIconButton(Icons.print_outlined),
@@ -299,8 +308,11 @@ class _MonthSectionHeader extends StatelessWidget {
   }
   Widget _buildIconButton(IconData icon) {
     return Container(
-      width: 40, height: 40,
-      decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(8)),
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8)),
       child: Icon(icon, color: Colors.blueGrey, size: 22),
     );
   }

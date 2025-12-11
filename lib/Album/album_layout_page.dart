@@ -2,7 +2,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/models/media_item.dart';
-// 📌 Import หน้า Sheet ทั้งหมด
 import 'package:wememmory/Album/photo_detail_sheet.dart'; 
 import 'package:wememmory/Album/video_detail_sheet.dart';
 import 'package:wememmory/Album/final_preview_sheet.dart'; 
@@ -49,7 +48,6 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
     });
   }
 
-  // ✅ เพิ่ม await และ setState
   Future<void> _handlePhotoTap(int index) async {
     final selectedItem = _items[index];
     
@@ -111,7 +109,8 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
             padding: EdgeInsets.symmetric(horizontal: 24.0),
             child: Row(
               children: [
-                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true),
+                // ✅ แก้ไข: เพิ่ม isCompleted: true เพื่อให้เส้นขวาเป็นสีฟ้า เชื่อมกับ Step ถัดไป
+                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true, isCompleted: true),
                 _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true),
                 _StepItem(label: 'พรีวิวสุดท้าย', isActive: false, isLast: true),
               ],
@@ -393,7 +392,6 @@ class _ReorderableSlot extends StatelessWidget {
   }
 }
 
-// ✅ แก้ไข: ลบโค้ดแสดงไอคอนวิดีโอออกแล้ว
 class _PhotoSlot extends StatefulWidget {
   final MediaItem item;
   final double frameRadius;
@@ -462,10 +460,6 @@ class _PhotoSlotState extends State<_PhotoSlot> {
                 Image.memory(_thumbnailData!, fit: BoxFit.cover)
               else
                 Container(color: Colors.grey[200]),
-
-              // ❌ ลบส่วนนี้ออกเพื่อไม่ให้แสดงไอคอนวิดีโอ
-              // if (widget.item.type == MediaType.video)
-              //   const Center(child: Icon(Icons.play_circle_fill, color: Colors.white70, size: 24)),
             ],
           ),
         ),
@@ -479,12 +473,14 @@ class _StepItem extends StatelessWidget {
   final bool isActive;
   final bool isFirst;
   final bool isLast;
+  final bool isCompleted; // เพิ่มตัวแปรนี้
 
   const _StepItem({
     required this.label,
     required this.isActive,
     this.isFirst = false,
     this.isLast = false,
+    this.isCompleted = false, // Default เป็น false
   });
 
   @override
@@ -494,13 +490,45 @@ class _StepItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: Container(height: 2, color: isFirst ? Colors.transparent : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]))),
-              Container(width: 12, height: 12, decoration: BoxDecoration(shape: BoxShape.circle, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300])),
-              Expanded(child: Container(height: 2, color: isLast ? Colors.transparent : Colors.grey[300])),
+              // เส้นซ้าย
+              Expanded(
+                child: Container(
+                  height: 2,
+                  color: isFirst 
+                      ? Colors.transparent 
+                      : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]),
+                ),
+              ),
+              // จุดวงกลม
+              Container(
+                width: 12, 
+                height: 12, 
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle, 
+                  color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300],
+                ),
+              ),
+              // เส้นขวา (แก้ไขให้ดูค่า isCompleted ด้วย)
+              Expanded(
+                child: Container(
+                  height: 2,
+                  color: isLast 
+                      ? Colors.transparent 
+                      : (isCompleted ? const Color(0xFF5AB6D8) : Colors.grey[300]),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),
-          Text(label, textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400], fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
+          Text(
+            label, 
+            textAlign: TextAlign.center, 
+            style: TextStyle(
+              fontSize: 11, 
+              color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400], 
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
         ],
       ),
     );

@@ -25,7 +25,7 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.95, // เกือบเต็มจอ
+      height: MediaQuery.of(context).size.height * 0.95,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -52,14 +52,14 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
 
           const SizedBox(height: 16),
 
-          // 2. Steps Indicator (Step 3 Active)
+          // 2. Steps Indicator
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 24.0),
             child: Row(
               children: [
-                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true),
-                _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true),
-                _StepItem(label: 'พรีวิวสุดท้าย', isActive: true, isLast: true), // Active สีฟ้า
+                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true, isCompleted: true),
+                _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true, isCompleted: true),
+                _StepItem(label: 'พรีวิวสุดท้าย', isActive: true, isLast: true), 
               ],
             ),
           ),
@@ -94,78 +94,8 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // ใช้ Layout เดิมมาแสดงผล
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Center(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF555555), // สีเทาเข้ม
-                          ),
-                          child: IntrinsicWidth(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // หน้าซ้าย
-                                _buildPageContainer(
-                                  child: GridView.count(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 3,
-                                    mainAxisSpacing: 3,
-                                    childAspectRatio: 1.0,
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    children: [
-                                      // Slot 0: ชื่อเดือน
-                                      Container(
-                                        decoration: const BoxDecoration(color: Colors.white),
-                                        child: Center(
-                                          child: Text(
-                                            widget.monthName,
-                                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                      ),
-                                      // Slot 1-5: รูปภาพ
-                                      for (int i = 0; i < 5; i++)
-                                        if (i < widget.items.length)
-                                          _StaticPhotoSlot(item: widget.items[i])
-                                        else
-                                          const SizedBox(),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 20),
-                                // หน้าขวา
-                                _buildPageContainer(
-                                  child: GridView.count(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 3,
-                                    mainAxisSpacing: 3,
-                                    childAspectRatio: 1.0,
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    children: [
-                                      // Slots 6-11: รูปภาพ
-                                      for (int i = 0; i < 6; i++)
-                                        if ((i + 5) < widget.items.length)
-                                          _StaticPhotoSlot(item: widget.items[i + 5])
-                                        else
-                                          const SizedBox(),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  // ✅ ใช้ Widget ที่แยกออกมาเพื่อแก้ปัญหาการกระพริบ
+                  _AlbumPreviewSection(items: widget.items, monthName: widget.monthName),
 
                   const SizedBox(height: 20),
 
@@ -175,7 +105,7 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE0F2F7), // สีฟ้าอ่อน
+                      color: const Color(0xFFE0F2F7),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: const Color(0xFFB3E0EE)),
                     ),
@@ -200,7 +130,7 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
           ),
 
           // 6. Bottom Buttons
-        Container(
+          Container(
             padding: const EdgeInsets.all(20),
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -213,7 +143,6 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      // ✅ เปิดหน้า PrintSheet (สั่งพิมพ์) และส่งข้อมูลรูปภาพไป
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
@@ -225,14 +154,13 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFED7D31), // สีส้ม
+                      backgroundColor: const Color(0xFFED7D31),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
                       elevation: 0,
                     ),
                     child: const Text('ยืนยัน', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
                 ),
-// ...
                 const SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
@@ -262,10 +190,96 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: Color.fromARGB(255, 255, 255, 255),  
-          activeTrackColor:  Color(0xFFED7D31).withOpacity(0.4),
+          activeColor: const Color.fromARGB(255, 255, 255, 255),
+          activeTrackColor: const Color(0xFFED7D31),
         ),
       ],
+    );
+  }
+}
+
+// ✅ แยก Widget แสดงผลอัลบั้มออกมาเป็น const เพื่อป้องกันการ Rebuild
+class _AlbumPreviewSection extends StatelessWidget {
+  final List<MediaItem> items;
+  final String monthName;
+
+  const _AlbumPreviewSection({
+    required this.items,
+    required this.monthName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Center(
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: const BoxDecoration(
+              color: Color(0xFF555555), // สีเทาเข้ม
+            ),
+            child: IntrinsicWidth(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // หน้าซ้าย
+                  _buildPageContainer(
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 3,
+                      mainAxisSpacing: 3,
+                      childAspectRatio: 1.0,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        // Slot 0: ชื่อเดือน
+                        Container(
+                          decoration: const BoxDecoration(color: Colors.white),
+                          child: Center(
+                            child: Text(
+                              monthName,
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        // Slot 1-5: รูปภาพ
+                        for (int i = 0; i < 5; i++)
+                          if (i < items.length)
+                            _StaticPhotoSlot(item: items[i]) // ✅ ใช้ Widget ที่โหลดรูปแล้ว
+                          else
+                            const SizedBox(),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  // หน้าขวา
+                  _buildPageContainer(
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 3,
+                      mainAxisSpacing: 3,
+                      childAspectRatio: 1.0,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        // Slots 6-11: รูปภาพ
+                        for (int i = 0; i < 6; i++)
+                          if ((i + 5) < items.length)
+                            _StaticPhotoSlot(item: items[i + 5])
+                          else
+                            const SizedBox(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -274,10 +288,42 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
   }
 }
 
-// Widget แสดงรูปภาพแบบนิ่ง (ไม่ต้องลากได้)
-class _StaticPhotoSlot extends StatelessWidget {
+// ✅ ปรับ _StaticPhotoSlot ให้เป็น Stateful เพื่อโหลดรูปครั้งเดียว
+class _StaticPhotoSlot extends StatefulWidget {
   final MediaItem item;
   const _StaticPhotoSlot({required this.item});
+
+  @override
+  State<_StaticPhotoSlot> createState() => _StaticPhotoSlotState();
+}
+
+class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
+  Uint8List? _imageData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadImage();
+  }
+
+  Future<void> _loadImage() async {
+    // ถ้ามีรูปแคป ให้ใช้เลย
+    if (widget.item.capturedImage != null) {
+      if (mounted) {
+        setState(() {
+          _imageData = widget.item.capturedImage;
+        });
+      }
+    } else {
+      // ถ้าไม่มี ให้โหลด Thumbnail
+      final data = await widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300));
+      if (mounted) {
+        setState(() {
+          _imageData = data;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -291,13 +337,10 @@ class _StaticPhotoSlot extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              FutureBuilder<Uint8List?>(
-                future: item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) return Image.memory(snapshot.data!, fit: BoxFit.cover);
-                  return Container(color: Colors.grey[200]);
-                },
-              ),
+              if (_imageData != null)
+                Image.memory(_imageData!, fit: BoxFit.cover)
+              else
+                Container(color: Colors.grey[200]), // Loading state
             ],
           ),
         ),
@@ -306,34 +349,68 @@ class _StaticPhotoSlot extends StatelessWidget {
   }
 }
 
-// Widget Step Indicator (Copy มาเพื่อให้เหมือนกัน)
+// ... _StepItem (เหมือนเดิม ไม่ต้องแก้) ...
 class _StepItem extends StatelessWidget {
   final String label;
   final bool isActive;
   final bool isFirst;
   final bool isLast;
+  final bool isCompleted;
 
   const _StepItem({
     required this.label,
     required this.isActive,
     this.isFirst = false,
     this.isLast = false,
+    this.isCompleted = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    const activeColor = Color(0xFF5AB6D8); 
+    const inactiveColor = Colors.grey;
+
     return Expanded(
       child: Column(
         children: [
           Row(
             children: [
-              Expanded(child: Container(height: 2, color: isFirst ? Colors.transparent : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]))),
-              Container(width: 10, height: 10, decoration: BoxDecoration(shape: BoxShape.circle, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300])),
-              Expanded(child: Container(height: 2, color: isLast ? Colors.transparent : Colors.grey[300])),
+              Expanded(
+                child: Container(
+                  height: 2, 
+                  color: isFirst 
+                      ? Colors.transparent 
+                      : (isActive ? activeColor : Colors.grey[300]),
+                ),
+              ),
+              Container(
+                width: 10, 
+                height: 10, 
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle, 
+                  color: isActive ? activeColor : Colors.grey[300],
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  height: 2, 
+                  color: isLast 
+                      ? Colors.transparent 
+                      : (isCompleted ? activeColor : Colors.grey[300]),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),
-          Text(label, textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400], fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
+          Text(
+            label, 
+            textAlign: TextAlign.center, 
+            style: TextStyle(
+              fontSize: 10, 
+              color: isActive ? activeColor : Colors.grey[400], 
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
         ],
       ),
     );
