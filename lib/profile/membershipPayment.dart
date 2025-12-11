@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wememmory/shop/paymentSuccessPage.dart';
+import 'package:wememmory/shop/couponPage.dart';
 
 class PaymentPage extends StatefulWidget {
   final String packageName;
@@ -26,14 +28,13 @@ class _PaymentPageState extends State<PaymentPage> {
   bool _isCreditCardExpanded = false;
 
   // ข้อมูลจำลองธนาคาร (ชื่อ + สีไอคอน)
-  final List<Map<String, dynamic>> _banks = [
-    {'name': 'Krungthai NEXT', 'color': const Color(0xFF1ba1e2), 'icon': Icons.account_balance},
-    {'name': 'Krungsri Mobile App', 'color': const Color(0xFFfec42d), 'icon': Icons.savings},
-    {'name': 'K PLUS', 'color': const Color(0xFF138f2d), 'icon': Icons.add},
-    {'name': 'SCB Easy', 'color': const Color(0xFF4e2583), 'icon': Icons.monetization_on},
-    {'name': 'Bangkok Bank Mobile Banking', 'color': const Color(0xFF1e4598), 'icon': Icons.account_balance},
+  final List<Map<String, String>> _banks = [
+    {'name': 'Krungthai NEXT', 'icon': 'assets/icons/kungthai.png'},
+    {'name': 'Krungsri Mobile App', 'icon': 'assets/icons/kung.png'},
+    {'name': 'K PLUS', 'icon': 'assets/icons/kbank.png'},
+    {'name': 'SCB Easy', 'icon': 'assets/icons/theb.png'},
+    {'name': 'Bangkok Bank Mobile Banking', 'icon': 'assets/icons/bangkkok.png'},
   ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,7 +121,7 @@ class _PaymentPageState extends State<PaymentPage> {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CouponSelectionPage())),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFEF703F),
                             elevation: 0,
@@ -159,10 +160,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Action ยืนยัน
-                    print('Method: $_selectedMainMethod, Bank: $_selectedBankIndex');
-                  },
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaymentSuccessPage())),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFEF703F),
                     shape: RoundedRectangleBorder(
@@ -251,7 +249,7 @@ class _PaymentPageState extends State<PaymentPage> {
         // รายชื่อธนาคาร (แสดงเมื่อ Expand)
         if (_isMobileBankingExpanded)
           Container(
-            color: const Color(0xFFF9F9F9), // พื้นหลังสีเทาอ่อนตามรูป
+            color: const Color(0xFFF9F9F9),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
               children: List.generate(_banks.length, (index) {
@@ -261,7 +259,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      _selectedMainMethod = 1; // ตั้งค่าเป็น Mobile Banking
+                      _selectedMainMethod = 1;
                       _selectedBankIndex = index;
                     });
                   },
@@ -269,20 +267,31 @@ class _PaymentPageState extends State<PaymentPage> {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Row(
                       children: [
-                        // โลโก้ธนาคาร (จำลองด้วย Icon)
-                        Container(
-                          width: 32, height: 32,
-                          decoration: BoxDecoration(
-                            color: bank['color'], 
-                            borderRadius: BorderRadius.circular(8),
+                        // --- ส่วนที่แก้ไข: ใช้ Image.asset แทน Icon ---
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8), // ลบมุมมนให้ไอคอนแอปดูสวยขึ้น
+                          child: Image.asset(
+                            bank['icon']!, // ดึง path รูปภาพมาแสดง
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              // กัน Error กรณีหาไฟล์รูปไม่เจอ ให้โชว์กล่องสีเทาแทน
+                              return Container(
+                                width: 32, height: 32, 
+                                color: Colors.grey.shade300,
+                                child: const Icon(Icons.broken_image, size: 16, color: Colors.grey),
+                              );
+                            },
                           ),
-                          child: Icon(bank['icon'], color: Colors.white, size: 20),
                         ),
+                        // ------------------------------------------
+
                         const SizedBox(width: 12),
                         
                         Expanded(
                           child: Text(
-                            bank['name'],
+                            bank['name']!,
                             style: const TextStyle(fontSize: 14, color: Colors.black87),
                           ),
                         ),

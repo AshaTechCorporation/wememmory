@@ -294,16 +294,17 @@ class _HeaderSection extends StatelessWidget {
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.w500, fontSize: 18),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         SizedBox(
           height: 72,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
+            
             children: [
-              _buildBar(1.0), _buildBar(0.9), _buildBar(0.4), _buildBar(0.7),
-              _buildBar(0.8), _buildBar(1.0), _buildBar(0.6), _buildBar(0.3),
-              _buildBar(0.9), _buildBar(0.7), _buildBar(0.5), _buildBar(0.8),
+              _buildBar(0.3), _buildBar(0.6), _buildBar(0.6), _buildBar(0.8),
+              _buildBar(0.4), _buildBar(0.5), _buildBar(0.3), _buildBar(0.6),
+              _buildBar(0.5), _buildBar(0.9), _buildBar(0.3), _buildBar(0.9),
             ],
           ),
         ),
@@ -422,10 +423,12 @@ class _MetricBarChart extends StatelessWidget {
         BarChartRodData(
           toY: y,
           color: color,
-          width: 40,
+          width: 60,
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(4),
-            topRight: Radius.circular(4),
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+            bottomLeft: Radius.circular(10),
+            bottomRight: Radius.circular(10)
           ),
         ),
       ],
@@ -440,7 +443,7 @@ class _ProgressCard extends StatelessWidget {
     const double progressValue = 0.66;
 
     return Container(
-      height: 150,
+      height: 120,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: cardColor,
@@ -474,8 +477,8 @@ class _ProgressCard extends StatelessWidget {
             ),
           ),
           SizedBox(
-            width: 100,
-            height: 100,
+            width: 80,
+            height: 80,
             child: Stack(
               alignment: Alignment.center,
               children: [

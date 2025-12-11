@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wememmory/shop/albumGifePage.dart';
 import 'package:wememmory/shop/termsAndServicesPage.dart';
 import 'package:wememmory/shop/faqPage.dart';
+import 'package:wememmory/profile/membershipPayment.dart';
 // import 'package:wememmory/shop/cartPage.dart';
 
 class ShopPage extends StatelessWidget {
@@ -11,7 +12,10 @@ class ShopPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: PreferredSize(preferredSize: const Size.fromHeight(96), child: _ShopAppBar()),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(96),
+        child: _ShopAppBar(),
+      ),
       body: const _ShopBody(),
     );
   }
@@ -34,19 +38,6 @@ class _ShopAppBar extends StatelessWidget {
       ),
       foregroundColor: Colors.black,
       iconTheme: const IconThemeData(color: Colors.black),
-      /*actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 12),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const CartPage()),
-              );
-            }, 
-            child: Image.asset('assets/icons/Cart.png', height: 26)
-          ),
-        ),
-      ],*/
     );
   }
 }
@@ -81,24 +72,22 @@ class _ShopBody extends StatelessWidget {
             ),
           ),
         ),
-        
-        // ส่วนแพ็กเกจสมาชิก (New UI)
+
+        // ส่วนแพ็กเกจสมาชิก (New UI แก้ไขแล้ว)
         const SliverToBoxAdapter(child: _MembershipPackageSection()),
-        
+
         const SliverToBoxAdapter(child: SizedBox(height: 32)),
-        
-        // 🔥 เอา _SecondaryBanner ออก และใส่ส่วนหัวข้อของขวัญแทนที่ 🔥
-        // const SliverToBoxAdapter(child: _SecondaryBanner()), // <-- เอาออก
-        const SliverToBoxAdapter(child: _SpecialGiftHeader()), // <-- ใส่เข้าใหม่
-        
-        // const SliverToBoxAdapter(child: SizedBox(height: 24)), // <-- ปรับระยะห่าง
-        
+
+        const SliverToBoxAdapter(child: _SpecialGiftHeader()),
+
         const SliverToBoxAdapter(child: _GiftCardBanner()),
         const SliverToBoxAdapter(child: SizedBox(height: 16)),
-        const SliverToBoxAdapter(child: _GiftCardBanner(type: GiftCardType.photoFrame)),
+        const SliverToBoxAdapter(
+          child: _GiftCardBanner(type: GiftCardType.photoFrame),
+        ),
         const SliverToBoxAdapter(child: SizedBox(height: 24)),
         const SliverToBoxAdapter(child: _SupportLinks()),
-        
+
         // พื้นที่ว่างด้านล่าง
         const SliverToBoxAdapter(child: SizedBox(height: 120)),
       ],
@@ -137,11 +126,12 @@ class _BannerCarouselState extends State<_BannerCarousel> {
             controller: _controller,
             itemCount: _banners.length,
             onPageChanged: (i) => setState(() => _idx = i),
-            itemBuilder: (_, i) => Image.asset(
-              _banners[i],
-              fit: BoxFit.cover,
-              width: MediaQuery.of(context).size.width,
-            ),
+            itemBuilder:
+                (_, i) => Image.asset(
+                  _banners[i],
+                  fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width,
+                ),
           ),
         ),
         const SizedBox(height: 6),
@@ -153,7 +143,13 @@ class _BannerCarouselState extends State<_BannerCarousel> {
               width: 20,
               height: 4,
               margin: const EdgeInsets.symmetric(horizontal: 3),
-              decoration: BoxDecoration(color: i == _idx ? const Color(0xFFFF8A3D) : const Color(0xFFFFC7A5), borderRadius: BorderRadius.circular(4)),
+              decoration: BoxDecoration(
+                color:
+                    i == _idx
+                        ? const Color(0xFFFF8A3D)
+                        : const Color(0xFFFFC7A5),
+                borderRadius: BorderRadius.circular(4),
+              ),
             ),
           ),
         ),
@@ -170,7 +166,10 @@ class _SectionPadding extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), child: child);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: child,
+    );
   }
 }
 
@@ -183,46 +182,54 @@ class _PromoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: Image.asset('assets/images/Hobby3.png', width: 380, height: double.infinity, fit: BoxFit.cover),
+      child: Image.asset(
+        'assets/images/Hobby3.png',
+        width: 380,
+        height: double.infinity,
+        fit: BoxFit.cover,
+      ),
     );
   }
 }
 
-/* =========================== MEMBERSHIP PACKAGE (NEW) ========================== */
+/* =========================== MEMBERSHIP PACKAGE (UPDATED) ========================== */
 
 class _MembershipPackageSection extends StatefulWidget {
   const _MembershipPackageSection();
 
   @override
-  State<_MembershipPackageSection> createState() => _MembershipPackageSectionState();
+  State<_MembershipPackageSection> createState() =>
+      _MembershipPackageSectionState();
 }
 
 class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
-  // เก็บสถานะว่าเลือกแพ็กเกจไหนอยู่ (เริ่มที่ index 0)
   int _selectedPackageIndex = 0;
 
   // ข้อมูลแพ็กเกจ
   final List<Map<String, dynamic>> _packages = [
     {
       "price": "899",
-      "originalPrice": "1,199",
+      "originalPrice": "฿1,199",
       "period": "3 เดือน",
-      "desc": "3 เดือนแห่งเรื่องราวสุดพิเศษ",
-      "subtitle": "฿299/เดือน"
+      "desc": "3 เดือนแห่งเรื่องราว",
+      "tag": "เริ่มต้น",
+      "monthPrice": "฿299/เดือน",
     },
     {
       "price": "1,599",
-      "originalPrice": "1,794",
+      "originalPrice": "฿1,794",
       "period": "6 เดือน",
-      "desc": "6 เดือนแห่งช่วงเวลาที่มีความหมาย",
-      "subtitle": "ประหยัด ฿195"
+      "desc": "6 เดือนที่แห่งช่วงเวลาไม่ลืม",
+      "tag": "พรีเมียม",
+      "monthPrice": "ประหยัด ฿195",
     },
     {
-      "price": "2,999", 
-      "originalPrice": "3,588",
+      "price": "2,999",
+      "originalPrice": "฿3,588",
       "period": "1 ปี",
-      "desc": "เก็บรักษาความทรงจำตลอดปี",
-      "subtitle": "คุ้มที่สุด"
+      "desc": "12 เดือนแห่งเรื่องราวชีวิต",
+      "tag": "รายปี",
+      "monthPrice": "ประหยัด ฿589",
     },
   ];
 
@@ -234,45 +241,63 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 1. ส่วนหัวข้อด้านบน
-          const Text('แพ็กเกจสมาชิก', 
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black)),
+          const Text(
+            'แพ็กเกจสมาชิก',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
           const SizedBox(height: 4),
-          const Text('เลือกแพ็กเกจที่ใช่เพื่อเก็บช่วงเวลาให้มีความหมายยิ่งขึ้น',
-            style: TextStyle(fontSize: 14, color: Colors.grey)),
+          const Text(
+            'เลือกแพ็กเกจที่ใช่เพื่อเก็บช่วงเวลาให้มีความหมายยิ่งขึ้น',
+            style: TextStyle(fontSize: 14, color: Colors.grey),
+          ),
           const SizedBox(height: 16),
 
-          // 2. ตัวการ์ดใหญ่ที่มีรูปคน
+          // 2. การ์ดใหญ่
           Container(
-            height: 580, 
+            height: 620,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
-              boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 16, offset: Offset(0, 10))],
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x22000000),
+                  blurRadius: 16,
+                  offset: Offset(0, 10),
+                ),
+              ],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(24),
               child: Stack(
                 children: [
-                  // Background Image
+                  // --- Background Image ---
                   Image.asset(
-                    'assets/images/Rectangle4.png', // รูปพื้นหลัง
+                    'assets/images/Rectangle4.png',
                     height: double.infinity,
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
-                  
-                  // Dark Gradient Overlay
+
+                  // --- Gradient Overlay ---
                   Container(
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Colors.transparent, Color(0xE61A1A1A), Color(0xFF1A1A1A)],
+                        colors: [
+                          Colors.transparent,
+                          Color(0xCC111111),
+                          Color(0xFF111111),
+                        ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        stops: [0.3, 0.65, 1.0],
+                        stops: [0.3, 0.6, 1.0],
                       ),
                     ),
                   ),
 
-                  // Content ภายในการ์ด
+                  // --- Content ---
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
@@ -280,118 +305,207 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Checklist สิทธิประโยชน์
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                             _buildBenefitItem('สิทธิที่ได้รับแบบจัดเต็ม'),
-                             _buildBenefitItem('พื้นที่เก็บรูปไม่จำกัด'),
-                             _buildBenefitItem('สร้างอัลบั้มได้หลากหลาย'),
-                             _buildBenefitItem('ไม่มีโฆษณาคั่น'),
-                          ],
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildBenefitItem('สิทธิที่ได้รับแบบจัดเต็ม'),
+                              _buildBenefitItem('พื้นที่เก็บรูปไม่จำกัด'),
+                              _buildBenefitItem('สร้างอัลบั้มได้หลากหลาย'),
+                              _buildBenefitItem('ไม่มีโฆษณาคั่น'),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 24),
 
                         // รายการแพ็กเกจ (Horizontal Scroll)
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          clipBehavior: Clip.none,
-                          child: Row(
-                            children: List.generate(_packages.length, (index) {
+                        SizedBox(
+                          height: 150,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _packages.length,
+                            separatorBuilder:
+                                (_, __) => const SizedBox(width: 12),
+                            itemBuilder: (context, index) {
                               final pkg = _packages[index];
                               final isSelected = _selectedPackageIndex == index;
+
+                              // Null Safety Check
+                              final String price = pkg['price'] ?? "0";
+                              final String tag = pkg['tag'] ?? "";
+                              final String monthPrice = pkg['monthPrice'] ?? "";
+                              final String originalPrice =
+                                  pkg['originalPrice'] ?? "";
+                              final String desc = pkg['desc'] ?? "";
+
                               return GestureDetector(
-                                onTap: () => setState(() => _selectedPackageIndex = index),
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  width: 150,
-                                  height: 130,
-                                  margin: const EdgeInsets.only(right: 12),
-                                  padding: const EdgeInsets.all(12),
+                                onTap:
+                                    () => setState(
+                                      () => _selectedPackageIndex = index,
+                                    ),
+                                child: Container(
+                                  width: 240,
+                                  padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    color: isSelected 
-                                      ? const Color(0xFF333333).withOpacity(0.95) 
-                                      : const Color(0xFF1A1A1A).withOpacity(0.7),
+                                    color:
+                                        isSelected
+                                            ? const Color(
+                                              0xFF2A2A2A,
+                                            ).withOpacity(0.90)
+                                            : const Color(
+                                              0xFF1A1A1A,
+                                            ).withOpacity(0.60),
                                     borderRadius: BorderRadius.circular(16),
-                                    border: isSelected 
-                                      ? Border.all(color: const Color(0xFFFF8A3D), width: 2) 
-                                      : Border.all(color: Colors.transparent),
+                                    border:
+                                        isSelected
+                                            ? Border.all(
+                                              color: const Color(0xFFFF8A3D),
+                                              width: 1.5,
+                                            )
+                                            : Border.all(
+                                              color: Colors.white24,
+                                              width: 1,
+                                            ),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      // ส่วนบน: ราคาและระยะเวลา
+                                      // ส่วนบน
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Row(
-                                            crossAxisAlignment: CrossAxisAlignment.baseline,
-                                            textBaseline: TextBaseline.alphabetic,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text('฿${pkg['price']}', 
-                                                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                                              const SizedBox(width: 4),
+                                              Text(
+                                                '฿$price',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              if (tag.isNotEmpty)
+                                                Text(
+                                                  tag,
+                                                  style: const TextStyle(
+                                                    color: Colors.white70,
+                                                    fontSize: 11,
+                                                  ),
+                                                ),
                                             ],
                                           ),
-                                          Container(
-                                            margin: const EdgeInsets.only(top: 2),
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.2),
-                                              borderRadius: BorderRadius.circular(4)
+                                          if (monthPrice.isNotEmpty)
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 8,
+                                              ),
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white24,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                  monthPrice,
+                                                  style: const TextStyle(
+                                                    fontSize: 11,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                            child: Text(pkg['subtitle'], style: const TextStyle(fontSize: 10, color: Colors.white)),
-                                          )
                                         ],
                                       ),
-                                      // ส่วนล่าง: ราคาเต็มและคำอธิบาย
+
+                                      // ส่วนล่าง
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '฿${pkg['originalPrice']}', 
+                                            originalPrice,
                                             style: const TextStyle(
-                                              color: Colors.grey, 
-                                              fontSize: 12, 
-                                              decoration: TextDecoration.lineThrough
-                                            )
+                                              color: Colors.white60,
+                                              fontSize: 13,
+                                              decoration:
+                                                  TextDecoration.lineThrough,
+                                            ),
                                           ),
-                                          const SizedBox(height: 2),
+                                          const SizedBox(height: 6),
                                           Text(
-                                            pkg['desc'], 
+                                            desc,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(color: Colors.white70, fontSize: 10)
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 13,
+                                            ),
                                           ),
                                         ],
-                                      )
+                                      ),
                                     ],
                                   ),
                                 ),
                               );
-                            }),
+                            },
                           ),
                         ),
-                        
+
                         const SizedBox(height: 24),
 
-                        // ปุ่มยืนยัน
+                        // --- ปุ่มยืนยัน (แก้ไขใหม่) ---
                         SizedBox(
                           width: double.infinity,
                           height: 52,
                           child: ElevatedButton(
                             onPressed: () {
-                              // ตัวอย่าง action
-                              print("Selected Package Index: $_selectedPackageIndex");
-                              print("Package Data: ${_packages[_selectedPackageIndex]}");
+                              // 1. ดึงข้อมูลแพ็กเกจปัจจุบันที่ user เลือก
+                              final selectedPkg =
+                                  _packages[_selectedPackageIndex];
+                              
+                              // ดึงค่าออกมา (ใช้ ?? "" กันค่า null)
+                              final String period = selectedPkg['period'] ?? "";
+                              final String price = selectedPkg['price'] ?? "0";
+
+                              // 2. ส่งข้อมูลไปหน้า PaymentPage
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => PaymentPage(
+                                        // ส่งชื่อแพ็กเกจ (เช่น "แพ็กเกจ 3 เดือน")
+                                        packageName: "แพ็กเกจ $period",
+                                        // ส่งราคา
+                                        price: price,
+                                      ),
+                                ),
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFFF8A3D),
                               foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                               elevation: 0,
                             ),
-                            child: const Text('ยืนยัน', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                            child: const Text(
+                              'ยืนยัน',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -408,20 +522,25 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
 
   Widget _buildBenefitItem(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
-          const Icon(Icons.check, color: Color(0xFFFF8A3D), size: 20),
-          const SizedBox(width: 10),
-          Text(text, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500)),
+          const Icon(Icons.check, color: Color(0xFFFF8A3D), size: 24),
+          const SizedBox(width: 12),
+          Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
         ],
       ),
     );
   }
 }
-
-/* ========================= SPECIAL GIFT HEADER (NEW) ======================== */
-// 🔥 Widget ใหม่สำหรับส่วนหัวข้อของขวัญ 🔥
+/* ========================= SPECIAL GIFT HEADER ======================== */
 class _SpecialGiftHeader extends StatelessWidget {
   const _SpecialGiftHeader();
 
@@ -439,16 +558,11 @@ class _SpecialGiftHeader extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
-         
           ),
           SizedBox(height: 4),
           Text(
             'แทนใจด้วยของขวัญที่บันทึกเรื่องราวที่อยากเก็บไว้ร่วมกัน',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey,
-            ),
-         
+            style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
         ],
       ),
@@ -456,9 +570,7 @@ class _SpecialGiftHeader extends StatelessWidget {
   }
 }
 
-/* ============================ SECONDARY BANNER (REMOVED) ========================== */
-// คลาสนี้ไม่ได้ใช้แล้ว สามารถลบออกได้
-// class _SecondaryBanner extends StatelessWidget { ... }
+/* ============================ GIFT CARD BANNER ========================== */
 
 enum GiftCardType { charm, photoFrame }
 
@@ -468,71 +580,181 @@ class _GiftCardBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget imageSection;
+    Widget textSection;
+
+    // ตัวแปรจัดวาง Text
+    CrossAxisAlignment textAlignment;
+    TextAlign textAlign;
+
+    if (type == GiftCardType.charm) {
+      // --- การ์ดบน (Charm) ---
+      // รูปซ้อน: Rectangle1 (หน้า), Rectangle3 (หลัง)
+      imageSection = _buildStackedImageContainer(
+        frontImage: 'assets/images/Rectangle1.png',
+        backImage: 'assets/images/Rectangle3.png', 
+      );
+
+      // ข้อความอยู่ขวา -> ชิดขวา
+      textAlignment = CrossAxisAlignment.end;
+      textAlign = TextAlign.right;
+      
+      textSection = _buildTextBlock(
+        context,
+        'เก็บช่วงเวลาที่รักไว้\nติดตัวไปทุกที่',
+        textAlignment,
+        textAlign,
+      );
+    } else {
+      // --- การ์ดล่าง (PhotoFrame) ---
+      // รูปซ้อน: Rectangle4 (หน้า), Rectangle0 (หลัง - ใช้รูปที่มีในโปรเจกต์เดิม)
+      imageSection = _buildStackedImageContainer(
+        frontImage: 'assets/images/Rectangle4.png',
+        backImage: 'assets/images/Rectangle0.png', 
+      );
+
+      // ข้อความอยู่ซ้าย -> ชิดซ้าย
+      textAlignment = CrossAxisAlignment.start;
+      textAlign = TextAlign.left;
+      
+      textSection = _buildTextBlock(
+        context,
+        'ให้ภาพของคุณเล่าเรื่อง\nอีกครั้ง',
+        textAlignment,
+        textAlign,
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 18, offset: Offset(0, 10))],
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0D000000),
+              blurRadius: 24,
+              offset: Offset(0, 8),
+            ),
+          ],
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: type == GiftCardType.charm
+              // การ์ดบน: รูปซ้าย | ข้อความขวา
               ? [
-                  _giftImages(),
-                  const SizedBox(width: 16),
-                  Expanded(child: _textBlock(context)),
+                  imageSection,
+                  const SizedBox(width: 20),
+                  Expanded(child: textSection),
                 ]
+              // การ์ดล่าง: ข้อความซ้าย | รูปขวา
               : [
-                  Expanded(child: _textBlock(context)),
-                  const SizedBox(width: 16),
-                  _giftImages(),
+                  Expanded(child: textSection),
+                  const SizedBox(width: 20),
+                  imageSection,
                 ],
         ),
       ),
     );
   }
 
-  Widget _giftImages() {
+  // --- Widget สร้างรูปซ้อนกัน 2 ชั้น (ใช้สำหรับทั้ง 2 การ์ด) ---
+  Widget _buildStackedImageContainer({required String frontImage, required String backImage}) {
+    const double size = 130;
+    const double borderRadius = 4; // ขอบเหลี่ยม (มนนิดเดียวเหมือนใบรูปถ่าย)
+
     return SizedBox(
-      width: 140,
-      height: 120,
+      width: size,
+      height: size,
       child: Stack(
         clipBehavior: Clip.none,
+        alignment: Alignment.center,
         children: [
-          Positioned(left: 14, top: 8, child: _GiftPhotoFrame(image: type == GiftCardType.charm ? 'assets/images/Rectangle3.png' : 'assets/images/Rectangle0.png')),
-          _GiftPhotoFrame(image: type == GiftCardType.charm ? 'assets/images/Rectangle1.png' : 'assets/images/Rectangle4.png'),
+          // 1. รูปด้านหลัง (เอียงซ้าย)
+          Transform.rotate(
+            angle: -0.12, // เอียงซ้ายประมาณ -7 องศา
+            child: Container(
+              width: size * 0.85,
+              height: size * 0.85,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(borderRadius),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x15000000), blurRadius: 6, offset: Offset(-4, 4)),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(borderRadius),
+                child: Image.asset(backImage, fit: BoxFit.cover),
+              ),
+            ),
+          ),
+          
+          // 2. รูปด้านหน้า (เอียงขวานิดๆ)
+          Transform.rotate(
+            angle: 0.08, // เอียงขวาประมาณ 4.5 องศา
+            child: Container(
+              width: size * 0.92,
+              height: size * 0.92,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(borderRadius),
+                // เพิ่มขอบขาวรอบรูปนิดหน่อยเพื่อให้ดูเหมือนรูปถ่ายโพลารอยด์/อัดรูป
+                border: Border.all(color: Colors.white, width: 2), 
+                boxShadow: const [
+                  BoxShadow(color: Color(0x25000000), blurRadius: 10, offset: Offset(2, 6)),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(borderRadius - 1), // ปรับให้พอดีกับขอบ
+                child: Image.asset(frontImage, fit: BoxFit.cover),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _textBlock(BuildContext context) {
+  // Widget ส่วนข้อความและปุ่ม
+  Widget _buildTextBlock(
+      BuildContext context, String text, CrossAxisAlignment alignment, TextAlign textAlign) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: alignment,
       children: [
         Text(
-          type == GiftCardType.charm ? 'เก็บช่วงเวลาที่รักไว้ติดตัวไปทุกที่' : 'ให้ภาพของคุณเล่าเรื่องอีกครั้ง',
-          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
+          text,
+          textAlign: textAlign,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 17,
+            height: 1.4,
+            color: Colors.black87,
+          ),
         ),
-        const SizedBox(height: 6),
         const SizedBox(height: 16),
         SizedBox(
-          width: 150,
+          height: 42,
           child: ElevatedButton(
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AlbumGiftPage()));
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8CD1E8),
+              backgroundColor: const Color(0xFF88CED8),
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
               elevation: 0,
             ),
-            child: const Text('ส่งของขวัญ'),
+            child: const Text(
+              'ส่งของขวัญ',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
           ),
         ),
       ],
@@ -552,7 +774,13 @@ class _GiftPhotoFrame extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: const [BoxShadow(color: Color(0x20000000), blurRadius: 10, offset: Offset(0, 4))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x20000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
@@ -571,7 +799,10 @@ class _SupportLinks extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: const [
-          _SupportTile(title: 'ข้อตกลงและเงื่อนไขการใช้บริการ', goToTerms: true),
+          _SupportTile(
+            title: 'ข้อตกลงและเงื่อนไขการใช้บริการ',
+            goToTerms: true,
+          ),
           Divider(height: 1),
           _SupportTile(title: 'คำถามที่พบบ่อย', goToFAQ: true),
         ],
@@ -584,13 +815,21 @@ class _SupportTile extends StatelessWidget {
   final String title;
   final bool goToTerms;
   final bool goToFAQ;
-  const _SupportTile({required this.title, this.goToTerms = false, this.goToFAQ = false});
+  const _SupportTile({
+    required this.title,
+    this.goToTerms = false,
+    this.goToFAQ = false,
+  });
 
   void _handleTap(BuildContext context) {
     if (goToTerms) {
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TermsAndServicesPage()));
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => const TermsAndServicesPage()));
     } else if (goToFAQ) {
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FAQPage()));
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => const FAQPage()));
     }
   }
 
@@ -600,7 +839,10 @@ class _SupportTile extends StatelessWidget {
       color: Colors.white,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-        title: Text(title, style: const TextStyle(fontSize: 15, color: Color(0xFF5B5B5B))),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 15, color: Color(0xFF5B5B5B)),
+        ),
         trailing: const Icon(Icons.chevron_right, color: Color(0xFFBDBDBD)),
         onTap: () => _handleTap(context),
       ),
