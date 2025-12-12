@@ -30,18 +30,18 @@ class ProfilePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 const _HeaderSection(),
                 
                 const _MetricBarChart(),
                 
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 _ProgressCard(),
-                const SizedBox(height: 70), 
+                const SizedBox(height: 20), 
 
                 const _UsageStatsSection(),
 
-                const SizedBox(height: 70), 
+                const SizedBox(height: 20), 
 
                 // --- ส่วนการ์ดเครดิต ---
                 Container(
@@ -289,7 +289,7 @@ class _HeaderSection extends StatelessWidget {
                 fontSize: 36)),
         const SizedBox(height: 10),
         const Text(
-          '100 คะแนนรวมเรื่องราวของคุณ\nสะสมเรื่องราวหลายเดือนตลอดที่ผ่านมา',
+          '100 คะแนนรวมของคุณ\nสะสมเรื่องราวหลายเดือนตลอดที่ผ่านมา',
           textAlign: TextAlign.center,
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.w500, fontSize: 18),
@@ -599,43 +599,136 @@ class _ChartContent extends StatelessWidget {
 class _UsageStatsSection extends StatelessWidget {
   const _UsageStatsSection();
 
-  Widget _buildStackedImages(Widget frontWidget) {
-    return Transform.translate(
-      offset: const Offset(-15, 0),
-      child: SizedBox(
-        width: 180, 
-        height: 200,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Transform.rotate(
-              angle: 0.30, 
-              child: Container(
-                width: 130, height: 140,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.10), blurRadius: 10, offset: const Offset(6, 6))],
-                ),
-              ),
-            ),
-            Transform.rotate(
-              angle: -0.30, 
-              child: Container(
-                width: 130, height: 140,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 8, offset: const Offset(-4, 4))],
-                ),
-              ),
-            ),
-            Container(
-              width: 130, height: 160,
+  // Widget สร้างกลุ่มรูปภาพซ้อนกัน (สำหรับส่วนบนซ้าย)
+  Widget _buildStackedImages() {
+    return SizedBox(
+      width: 160,
+      height: 180,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // รูปหลังซ้าย (เอียงซ้าย)
+          Transform.rotate(
+            angle: -0.2,
+            child: Container(
+              width: 120,
+              height: 140,
+              margin: const EdgeInsets.only(right: 40, bottom: 20),
               decoration: BoxDecoration(
                 color: Colors.white,
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 16, offset: const Offset(0, 8))],
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(-5, 5))
+                ],
               ),
-              padding: const EdgeInsets.all(8),
-              child: frontWidget,
+            ),
+          ),
+          // รูปหลังขวา (เอียงขวา)
+          Transform.rotate(
+            angle: 0.15,
+            child: Container(
+              width: 120,
+              height: 140,
+              margin: const EdgeInsets.only(left: 40, bottom: 20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(5, 5))
+                ],
+              ),
+            ),
+          ),
+          // รูปหน้า (ตรง)
+          Container(
+            width: 150,
+            height: 180,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8))
+              ],
+            ),
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              children: [
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(2),
+                    child: Image.asset(
+                      'assets/images/sample_photo_1.jpg', // เปลี่ยนเป็นรูปของคุณ
+                      fit: BoxFit.cover,
+                      errorBuilder: (c, o, s) =>
+                          Container(color: Colors.grey[200]),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text('อากาศดี วิวสวย',
+                    style:
+                        TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                const Text('#ครอบครัว #ความรัก',
+                    style: TextStyle(fontSize: 9, color: Color(0xFF5AAEE5))),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Widget สร้างการ์ดสถิติเล็ก (สำหรับ 4 ช่องด้านล่าง)
+  Widget _buildStatCard(
+      {required IconData icon,
+      required String title,
+      required String value,
+      required Color themeColor}) {
+    return Expanded(
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 100),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.grey.shade300, width: 1),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Icon
+            Icon(icon, size: 42, color: themeColor),
+            const SizedBox(width: 12),
+            // Text
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500)),
+                  Text(value,
+                      style: TextStyle(
+                          fontSize: 22,
+                          color: themeColor,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2)),
+                ],
+              ),
             ),
           ],
         ),
@@ -645,163 +738,99 @@ class _UsageStatsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color themeColor = Color(0xFF5AAEE5);
-    const TextStyle labelStyle = TextStyle(
-        fontSize: 16, color: Colors.grey, fontWeight: FontWeight.w600);
-    const TextStyle valueStyle = TextStyle(
-        fontSize: 60,
-        fontWeight: FontWeight.bold,
-        color: themeColor,
-        height: 1.0);
+    const Color themeColor = Color(0xFF5AAEE5); // สีธีมฟ้าอมเขียวตามรูป
 
-    const double spacing = 10.0;
-
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildStackedImages(
-              Column(
-                children: [
-                  Expanded(
-                    child: Image.asset('assets/images/sample_photo_1.jpg',
-                        fit: BoxFit.cover,
-                        errorBuilder: (c, o, s) =>
-                            Container(color: Colors.grey[200])),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          // --- ส่วนบน: การ์ดใหญ่ (รูป Stack + เลข 88) ---
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.grey.shade300, width: 1),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildStackedImages(),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: const [
+                      Text(
+                        'รูปภาพของปีนี้',
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '88',
+                        style: TextStyle(
+                            fontSize: 80,
+                            fontWeight: FontWeight.bold,
+                            color: themeColor,
+                            height: 1.0),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  const Text('อากาศดี วิวสวย',
-                      style:
-                          TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                  const Text('#ครอบครัว #ความรัก',
-                      style: TextStyle(fontSize: 10, color: themeColor)),
-                ],
-              ),
-            ),
-            SizedBox(width: spacing),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('รูปภาพของปีนี้', style: labelStyle),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text('88', style: valueStyle),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 30),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('คะแนนเฉลี่ยแต่ละเดือน', style: labelStyle),
-                  Text('10', style: valueStyle),
-                ],
-              ),
-            ),
-            SizedBox(width: spacing),
-            _buildStackedImages(
-              const _ChartContent(themeColor: themeColor),
-            ),
-          ],
-        ),
-        const SizedBox(height: 30),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildStackedImages(
-              Image.asset('assets/images/sample_photo_2.jpg',
-                  fit: BoxFit.cover,
-                  errorBuilder: (c, o, s) =>
-                      Container(color: Colors.grey[200])),
-            ),
-            SizedBox(width: spacing),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text('วันที่สร้างมากที่สุด', style: labelStyle),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child:
-                        Text('อาทิตย์', style: valueStyle.copyWith(fontSize: 50)),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 30),
-
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('แท็กทั้งหมด', style: labelStyle),
-                Text('15', style: valueStyle),
+                ),
               ],
             ),
-            SizedBox(width: spacing),
-            Expanded(
-              child: Wrap(
-                spacing: 8.0,
-                runSpacing: 8.0,
-                alignment: WrapAlignment.end,
-                children: [
-                  _buildChip('moment ที่อยากจำ', themeColor, true),
-                  _buildChip('Wemory Moment', Colors.grey, false),
-                  _buildChip('บันทึกความรักในรูป', themeColor, true),
-                  _buildChip('วันสุข', Colors.grey, false),
-                ],
-              ),
-            )
-          ],
-        ),
-        const SizedBox(height: 30),
+          ),
 
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            _buildStackedImages(
-              Image.asset(
-                'assets/images/open_album.png',
-                fit: BoxFit.contain,
-                errorBuilder: (c, o, s) => Container(
-                    color: Colors.grey[200],
-                    child: const Center(child: Text('Album'))),
+          const SizedBox(height: 16),
+
+          // --- ส่วนล่าง: Grid 4 ช่อง ---
+          // แถวที่ 1
+          Row(
+            children: [
+              _buildStatCard(
+                icon: Icons.grid_view_rounded,
+                title: 'คะแนนเฉลี่ย',
+                value: '10',
+                themeColor: themeColor,
               ),
-            ),
-            SizedBox(width: spacing),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text('สร้างอัลบั้มจากคุณ', style: labelStyle),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text('10', style: valueStyle.copyWith(fontSize: 50)),
-                  ),
-                ],
+              const SizedBox(width: 12),
+              _buildStatCard(
+                icon: Icons.collections_bookmark_rounded,
+                title: 'สร้างอัลบั้มจากคุณ',
+                value: '10',
+                themeColor: themeColor,
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // แถวที่ 2
+          Row(
+            children: [
+              _buildStatCard(
+                icon: Icons.tag, // หรือ Icons.numbers
+                title: 'แท็กทั้งหมด',
+                value: '15',
+                themeColor: themeColor,
+              ),
+              const SizedBox(width: 12),
+              _buildStatCard(
+                icon: Icons.calendar_today_rounded,
+                title: 'วันที่สร้างมากที่สุด',
+                value: 'อาทิตย์',
+                themeColor: themeColor,
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
+}
 
   Widget _buildChip(String label, Color color, bool isFilled) {
     return Container(
@@ -821,7 +850,6 @@ class _UsageStatsSection extends StatelessWidget {
       ),
     );
   }
-}
 
 // ✅ Widget ใหม่: การ์ดแสดงสถานะแบบมี Progress Bar (เหมือนรูปที่ 2)
 class _OrderStatusCard extends StatelessWidget {

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-
-// ✅ อย่าลืม Import ไฟล์หน้าอื่นๆ ที่เราสร้างไว้ครับ
-// (ตรวจสอบชื่อไฟล์ให้ตรงกับที่คุณบันทึกไว้นะครับ)
 import 'package:wememmory/profile/membershipPayment.dart';            // หน้าชำระเงิน
 import 'package:wememmory/profile/historyPayment.dart';  // หน้าประวัติ
 
