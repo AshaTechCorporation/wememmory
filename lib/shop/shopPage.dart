@@ -310,10 +310,10 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildBenefitItem('สิทธิที่ได้รับแบบจัดเต็ม'),
-                              _buildBenefitItem('พื้นที่เก็บรูปไม่จำกัด'),
-                              _buildBenefitItem('สร้างอัลบั้มได้หลากหลาย'),
-                              _buildBenefitItem('ไม่มีโฆษณาคั่น'),
+                              _buildBenefitItem('สิทธิที่ได้รับ'),
+                              _buildBenefitItem('สิทธิที่ได้รับ'),
+                              _buildBenefitItem('สิทธิที่ได้รับ'),
+                              _buildBenefitItem('สิทธิที่ได้รับ'),
                             ],
                           ),
                         ),

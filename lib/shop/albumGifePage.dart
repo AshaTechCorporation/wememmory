@@ -1,321 +1,377 @@
 import 'package:flutter/material.dart';
 import 'package:wememmory/shop/paymentPage.dart';
 
-class AlbumGiftPage extends StatelessWidget {
+class AlbumGiftPage extends StatefulWidget {
   const AlbumGiftPage({super.key});
+
+  @override
+  State<AlbumGiftPage> createState() => _AlbumGiftPageState();
+}
+
+class _AlbumGiftPageState extends State<AlbumGiftPage> {
+  // --- ตัวแปรจัดการ State ---
+  int _quantity = 1;
+  int _selectedColorIndex = 0; // 0: เทา, 1: ส้ม, 2: ดำ, 3: น้ำเงิน
+
+  // ข้อมูลสีตัวเลือก
+  final List<Map<String, dynamic>> _colorOptions = [
+    {'name': 'เทา', 'color': const Color(0xFF424242)},
+    {'name': 'ส้ม', 'color': const Color(0xFFFF7043)},
+    {'name': 'ดำ', 'color': const Color(0xFF000000)},
+    {'name': 'น้ำเงิน', 'color': const Color(0xFF26C6DA)},
+  ];
+
+  // รายการรูปภาพสำหรับส่วน Story (3 รูป)
+  final List<String> _storyImages = [
+    'assets/images/Rectangle4.png',
+    'assets/images/Rectangle5.png',
+    'assets/images/Rectangle6.png',
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Colors.white,
+      // --- ส่วนหัว (AppBar) ---
       appBar: AppBar(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
-        titleSpacing: 0,
-        title: const Text('อัลบั้ม', style: TextStyle(fontWeight: FontWeight.w700)),
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'อัลบั้ม',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        centerTitle: false,
       ),
+
+      // --- เนื้อหาหลัก (Body) ---
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.asset('assets/images/Rectangle1.png', fit: BoxFit.cover, height: 220),
+            // 1. ส่วนแสดงรูปภาพสินค้าด้านบน
+            Container(
+              width: double.infinity,
+              height: 300,
+              color: const Color(0xFFBCAAA4), // พื้นหลังสีเทาอมน้ำตาล
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Image.asset(
+                    'assets/images/Rectangle1.png', // รูปสินค้าหลัก
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.photo_album, size: 80, color: Colors.white54),
+                  ),
+                ),
               ),
             ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: const [BoxShadow(color: Color(0x26000000), blurRadius: 16, offset: Offset(0, 8))],
-              ),
+
+            Padding(
+              padding: const EdgeInsets.all(20.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // 2. ตัวเลือกสี (Radio Buttons Custom)
+                  SizedBox(
+                    height: 50,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _colorOptions.length,
+                      separatorBuilder: (context, index) => const SizedBox(width: 12),
+                      itemBuilder: (context, index) {
+                        final isSelected = _selectedColorIndex == index;
+                        return GestureDetector(
+                          onTap: () => setState(() => _selectedColorIndex = index),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: isSelected ? const Color(0xFFFF8A3D) : Colors.grey.shade300,
+                                width: isSelected ? 2 : 1,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: _colorOptions[index]['color'],
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.grey.shade200),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  _colorOptions[index]['name'],
+                                  style: TextStyle(
+                                    color: isSelected ? const Color(0xFFFF8A3D) : Colors.grey,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // 3. ชื่อสินค้า และ ราคา
                   Row(
-                    children: [
-                      SizedBox(
-                        width: 150,
-                        height: 120,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: const [
-                            Positioned(left: 36, top: 18, child: _MiniStack(image: 'assets/images/Rectangle3.png')),
-                            Positioned(left: 12, child: _MiniStack(image: 'assets/images/Rectangle2.png')),
-                          ],
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text(
+                        'อัลบั้มสำหรับคนสำคัญ',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFFF8A3D),
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text('ของขวัญพิเศษ', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
-                            Text('สำหรับคนสำคัญ', style: TextStyle(color: Color(0xFFFF8A3D), fontWeight: FontWeight.w700, fontSize: 22)),
-                          ],
+                      Text(
+                        '฿ 599',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFFF8A3D),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'เก็บทุกช่วงเวลาที่คุณรัก...ไว้ในเล่มเดียว',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Color(0xFFFF6F00), fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'รวมทุกภาพที่มีความหมายที่สุดของคุณไว้ในอัลบั้มสุดอบอุ่น เปิดเมื่อไรก็เห็นอ้อมกอดเก่านั้นในวันสำคัญของอีกครั้ง',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Color(0xFF6F6F6F)),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
-            const SizedBox(height: 28),
-            SizedBox(
-              height: 300,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (_, i) => _PolaroidCard(image: _polaroids[i]),
-                separatorBuilder: (_, __) => const SizedBox(width: 16),
-                itemCount: _polaroids.length,
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
-              child: Text(
-                'อัลบั้มภาพคือของขวัญที่เก็บได้ทั้งรอยยิ้มและเวลา เหมาะจะมอบให้กับคนที่คุณรักไม่ว่าจะเป็นวันเกิดหรือวันสำคัญอื่น ๆ',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xFF6F6F6F),fontSize: 18),
-              ),
-            ),
-            const SizedBox(height: 80),
-          ],
-        ),
-      ),
-      bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.fromLTRB(24, 0, 24, 20),
-        child: SizedBox(
-          height: 56,
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () => _showOrderSheet(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF8A3D),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-            ),
-            child: const Text('เริ่มสร้างอัลบั้มของคุณ', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
-          ),
-        ),
-      ),
-    );
-  }
 
-  void _showOrderSheet(BuildContext rootContext) {
-    showModalBottomSheet(
-      context: rootContext,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(32))),
-      builder: (sheetContext) {
-        int quantity = 1;
-        int selectedIndex = 0;
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Padding(
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Container(width: 60, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(4))),
-                    ),
-                    Row(
-                      children: [
-                        const Expanded(child: Text('อัลบั้มรูป', style: TextStyle(fontWeight: FontWeight.w700))),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: const [
-                            Text('฿ 599', style: TextStyle(color: Color(0xFFFF8A3D), fontWeight: FontWeight.w700, fontSize: 18)),
-                          ],
-                        ),
-                        IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(sheetContext)),
+                  const SizedBox(height: 24),
+
+                  // 4. การ์ดอัปโหลดรูปหน้าปก
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade200),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.shade100,
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        )
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Expanded(
-                          child: Text('จำนวน', style: TextStyle(color: Color(0xFF8D8D8D))),
+                        const Text(
+                          'รูปภาพหน้าปกอัลบั้ม',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
+                        const SizedBox(height: 12),
                         Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFFE0E0E0)),
-                            borderRadius: BorderRadius.circular(8),
+                            color: const Color(0xFFE0F7FA).withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
                             children: [
-                              IconButton(
-                                icon: const Icon(Icons.remove),
-                                onPressed: () => setState(() => quantity = quantity > 1 ? quantity - 1 : 1),
+                              const Expanded(
+                                child: Text(
+                                  'เลือกรูปที่ไว้ใส่หน้าปกของคุณ',
+                                  style: TextStyle(color: Colors.grey, fontSize: 13),
+                                ),
                               ),
-                              Text('$quantity', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-                              IconButton(
-                                icon: const Icon(Icons.add),
-                                onPressed: () => setState(() => quantity += 1),
+                              ElevatedButton(
+                                onPressed: () {
+                                  // TODO: ฟังก์ชันเลือกรูป
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF5ABCB9),
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                ),
+                                child: const Text(
+                                  'เลือกรูปภาพ',
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      height: 140,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _orderOptions.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 12),
-                        itemBuilder: (_, i) => GestureDetector(
-                          onTap: () => setState(() => selectedIndex = i),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: i == selectedIndex ? const Color(0xFFFF8A3D) : Colors.transparent, width: 2),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            padding: const EdgeInsets.all(4),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.asset(_orderOptions[i], width: 100, height: 130, fit: BoxFit.cover),
-                            ),
-                          ),
-                        ),
-                      ),
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // 5. ส่วน Story (เพิ่มใหม่ตามรูปที่ 2)
+                  _buildStorySection(),
+
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      // --- ส่วนล่าง (Bottom Bar) ---
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              offset: const Offset(0, -4),
+              blurRadius: 10,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // ปุ่มราคา (Buy Button)
+            Expanded(
+              flex: 3,
+              child: SizedBox(
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () { Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const PaymentPage()),
+              );
+                    // TODO: ไปหน้าชำระเงิน
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF7043),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(sheetContext).pop();
-                          Navigator.of(rootContext).push(MaterialPageRoute(builder: (_) => const PaymentPage()));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF8A3D),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                        ),
-                        child: const Text('สั่งซื้อสินค้า', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
-                      ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    '฿ 599',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                  ],
+                  ),
                 ),
               ),
-            );
-          },
-        );
-      },
-    );
-  }
-}
+            ),
+            const SizedBox(width: 16),
 
-class _MiniStack extends StatelessWidget {
-  final String image;
-  const _MiniStack({required this.image});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 100,
-      height: 80,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned(
-            left: 8,
-            top: 6,
-            child: Container(
-              width: 80,
-              height: 60,
+            // ตัวปรับจำนวน (Stepper)
+            Container(
+              height: 50,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: const [BoxShadow(color: Color(0x19000000), blurRadius: 8, offset: Offset(0, 4))],
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove),
+                    onPressed: () {
+                      if (_quantity > 1) setState(() => _quantity--);
+                    },
+                  ),
+                  Text(
+                    '$_quantity',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () {
+                      setState(() => _quantity++);
+                    },
+                  ),
+                ],
               ),
             ),
-          ),
-          Container(
-            width: 80,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: const [BoxShadow(color: Color(0x19000000), blurRadius: 8, offset: Offset(0, 4))],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: Image.asset(image, fit: BoxFit.cover),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
-}
 
-const _polaroids = [
-  'assets/images/Rectangle4.png',
-  'assets/images/Rectangle5.png',
-  'assets/images/Rectangle6.png',
-];
-
-const _orderOptions = [
-  'assets/images/Rectangle4.png',
-  'assets/images/Rectangle5.png',
-  'assets/images/Rectangle6.png',
-  'assets/images/Rectangle7.png',
-];
-
-class _PolaroidCard extends StatelessWidget {
-  final String image;
-  const _PolaroidCard({required this.image});
-
-  @override
-  Widget build(BuildContext context) {
+  // --- Widget ย่อยสำหรับส่วน Story ---
+  Widget _buildStorySection() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 220,
-          height: 240,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(4),
-            boxShadow: const [BoxShadow(color: Color(0x21000000), blurRadius: 10, offset: Offset(0, 6))],
+        const Text(
+          'เก็บทุกช่วงเวลาที่คุณรัก...ไว้ในเล่มเดียว',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
           ),
-          padding: const EdgeInsets.fromLTRB(10, 12, 10, 20),
-          child: Column(
-            children: [
-              Expanded(
-                child: ClipRRect(
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'รวมทุกภาพที่มีความหมายที่สุดของคุณไว้ในอัลบั้มสุดอบอุ่น เปิดเมื่อไรก็เหมือนได้ย้อนกลับไปในวันที่ยิ้มกว้างอีกครั้ง',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey.shade600,
+            height: 1.5,
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        SizedBox(
+          height: 280,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: _storyImages.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 16),
+            itemBuilder: (context, index) {
+              return Container(
+                width: 280,
+                decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(4),
-                  child: Image.asset(image, fit: BoxFit.cover),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 12),
-              Container(height: 6, width: 50, color: const Color(0xFFEAEAEA)),
-            ],
+                padding: const EdgeInsets.all(12),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: Image.asset(
+                    _storyImages[index],
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Container(color: Colors.grey.shade300),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+
+        const SizedBox(height: 24),
+        Text(
+          'อัลบั้มภาพคือของขวัญที่เก็บได้ทั้งรอยยิ้มและเวลาเหมาะจะมอบให้กับคนที่คุณรักไม่ว่าจะเป็นวันเกิดหรือวันสำคัญอื่น ๆ',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey.shade600,
+            height: 1.5,
           ),
         ),
       ],
