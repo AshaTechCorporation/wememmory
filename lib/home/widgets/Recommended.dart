@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/models/media_item.dart';
 
-// ... (Recommended Widget and _RecommendedState remain unchanged)
-
 class Recommended extends StatefulWidget {
   final List<MediaItem>? albumItems;
   final String? albumMonth;
@@ -34,36 +32,44 @@ class _RecommendedState extends State<Recommended> {
   @override
   void didUpdateWidget(covariant Recommended oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.albumItems != oldWidget.albumItems || 
+    if (widget.albumItems != oldWidget.albumItems ||
         widget.albumMonth != oldWidget.albumMonth) {
       _initData();
     }
   }
 
   void _initData() {
-    // Default Data
     _items = [
       MemoryCardData(
         topTitle: 'เติมเรื่องราวครึ่งปีแรกด้วยอัลบั้มใหม่กัน',
         mainTitle: 'พฤษภาคมของฉัน',
         subTitle: 'เพิ่มความทรงจำ',
-        footerText: 'อีกมากกว่า 23+\nที่เพิ่มรูปภาพเดือนนี้', 
+        footerText: 'อีกมากกว่า 23+ ที่เพิ่มรูปภาพเดือนนี้',
         gradientColors: [const Color(0xFF424242), const Color(0xFF212121)],
         accentColor: const Color(0xFFFF7043),
+        assetImages: [
+          'assets/images/Hobby2.png',
+          'assets/images/Hobby3.png',
+          'assets/images/Hobby1.png',
+        ],
       ),
       MemoryCardData(
         topTitle: 'บันทึกความสำเร็จของคุณ',
         mainTitle: 'เมษายนของฉัน',
         subTitle: 'ความทรงจำที่ผ่านมา',
-        footerText: 'คุณได้อธิบายภาพ\nในเดือนนี้แล้ว 76%',
+        footerText: 'คุณได้อธิบายภาพในเดือนนี้แล้ว 76%',
         gradientColors: [const Color(0xFF37474F), const Color(0xFF102027)],
         accentColor: const Color(0xFF42A5F5),
+        assetImages: [
+          'assets/images/image4.png',
+          'assets/images/image5.png',
+        ],
       ),
       MemoryCardData(
         topTitle: 'เริ่มต้นเดือนใหม่',
         mainTitle: 'มิถุนายนนี้',
         subTitle: 'วางแผนล่วงหน้า',
-        footerText: 'เพื่อน 5 คน\nเพิ่มรูปภาพแล้ว',
+        footerText: 'เพื่อน 5 คน เพิ่มรูปภาพแล้ว',
         gradientColors: [const Color(0xFF33691E), const Color(0xFF1B5E20)],
         accentColor: const Color(0xFF66BB6A),
       ),
@@ -73,18 +79,18 @@ class _RecommendedState extends State<Recommended> {
       String displayTitle = widget.albumMonth ?? 'เดือนล่าสุด';
       _items[0] = MemoryCardData(
         topTitle: 'เติมเรื่องราวด้วยอัลบั้มใหม่กัน',
-        mainTitle: displayTitle, 
+        mainTitle: displayTitle,
         subTitle: 'เพิ่มความทรงจำ',
-        footerText: 'อีกมากกว่า 23+\nที่เพิ่มรูปภาพเดือนนี้',
+        footerText: 'อีกมากกว่า 23+ ที่เพิ่มรูปภาพเดือนนี้',
         gradientColors: [const Color(0xFF424242), const Color(0xFF212121)],
         accentColor: const Color(0xFFFF7043),
         imageItems: widget.albumItems,
       );
     }
-    
+
     if (mounted) setState(() {});
   }
-// ... (_nextCard, _previousCard, build remain unchanged)
+
   void _nextCard() {
     if (_currentIndex < _items.length - 1) {
       setState(() => _currentIndex++);
@@ -100,7 +106,7 @@ class _RecommendedState extends State<Recommended> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 400,
+      height: 420, // ความสูง Container รวม
       width: double.infinity,
       child: Stack(
         alignment: Alignment.center,
@@ -113,10 +119,10 @@ class _RecommendedState extends State<Recommended> {
 
   Widget _buildCardItem(int index, MemoryCardData item) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = 290.0;
-    final cardHeight = 330.0;
+    final cardWidth = 328.0;
+    final cardHeight = 350.0;
     final centerPosition = (screenWidth - cardWidth) / 2;
-    final adjustedStartPosition = centerPosition - 30.0;
+    final adjustedStartPosition = centerPosition - 25.0;
 
     if (index < _currentIndex) {
       return AnimatedPositioned(
@@ -184,7 +190,8 @@ class MemoryCardData {
   final String footerText;
   final List<Color> gradientColors;
   final Color accentColor;
-  final List<MediaItem>? imageItems; 
+  final List<MediaItem>? imageItems;
+  final List<String>? assetImages;
 
   MemoryCardData({
     required this.topTitle,
@@ -194,10 +201,13 @@ class MemoryCardData {
     required this.gradientColors,
     required this.accentColor,
     this.imageItems,
+    this.assetImages,
   });
 }
 
-// ... (MemoryCard remains unchanged)
+// ---------------------------------------------------------------------------
+// MemoryCard Widget
+// ---------------------------------------------------------------------------
 class MemoryCard extends StatelessWidget {
   final MemoryCardData data;
   final VoidCallback? onTap;
@@ -217,8 +227,8 @@ class MemoryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
           gradient: LinearGradient(
             colors: data.gradientColors,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
           boxShadow: [
             BoxShadow(
@@ -228,112 +238,115 @@ class MemoryCard extends StatelessWidget {
               spreadRadius: -2,
             ),
           ],
-          border: Border.all(color: Colors.white.withOpacity(0.15), width: 1.2),
+          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(26),
           child: Stack(
             children: [
-              // Background Circle (Optional decoration)
               Positioned(
-                top: -70, left: -70,
+                top: -100,
+                right: -50,
                 child: Container(
-                  width: 220, height: 220,
+                  width: 300,
+                  height: 300,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.03),
-                    boxShadow: [
-                      BoxShadow(color: Colors.white.withOpacity(0.02), blurRadius: 50, spreadRadius: 15),
-                    ],
+                    gradient: RadialGradient(
+                      colors: [Colors.white.withOpacity(0.1), Colors.transparent],
+                    ),
                   ),
                 ),
               ),
-              
-              // เนื้อหาหลัก (จัด Layout ตามภาพ)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center, // จัดกึ่งกลางแนวนอน
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // 1. ข้อความด้านบน (Top Title)
-                    Text(
-                      data.topTitle,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9), 
-                        fontSize: 13,
-                        fontWeight: FontWeight.w300
+                    // 1. Top Title
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      textAlign: TextAlign.center,
+                      child: Text(
+                        data.topTitle,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    
-                    const SizedBox(height: 8),
-                    
-                    // 2. ชื่อเดือน (Main Title)
+                    const SizedBox(height: 12),
+
+                    // 2. Main Title
                     Text(
                       data.mainTitle,
                       style: const TextStyle(
-                        color: Colors.white, 
-                        fontSize: 26, // ใหญ่ขึ้นนิดนึงเพื่อให้เด่น
+                        color: Colors.white,
+                        fontSize: 26,
                         fontWeight: FontWeight.bold,
-                        height: 1.1
+                        height: 1.0,
+                        letterSpacing: -0.5,
                       ),
                       textAlign: TextAlign.center,
                     ),
+                    const SizedBox(height: 6),
 
-                    const Spacer(), // ดันรูปภาพให้อยู่กลาง
-
-                    // 3. รูปภาพ 3 ใบ (Photo Stack)
-                    // ใช้ Container กำหนดขนาดให้รูปอยู่ตรงกลางสวยๆ
-                    SizedBox(
-                      height: 100, // ความสูงพื้นที่แสดงรูป
-                      width: 200,  // ความกว้างพื้นที่แสดงรูป
-                      child: _PhotoStack(items: data.imageItems),
+                    // 3. Footer Text
+                    Text(
+                      data.footerText,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w300,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
+                    const SizedBox(height: 6),
 
-                    const Spacer(), // ดันข้อความล่างลงไป
+                    // 4. Photo Stack
+                    SizedBox(
+                      height: 150,
+                      width: 280,
+                      child: _PhotoStack(
+                        items: data.imageItems,
+                        assetImages: data.assetImages,
+                      ),
+                    ),
+                    const SizedBox(height: 21),
 
-                    // 4. ข้อความด้านล่างซ้าย (ปุ่มส้ม) และ ขวา (Footer Text)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end, // จัดให้ตรงกันด้านล่าง
-                      children: [
-                        // ปุ่มสีส้ม "เพิ่มความทรงจำ" (ทำเป็น Container ธรรมดา ไม่ใช่ปุ่มกด เพราะกดทั้งการ์ดได้)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: data.accentColor,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 4)),
-                            ],
+                    // 5. Button
+                    Container(
+                      width: double.infinity,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: data.accentColor,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
                           ),
-                          child: const Text(
-                            "เพิ่มความทรงจำ",
-                            style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                          ),
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        "คัดสรรรูปภาพของคุณ",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                         ),
-                        
-                        // ข้อความฝั่งขวา
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 12.0, bottom: 4),
-                            child: Text(
-                              data.footerText, // "อีกมากกว่า 23+ ..."
-                              style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11),
-                              textAlign: TextAlign.right,
-                              maxLines: 2,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
               ),
-
-              // 5. ปุ่มบวก (+) ลอยตัว (Floating Button) - ถ้าต้องการเอาออกตามภาพ ให้ลบส่วนนี้ทิ้ง
-              // แต่ถ้าต้องการคงฟังก์ชันเดิมไว้ ก็สามารถเก็บไว้ได้ครับ
-              // Positioned(...) 
             ],
           ),
         ),
@@ -342,43 +355,56 @@ class MemoryCard extends StatelessWidget {
   }
 }
 
-// ==========================================
-// 4. Helper Widgets (_PhotoStack Updated)
-// ==========================================
+// ---------------------------------------------------------------------------
+// Photo Stack
+// ---------------------------------------------------------------------------
 class _PhotoStack extends StatelessWidget {
   final List<MediaItem>? items;
+  final List<String>? assetImages;
 
-  const _PhotoStack({Key? key, this.items}) : super(key: key);
+  const _PhotoStack({Key? key, this.items, this.assetImages}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Determine items to display
-    final item1 = (items != null && items!.isNotEmpty) ? items![0] : null;
-    final item2 = (items != null && items!.length > 1) ? items![1] : null;
-    final item3 = (items != null && items!.length > 2) ? items![2] : null;
+    dynamic getItem(int index) {
+      if (items != null && index < items!.length) {
+        return items![index];
+      }
+      if (assetImages != null && index < assetImages!.length) {
+        return assetImages![index];
+      }
+      return null;
+    }
+
+    final item1 = getItem(0);
+    final item2 = getItem(1);
+    final item3 = getItem(2);
 
     return Stack(
       alignment: Alignment.center,
       clipBehavior: Clip.none,
       children: [
-        // Left (rotated)
+        // Left
         _buildPolaroid(
-          angle: -0.26, 
-          offset: const Offset(-65, 10), 
-          item: item3
+          angle: -0.12,
+          offset: const Offset(-70, 10),
+          item: item3,
+          color: Colors.grey[100],
         ),
-        // Right (rotated)
+        // Right
         _buildPolaroid(
-          angle: 0.26,
-          offset: const Offset(65, 10), 
-          item: item2
+          angle: 0.12,
+          offset: const Offset(70, 10),
+          item: item2,
+          color: Colors.grey[200],
         ),
-        // Center (front)
+        // Center
         _buildPolaroid(
-          angle: 0.0, 
-          offset: const Offset(0, -5), 
+          angle: 0.0,
+          offset: const Offset(0, 0),
           item: item1,
-          isFront: true
+          isFront: true,
+          color: Colors.white,
         ),
       ],
     );
@@ -388,11 +414,11 @@ class _PhotoStack extends StatelessWidget {
     required double angle,
     required Offset offset,
     bool isFront = false,
-    MediaItem? item,
+    dynamic item,
+    Color? color,
   }) {
-    // Polaroid Size - Slightly larger
-    const double polaroidWidth = 85; 
-    const double polaroidHeight = 95;
+    const double polaroidWidth = 90;
+    const double polaroidHeight = 115;
 
     return Transform.translate(
       offset: offset,
@@ -401,41 +427,67 @@ class _PhotoStack extends StatelessWidget {
         child: Container(
           width: polaroidWidth,
           height: polaroidHeight,
-          padding: const EdgeInsets.fromLTRB(5, 5, 5, 15), // Thicker bottom padding
+          padding:  EdgeInsets.fromLTRB(2, 9, 2, 5),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(2),
+            color: color ?? Colors.white,
+            borderRadius: BorderRadius.circular(3),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
           child: Container(
-            color: Colors.grey[200],
-            child: item != null
-                ? FutureBuilder<Uint8List?>(
-                    future: item.capturedImage != null
-                        ? Future.value(item.capturedImage)
-                        : item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData && snapshot.data != null) {
-                        return Image.memory(
-                          snapshot.data!,
-                          fit: BoxFit.cover,
-                        );
-                      }
-                      return Container(color: Colors.grey[300]);
-                    },
-                  )
-                : (isFront 
-                    ? const Center(child: Icon(Icons.photo_library, color: Colors.grey, size: 30))
-                    : null),
+            color: const Color.fromARGB(255, 255, 255, 255),
+            child: _buildImageContent(item),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildImageContent(dynamic item) {
+    if (item == null) {
+      return const Center(child: Icon(Icons.image, color: Colors.white, size: 24));
+    }
+
+    // กำหนดขนาด Padding เพื่อให้รูปเล็กลงเหมือนมีขอบ
+    const double imagePadding = 4.0;
+
+    if (item is String) {
+      return Padding(
+        padding: const EdgeInsets.all(imagePadding),
+        child: Image.asset(
+          item,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) =>
+              const Center(child: Icon(Icons.broken_image, color: Colors.grey, size: 24)),
+        ),
+      );
+    }
+
+    if (item is MediaItem) {
+      return FutureBuilder<Uint8List?>(
+        future: item.capturedImage != null
+            ? Future.value(item.capturedImage)
+            : item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            return Padding(
+              padding: const EdgeInsets.all(imagePadding),
+              child: Image.memory(
+                snapshot.data!,
+                fit: BoxFit.cover,
+              ),
+            );
+          }
+          return const Center(child: SizedBox());
+        },
+      );
+    }
+
+    return const SizedBox();
   }
 }

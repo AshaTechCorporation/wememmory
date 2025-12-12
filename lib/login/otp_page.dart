@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:wememmory/home/firstPage.dart'; // เอาออกชั่วคราว หรือเก็บไว้ถ้าจำเป็น
-import 'username_page.dart'; // ✅ 1. เพิ่ม import ไฟล์ใหม่
+import 'username_page.dart';
 
 class OtpPage extends StatefulWidget {
   final String phoneNumber;
@@ -159,29 +158,50 @@ class _OtpPageState extends State<OtpPage> {
                               backgroundColor: _primaryOrange,
                               foregroundColor: Colors.white,
                               shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.zero, // ✅ กำหนดเป็น zero เพื่อให้เป็นสี่เหลี่ยมมุมฉากทั้ง 4 ด้าน
+                                borderRadius: BorderRadius.zero,
                               ),
                               elevation: 0,
                             ),
                             onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => const UsernamePage()),
-                              );
+                              // ✅ 1. รวมข้อความจาก Controller ทั้ง 6 ตัว
+                              String inputOtp = _controllers.map((c) => c.text).join();
+
+                              // ✅ 2. ตรวจสอบเงื่อนไข
+                              if (inputOtp == "111111") {
+                                // ถ้าถูกต้อง ให้ไปหน้าถัดไป
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const UsernamePage()),
+                                );
+                              } else {
+                                // ✅ 3. ถ้าผิด ให้แจ้งเตือน (SnackBar)
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('รหัส OTP ไม่ถูกต้อง กรุณาลองใหม่'),
+                                    backgroundColor: Colors.red,
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              }
                             },
                             child: const Text(
                               'ยืนยัน',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w600),
                             ),
                           ),
                         ),
                         const SizedBox(height: 16),
                         Center(
                           child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                                // เพิ่ม Logic ส่งรหัสใหม่ที่นี่
+                            },
                             child: const Text(
                               'ส่งรหัสใหม่',
-                              style: TextStyle(color: _primaryOrange, fontSize: 14),
+                              style:
+                                  TextStyle(color: _primaryOrange, fontSize: 14),
                             ),
                           ),
                         ),

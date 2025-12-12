@@ -63,7 +63,7 @@ class _PrintSheetState extends State<PrintSheet> {
                   const Text("อัลบั้มรูปของคุณ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 12),
 
-                  // ✅ ใช้ Widget ที่แยกออกมาเพื่อแก้ปัญหาการกระพริบ
+                  // ส่วนแสดงรูป (ใช้ Widget ที่แยกไว้)
                   _PrintPreviewSection(items: widget.items, monthName: widget.monthName),
 
                   const SizedBox(height: 24),
@@ -97,7 +97,7 @@ class _PrintSheetState extends State<PrintSheet> {
                     const SizedBox(height: 20),
                     _buildAddressCard(
                       title: "ที่อยู่ผู้รับของขวัญ",
-                      address: "กรุณาเลือกที่อยู่ผู้รับ...", // หรือข้อความ Placeholder
+                      address: "กรุณาเลือกที่อยู่ผู้รับ...",
                     ),
                   ],
 
@@ -113,17 +113,24 @@ class _PrintSheetState extends State<PrintSheet> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                Text("ยอดเครดิตคงเหลือ : ", style: TextStyle(color: Colors.white, fontSize: 14)),
-                                Text("🪙 10", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                                const Text("ยอดเครดิตคงเหลือ : ", style: TextStyle(color: Colors.white, fontSize: 14)),
+                                // ✅ แก้ไข: เปลี่ยนไอคอนเหรียญ
+                                Image.asset(
+                                  'assets/icons/dollar-circle.png',
+                                  width: 24, // ปรับขนาดให้พอดีกับ Text fontSize 16
+                                  height: 24,
+                                ),
+                                const SizedBox(width: 4),
+                                const Text("10", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                               ],
                             ),
-                            SizedBox(height: 2),
-                            Text("เติมเครดิตตามจำนวนที่คุณต้องการ", style: TextStyle(color: Colors.white70, fontSize: 11)),
+                            const SizedBox(height: 2),
+                            const Text("เติมเครดิตตามจำนวนที่คุณต้องการ", style: TextStyle(color: Colors.white70, fontSize: 11)),
                           ],
                         ),
                         ElevatedButton(
@@ -147,11 +154,22 @@ class _PrintSheetState extends State<PrintSheet> {
                   // รายละเอียดการสั่งพิมพ์
                   const Text("รายละเอียดการสั่งพิมพ์", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("อัลบั้มรูปของคุณ", style: TextStyle(color: Colors.black87, fontSize: 14)),
-                      Text("🪙 10", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      const Text("อัลบั้มรูปของคุณ", style: TextStyle(color: Colors.black87, fontSize: 14)),
+                      // ✅ แก้ไข: เปลี่ยนไอคอนเหรียญ
+                      Row(
+                        children: [
+                          Image.asset(
+                            'assets/icons/dollar-circle.png',
+                            width: 24, // ขนาดเท่า fontSize
+                            height: 24,
+                          ),
+                          const SizedBox(width: 4),
+                          const Text("10", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                        ],
+                      ),
                     ],
                   ),
                 ],
@@ -170,16 +188,20 @@ class _PrintSheetState extends State<PrintSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // --- ส่วนแสดงเครดิต (ซ้าย) ---
-                const Row(
+                Row(
                   children: [
-                    Text(
+                    const Text(
                       "เครดิตที่ต้องใช้",
                       style: TextStyle(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.normal),
                     ),
-                    SizedBox(width: 8),
-                    Icon(Icons.monetization_on, size: 24, color: Color(0xFFFFC107)),
-                    SizedBox(width: 6),
-                    Text(
+                    const SizedBox(width: 8),
+                    Image.asset(
+                      'assets/icons/dollar-circle.png',
+                      width: 24, // ขนาดเดิมของ Icon
+                      height: 24,
+                    ),
+                    const SizedBox(width: 6),
+                    const Text(
                       "10",
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
                     ),
