@@ -4,7 +4,6 @@ import 'package:wememmory/home/widgets/AchievementLayout.dart';
 import 'package:wememmory/home/widgets/Recommended.dart';
 import 'package:wememmory/home/widgets/summary_strip.dart';
 import 'package:wememmory/models/media_item.dart';
-// ✅ Import CollectionPage
 
 class HomePage extends StatefulWidget {
   final List<MediaItem>? albumItems;
@@ -31,7 +30,6 @@ class _HomePageState extends State<HomePage> {
     _currentAlbumMonth = widget.albumMonth;
   }
 
-  // ✅ ฟังก์ชันสำหรับไปหน้า CollectionPage และรับข้อมูลกลับมา
   Future<void> _navigateToCollection() async {
     final result = await Navigator.push(
       context,
@@ -43,7 +41,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    // ✅ ถ้ามีข้อมูลกลับมา ให้อัปเดต State
     if (result != null && result is Map) {
       setState(() {
         _currentAlbumItems = result['items'] as List<MediaItem>?;
@@ -55,37 +52,40 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 239, 239, 239),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFB085),
         elevation: 0,
-        toolbarHeight: 110,
+        toolbarHeight: 108,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.elliptical(420, 70),
-          ),
+          borderRadius: BorderRadius.vertical(bottom: Radius.elliptical(420, 70)),
         ),
-        leadingWidth: 70,
-        leading: const Padding(padding: EdgeInsets.only(left: 16)),
-        titleSpacing: 0,
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
+        // ✅ ปรับ Layout ใหม่: เอา Leading เดิมออก และจัด Layout ใน Title ด้วย Row
+        automaticallyImplyLeading: false, 
+        titleSpacing: 24, // เว้นระยะจากซ้าย
+        title: Row(
           children: [
-            Text(
-              'ยินดีต้อนรับ',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                height: 1.2,
+            // 1. รูปโปรไฟล์ / โลโก้
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle, 
+                image: const DecorationImage(
+                  // ✅ ใช้รูปจาก Asset ที่ระบุ
+                  image: AssetImage('assets/images/userpic.png'), 
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            Text(
-              'korakrit',
+            const SizedBox(width: 14), // ระยะห่างระหว่างรูปกับชื่อ
+            
+            // 2. ชื่อ korawit
+            const Text(
+              'korawit',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 22,
+                fontSize: 24,
                 fontWeight: FontWeight.w700,
                 height: 1.2,
               ),
@@ -96,48 +96,40 @@ class _HomePageState extends State<HomePage> {
           Stack(
             alignment: Alignment.center,
             children: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.notifications,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-              Positioned(
-                top: 10,
-                right: 12,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
+              IconButton(onPressed: () {}, icon: const Icon(Icons.notifications, color: Colors.white, size: 28)),
+              Positioned(top: 10, right: 12, child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle))),
             ],
           ),
           const SizedBox(width: 12),
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ✅ ส่งข้อมูลและ callback ไปให้ Recommended
-              Recommended(
-                albumItems: _currentAlbumItems,
-                albumMonth: _currentAlbumMonth,
-                onCardTap: _navigateToCollection, // ✅ ส่ง callback สำหรับคลิกการ์ด
+        bottom: false,
+        // ✅ ใช้ CustomScrollView เพื่อจัดการ Layout ยืดหยุ่น
+        child: CustomScrollView(
+          slivers: [
+            // ส่วนบน: Recommended และ Summary
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  Recommended(
+                    albumItems: _currentAlbumItems,
+                    albumMonth: _currentAlbumMonth,
+                    onCardTap: _navigateToCollection,
+                  ),
+                  const SizedBox(height: 3),
+                  const SummaryStrip(),
+                  const SizedBox(height: 35),
+                ],
               ),
-              const SizedBox(height: 7),
-              const SummaryStrip(),
-              const SizedBox(height: 35),
-              const AchievementLayout(),
-            ],
-          ),
+            ),
+            
+            // ✅ ส่วนล่าง: AchievementLayout ยืดเต็มพื้นที่ที่เหลือ
+            const SliverFillRemaining(
+              hasScrollBody: false, // สำคัญ: เพื่อให้มันยืดโดยไม่คิดว่าเป็น List
+              child: AchievementLayout(),
+            ),
+          ],
         ),
       ),
     );
