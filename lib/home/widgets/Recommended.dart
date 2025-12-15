@@ -427,10 +427,10 @@ class _PhotoStack extends StatelessWidget {
         child: Container(
           width: polaroidWidth,
           height: polaroidHeight,
-          padding:  EdgeInsets.fromLTRB(2, 9, 2, 5),
+          padding:  EdgeInsets.fromLTRB(2, 10, 2, 5),
           decoration: BoxDecoration(
             color: color ?? Colors.white,
-            borderRadius: BorderRadius.circular(3),
+            // borderRadius: BorderRadius.circular(3),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.15),

@@ -84,9 +84,24 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
       ),
       child: Column(
         children: [
+          // ---------------------------------------------------------
+          // [ส่วนที่เพิ่ม] : Slide Indicator (แถบขีดด้านบน)
+          // ---------------------------------------------------------
+          const SizedBox(height: 12), // ระยะห่างจากขอบบนสุด
+          Container(
+            width: 61, // ความกว้างของขีด
+            height: 5, // ความหนาของขีด
+            decoration: BoxDecoration(
+              color: Colors.grey[300], // สีเทาอ่อน
+              borderRadius: BorderRadius.circular(2.5), // ความมน
+            ),
+          ),
+          // ---------------------------------------------------------
+
           // Header
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            // ปรับระยะห่างด้านบนเป็น 10 (เดิม 20) เพื่อชดเชยพื้นที่ขีด
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

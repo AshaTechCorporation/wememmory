@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:video_player/video_player.dart';
+import 'package:video_player/video_player.dart'; // ถ้าไม่ได้ใช้ในหน้านี้เอาออกได้ครับ แต่ผมคงไว้ตามเดิม
 import 'package:wememmory/Album/album_layout_page.dart';
-import 'package:wememmory/models/media_item.dart'; 
+import 'package:wememmory/models/media_item.dart';
 
 class UploadPhotoPage extends StatefulWidget {
   final String selectedMonth;
@@ -18,7 +18,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   final List<MediaItem> mediaList = [];
   final List<MediaItem> selectedItems = [];
   final Map<String, Future<Uint8List?>> _thumbnailFutures = {};
-  
+
   bool showThisMonthOnly = false;
   bool isLoading = true;
 
@@ -37,7 +37,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   }
 
   Future<void> _loadAllMediaFromDevice() async {
-    // ... (ส่วนโหลดรูปเหมือนเดิม ไม่ต้องแก้) ...
     setState(() => isLoading = true);
     final ps = await PhotoManager.requestPermissionExtend();
     if (!ps.isAuth) {
@@ -63,7 +62,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     }
 
     final AssetPathEntity primaryAlbum = albums.first;
-    const int pageSize = 1000; 
+    const int pageSize = 1000;
     List<AssetEntity> assets = await primaryAlbum.getAssetListPaged(page: 0, size: pageSize);
 
     if (showThisMonthOnly) {
@@ -84,7 +83,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     setState(() {
       mediaList.clear();
       mediaList.addAll(temp);
-      _thumbnailFutures.clear(); 
+      _thumbnailFutures.clear();
       isLoading = false;
     });
   }
@@ -93,7 +92,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     setState(() {
       showThisMonthOnly = value;
     });
-    _loadAllMediaFromDevice(); 
+    _loadAllMediaFromDevice();
   }
 
   void _toggleSelection(MediaItem item) {
@@ -116,15 +115,12 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     });
   }
 
-  // ใน class _UploadPhotoPageState
-
   void _onNextPressed() {
     if (selectedItems.isNotEmpty) {
-      // ใช้ showModalBottomSheet แทน Navigator.push
       showModalBottomSheet(
         context: context,
-        isScrollControlled: true, // สำคัญ: เพื่อให้กำหนดความสูงของ Sheet ได้อิสระ (เช่น 90%)
-        backgroundColor: Colors.transparent, // โปร่งใสเพื่อให้เห็นมุมโค้งของ AlbumLayoutPage
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
         builder: (context) => AlbumLayoutPage(
           selectedItems: selectedItems,
           monthName: widget.selectedMonth,
@@ -136,7 +132,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // ... (ส่วน UI เหมือนเดิม) ...
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -144,9 +139,24 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
       ),
       child: Column(
         children: [
+          // ---------------------------------------------------------
+          // [ส่วนที่เพิ่ม] : Slide Indicator (แถบขีดด้านบน)
+          // ---------------------------------------------------------
+          const SizedBox(height: 12), // ระยะห่างจากขอบบนสุด
+          Container(
+            width: 61, // ความกว้างของขีด
+            height: 5, // ความหนาของขีด
+            decoration: BoxDecoration(
+              color: Colors.grey[300], // สีเทาอ่อน
+              borderRadius: BorderRadius.circular(2.5), // ความมน
+            ),
+          ),
+          // ---------------------------------------------------------
+
           // Header
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            // ปรับ padding ด้านบนเป็น 10 (จากเดิม 20) เพื่อชดเชยกับพื้นที่ของขีดด้านบน
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -193,12 +203,10 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                 Switch(
                   value: showThisMonthOnly,
                   onChanged: _toggleThisMonth,
-                  // สีปุ่มตอนเปิด (ON)
-                  activeColor: Colors.white, // สีของหัวปุ่ม (Thumb) เป็นสีขาว
-                  activeTrackColor: const Color(0xFFED7D31), // สีของราง (Track) เป็นสีส้ม
-                  // สีปุ่มตอนปิด (OFF)
-                  inactiveThumbColor: Colors.grey, // สีของหัวปุ่ม (Thumb) เป็นสีเทา
-                  inactiveTrackColor: const Color(0xFFE0E0E0), // สีของราง (Track) เป็นสีเทาอ่อน
+                  activeColor: Colors.white,
+                  activeTrackColor: const Color(0xFFED7D31),
+                  inactiveThumbColor: Colors.grey,
+                  inactiveTrackColor: const Color(0xFFE0E0E0),
                 ),
               ],
             ),
@@ -333,11 +341,11 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                // ✅ แก้ตรงนี้ให้เรียก _onNextPressed
                 onPressed: selectedItems.isNotEmpty ? _onNextPressed : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: selectedItems.isNotEmpty ? const Color(0xFF5AB6D8) : Colors.grey[400],
                   shape: RoundedRectangleBorder(
+                    // borderRadius: BorderRadius.circular(12), // เพิ่ม BorderRadius ให้ปุ่มมนขึ้นเล็กน้อย
                   ),
                   elevation: 0,
                 ),
@@ -358,7 +366,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   }
 }
 
-// ... (StepItem เหมือนเดิม)
 class _StepItem extends StatelessWidget {
   final String label;
   final bool isActive;

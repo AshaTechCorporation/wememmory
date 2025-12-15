@@ -211,13 +211,20 @@ class _SearchBar extends StatelessWidget {
     return Container(
       height: 44,
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 192, 192, 192).withOpacity(0.25),
+        // 1. เปลี่ยนสีพื้นหลังเป็น Hex code #6BB0C50D (แปลงเป็น 0x0D6BB0C5 ใน Flutter)
+        color: const Color(0x0D6BB0C5),
         borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         children: [
-          Image.asset('assets/icons/Search.png', width: 18, height: 18),
+          // 2. เปลี่ยนสีภาพโลโก้ให้เป็นสีดำโดยใช้ property 'color'
+          Image.asset(
+            'assets/icons/Search.png',
+            width: 18,
+            height: 18,
+            color: Colors.black,
+          ),
           const SizedBox(width: 10),
           const Expanded(
             child: TextField(
@@ -225,6 +232,8 @@ class _SearchBar extends StatelessWidget {
               style: TextStyle(color: Colors.black, fontSize: 14.5),
               decoration: InputDecoration(
                 hintText: 'ค้นหาความทรงจำตามแท็กและโน้ต.....',
+                // อาจจะต้องปรับสี hintText ให้เข้มขึ้นเล็กน้อยเพื่อให้เข้ากับพื้นหลังใหม่
+                // hintStyle: TextStyle(color: Colors.black54),
                 isDense: true,
                 border: InputBorder.none,
               ),
@@ -313,7 +322,7 @@ class _MonthSectionHeader extends StatelessWidget {
       decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(8)),
-      child: Icon(icon, color: Colors.blueGrey, size: 22),
+      child: Icon(icon, color: const Color(0xFF6BB0C5), size: 22),
     );
   }
 }

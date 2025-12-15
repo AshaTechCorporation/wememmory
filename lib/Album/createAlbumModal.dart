@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wememmory/Album/upload_photo_page.dart';
 
-
 class CreateAlbumModal extends StatelessWidget {
   const CreateAlbumModal({super.key});
 
@@ -11,13 +10,28 @@ class CreateAlbumModal extends StatelessWidget {
       height: MediaQuery.of(context).size.height * 0.75, // สูง 75% ของจอ
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(12 )),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
       child: Column(
         children: [
+          // ---------------------------------------------------------
+          // [ส่วนที่เพิ่ม] : Slide Indicator (แถบขีดด้านบน)
+          // ---------------------------------------------------------
+          const SizedBox(height: 12), // ระยะห่างจากขอบบนสุด
+          Container(
+            width: 61, // ความกว้างของขีด
+            height: 5, // ความหนาของขีด
+            decoration: BoxDecoration(
+              color: Colors.grey[300], // สีเทาอ่อน
+              borderRadius: BorderRadius.circular(2.5), // ความมน
+            ),
+          ),
+          // ---------------------------------------------------------
+
           // 1. Header (ชื่อหน้า + ปุ่มปิด)
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 10),
+            // ปรับ padding ด้านบน (top) เหลือ 10 เพราะมีขีดด้านบนกินที่ไปแล้ว (เดิม 24)
+            padding: const EdgeInsets.fromLTRB(24, 10, 24, 10), 
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -67,7 +81,6 @@ class CreateAlbumModal extends StatelessWidget {
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
-              // ใช้ physics: BouncingScrollPhysics() เพื่อให้เด้งๆ แบบ iOS หรือ ClampingScrollPhysics() แบบ Android
               physics: const BouncingScrollPhysics(), 
               children: const [
                 // --- 2026 (อนาคต - ตัวอย่าง) ---
@@ -118,7 +131,7 @@ class CreateAlbumModal extends StatelessWidget {
   }
 }
 
-// Widget ย่อยสำหรับแต่ละแถว (Row Item)
+// Widget ย่อยสำหรับแต่ละแถว (Row Item) - (คงเดิม ไม่มีการเปลี่ยนแปลง)
 class _AlbumOptionItem extends StatelessWidget {
   final String month;
   final String statusText;
@@ -130,12 +143,11 @@ class _AlbumOptionItem extends StatelessWidget {
     required this.isDone,
   });
 
-  // ฟังก์ชันสำหรับเปิด Bottom Sheet หน้าอัพโหลดรูป
   void _showUploadPhotoSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // 🟢 สำคัญ: ให้ขยายความสูงได้เกือบเต็มจอ
-      backgroundColor: Colors.transparent, // เพื่อให้เห็นมุมโค้ง
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) => UploadPhotoPage(selectedMonth: month),
     );
   }
@@ -144,12 +156,7 @@ class _AlbumOptionItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: isDone ? null : () {
-        // 1. ปิด Modal เลือกเดือนก่อน (ถ้าต้องการ)
         Navigator.pop(context); 
-        
-        // 2. เปิด Modal อัพโหลดรูปขึ้นมาใหม่
-        // ใช้ Future.delayed เล็กน้อยเพื่อให้ Modal แรกปิดสนิทก่อน Modal สองจะเด้งขึ้นมา
-        // เพื่อความสวยงามของ Animation
         Future.delayed(const Duration(milliseconds: 150), () {
           if (context.mounted) {
             _showUploadPhotoSheet(context); 
@@ -157,7 +164,6 @@ class _AlbumOptionItem extends StatelessWidget {
         });
       },
       child: Padding(
-        // ... (UI เดิม) ...
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
