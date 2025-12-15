@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/models/media_item.dart';
 
+// หน้า รายละเอียดรูปภาพ
 class PhotoDetailSheet extends StatefulWidget {
   final MediaItem item;
 

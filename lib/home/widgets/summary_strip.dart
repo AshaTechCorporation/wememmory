@@ -58,6 +58,17 @@ class SummaryStrip extends StatelessWidget {
                   topCaptionSub: '#Food #Yummy',
                 ),
               ),
+              // การ์ดที่ 4 
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
+                child: InfoCard(
+                  title: 'ร้านอาหารโปรด',
+                  count: '34',
+                  countColor: Color(0xFF8BC34A),
+                  topCaptionTitle: 'อร่อยมาก',
+                  topCaptionSub: '#Food #Yummy',
+                ),
+              ),
             ],
           ),
         ),
