@@ -130,7 +130,7 @@ class _MembershipHistoryPageState extends State<MembershipHistoryPage> {
                         // หน้าตาของปุ่มกด (Trigger)
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          width: 140,
+                          width: 150,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(color: Colors.grey.shade300),

@@ -47,14 +47,13 @@ class _MembershipPackagePageState extends State<MembershipPackagePage> {
           // -------------------------------------------------------
           // 1. ภาพพื้นหลัง (Background Image)
           // -------------------------------------------------------
-          Positioned.fill(
-            child: Image.network(
-              'https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=2070&auto=format&fit=crop', 
-              fit: BoxFit.cover,
-              // กรณีโหลดรูปไม่ได้ ให้แสดงสีเทาแทน
-              errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey.shade900),
-            ),
-          ),
+            Image.asset(
+                    'assets/images/membershipBackground.png',
+                    height: double.infinity,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+          
 
           // -------------------------------------------------------
           // 2. Gradient Overlay (เงาดำเพื่อให้ตัวหนังสือชัด)

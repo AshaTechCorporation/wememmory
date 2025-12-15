@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wememmory/shop/paymentSuccessPage.dart';
 import 'package:wememmory/shop/couponPage.dart';
+import 'package:wememmory/shop/addCardPage.dart';
 
 class PaymentPage extends StatefulWidget {
   final String packageName;
@@ -201,7 +202,7 @@ class _PaymentPageState extends State<PaymentPage> {
         color: Colors.transparent,
         child: Row(
           children: [
-            const Icon(Icons.qr_code_scanner, color: Color(0xFF2C5F86), size: 28),
+            Image.asset('assets/icons/qrPayment.png', width: 28, height: 28, errorBuilder: (_,__,___) => const Icon(Icons.qr_code_2, size: 28, color: Color(0xFF1A237E))),
             const SizedBox(width: 16),
             const Expanded(
               child: Text('QR พร้อมเพย์', style: TextStyle(fontSize: 16, color: Colors.black87)),
@@ -232,11 +233,11 @@ class _PaymentPageState extends State<PaymentPage> {
             color: Colors.transparent,
             child: Row(
               children: [
-                const Icon(Icons.account_balance, color: Color(0xFF2C5F86), size: 28),
-                const SizedBox(width: 16),
-                const Expanded(
-                  child: Text('Mobile Banking', style: TextStyle(fontSize: 16, color: Colors.black87)),
-                ),
+            Image.asset('assets/icons/bank.png', width: 28, height: 28, errorBuilder: (_,__,___) => const Icon(Icons.qr_code_2, size: 28, color: Color(0xFF1A237E))),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Text('Mobile Banking', style: TextStyle(fontSize: 16, color: Colors.black87)),
+            ),
                 Icon(
                   _isMobileBankingExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                   color: Colors.grey,
@@ -326,11 +327,11 @@ class _PaymentPageState extends State<PaymentPage> {
             color: Colors.transparent,
             child: Row(
               children: [
-                const Icon(Icons.credit_card, color: Color(0xFF2C5F86), size: 28),
-                const SizedBox(width: 16),
-                const Expanded(
-                  child: Text('บัตรเครดิต/บัตรเดบิต', style: TextStyle(fontSize: 16, color: Colors.black87)),
-                ),
+            Image.asset('assets/icons/card.png', width: 28, height: 28, errorBuilder: (_,__,___) => const Icon(Icons.qr_code_2, size: 28, color: Color(0xFF1A237E))),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Text('บัตรเครดิต / บัตรเดบิต', style: TextStyle(fontSize: 16, color: Colors.black87)),
+            ),
                 Icon(
                   _isCreditCardExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                   color: Colors.grey,
@@ -348,12 +349,8 @@ class _PaymentPageState extends State<PaymentPage> {
             padding: const EdgeInsets.all(16),
             child: GestureDetector(
               onTap: () {
-                // Action เพิ่มบัตร
-                setState(() {
-                  _selectedMainMethod = 2; // เลือก Credit Card
-                  _selectedBankIndex = null;
-                });
-              },
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AddCardPage()));
+                  },
               child: Container(
                 height: 50,
                 decoration: BoxDecoration(

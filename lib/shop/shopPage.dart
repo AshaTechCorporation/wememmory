@@ -13,7 +13,7 @@ class ShopPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(96),
+        preferredSize: const Size.fromHeight(50),
         child: _ShopAppBar(),
       ),
       body: const _ShopBody(),
@@ -33,7 +33,7 @@ class _ShopAppBar extends StatelessWidget {
       elevation: 0,
       titleSpacing: 0,
       title: const Padding(
-        padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
+        padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         child: Text('ร้านความทรงจำ', style: TextStyle(color: Colors.black)),
       ),
       foregroundColor: Colors.black,
@@ -51,9 +51,9 @@ class _ShopBody extends StatelessWidget {
   Widget build(BuildContext context) {
     // 1. สร้างรายการรูปภาพตรงนี้
     final List<String> promoImages = [
-      'assets/images/Hobby3.png',
-      'assets/images/People.png', // เปลี่ยนเป็นชื่อไฟล์รูปอื่นของคุณ
-      'assets/images/Hobby4.png',
+      'assets/images/promo1.png',
+      'assets/images/promo2.png', // เปลี่ยนเป็นชื่อไฟล์รูปอื่นของคุณ
+      'assets/images/promo3.png',
       // เพิ่มรูปได้เรื่อยๆ ตามต้องการ
     ];
 
@@ -108,7 +108,6 @@ class _ShopBody extends StatelessWidget {
 }
 
 /* =============================== BANNER ================================ */
-
 class _BannerCarousel extends StatefulWidget {
   const _BannerCarousel();
 
@@ -120,7 +119,7 @@ class _BannerCarouselState extends State<_BannerCarousel> {
   final _controller = PageController();
   int _idx = 0;
 
-  final _banners = const ['assets/images/banner.png'];
+  final _banners = const ['assets/images/bannerShop.png'];
 
   @override
   void dispose() {
@@ -128,22 +127,24 @@ class _BannerCarouselState extends State<_BannerCarousel> {
     super.dispose();
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(height: 20),
         AspectRatio(
-          aspectRatio: 16 / 8,
+          aspectRatio: 200 / 70, 
           child: PageView.builder(
             controller: _controller,
             itemCount: _banners.length,
             onPageChanged: (i) => setState(() => _idx = i),
-            itemBuilder:
-                (_, i) => Image.asset(
-                  _banners[i],
-                  fit: BoxFit.cover,
-                  width: MediaQuery.of(context).size.width,
-                ),
+            itemBuilder: (_, i) => Image.asset(
+              _banners[i],
+              fit: BoxFit.cover, 
+              width: MediaQuery.of(context).size.width,
+            ),
           ),
         ),
         const SizedBox(height: 6),
@@ -156,10 +157,9 @@ class _BannerCarouselState extends State<_BannerCarousel> {
               height: 4,
               margin: const EdgeInsets.symmetric(horizontal: 3),
               decoration: BoxDecoration(
-                color:
-                    i == _idx
-                        ? const Color(0xFFFF8A3D)
-                        : const Color(0xFFFFC7A5),
+                color: i == _idx
+                    ? const Color(0xFFFF8A3D)
+                    : const Color(0xFFFFC7A5),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -291,7 +291,7 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
                 children: [
                   // --- Background Image ---
                   Image.asset(
-                    'assets/images/Rectangle4.png',
+                    'assets/images/membershipBackground.png',
                     height: double.infinity,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -607,8 +607,8 @@ class _GiftCardBanner extends StatelessWidget {
       // --- การ์ดบน (Charm) ---
       // รูปซ้อน: Rectangle1 (หน้า), Rectangle3 (หลัง)
       imageSection = _buildStackedImageContainer(
-        frontImage: 'assets/images/Rectangle1.png',
-        backImage: 'assets/images/Rectangle3.png', 
+        frontImage: 'assets/images/front1.png',
+        backImage: 'assets/images/back1.png', 
       );
 
       // ข้อความอยู่ขวา -> ชิดขวา
@@ -625,8 +625,8 @@ class _GiftCardBanner extends StatelessWidget {
       // --- การ์ดล่าง (PhotoFrame) ---
       // รูปซ้อน: Rectangle4 (หน้า), Rectangle0 (หลัง - ใช้รูปที่มีในโปรเจกต์เดิม)
       imageSection = _buildStackedImageContainer(
-        frontImage: 'assets/images/Rectangle4.png',
-        backImage: 'assets/images/Rectangle0.png', 
+        frontImage: 'assets/images/front2.png',
+        backImage: 'assets/images/back2.png', 
       );
 
       // ข้อความอยู่ซ้าย -> ชิดซ้าย
@@ -678,61 +678,68 @@ class _GiftCardBanner extends StatelessWidget {
 
   // --- Widget สร้างรูปซ้อนกัน 2 ชั้น (ใช้สำหรับทั้ง 2 การ์ด) ---
   Widget _buildStackedImageContainer({required String frontImage, required String backImage}) {
-    const double size = 130;
-    const double borderRadius = 4; // ขอบเหลี่ยม (มนนิดเดียวเหมือนใบรูปถ่าย)
+  const double size = 160;
+  // ----- แก้ไขตรงนี้ครับ -----
+  // เปลี่ยนจาก 4 เป็นตัวเลขที่มากขึ้น เช่น 12, 16, 20 ยิ่งเยอะยิ่งมน
+  const double borderRadius = 16;
+  // ------------------------
 
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.center,
-        children: [
-          // 1. รูปด้านหลัง (เอียงซ้าย)
-          Transform.rotate(
-            angle: -0.12, // เอียงซ้ายประมาณ -7 องศา
-            child: Container(
-              width: size * 0.85,
-              height: size * 0.85,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(borderRadius),
-                boxShadow: const [
-                  BoxShadow(color: Color(0x15000000), blurRadius: 6, offset: Offset(-4, 4)),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(borderRadius),
-                child: Image.asset(backImage, fit: BoxFit.cover),
-              ),
+  return SizedBox(
+    width: size,
+    height: size,
+    child: Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.center,
+      children: [
+        // 1. รูปด้านหลัง (เอียงซ้าย)
+        Transform.rotate(
+          angle: -0.12,
+          child: Container(
+            width: size * 1,
+            height: size * 0.9,
+            /*decoration: BoxDecoration(
+              color: Colors.white,
+              // ตรงนี้จะใช้ค่า borderRadius ที่เรากำหนดด้านบน
+              borderRadius: BorderRadius.circular(borderRadius),
+              boxShadow: const [
+                BoxShadow(color: Color(0x15000000), blurRadius: 6, offset: Offset(-4, 4)),
+              ],
+            ),*/
+            child: ClipRRect(
+              // ตรงนี้ก็ใช้ค่าเดียวกัน
+              borderRadius: BorderRadius.circular(borderRadius),
+              child: Image.asset(backImage, fit: BoxFit.cover),
             ),
           ),
-          
-          // 2. รูปด้านหน้า (เอียงขวานิดๆ)
-          Transform.rotate(
-            angle: 0.08, // เอียงขวาประมาณ 4.5 องศา
-            child: Container(
-              width: size * 0.92,
-              height: size * 0.92,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(borderRadius),
-                // เพิ่มขอบขาวรอบรูปนิดหน่อยเพื่อให้ดูเหมือนรูปถ่ายโพลารอยด์/อัดรูป
-                border: Border.all(color: Colors.white, width: 2), 
-                boxShadow: const [
-                  BoxShadow(color: Color(0x25000000), blurRadius: 10, offset: Offset(2, 6)),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(borderRadius - 1), // ปรับให้พอดีกับขอบ
-                child: Image.asset(frontImage, fit: BoxFit.cover),
-              ),
+        ),
+
+        // 2. รูปด้านหน้า (เอียงขวานิดๆ)
+        Transform.rotate(
+          angle: 0.08,
+          child: Container(
+            width: size * 1,
+            height: size * 0.9,
+            /*decoration: BoxDecoration(
+              color: Colors.white,
+              // ตรงนี้ใช้ค่า borderRadius
+              borderRadius: BorderRadius.circular(borderRadius),
+              border: Border.all(color: Colors.white, width: 2),
+              boxShadow: const [
+                BoxShadow(color: Color(0x25000000), blurRadius: 10, offset: Offset(2, 6)),
+              ],
+            ),*/
+            child: ClipRRect(
+              // ตรงนี้มีการลบออก 1 เพื่อชดเชยขอบขาว (Border)
+              // ถ้า borderRadius = 16 ตรงนี้จะเป็น 15 ซึ่งถูกต้องแล้วครับ
+              borderRadius: BorderRadius.circular(borderRadius - 1),
+              child: Image.asset(frontImage, fit: BoxFit.cover),
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   // Widget ส่วนข้อความและปุ่ม
   Widget _buildTextBlock(
@@ -746,7 +753,7 @@ class _GiftCardBanner extends StatelessWidget {
           textAlign: textAlign,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 17,
+            fontSize: 16,
             height: 1.4,
             color: Colors.black87,
           ),

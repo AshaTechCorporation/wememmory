@@ -23,9 +23,16 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
 
   // รายการรูปภาพสำหรับส่วน Story (3 รูป)
   final List<String> _storyImages = [
-    'assets/images/Rectangle4.png',
-    'assets/images/Rectangle5.png',
-    'assets/images/Rectangle6.png',
+    'assets/images/exGife.png',
+    'assets/images/exGife1.png',
+    'assets/images/exGife2.png',
+  ];
+
+  // ✅ เพิ่มรายการรูปภาพแนวตั้งใหม่ 3 รูป (ต้องมีไฟล์รูปจริงใน folder assets นะครับ)
+  final List<String> _storyImagesVertical = [
+    'assets/images/family.png', // TODO: เปลี่ยนชื่อไฟล์ให้ตรงกับที่มีจริง
+    'assets/images/Rectangle569.png',
+    'assets/images/exProfile.png',
   ];
 
   @override
@@ -307,6 +314,7 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
   }
 
   // --- Widget ย่อยสำหรับส่วน Story ---
+// --- Widget ย่อยสำหรับส่วน Story ---
   Widget _buildStorySection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,50 +338,108 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
         ),
         const SizedBox(height: 24),
 
-        SizedBox(
-          height: 280,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: _storyImages.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 16),
-            itemBuilder: (context, index) {
-              return Container(
-                width: 280,
+        // ---------------------------------------------------------
+        // 1. แสดงรูปแนวตั้ง (Vertical) เรียงลงมา 3 รูป
+        // ---------------------------------------------------------
+        Column(
+          children: _storyImagesVertical.map((imagePath) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Container(
+                width: 400,
+                height: 400,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(4),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
                   ],
                 ),
                 padding: const EdgeInsets.all(12),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(2),
                   child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey.shade300),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+
+        const SizedBox(height: 8),
+        
+        Text(
+          'อัลบั้มภาพคือของขวัญที่เก็บได้ทั้งรอยยิ้มและเวลาเหมาะจะมอบให้กับคนที่คุณรักไม่ว่าจะเป็นวันเกิดหรือวันสำคัญอื่น ๆ',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.black,
+            height: 1.5,
+          ),
+        ),
+
+        const SizedBox(height: 30), // เว้นระยะห่างก่อนเริ่มส่วนเลื่อนแนวนอน
+
+        // ---------------------------------------------------------
+        // 2. แสดงรูปแนวนอน (Horizontal) เลื่อนขวาได้ ต่อท้ายสุด
+        // ---------------------------------------------------------
+        const Text(
+          'เลือกภาพที่คุณรัก มาเป็นหน้าปกอัลบั้ม', // (Optional) หัวข้อเล็กๆ
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        const SizedBox(height: 12),
+
+        Text(
+          'ภาพหน้าปกที่สะท้อนความทรงจำของคุณและเก็บทุกช่วงเวลาสำคัญไว้ในอัลบั้ม',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.black,
+            height: 1.5,
+          ),
+        ),
+        
+        SizedBox(
+          height: 350, // กำหนดความสูงของโซนเลื่อนแนวนอน
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: _storyImages.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 16),
+            itemBuilder: (context, index) {
+              return Container(
+                width: 350, // ความกว้างของการ์ดแต่ละใบ
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2)),
+                  ],
+                ),
+                padding: const EdgeInsets.all(10),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: Image.asset(
                     _storyImages[index],
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Container(color: Colors.grey.shade300),
+                    errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey.shade300),
                   ),
                 ),
               );
             },
           ),
         ),
+        
+        const SizedBox(height: 8),
 
-        const SizedBox(height: 24),
         Text(
-          'อัลบั้มภาพคือของขวัญที่เก็บได้ทั้งรอยยิ้มและเวลาเหมาะจะมอบให้กับคนที่คุณรักไม่ว่าจะเป็นวันเกิดหรือวันสำคัญอื่น ๆ',
+          'เพื่อให้ทุกความทรงจำเริ่มต้นอย่างมีความหมายทุกครั้งที่เปิืดคือการย้อนกลับไปสู่ช่วงเวลาดี ๆ ของคุณ',
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey.shade600,
+            color: Colors.black,
             height: 1.5,
           ),
-        ),
+        )
       ],
     );
   }

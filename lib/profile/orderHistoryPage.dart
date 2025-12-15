@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wememmory/profile/orderDetailPage.dart';
-import 'package:wememmory/shop/paymentPage.dart'; // 1. อย่าลืม Import หน้ารายละเอียด
+import 'package:wememmory/shop/paymentPage.dart'; 
 
 class OrderHistoryPage extends StatelessWidget {
   const OrderHistoryPage({super.key});
@@ -37,90 +37,93 @@ class OrderHistoryPage extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // Case 1: รอชำระ -> ส่ง status waitingPayment
+          // Case 1: รอชำระ
           _OrderCard(
             statusText: 'รอชำระ',
             barCount: 1,
             totalBars: 4,
             mainColor: kOrangeColor,
-            iconData: Icons.payment,
+            icon: Image.asset(
+              'assets/icons/truck.png', 
+              width: 18, height: 18, color: Colors.white,
+            ),
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const PaymentPage()),
-              );
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaymentPage()));
             },
           ),
 
-          // Case 2: เตรียมจัดส่ง -> ส่ง status preparing
+          // Case 2: เตรียมจัดส่ง
           _OrderCard(
             statusText: 'เตรียมจัดส่ง',
             barCount: 2,
             totalBars: 4,
             mainColor: kOrangeColor,
-            iconData: Icons.inventory_2_outlined,
+            icon: Image.asset(
+              'assets/icons/truck.png', 
+              width: 18, height: 18, color: Colors.white,
+            ),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) => const OrderDetailPage(status: OrderStatus.preparing),
-              ));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const OrderDetailPage(status: OrderStatus.preparing)));
             },
           ),
 
-          // Case 3: อยู่ระหว่างขนส่ง -> ส่ง status shipping
+          // Case 3: อยู่ระหว่างขนส่ง
           _OrderCard(
             statusText: 'อยู่ระหว่างขนส่ง',
             barCount: 3,
             totalBars: 4,
             mainColor: kOrangeColor,
-            iconData: Icons.local_shipping_outlined,
+            icon: Image.asset(
+              'assets/icons/truck.png', 
+              width: 18, height: 18, color: Colors.white,
+            ),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) => const OrderDetailPage(status: OrderStatus.shipping),
-              ));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const OrderDetailPage(status: OrderStatus.shipping)));
             },
           ),
 
-          // Case 4: สำเร็จ -> ส่ง status completed
+          // Case 4: สำเร็จ
           _OrderCard(
             statusText: 'สำเร็จ',
             barCount: 4,
             totalBars: 4,
             mainColor: kGreenColor,
-            iconData: Icons.check,
             isCompleted: true,
+            icon: const Icon(Icons.check, size: 18, color: Colors.white),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) => const OrderDetailPage(status: OrderStatus.completed),
-              ));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const OrderDetailPage(status: OrderStatus.completed)));
             },
           ),
 
-          // Case 5: คืนสินค้า -> ส่ง status returned
+          // Case 5: คืนสินค้า
           _OrderCard(
             statusText: 'คืนสินค้า',
-            barCount: 3, // แก้เป็น 3 หรือ 4 ตามดีไซน์ (ภาพตัวอย่างมักใช้ 3 สำหรับคืนสินค้า)
+            barCount: 4,
             totalBars: 4,
             mainColor: kPeachColor,
-            iconData: Icons.assignment_return_outlined,
             overrideIconBgColor: kPeachDarkColor,
+            icon: Image.asset(
+              'assets/icons/cube.png', 
+              width: 18, height: 18, color: Colors.white,
+            ),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) => const OrderDetailPage(status: OrderStatus.returned),
-              ));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const OrderDetailPage(status: OrderStatus.returned)));
             },
           ),
           
-          // Case 6: ยกเลิก -> ส่ง status cancelled
+          // Case 6: ยกเลิก
            _OrderCard(
             statusText: 'ยกเลิก',
             barCount: 4,
             totalBars: 4,
             mainColor: kRedColor,
-            iconData: Icons.lock_outline,
             isCompleted: true,
+            icon: Image.asset(
+              'assets/icons/bag-cross.png', 
+              width: 18, height: 18, color: Colors.white,
+            ),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) => const OrderDetailPage(status: OrderStatus.cancelled),
-              ));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const OrderDetailPage(status: OrderStatus.cancelled)));
             },
           ),
 
@@ -131,67 +134,61 @@ class OrderHistoryPage extends StatelessWidget {
   }
 }
 
-// ... _HeaderBanner (ใช้โค้ดเดิมของคุณได้เลย) ...
+// ------------------------------------------
+// Widgets ส่วนประกอบ
+// ------------------------------------------
+
 class _HeaderBanner extends StatelessWidget {
   const _HeaderBanner();
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 160,
-      decoration: const BoxDecoration(
-        color: Colors.grey, 
-        image: DecorationImage(image: AssetImage('assets/images/Hobby.png'), fit: BoxFit.cover),
-      ),
-      child: Stack(
-        children: [
-          Container(
+    return Stack(
+      children: [
+        Image.asset(
+          'assets/images/bannerOrder.png',
+          width: double.infinity,
+          fit: BoxFit.fitWidth,
+        ),
+        Positioned.fill(
+          child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
                 colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
               ),
             ),
           ),
-          const Positioned(
-            bottom: 16, right: 16,
-            child: Text("เพราะเราเข้าใจว่า ‘ภาพหนึ่งใบ’\nมีค่ามากกว่าที่เห็น", textAlign: TextAlign.right, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, height: 1.4, shadows: [Shadow(offset: Offset(0, 1), blurRadius: 4, color: Colors.black54)])),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
-// ------------------------------------------
-// แก้ไข _OrderCard ให้รับ onTap
-// ------------------------------------------
 class _OrderCard extends StatelessWidget {
   final String statusText;
   final int barCount;
   final int totalBars;
   final Color mainColor;
-  final IconData iconData;
+  final Widget icon;
   final bool isCompleted;
-  final Color? iconColor;
   final Color? overrideIconBgColor;
-  final VoidCallback? onTap; // 2. เพิ่มตัวแปรรับการกด
+  final VoidCallback? onTap;
 
   const _OrderCard({
     required this.statusText,
     required this.barCount,
     this.totalBars = 4,
     required this.mainColor,
-    required this.iconData,
+    required this.icon,
     this.isCompleted = false,
-    this.iconColor,
     this.overrideIconBgColor,
-    this.onTap, // รับค่าเข้ามา
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    // 3. หุ้มด้วย GestureDetector
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -222,18 +219,77 @@ class _OrderCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset('assets/images/Rectangle569.png', width: 80, height: 80, fit: BoxFit.cover, errorBuilder: (c, o, s) => Container(width: 80, height: 80, color: Colors.grey[200])),
+                
+                // ✅ ส่วนที่แก้ไข: สลับตำแหน่งซ้าย-ขวา
+                SizedBox(
+                  width: 90, 
+                  height: 80,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // --- รูปด้านหลัง (Back Layer) : ย้ายมาซ้าย ---
+                      Positioned(
+                        left: 0, // ชิดซ้าย
+                        top: 5,
+                        child: Transform.rotate(
+                          angle: 0.10, // เอียงซ้าย (ค่าลบ)
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Opacity(
+                              opacity: 0.8,
+                              child: Image.asset(
+                                'assets/images/order2.png', 
+                                width: 70, 
+                                height: 70, 
+                                fit: BoxFit.cover
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      
+                      // --- รูปด้านหน้า (Front Layer) : ย้ายมาขวา ---
+                      Positioned(
+                        right: 0, // ชิดขวา
+                        bottom: 0,
+                        child: Transform.rotate(
+                          angle: -0.10, // เอียงขวา (ค่าบวก)
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.15),
+                                  blurRadius: 5,
+                                  offset: const Offset(-2, 4) // ปรับเงาให้สมจริงขึ้นเมื่อย้ายฝั่ง
+                                )
+                              ]
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.asset(
+                                'assets/images/order1.png', 
+                                width: 70, 
+                                height: 70, 
+                                fit: BoxFit.cover
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                
                 const SizedBox(width: 16),
+                
+                // ส่วน Text และ Progress Bar (เหมือนเดิม)
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(statusText, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87)),
                       const SizedBox(height: 8),
-                      // ... (โค้ดหลอด Stack เดิมของคุณ) ...
                       SizedBox(
                         height: 40,
                         child: LayoutBuilder(
@@ -279,7 +335,7 @@ class _OrderCard extends StatelessWidget {
                                       border: Border.all(color: Colors.white, width: 2.5),
                                       boxShadow: [BoxShadow(color: (overrideIconBgColor ?? mainColor).withOpacity(0.4), blurRadius: 4, offset: const Offset(0, 3))],
                                     ),
-                                    child: Icon(iconData, color: iconColor ?? Colors.white, size: 18),
+                                    child: Center(child: icon),
                                   ),
                                 ),
                               ],

@@ -3,7 +3,7 @@ import 'package:wememmory/shop/paymentSuccessPage.dart';
 import 'package:wememmory/shop/addCardPage.dart';
 import 'package:wememmory/shop/addressSelectionPage.dart';
 import 'package:wememmory/shop/couponPage.dart';
-import 'package:wememmory/shop/address_model.dart'; // 1. อย่าลืม Import Model
+import 'package:wememmory/shop/address_model.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -13,7 +13,7 @@ class PaymentPage extends StatefulWidget {
 }
 
 class _PaymentPageState extends State<PaymentPage> {
-  // 2. ตัวแปรเก็บที่อยู่ (เริ่มแรกอาจเป็น null หรือค่า default)
+  // 2. ตัวแปรเก็บที่อยู่
   AddressInfo? _deliveryAddress; 
 
   int _selectedMethod = 0; 
@@ -31,7 +31,6 @@ class _PaymentPageState extends State<PaymentPage> {
   @override
   void initState() {
     super.initState();
-    // (Optional) ตั้งค่าที่อยู่เริ่มต้นตรงนี้ถ้าต้องการ
     _deliveryAddress = AddressInfo(
        name: 'ชื่อ - นามสกุล',
        phone: '098 - 765 - 4321',
@@ -42,16 +41,13 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
-  // 3. ฟังก์ชันสำหรับไปเลือกที่อยู่และรับค่ากลับ
   Future<void> _selectAddress() async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        // ส่งที่อยู่ปัจจุบันไป (เพื่อให้หน้าเลือกติ๊กถูกอันที่ใช้อยู่)
         builder: (_) => AddressSelectionPage(selected: _deliveryAddress),
       ),
     );
 
-    // ถ้ามีการเลือกและส่งค่ากลับมา
     if (result != null && result is AddressInfo) {
       setState(() {
         _deliveryAddress = result;
@@ -87,7 +83,7 @@ class _PaymentPageState extends State<PaymentPage> {
             const Text('ที่อยู่', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 12),
             InkWell(
-              onTap: _selectAddress, // 4. เรียกฟังก์ชันเลือกที่อยู่
+              onTap: _selectAddress,
               borderRadius: BorderRadius.circular(8),
               child: Container(
                 width: double.infinity,
@@ -100,7 +96,6 @@ class _PaymentPageState extends State<PaymentPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      // 5. แสดงผลข้อมูลจากตัวแปร _deliveryAddress
                       child: _deliveryAddress == null
                           ? const Text('กรุณาเลือกที่อยู่จัดส่ง', style: TextStyle(color: Colors.red))
                           : Column(
@@ -129,7 +124,7 @@ class _PaymentPageState extends State<PaymentPage> {
             const Divider(thickness: 1, height: 1, color: Color(0xFFEEEEEE)),
             const SizedBox(height: 24),
 
-            // --- 2. รายละเอียดสินค้า (คงเดิม) ---
+            // --- 2. รายละเอียดสินค้า ---
             const Text('รายละเอียดสินค้า', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 16),
             Row(
@@ -144,7 +139,7 @@ class _PaymentPageState extends State<PaymentPage> {
             const Divider(thickness: 1, height: 1, color: Color(0xFFEEEEEE)),
             const SizedBox(height: 24),
 
-            // --- 3. ช่องทางชำระเงิน (คงเดิม) ---
+            // --- 3. ช่องทางชำระเงิน ---
             const Text('ช่องทางชำระเงิน', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 16),
 
@@ -158,7 +153,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
                   children: [
-                    Image.asset('assets/icons/qr_icon.png', width: 28, height: 28, errorBuilder: (_,__,___) => const Icon(Icons.qr_code_2, size: 28, color: Color(0xFF1A237E))),
+                    Image.asset('assets/icons/qrPayment.png', width: 28, height: 28, errorBuilder: (_,__,___) => const Icon(Icons.qr_code_2, size: 28, color: Color(0xFF1A237E))),
                     const SizedBox(width: 12),
                     const Expanded(child: Text('QR พร้อมเพย์', style: TextStyle(fontSize: 15))),
                     _buildRadio(_selectedMethod == 0),
@@ -171,7 +166,8 @@ class _PaymentPageState extends State<PaymentPage> {
             // Mobile Banking
             _buildDropdownSection(
               title: 'Mobile Banking',
-              iconData: Icons.account_balance,
+              // ✅ แก้ไข: ส่ง path รูปภาพ (String)
+              iconAsset: 'assets/icons/bank.png', 
               isExpanded: _expandedSection == 'mobile',
               onTap: () => setState(() {
                 if (_expandedSection == 'mobile') {
@@ -218,7 +214,10 @@ class _PaymentPageState extends State<PaymentPage> {
             // บัตรเครดิต
             _buildDropdownSection(
               title: 'บัตรเครดิต/บัตรเดบิต',
-              iconData: Icons.credit_card,
+              
+              // ✅ แก้ไข: เปลี่ยนจาก iconData เป็น iconAsset
+              iconAsset: 'assets/icons/card.png', 
+              
               isExpanded: _expandedSection == 'card',
               onTap: () => setState(() {
                 if (_expandedSection == 'card') {
@@ -296,7 +295,6 @@ class _PaymentPageState extends State<PaymentPage> {
           height: 56,
           child: ElevatedButton(
             onPressed: () {
-               // 6. เพิ่มการเช็คว่าเลือกที่อยู่หรือยังก่อนจ่ายเงิน
               if (_deliveryAddress == null) {
                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('กรุณาเลือกที่อยู่จัดส่ง')));
                  return;
@@ -318,10 +316,11 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
-  // Helper Widget: ส่วน Dropdown ที่ยืดหดได้
+  // ✅ แก้ไข Helper Widget: ให้รองรับทั้ง IconData และ Image Asset
   Widget _buildDropdownSection({
     required String title,
-    required IconData iconData,
+    IconData? iconData, // ทำให้เป็น optional
+    String? iconAsset,  // เพิ่ม optional สำหรับ path รูปภาพ
     required bool isExpanded,
     required VoidCallback onTap,
     required Widget content,
@@ -334,7 +333,14 @@ class _PaymentPageState extends State<PaymentPage> {
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Row(
               children: [
-                Icon(iconData, color: const Color(0xFF607D8B), size: 26),
+                // แสดงผลตามสิ่งที่ส่งมา
+                if (iconAsset != null)
+                   Image.asset(iconAsset, width: 26, height: 26)
+                else if (iconData != null)
+                   Icon(iconData, color: const Color(0xFF607D8B), size: 26)
+                else
+                   const SizedBox(width: 26), // กรณีไม่ส่งอะไรมาเลย
+                   
                 const SizedBox(width: 12),
                 Expanded(child: Text(title, style: const TextStyle(fontSize: 15))),
                 Icon(

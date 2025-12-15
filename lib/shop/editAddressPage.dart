@@ -235,7 +235,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(
-                'assets/images/Rectangle569.png',
+                'assets/images/map.png',
                 height: 180,
                 width: double.infinity,
                 fit: BoxFit.cover,

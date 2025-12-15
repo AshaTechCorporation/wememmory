@@ -12,7 +12,7 @@ class TermsAndServicesPage extends StatelessWidget {
           Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
           const SizedBox(height: 8),
           const Text(
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin aliquet, neque sit amet facilisis dictum, felis nibh tincidunt erat, vitae tristique lectus quam vitae libero. Suspendisse potenti.',
+            'รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด ',
             style: TextStyle(color: Color(0xFF666666)),
           ),
         ],

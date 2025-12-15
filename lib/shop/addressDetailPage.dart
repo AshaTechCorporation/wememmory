@@ -184,7 +184,7 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
                        ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.asset(
-                          'assets/images/Rectangle569.png',
+                          'assets/images/map.png',
                           height: 150,
                           width: double.infinity,
                           fit: BoxFit.cover,
