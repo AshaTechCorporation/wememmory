@@ -151,6 +151,10 @@ class _EditAddressPageState extends State<EditAddressPage> {
             const SizedBox(height: 8),
             TextField(
               controller: _nameController,
+              // เพิ่มบรรทัดนี้: ระบุว่าเป็นชื่อ จะช่วยให้แป้นพิมพ์แนะนำคำได้ถูกต้องขึ้น
+              keyboardType: TextInputType.name, 
+              // เพิ่มบรรทัดนี้: จัดการเรื่องตัวอักษรพิมพ์เล็ก/ใหญ่ (สำหรับภาษาอังกฤษ)
+              textCapitalization: TextCapitalization.words, 
               decoration: InputDecoration(
                 hintText: 'ชื่อ - นามสกุล',
                 hintStyle: const TextStyle(color: Colors.grey),
@@ -158,6 +162,12 @@ class _EditAddressPageState extends State<EditAddressPage> {
                 border: borderStyle,
                 enabledBorder: borderStyle,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+              // เพิ่มบรรทัดนี้: (Optional) กำหนดฟอนต์ถ้าต้องการให้สระวรรณยุกต์สวยงาม
+              style: const TextStyle(
+                fontFamily: 'Kanit', // หรือชื่อฟอนต์ไทยที่คุณใช้ในโปรเจกต์
+                fontSize: 16,
+                color: Colors.black,
               ),
             ),
             const SizedBox(height: 16),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wememmory/home/firstPage.dart';
 
 class PaymentSuccessPage extends StatelessWidget {
   const PaymentSuccessPage({super.key});
@@ -36,7 +37,7 @@ class PaymentSuccessPage extends StatelessWidget {
         child: SizedBox(
           height: 52,
           child: ElevatedButton(
-            onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+            onPressed: () {Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FirstPage()));},
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF8A3D),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),

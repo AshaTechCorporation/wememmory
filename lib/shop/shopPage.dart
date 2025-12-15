@@ -49,24 +49,38 @@ class _ShopBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 1. สร้างรายการรูปภาพตรงนี้
+    final List<String> promoImages = [
+      'assets/images/Hobby3.png',
+      'assets/images/People.png', // เปลี่ยนเป็นชื่อไฟล์รูปอื่นของคุณ
+      'assets/images/Hobby4.png',
+      // เพิ่มรูปได้เรื่อยๆ ตามต้องการ
+    ];
+
     return CustomScrollView(
       primary: false,
       slivers: [
         const SliverToBoxAdapter(child: _BannerCarousel()),
 
         // ส่วนลด (horizontal scroll)
+        // ส่วนลด (horizontal scroll)
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.only(top: 16, bottom: 20),
+            padding: const EdgeInsets.only(top: 16),
             child: _SectionPadding(
               child: SizedBox(
                 height: 170,
                 child: ListView.separated(
                   primary: false,
                   scrollDirection: Axis.horizontal,
-                  itemCount: 6,
+                  
+                  // 2.1 เปลี่ยนเลขคงที่ เป็นจำนวนรูปใน List
+                  itemCount: promoImages.length, 
+                  
                   separatorBuilder: (_, __) => const SizedBox(width: 8),
-                  itemBuilder: (_, i) => const _PromoCard(),
+                  
+                  // 2.2 ส่งรูปภาพไปยัง _PromoCard
+                  itemBuilder: (_, i) => _PromoCard(imagePath: promoImages[i]),
                 ),
               ),
             ),
@@ -82,9 +96,7 @@ class _ShopBody extends StatelessWidget {
 
         const SliverToBoxAdapter(child: _GiftCardBanner()),
         const SliverToBoxAdapter(child: SizedBox(height: 16)),
-        const SliverToBoxAdapter(
-          child: _GiftCardBanner(type: GiftCardType.photoFrame),
-        ),
+        const SliverToBoxAdapter(child: _GiftCardBanner(type: GiftCardType.photoFrame),),
         const SliverToBoxAdapter(child: SizedBox(height: 24)),
         const SliverToBoxAdapter(child: _SupportLinks()),
 
@@ -176,14 +188,18 @@ class _SectionPadding extends StatelessWidget {
 /* =============================== PROMO ================================= */
 
 class _PromoCard extends StatelessWidget {
-  const _PromoCard();
+  // 3.1 เพิ่มตัวแปรรับค่า
+  final String imagePath; 
+  
+  // 3.2 แก้ Constructor ให้รับค่า required
+  const _PromoCard({required this.imagePath});
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Image.asset(
-        'assets/images/Hobby3.png',
+        imagePath, // 3.3 เปลี่ยนจากชื่อไฟล์ตายตัว เป็นตัวแปรนี้
         width: 380,
         height: double.infinity,
         fit: BoxFit.cover,
