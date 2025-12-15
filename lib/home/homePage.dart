@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFB085),
         elevation: 0,
-        toolbarHeight: 108,
+        toolbarHeight: 110,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.elliptical(420, 70)),
         ),
@@ -115,11 +115,9 @@ class _HomePageState extends State<HomePage> {
                   Recommended(
                     albumItems: _currentAlbumItems,
                     albumMonth: _currentAlbumMonth,
-                    onCardTap: _navigateToCollection,
                   ),
-                  const SizedBox(height: 3),
                   const SummaryStrip(),
-                  const SizedBox(height: 35),
+                  const SizedBox(height: 37),
                 ],
               ),
             ),

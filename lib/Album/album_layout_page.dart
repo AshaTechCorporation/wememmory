@@ -6,6 +6,8 @@ import 'package:wememmory/Album/photo_detail_sheet.dart';
 import 'package:wememmory/Album/video_detail_sheet.dart';
 import 'package:wememmory/Album/final_preview_sheet.dart'; 
 
+// หน้าแฟ้มโชว์การจัดวางอัลบั้มรูป
+
 // --- Data Model สำหรับการลากย้าย ---
 class PhotoDragData {
   final int index;

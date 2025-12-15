@@ -5,6 +5,7 @@ import 'package:video_player/video_player.dart'; // ถ้าไม่ได้�
 import 'package:wememmory/Album/album_layout_page.dart';
 import 'package:wememmory/models/media_item.dart';
 
+// หน้าการอัปโหลดรูปภาพจากอุปกรณ์
 class UploadPhotoPage extends StatefulWidget {
   final String selectedMonth;
 

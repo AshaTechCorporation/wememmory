@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 // --- Palette สี ---
 const Color _sidebarOrange = Color(0xFFF8B887); // สีขอบส้ม
@@ -7,7 +6,6 @@ const Color _bgWhite = Colors.white; // สีพื้นหลังขาว
 const Color _textDark = Color(0xFF333333);
 const Color _textGrey = Color(0xFF757575);
 const Color _cardTeal = Color(0xFF6DA5B8); // สีฟ้าอมเขียว (Teal)
-const Color _timelineLineColor = Color(0xFFE0E0E0); // สีเส้น Timeline
 
 class AchievementLayout extends StatelessWidget {
   const AchievementLayout({super.key});
@@ -47,30 +45,42 @@ class AchievementLayout extends StatelessWidget {
                   // ส่วน Cards
                   const Column(
                     children: [
+                      // เดือนเมษายน
                       TimelineItem(
                         monthLabel: 'เดือนเมษายนของคุณ',
                         mainText: 'แชร์รูปภาพ 20 ครั้ง',
                         subText: 'แชร์รูปภาพมากที่สุดในปีนี้',
-                        iconType: IconType.arrowBack,
+                        imagePath: 'assets/icons/shareLogo.png',
+                        imgWidth: 67,
+                        imgHeight: 57.52,
                       ),
+                      // เดือนมีนาคม
                       TimelineItem(
                         monthLabel: 'เดือนมีนาคมของคุณ',
                         mainText: 'ใช้เวลาเพียง 15 นาที',
                         subText: 'ในการสร้างอัลบั้มเดือนที่เร็วที่สุด',
-                        iconType: IconType.gauge,
+                        imagePath: 'assets/icons/semicircle.png',
+                        imgWidth: 82,
+                        imgHeight: 76,
                       ),
+                      // เดือนกุมภาพันธ์
                       TimelineItem(
                         monthLabel: 'เดือนกุมภาพันธ์ของคุณ',
                         mainText: 'อธิบายภาพในเดือนนี้',
                         subText: 'บันทึกเรื่องราวของเดือนนี้มากที่สุด',
-                        iconType: IconType.percentCircle,
-                        percentValue: 76,
+                        imagePath: 'assets/icons/percent.png',
+                        imgWidth: 82,
+                        imgHeight: 103,
+                        isFill: true, // ตัวอย่างการส่ง flag ว่า fill (ถ้าต้องการใช้)
                       ),
+                      // เดือนมกราคม
                       TimelineItem(
                         monthLabel: 'เดือนมกราคมของคุณ',
                         mainText: 'ความทรงจำครั้งแรก',
                         subText: 'สร้างความทรงจำครั้งแรก',
-                        iconType: IconType.bookmark,
+                        imagePath: 'assets/icons/memory.png',
+                        imgWidth: 75,
+                        imgHeight: 75,
                       ),
                     ],
                   ),
@@ -97,6 +107,8 @@ class _HeaderSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ตรงนี้ถ้า Header logo ยังใช้รูปเดิมก็คงไว้
+        // หรือถ้าต้องการเปลี่ยน Header logo ด้วยก็แก้ path ตรงนี้ได้ครับ
         Image.asset(
           'assets/images/image2.png',
           height: 18,
@@ -114,12 +126,12 @@ class _HeaderSection extends StatelessWidget {
         const Text(
           'ผลงานประจำปีของคุณ',
           style: TextStyle(
-            fontSize: 33,
+            fontSize: 36,
             fontWeight: FontWeight.bold,
             color: _textDark,
           ),
         ),
-        const SizedBox(height: 4),
+        
         const Text(
           'เรื่องราวการเติบโตของฉัน',
           style: TextStyle(
@@ -135,22 +147,24 @@ class _HeaderSection extends StatelessWidget {
 // -----------------------------------------------------------------
 // 📌 2. Timeline Item Structure
 // -----------------------------------------------------------------
-enum IconType { arrowBack, gauge, percentCircle, bookmark }
-
 class TimelineItem extends StatelessWidget {
   final String monthLabel;
   final String mainText;
   final String subText;
-  final IconType iconType;
-  final int percentValue;
+  final String imagePath;
+  final double imgWidth;
+  final double imgHeight;
+  final bool isFill; // สำหรับ case 'fill' ของเดือนกุมภาพันธ์ (ถ้าต้องการจัดการพิเศษ)
 
   const TimelineItem({
     super.key,
     required this.monthLabel,
     required this.mainText,
     required this.subText,
-    required this.iconType,
-    this.percentValue = 0,
+    required this.imagePath,
+    required this.imgWidth,
+    required this.imgHeight,
+    this.isFill = false,
   });
 
   @override
@@ -161,8 +175,10 @@ class TimelineItem extends StatelessWidget {
         monthLabel: monthLabel,
         mainText: mainText,
         subText: subText,
-        iconType: iconType,
-        percentValue: percentValue,
+        imagePath: imagePath,
+        imgWidth: imgWidth,
+        imgHeight: imgHeight,
+        isFill: isFill,
       ),
     );
   }
@@ -175,15 +191,19 @@ class _DetailCard extends StatelessWidget {
   final String monthLabel;
   final String mainText;
   final String subText;
-  final IconType iconType;
-  final int percentValue;
+  final String imagePath;
+  final double imgWidth;
+  final double imgHeight;
+  final bool isFill;
 
   const _DetailCard({
     required this.monthLabel,
     required this.mainText,
     required this.subText,
-    required this.iconType,
-    required this.percentValue,
+    required this.imagePath,
+    required this.imgWidth,
+    required this.imgHeight,
+    required this.isFill,
   });
 
   @override
@@ -215,33 +235,32 @@ class _DetailCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // ✅ แก้ไข 1: เอา width/height ออก และใส่ padding แทน เพื่อให้ปุ่มยืดตาม Text
+                // Tag เดือน
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     monthLabel,
                     style: const TextStyle(
                       color: _cardTeal,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w100,
+                      fontSize: 12,
+                      // fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
                 
-                // ✅ แก้ไข 2: เพิ่มระยะห่างตรงนี้เล็กน้อย (12px)
-                const SizedBox(height: 15),
+                const SizedBox(height: 12),
 
                 Text(
                   mainText,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.bold ,
                     height: 1.2,
                   ),
                 ),
@@ -257,112 +276,26 @@ class _DetailCard extends StatelessWidget {
             ),
           ),
 
-          // Icon ด้านขวา
+          // Icon ด้านขวา (ใช้ Image.asset)
           Positioned(
             right: 16,
             top: 0,
             bottom: 0,
             child: Center(
-              child: _buildRightIcon(),
+              child: Image.asset(
+                imagePath,
+                width: imgWidth,
+                height: imgHeight,
+                fit: isFill ? BoxFit.fill : BoxFit.contain, // ใช้ BoxFit ตามต้องการ
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback ถ้าหาภาพไม่เจอ
+                  return const Icon(Icons.broken_image, color: Colors.white, size: 50);
+                },
+              ),
             ),
           ),
         ],
       ),
     );
   }
-
-  Widget _buildRightIcon() {
-    // ✅ แก้ไข 3: ปรับขนาดไอคอนให้ใหญ่ขึ้นทุกอัน
-    switch (iconType) {
-      case IconType.arrowBack:
-        return Transform.rotate(
-          angle: -0.5,
-          child: const Icon(Icons.reply, size: 70, color: Colors.white), // 50 -> 70
-        );
-      case IconType.gauge:
-        return const SizedBox(
-          width: 65, // 50 -> 65
-          height: 65, // 50 -> 65
-          child: CustomPaint(painter: GaugePainter()),
-        );
-      case IconType.percentCircle:
-        return SizedBox(
-          width: 75, // 55 -> 75
-          height: 75, // 55 -> 75
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              CircularProgressIndicator(
-                value: percentValue / 100,
-                strokeWidth: 6, // เพิ่มความหนาเส้น
-                backgroundColor: Colors.white.withOpacity(0.3),
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-              Text(
-                "$percentValue%",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18, // เพิ่มขนาดฟอนต์
-                ),
-              )
-            ],
-          ),
-        );
-      case IconType.bookmark:
-        return Container(
-          padding: const EdgeInsets.all(10), // เพิ่ม padding
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.white, width: 3), // เพิ่มความหนาขอบ
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Icon(Icons.bookmark, size: 40, color: Colors.white), // 30 -> 40
-        );
-    }
-  }
-}
-
-// -----------------------------------------------------------------
-// 📌 Custom Painters
-// -----------------------------------------------------------------
-class GaugePainter extends CustomPainter {
-  const GaugePainter();
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
-    final paintBase = Paint()
-      ..color = Colors.white.withOpacity(0.3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 8 // เพิ่มความหนาเส้น
-      ..strokeCap = StrokeCap.round;
-
-    final paintActive = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 8 // เพิ่มความหนาเส้น
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawArc(rect, math.pi * 0.8, math.pi * 1.4, false, paintBase);
-    canvas.drawArc(rect, math.pi * 0.8, math.pi * 0.5, false, paintActive);
-
-    final iconPainter = TextPainter(
-      text: TextSpan(
-        text: String.fromCharCode(0xe30d), // Icons.local_fire_department
-        style: TextStyle(
-            fontSize: size.width * 0.4, // ปรับขนาดไอคอนไฟตามขนาด Gauge
-            fontFamily: 'MaterialIcons', 
-            color: Colors.white
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    iconPainter.layout();
-    iconPainter.paint(
-        canvas,
-        Offset((size.width - iconPainter.width) / 2,
-            (size.height - iconPainter.height) / 2 + 5));
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

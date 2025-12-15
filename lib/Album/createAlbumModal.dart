@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wememmory/Album/upload_photo_page.dart';
 
+// หน้าสร้างอัลบั้มรูป
 class CreateAlbumModal extends StatelessWidget {
   const CreateAlbumModal({super.key});
 

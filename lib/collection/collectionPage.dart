@@ -36,7 +36,7 @@ class CollectionPage extends StatelessWidget {
               if (newAlbumItems != null && newAlbumItems!.isNotEmpty)
                 GestureDetector(
                   onTap: () {
-                    // ✅ แก้ไข: ลบโค้ด async/await และ Navigator.pop ด้านล่างออก
+                    // แก้ไข: ลบโค้ด async/await และ Navigator.pop ด้านล่างออก
                     // เพื่อให้เมื่อกดกลับจาก MonthDetailPage แล้วยังอยู่ที่หน้านี้
                     Navigator.push(
                       context,
@@ -65,7 +65,6 @@ class CollectionPage extends StatelessWidget {
   }
 }
 
-// ... (Widget อื่นๆ _AlbumPreviewSection, _StaticPhotoSlot, _SearchBar ฯลฯ ใช้โค้ดเดิมได้เลยครับ)
 class _AlbumPreviewSection extends StatelessWidget {
   final List<MediaItem> items;
   final String monthTitle;
@@ -211,14 +210,12 @@ class _SearchBar extends StatelessWidget {
     return Container(
       height: 44,
       decoration: BoxDecoration(
-        // 1. เปลี่ยนสีพื้นหลังเป็น Hex code #6BB0C50D (แปลงเป็น 0x0D6BB0C5 ใน Flutter)
         color: const Color(0x0D6BB0C5),
         borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         children: [
-          // 2. เปลี่ยนสีภาพโลโก้ให้เป็นสีดำโดยใช้ property 'color'
           Image.asset(
             'assets/icons/Search.png',
             width: 18,
@@ -232,8 +229,6 @@ class _SearchBar extends StatelessWidget {
               style: TextStyle(color: Colors.black, fontSize: 14.5),
               decoration: InputDecoration(
                 hintText: 'ค้นหาความทรงจำตามแท็กและโน้ต.....',
-                // อาจจะต้องปรับสี hintText ให้เข้มขึ้นเล็กน้อยเพื่อให้เข้ากับพื้นหลังใหม่
-                // hintStyle: TextStyle(color: Colors.black54),
                 isDense: true,
                 border: InputBorder.none,
               ),
@@ -307,22 +302,32 @@ class _MonthSectionHeader extends StatelessWidget {
                 color: Colors.black87)),
         Row(
           children: [
-            _buildIconButton(Icons.print_outlined),
+            // ✅ ใช้ path รูปภาพแทน IconData
+            _buildIconButton('assets/icons/print.png'),
             const SizedBox(width: 8),
-            _buildIconButton(Icons.share_outlined),
+            _buildIconButton('assets/icons/share.png'),
           ],
         ),
       ],
     );
   }
-  Widget _buildIconButton(IconData icon) {
+
+  // ✅ แก้ไขให้รับ String iconPath และแสดงผล Image.asset
+  Widget _buildIconButton(String iconPath) {
     return Container(
       width: 40,
       height: 40,
       decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(8)),
-      child: Icon(icon, color: const Color(0xFF6BB0C5), size: 22),
+      padding: const EdgeInsets.all(10), // เพิ่ม padding เล็กน้อยเพื่อให้รูปไม่ชิดขอบเกินไป
+      child: Image.asset(
+        iconPath,
+        width: 20, // ขนาดรูป 20
+        height: 20, // ขนาดรูป 20
+        color: const Color(0xFF6BB0C5), // ยังคงสีเดิมไว้
+        fit: BoxFit.contain,
+      ),
     );
   }
 }

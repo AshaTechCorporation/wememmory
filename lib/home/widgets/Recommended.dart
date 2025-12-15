@@ -1,18 +1,17 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:wememmory/Album/createAlbumModal.dart';
 import 'package:wememmory/models/media_item.dart';
 
 class Recommended extends StatefulWidget {
   final List<MediaItem>? albumItems;
   final String? albumMonth;
-  final VoidCallback? onCardTap;
 
   const Recommended({
     Key? key,
     this.albumItems,
     this.albumMonth,
-    this.onCardTap,
   }) : super(key: key);
 
   @override
@@ -22,7 +21,7 @@ class Recommended extends StatefulWidget {
 class _RecommendedState extends State<Recommended> {
   int _currentIndex = 0;
   late List<MemoryCardData> _items;
-
+  
   @override
   void initState() {
     super.initState();
@@ -40,6 +39,9 @@ class _RecommendedState extends State<Recommended> {
 
   void _initData() {
     _items = [
+      // ---------------------------------------------------
+      // Card ใบที่ 1 (แบบเดิม)
+      // ---------------------------------------------------
       MemoryCardData(
         topTitle: 'เติมเรื่องราวครึ่งปีแรกด้วยอัลบั้มใหม่กัน',
         mainTitle: 'พฤษภาคมของฉัน',
@@ -53,28 +55,37 @@ class _RecommendedState extends State<Recommended> {
           'assets/images/Hobby1.png',
         ],
       ),
-      MemoryCardData(
-        topTitle: 'บันทึกความสำเร็จของคุณ',
-        mainTitle: 'เมษายนของฉัน',
-        subTitle: 'ความทรงจำที่ผ่านมา',
-        footerText: 'คุณได้อธิบายภาพในเดือนนี้แล้ว 76%',
-        gradientColors: [const Color(0xFF37474F), const Color(0xFF102027)],
-        accentColor: const Color(0xFF42A5F5),
-        assetImages: [
-          'assets/images/image4.png',
-          'assets/images/image5.png',
-        ],
-      ),
-      MemoryCardData(
-        topTitle: 'เริ่มต้นเดือนใหม่',
-        mainTitle: 'มิถุนายนนี้',
-        subTitle: 'วางแผนล่วงหน้า',
-        footerText: 'เพื่อน 5 คน เพิ่มรูปภาพแล้ว',
-        gradientColors: [const Color(0xFF33691E), const Color(0xFF1B5E20)],
-        accentColor: const Color(0xFF66BB6A),
-      ),
-    ];
 
+      // ---------------------------------------------------
+      // ✅ Card ใบที่ 2 (แบบใหม่: แสดงรูปพื้นหลัง + ข้อความ)
+      // ---------------------------------------------------
+      MemoryCardData(
+        topTitle: 'เมษายน',
+        mainTitle: 'ให้รูปภาพเป็นได้มากกว่า\nความทรงจำ',
+        subTitle: '',
+        footerText: '',
+        gradientColors: [], 
+        accentColor: Colors.transparent,
+        backgroundImage: 'assets/images/Hobby3.png',
+        showTextOverlay: true, // เพิ่มตัวเลือกให้แสดงข้อความ
+      ),
+
+      // ---------------------------------------------------
+      // Card ใบที่ 3 (แบบเดิม)
+      // ---------------------------------------------------
+        MemoryCardData(
+          topTitle: 'เมษายน',
+          mainTitle: 'ให้รูปภาพเป็นได้มากกว่า\nความทรงจำ',
+          subTitle: '',
+          footerText: '',
+          gradientColors: [], 
+          accentColor: Colors.transparent,
+          backgroundImage: 'assets/images/Hobby1.png',
+          showTextOverlay: true, // เพิ่มตัวเลือกให้แสดงข้อความ
+        ),
+      ];
+
+    // Logic สำหรับอัปเดตการ์ดใบแรกถ้ามีข้อมูลส่งมา
     if (widget.albumItems != null && widget.albumItems!.isNotEmpty) {
       String displayTitle = widget.albumMonth ?? 'เดือนล่าสุด';
       _items[0] = MemoryCardData(
@@ -103,10 +114,20 @@ class _RecommendedState extends State<Recommended> {
     }
   }
 
+  // ✅ ฟังก์ชันเปิด CreateAlbumModal
+  void _openCreateAlbumModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const CreateAlbumModal(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 420, // ความสูง Container รวม
+      height: 420,
       width: double.infinity,
       child: Stack(
         alignment: Alignment.center,
@@ -119,8 +140,8 @@ class _RecommendedState extends State<Recommended> {
 
   Widget _buildCardItem(int index, MemoryCardData item) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = 328.0;
-    final cardHeight = 350.0;
+    final cardWidth = 330.0;
+    final cardHeight = 330.0;
     final centerPosition = (screenWidth - cardWidth) / 2;
     final adjustedStartPosition = centerPosition - 25.0;
 
@@ -137,22 +158,22 @@ class _RecommendedState extends State<Recommended> {
             child: SizedBox(
               width: cardWidth,
               height: cardHeight,
-              child: MemoryCard(data: item, onTap: widget.onCardTap),
+              child: MemoryCard(data: item),
             ),
           ),
         ),
       );
     } else {
       final int relativeIndex = index - _currentIndex;
-      final double scale = 1.0 - (relativeIndex * 0.1);
-      final double rightShift = relativeIndex * 60.0;
+      final double scale = 1.0 - (relativeIndex * 0.15);
+      final double rightShift = relativeIndex * 71.0;
       final double finalLeftPosition = adjustedStartPosition + rightShift;
       final double opacity = relativeIndex > 2 ? 0.0 : 1.0;
 
       return AnimatedPositioned(
         duration: const Duration(milliseconds: 500),
         curve: Curves.easeOutBack,
-        top: 35,
+        top: 42,
         left: finalLeftPosition,
         child: GestureDetector(
           onHorizontalDragEnd: (details) {
@@ -172,7 +193,11 @@ class _RecommendedState extends State<Recommended> {
                 height: cardHeight,
                 child: AbsorbPointer(
                   absorbing: relativeIndex > 0,
-                  child: MemoryCard(data: item, onTap: widget.onCardTap),
+                  child: MemoryCard(
+                    data: item,
+                    // ✅ ส่ง callback ให้การ์ดแรกเท่านั้น
+                    onButtonTap: index == 0 ? _openCreateAlbumModal : null,
+                  ),
                 ),
               ),
             ),
@@ -183,6 +208,7 @@ class _RecommendedState extends State<Recommended> {
   }
 }
 
+// ✅ เพิ่มตัวแปร showTextOverlay
 class MemoryCardData {
   final String topTitle;
   final String mainTitle;
@@ -192,6 +218,8 @@ class MemoryCardData {
   final Color accentColor;
   final List<MediaItem>? imageItems;
   final List<String>? assetImages;
+  final String? backgroundImage;
+  final bool showTextOverlay; // เพิ่มตัวแปรนี้
 
   MemoryCardData({
     required this.topTitle,
@@ -202,6 +230,8 @@ class MemoryCardData {
     required this.accentColor,
     this.imageItems,
     this.assetImages,
+    this.backgroundImage,
+    this.showTextOverlay = false, // ค่า default เป็น false
   });
 }
 
@@ -210,122 +240,177 @@ class MemoryCardData {
 // ---------------------------------------------------------------------------
 class MemoryCard extends StatelessWidget {
   final MemoryCardData data;
-  final VoidCallback? onTap;
+  final VoidCallback? onButtonTap;
 
   const MemoryCard({
     Key? key,
     required this.data,
-    this.onTap,
+    this.onButtonTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
+    // ✅ 1. เช็คว่ามีรูปพื้นหลังไหม
+    if (data.backgroundImage != null) {
+      return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(28),
-          gradient: LinearGradient(
-            colors: data.gradientColors,
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-              spreadRadius: -2,
-            ),
-          ],
           border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+          image: DecorationImage(
+            image: AssetImage(data.backgroundImage!),
+            fit: BoxFit.cover,
+          ),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(26),
-          child: Stack(
-            children: [
-              Positioned(
-                top: -100,
-                right: -50,
-                child: Container(
-                  width: 300,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [Colors.white.withOpacity(0.1), Colors.transparent],
-                    ),
+        // ✅ ถ้า showTextOverlay = true แสดงข้อความทับรูป
+        child: data.showTextOverlay
+            ? Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(28),
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.black.withOpacity(0.5),
+                      Colors.transparent,
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.center,
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                padding: const EdgeInsets.all(20),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 1. Top Title
+                    // Top Title
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
                         data.topTitle,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 10,
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
                     const SizedBox(height: 12),
-
-                    // 2. Main Title
+                    // Main Title
                     Text(
                       data.mainTitle,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 26,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        height: 1.0,
-                        letterSpacing: -0.5,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : null,
+      );
+    }
+
+    // ✅ 2. ถ้าไม่มีรูปพื้นหลัง ให้แสดง Layout เดิม (Gradient + ข้อมูล)
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        gradient: LinearGradient(
+          colors: data.gradientColors,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(26),
+        child: Stack(
+          children: [
+            Positioned(
+              top: -100,
+              right: -50,
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [Colors.white.withOpacity(0.1), Colors.transparent],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // 1. Top Title
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 203, 203, 203).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      data.topTitle,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 6),
+                  ),
+                  const SizedBox(height: 10),
 
-                    // 3. Footer Text
-                    Text(
-                      data.footerText,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w300,
-                      ),
-                      textAlign: TextAlign.center,
+                  // 2. Main Title
+                  Text(
+                    data.mainTitle,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      height: 1.0,
+                      letterSpacing: -0.5,
                     ),
-                    const SizedBox(height: 6),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 6),
 
-                    // 4. Photo Stack
-                    SizedBox(
-                      height: 150,
-                      width: 280,
-                      child: _PhotoStack(
-                        items: data.imageItems,
-                        assetImages: data.assetImages,
-                      ),
+                  // 3. Footer Text
+                  Text(
+                    data.footerText,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.6),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w300,
                     ),
-                    const SizedBox(height: 21),
+                    textAlign: TextAlign.center,
+                  ),
+        
+                  // 4. Photo Stack
+                  SizedBox(
+                    height: 138,
+                    width: 280,
+                    child: _PhotoStack(
+                      items: data.imageItems,
+                      assetImages: data.assetImages,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
 
-                    // 5. Button
-                    Container(
+                  // 5. Button (กดได้เฉพาะถ้ามีการส่ง onButtonTap มา)
+                  GestureDetector(
+                    onTap: onButtonTap, 
+                    child: Container(
                       width: double.infinity,
-                      height: 42,
+                      height: 39,
                       decoration: BoxDecoration(
                         color: data.accentColor,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.2),
@@ -344,11 +429,11 @@ class MemoryCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -356,7 +441,7 @@ class MemoryCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Photo Stack
+// Photo Stack (คงเดิม)
 // ---------------------------------------------------------------------------
 class _PhotoStack extends StatelessWidget {
   final List<MediaItem>? items;
@@ -384,21 +469,18 @@ class _PhotoStack extends StatelessWidget {
       alignment: Alignment.center,
       clipBehavior: Clip.none,
       children: [
-        // Left
         _buildPolaroid(
           angle: -0.12,
-          offset: const Offset(-70, 10),
+          offset: const Offset(-82, 4),
           item: item3,
           color: Colors.grey[100],
         ),
-        // Right
         _buildPolaroid(
           angle: 0.12,
-          offset: const Offset(70, 10),
+          offset: const Offset(81, 4),
           item: item2,
           color: Colors.grey[200],
         ),
-        // Center
         _buildPolaroid(
           angle: 0.0,
           offset: const Offset(0, 0),
@@ -427,10 +509,9 @@ class _PhotoStack extends StatelessWidget {
         child: Container(
           width: polaroidWidth,
           height: polaroidHeight,
-          padding:  EdgeInsets.fromLTRB(2, 10, 2, 5),
+          padding: const EdgeInsets.fromLTRB(2, 10, 2, 5),
           decoration: BoxDecoration(
             color: color ?? Colors.white,
-            // borderRadius: BorderRadius.circular(3),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.15),
@@ -453,7 +534,6 @@ class _PhotoStack extends StatelessWidget {
       return const Center(child: Icon(Icons.image, color: Colors.white, size: 24));
     }
 
-    // กำหนดขนาด Padding เพื่อให้รูปเล็กลงเหมือนมีขอบ
     const double imagePadding = 4.0;
 
     if (item is String) {
@@ -491,3 +571,7 @@ class _PhotoStack extends StatelessWidget {
     return const SizedBox();
   }
 }
+
+// ---------------------------------------------------------------------------
+// CreateAlbumModal Widget (ตัวอย่าง)
+// ---------------------------------------------------------------------------
