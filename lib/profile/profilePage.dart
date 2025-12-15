@@ -177,7 +177,7 @@ class ProfilePage extends StatelessWidget {
                           title: 'อัลบั้มของฉัน',
                           completed: 9,
                           total: 10,
-                          themeColor: Color(0xFF5AAEE5), // สีฟ้า
+                          themeColor: Color.fromARGB(255, 79, 143, 166), // สีฟ้า
                         ),
                       ),
                     ),
@@ -340,7 +340,7 @@ class _MetricBarChart extends StatelessWidget {
     );
 
     return Container(
-      height: 320, 
+      height: 320,
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -351,13 +351,22 @@ class _MetricBarChart extends StatelessWidget {
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
           maxY: 100,
+          // 1. ปิดการตอบสนองเมื่อกดที่กราฟ
+          barTouchData: BarTouchData(enabled: false), 
+          
           borderData: FlBorderData(show: false),
           gridData: FlGridData(
             show: true,
             drawVerticalLine: false,
+            // 2. กำหนดให้วาดเส้นเฉพาะค่าที่ต้องการ (25, 50, 75, 100)
+            checkToShowHorizontalLine: (value) {
+              return value == 25 || value == 50 || value == 75 || value == 100;
+            },
+            // 3. ปรับสไตล์เส้นให้เป็นเส้นประ (dashArray)
             getDrawingHorizontalLine: (value) => FlLine(
               color: gridColor,
               strokeWidth: 1,
+              dashArray: [5, 5], // [ความยาวขีด, ความยาวช่องว่าง]
             ),
           ),
           titlesData: FlTitlesData(
@@ -368,9 +377,10 @@ class _MetricBarChart extends StatelessWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 30,
-                interval: 25,
+                interval: 25, // ระยะห่างตัวเลขแกน Y
                 getTitlesWidget: (value, meta) {
-                  if (value == 75) return const SizedBox.shrink();
+                  // แสดงตัวเลขตามปกติ (ถ้าต้องการซ่อน 75 เหมือนเดิมก็ใส่เงื่อนไขได้)
+                  if (value == 0) return const SizedBox.shrink(); // ซ่อนเลข 0 ถ้าไม่ต้องการ
                   return Text(
                     value.toInt().toString(),
                     style: const TextStyle(
@@ -425,21 +435,39 @@ class _MetricBarChart extends StatelessWidget {
           color: color,
           width: 60,
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(10),
-            bottomLeft: Radius.circular(10),
-            bottomRight: Radius.circular(10)
-          ),
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10)),
         ),
       ],
     );
   }
 }
 
+  // BarChartGroupData _makeBarGroup(int x, double y, Color color) {
+  //   return BarChartGroupData(
+  //     x: x,
+  //     barRods: [
+  //       BarChartRodData(
+  //         toY: y,
+  //         color: color,
+  //         width: 60,
+  //         borderRadius: const BorderRadius.only(
+  //           topLeft: Radius.circular(10),
+  //           topRight: Radius.circular(10),
+  //           bottomLeft: Radius.circular(10),
+  //           bottomRight: Radius.circular(10)
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+
 class _ProgressCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    const Color cardColor = Color(0xFF5AAEE5);
+    const Color cardColor = Color.fromARGB(255, 79, 143, 166);
     const double progressValue = 0.66;
 
     return Container(
@@ -485,8 +513,8 @@ class _ProgressCard extends StatelessWidget {
                 SizedBox.expand(
                   child: CircularProgressIndicator(
                     value: progressValue,
-                    strokeWidth: 8,
-                    backgroundColor: Colors.white.withOpacity(0.3),
+                    strokeWidth: 4,
+                    backgroundColor: Colors.white.withOpacity(0.2),
                     valueColor:
                         const AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
@@ -505,96 +533,96 @@ class _ProgressCard extends StatelessWidget {
   }
 }
 
-class _ChartContent extends StatelessWidget {
-  const _ChartContent({required this.themeColor});
-  final Color themeColor;
+// class _ChartContent extends StatelessWidget {
+//   const _ChartContent({required this.themeColor});
+//   final Color themeColor;
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text('100',
-                      style: TextStyle(
-                          fontSize: 9,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500)),
-                  Text('50',
-                      style: TextStyle(
-                          fontSize: 9,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500)),
-                  Text('0',
-                      style: TextStyle(
-                          fontSize: 9,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500)),
-                ],
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Stack(
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Divider(height: 1, color: Colors.grey.shade200),
-                        Divider(height: 1, color: Colors.grey.shade200),
-                        Divider(height: 1, color: Colors.grey.shade200),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        _buildBar(0.8, 'ความสม่ำเสมอ'),
-                        _buildBar(0.5, 'ตรงเวลา'),
-                        _buildBar(0.5, 'ครบ'),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       children: [
+//         Expanded(
+//           child: Row(
+//             children: [
+//               Column(
+//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                 children: const [
+//                   Text('100',
+//                       style: TextStyle(
+//                           fontSize: 9,
+//                           color: Colors.grey,
+//                           fontWeight: FontWeight.w500)),
+//                   Text('50',
+//                       style: TextStyle(
+//                           fontSize: 9,
+//                           color: Colors.grey,
+//                           fontWeight: FontWeight.w500)),
+//                   Text('0',
+//                       style: TextStyle(
+//                           fontSize: 9,
+//                           color: Colors.grey,
+//                           fontWeight: FontWeight.w500)),
+//                 ],
+//               ),
+//               const SizedBox(width: 6),
+//               Expanded(
+//                 child: Stack(
+//                   children: [
+//                     Column(
+//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                       children: [
+//                         Divider(height: 1, color: Colors.grey.shade200),
+//                         Divider(height: 1, color: Colors.grey.shade200),
+//                         Divider(height: 1, color: Colors.grey.shade200),
+//                       ],
+//                     ),
+//                     Row(
+//                       mainAxisAlignment: MainAxisAlignment.spaceAround,
+//                       crossAxisAlignment: CrossAxisAlignment.end,
+//                       children: [
+//                         _buildBar(0.8, 'ความสม่ำเสมอ'),
+//                         _buildBar(0.5, 'ตรงเวลา'),
+//                         _buildBar(0.5, 'ครบ'),
+//                       ],
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ],
+//     );
+//   }
 
-  Widget _buildBar(double heightFactor, String label) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Container(
-          width: 14,
-          height: 70 * heightFactor,
-          decoration: BoxDecoration(
-            color: themeColor,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-        const SizedBox(height: 4),
-        SizedBox(
-          width: 24,
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(label,
-                style: const TextStyle(
-                    fontSize: 8,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w500)),
-          ),
-        ),
-      ],
-    );
-  }
-}
+//   Widget _buildBar(double heightFactor, String label) {
+//     return Column(
+//       mainAxisAlignment: MainAxisAlignment.end,
+//       children: [
+//         Container(
+//           width: 14,
+//           height: 70 * heightFactor,
+//           decoration: BoxDecoration(
+//             color: themeColor,
+//             borderRadius: BorderRadius.circular(4),
+//           ),
+//         ),
+//         const SizedBox(height: 4),
+//         SizedBox(
+//           width: 24,
+//           child: FittedBox(
+//             fit: BoxFit.scaleDown,
+//             child: Text(label,
+//                 style: const TextStyle(
+//                     fontSize: 8,
+//                     color: Colors.grey,
+//                     fontWeight: FontWeight.w500)),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
 
 class _UsageStatsSection extends StatelessWidget {
   const _UsageStatsSection();
@@ -688,57 +716,68 @@ class _UsageStatsSection extends StatelessWidget {
   }
 
   // Widget สร้างการ์ดสถิติเล็ก (สำหรับ 4 ช่องด้านล่าง)
-  Widget _buildStatCard(
+Widget _buildStatCard(
       {required IconData icon,
       required String title,
       required String value,
       required Color themeColor}) {
-    return Expanded(
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 100),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey.shade300, width: 1),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Icon
-            Icon(icon, size: 42, color: themeColor),
-            const SizedBox(width: 12),
-            // Text
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w500)),
-                  Text(value,
-                      style: TextStyle(
-                          fontSize: 22,
-                          color: themeColor,
-                          fontWeight: FontWeight.bold,
-                          height: 1.2)),
-                ],
-              ),
+    // เอา Expanded ออก, return เป็น Container เลย
+    return Container(
+      constraints: const BoxConstraints(minHeight: 100),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 79, 143, 166),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: themeColor.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(icon, size: 38, color: Colors.white),
+          const SizedBox(width: 10),
+          Expanded( // ยังคง Expanded ตรงนี้ไว้ เพื่อให้ข้อความไม่ล้น Container ของตัวเอง
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    height: 1.2,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    const Color themeColor = Color(0xFF5AAEE5); // สีธีมฟ้าอมเขียวตามรูป
+    const Color themeColor = Color.fromARGB(255, 255, 255, 255); // สีธีมฟ้าอมเขียวตามรูป
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -772,9 +811,9 @@ class _UsageStatsSection extends StatelessWidget {
                       Text(
                         '88',
                         style: TextStyle(
-                            fontSize: 80,
+                            fontSize: 50,
                             fontWeight: FontWeight.bold,
-                            color: themeColor,
+                            color: Color.fromARGB(255, 79, 143, 166),
                             height: 1.0),
                       ),
                     ],
@@ -788,20 +827,30 @@ class _UsageStatsSection extends StatelessWidget {
 
           // --- ส่วนล่าง: Grid 4 ช่อง ---
           // แถวที่ 1
+          // --- ส่วนล่าง: Grid 4 ช่อง ---
+          // แถวที่ 1
           Row(
             children: [
-              _buildStatCard(
-                icon: Icons.grid_view_rounded,
-                title: 'คะแนนเฉลี่ย',
-                value: '10',
-                themeColor: themeColor,
+              // กล่องซ้าย: ให้เล็กลง (flex: 2 ประมาณ 40%)
+              Expanded(
+                flex: 45, 
+                child: _buildStatCard(
+                  icon: Icons.grid_view_rounded,
+                  title: 'คะแนนเฉลี่ย',
+                  value: '10',
+                  themeColor: themeColor,
+                ),
               ),
               const SizedBox(width: 12),
-              _buildStatCard(
-                icon: Icons.collections_bookmark_rounded,
-                title: 'สร้างอัลบั้มจากคุณ',
-                value: '10',
-                themeColor: themeColor,
+              // กล่องขวา: ให้ใหญ่ขึ้น (flex: 3 ประมาณ 60%)
+              Expanded(
+                flex: 55,
+                child: _buildStatCard(
+                  icon: Icons.collections_bookmark_rounded,
+                  title: 'สร้างอัลบั้มจากคุณ',
+                  value: '10',
+                  themeColor: themeColor,
+                ),
               ),
             ],
           ),
@@ -811,18 +860,26 @@ class _UsageStatsSection extends StatelessWidget {
           // แถวที่ 2
           Row(
             children: [
-              _buildStatCard(
-                icon: Icons.tag, // หรือ Icons.numbers
-                title: 'แท็กทั้งหมด',
-                value: '15',
-                themeColor: themeColor,
+              // กล่องซ้าย: เล็กลง (flex: 2)
+              Expanded(
+                flex: 45,
+                child: _buildStatCard(
+                  icon: Icons.tag,
+                  title: 'แท็กทั้งหมด',
+                  value: '15',
+                  themeColor: themeColor,
+                ),
               ),
               const SizedBox(width: 12),
-              _buildStatCard(
-                icon: Icons.calendar_today_rounded,
-                title: 'วันที่สร้างมากที่สุด',
-                value: 'อาทิตย์',
-                themeColor: themeColor,
+              // กล่องขวา: ใหญ่ขึ้น (flex: 3)
+              Expanded(
+                flex: 55,
+                child: _buildStatCard(
+                  icon: Icons.calendar_today_rounded,
+                  title: 'วันที่สร้างมากที่สุด',
+                  value: 'อาทิตย์',
+                  themeColor: themeColor,
+                ),
               ),
             ],
           ),
@@ -832,24 +889,24 @@ class _UsageStatsSection extends StatelessWidget {
   }
 }
 
-  Widget _buildChip(String label, Color color, bool isFilled) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: isFilled ? color : Colors.transparent,
-        border: isFilled ? null : Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: isFilled ? Colors.white : Colors.black54,
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
+  // Widget _buildChip(String label, Color color, bool isFilled) {
+  //   return Container(
+  //     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+  //     decoration: BoxDecoration(
+  //       color: isFilled ? color : Colors.transparent,
+  //       border: isFilled ? null : Border.all(color: Colors.grey.shade300),
+  //       borderRadius: BorderRadius.circular(24),
+  //     ),
+  //     child: Text(
+  //       label,
+  //       style: TextStyle(
+  //         color: isFilled ? Colors.white : Colors.black54,
+  //         fontSize: 13,
+  //         fontWeight: FontWeight.w500,
+  //       ),
+  //     ),
+  //   );
+  // }
 
 // ✅ Widget ใหม่: การ์ดแสดงสถานะแบบมี Progress Bar (เหมือนรูปที่ 2)
 class _OrderStatusCard extends StatelessWidget {
