@@ -87,23 +87,22 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
       child: Column(
         children: [
           // ---------------------------------------------------------
-          // [ส่วนที่เพิ่ม] : Slide Indicator (แถบขีดด้านบน)
+          // Slide Indicator (แถบขีดด้านบน)
           // ---------------------------------------------------------
-          const SizedBox(height: 12), // ระยะห่างจากขอบบนสุด
+          const SizedBox(height: 12),
           Container(
-            width: 61, // ความกว้างของขีด
-            height: 5, // ความหนาของขีด
+            width: 61,
+            height: 5,
             decoration: BoxDecoration(
-              color: Colors.grey[300], // สีเทาอ่อน
-              borderRadius: BorderRadius.circular(2.5), // ความมน
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2.5),
             ),
           ),
           // ---------------------------------------------------------
 
           // Header
           Padding(
-            // ปรับระยะห่างด้านบนเป็น 10 (เดิม 20) เพื่อชดเชยพื้นที่ขีด
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+            padding: const EdgeInsets.fromLTRB(20, 13, 20, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -111,9 +110,14 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                   '$monthTitle : อัลบั้ม (0 แก้ไข)',
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
                 ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, size: 28, color: Colors.black54),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Image.asset(
+                    'assets/icons/cross.png',
+                    width: 25,
+                    height: 25,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ],
             ),
@@ -123,13 +127,28 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
 
           // Steps Indicator
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.0),
+            padding: EdgeInsets.symmetric(horizontal: 7.0),
             child: Row(
               children: [
-                // ✅ แก้ไข: เพิ่ม isCompleted: true เพื่อให้เส้นขวาเป็นสีฟ้า เชื่อมกับ Step ถัดไป
-                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true, isCompleted: true),
-                _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true),
-                _StepItem(label: 'พรีวิวสุดท้าย', isActive: false, isLast: true),
+                // Step 1: เลือกรูปภาพ
+                _StepItem(
+                  label: 'เลือกรูปภาพ', 
+                  isActive: true,
+                  isFirst: true,
+                  isCompleted: true,
+                ),
+                // Step 2: แก้ไขและจัดเรียง
+                _StepItem(
+                  label: 'แก้ไขและจัดเรียง', 
+                  isActive: true,
+                  isCompleted: false, // ยังไม่เสร็จ (เส้นขวาจะเป็นสีเทา)
+                ),
+                // Step 3: พรีวิวสุดท้าย
+                _StepItem(
+                  label: 'พรีวิวสุดท้าย', 
+                  isActive: false,
+                  isLast: true,
+                ),
               ],
             ),
           ),
@@ -280,12 +299,13 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
             ),
           ),
 
-          // Bottom Buttons
+          // Bottom Buttons (ส่วนที่แก้ไข)
           Container(
-            padding: const EdgeInsets.all(20),
+            // ✅ แก้ไข: ปรับ Padding ด้านล่างเป็น 50 เพื่อดันปุ่มขึ้นมา (จากเดิม 20)
+            padding: const EdgeInsets.fromLTRB(20, 25, 20, 50),
             decoration: const BoxDecoration(
               color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.black12)),
+              // border: Border(top: BorderSide(color: Colors.black12)),
             ),
             child: Column(
               children: [
@@ -490,14 +510,15 @@ class _StepItem extends StatelessWidget {
   final bool isActive;
   final bool isFirst;
   final bool isLast;
-  final bool isCompleted; // เพิ่มตัวแปรนี้
+  final bool isCompleted;
 
   const _StepItem({
+    super.key,
     required this.label,
     required this.isActive,
     this.isFirst = false,
     this.isLast = false,
-    this.isCompleted = false, // Default เป็น false
+    this.isCompleted = false,
   });
 
   @override
@@ -507,43 +528,53 @@ class _StepItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              // เส้นซ้าย
+              // --- เส้นซ้าย ---
               Expanded(
+                flex: 2,
                 child: Container(
                   height: 2,
-                  color: isFirst 
-                      ? Colors.transparent 
+                  // ถ้า Active เส้นซ้ายเป็นสีฟ้า
+                  color: isFirst
+                      ? Colors.transparent
                       : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]),
                 ),
               ),
-              // จุดวงกลม
+              
+              const SizedBox(width: 40),
+              
+              // --- จุดวงกลม ---
               Container(
-                width: 12, 
-                height: 12, 
+                width: 11,
+                height: 11,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle, 
+                  shape: BoxShape.circle,
                   color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300],
                 ),
               ),
-              // เส้นขวา (แก้ไขให้ดูค่า isCompleted ด้วย)
+              
+              const SizedBox(width: 40),
+              
+              // --- เส้นขวา ---
               Expanded(
+                flex: 2,
                 child: Container(
                   height: 2,
-                  color: isLast 
-                      ? Colors.transparent 
+                  // Logic: ถ้าไม่ใช่ตัวสุดท้าย และ isCompleted เป็นจริง ให้เป็นสีฟ้า
+                  color: isLast
+                      ? Colors.transparent
                       : (isCompleted ? const Color(0xFF5AB6D8) : Colors.grey[300]),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 5),
           Text(
-            label, 
-            textAlign: TextAlign.center, 
+            label,
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 11, 
-              color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400], 
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              fontSize: 12,
+              color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400],
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
         ],

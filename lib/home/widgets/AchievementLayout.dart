@@ -78,9 +78,9 @@ class AchievementLayout extends StatelessWidget {
                         monthLabel: 'เดือนมกราคมของคุณ',
                         mainText: 'ความทรงจำครั้งแรก',
                         subText: 'สร้างความทรงจำครั้งแรก',
-                        imagePath: 'assets/icons/memory.png',
-                        imgWidth: 75,
-                        imgHeight: 75,
+                        imagePath: 'assets/icons/book2.png',
+                        imgWidth: 61,
+                        imgHeight: 90,
                       ),
                     ],
                   ),
@@ -107,30 +107,38 @@ class _HeaderSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ตรงนี้ถ้า Header logo ยังใช้รูปเดิมก็คงไว้
-        // หรือถ้าต้องการเปลี่ยน Header logo ด้วยก็แก้ path ตรงนี้ได้ครับ
-        Image.asset(
-          'assets/images/image2.png',
-          height: 18,
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              color: Colors.orange,
-              child: const Text("WE MEMORY",
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
-            );
-          },
+        // ✅ ปรับ: นำรูปภาพและข้อความ "ผลงานประจำปีของคุณ" มาอยู่ใน Row เดียวกัน
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center, // จัดกึ่งกลางแนวตั้ง
+          children: [
+            Image.asset(
+              'assets/images/image2.png',
+              height: 24, // ความสูงรูปเท่าเดิม
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  color: Colors.orange,
+                  child: const Text("WE MEMORY",
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
+                );
+              },
+            ),
+            const SizedBox(width: 12), // ระยะห่างระหว่างรูปกับข้อความ
+            
+            // ✅ ปรับ: ข้อความ "ผลงานประจำปีของคุณ" ขนาด 32
+            const Text(
+              'ปีนี้ของเรา',
+              style: TextStyle(
+                fontSize: 32, // ขนาด 32 ตามที่ต้องการ
+                fontWeight: FontWeight.w400,
+                color: _textDark,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 12),
-        const Text(
-          'ผลงานประจำปีของคุณ',
-          style: TextStyle(
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-            color: _textDark,
-          ),
-        ),
+        
+        const SizedBox(height: 2), // ระยะห่างระหว่างบรรทัดบนกับบรรทัดล่าง
         
         const Text(
           'เรื่องราวการเติบโตของฉัน',

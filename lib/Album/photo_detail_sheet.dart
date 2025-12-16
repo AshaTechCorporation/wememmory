@@ -120,9 +120,18 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
       ),
       child: Column(
         children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 61,
+            height: 5,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2.5),
+            ),
+          ),
           // 1. Header
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            padding: const EdgeInsets.fromLTRB(16, 13, 16, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -141,11 +150,14 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                     ),
                   ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.black54),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: () => Navigator.pop(context),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Image.asset(
+                    'assets/icons/cross.png', // อ้างอิง Path ในโปรเจกต์
+                    width: 25,
+                    height: 25,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ],
             ),
@@ -154,13 +166,29 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
           const SizedBox(height: 16),
 
           // 2. Steps Indicator
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.0),
+           const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 7.0),
             child: Row(
               children: [
-                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true, isCompleted: true),
-                _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true),
-                _StepItem(label: 'พรีวิวสุดท้าย', isActive: false, isLast: true),
+                // Step 1: เลือกรูปภาพ
+                _StepItem(
+                  label: 'เลือกรูปภาพ', 
+                  isActive: true,
+                  isFirst: true,
+                  isCompleted: true,
+                ),
+                // Step 2: แก้ไขและจัดเรียง
+                _StepItem(
+                  label: 'แก้ไขและจัดเรียง', 
+                  isActive: true,
+                  isCompleted: false, // ยังไม่เสร็จ (เส้นขวาจะเป็นสีเทา)
+                ),
+                // Step 3: พรีวิวสุดท้าย
+                _StepItem(
+                  label: 'พรีวิวสุดท้าย', 
+                  isActive: false,
+                  isLast: true,
+                ),
               ],
             ),
           ),
@@ -286,7 +314,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
 
           // 4. Bottom Button (Save)
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 38),
             decoration: const BoxDecoration(
               border: Border(top: BorderSide(color: Colors.transparent)),
             ),
@@ -348,6 +376,7 @@ class _StepItem extends StatelessWidget {
   final bool isCompleted;
 
   const _StepItem({
+    super.key,
     required this.label,
     required this.isActive,
     this.isFirst = false,
@@ -357,47 +386,58 @@ class _StepItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const activeColor = Color(0xFF5AB6D8); 
-
     return Expanded(
       child: Column(
         children: [
           Row(
             children: [
+              // --- เส้นซ้าย ---
               Expanded(
+                flex: 2,
                 child: Container(
-                  height: 2, 
-                  color: isFirst 
-                      ? Colors.transparent 
-                      : (isActive ? activeColor : Colors.grey[300]),
+                  height: 2,
+                  // ถ้า Active เส้นซ้ายเป็นสีฟ้า
+                  color: isFirst
+                      ? Colors.transparent
+                      : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]),
                 ),
               ),
+              
+              const SizedBox(width: 40),
+              
+              // --- จุดวงกลม ---
               Container(
-                width: 10, 
-                height: 10, 
+                width: 11,
+                height: 11,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle, 
-                  color: isActive ? activeColor : Colors.grey[300],
+                  shape: BoxShape.circle,
+                  color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300],
                 ),
               ),
+              
+              const SizedBox(width: 40),
+              
+              // --- เส้นขวา ---
               Expanded(
+                flex: 2,
                 child: Container(
-                  height: 2, 
-                  color: isLast 
-                      ? Colors.transparent 
-                      : (isCompleted ? activeColor : Colors.grey[300]),
+                  height: 2,
+                  // Logic: ถ้าไม่ใช่ตัวสุดท้าย และ isCompleted เป็นจริง ให้เป็นสีฟ้า
+                  color: isLast
+                      ? Colors.transparent
+                      : (isCompleted ? const Color(0xFF5AB6D8) : Colors.grey[300]),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 5),
           Text(
-            label, 
-            textAlign: TextAlign.center, 
+            label,
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 10, 
-              color: isActive ? activeColor : Colors.grey[400], 
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              fontSize: 12,
+              color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400],
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
         ],
