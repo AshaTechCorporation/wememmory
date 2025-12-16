@@ -30,15 +30,13 @@ class SummaryStrip extends StatelessWidget {
               ),
               
               // -------------------------------------------------------
-              // ✅ การ์ดที่ 2 (แก้ไขใหม่ตามรูปภาพ 2month.jpg)
+              // การ์ดที่ 2 (แก้ไขใหม่ตามรูปภาพ 2month.jpg)
               // -------------------------------------------------------
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
                 child: SubscriptionCard(
                   imagePaths: [
-                    
-                    'assets/images/Hobby3.png', 
-                    
+                    'assets/images/Hobby3.png',  
                   ],
                   
                 ),
@@ -407,3 +405,4 @@ class _PhotoCard extends StatelessWidget {
     );
   }
 }
+

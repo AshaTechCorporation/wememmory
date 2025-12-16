@@ -84,7 +84,7 @@ class _PrintSheetState extends State<PrintSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // หัวข้ออัลบั้ม
-                  const Text("อัลบั้มรูปของคุณ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300)),
+                  const Text("อัลบั้มรูปของคุณ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 12),
 
                   // ส่วนแสดงรูป (ใช้ Widget ที่แยกไว้)
@@ -139,7 +139,7 @@ class _PrintSheetState extends State<PrintSheet> {
                           children: [
                             Row(
                               children: [
-                                const Text("ยอดเครดิตคงเหลือ : ", style: TextStyle(color: Colors.white, fontSize: 16,fontWeight: FontWeight.w900)),
+                                const Text("ยอดเครดิตคงเหลือ : ", style: TextStyle(color: Colors.white, fontSize: 14)),
                                 Image.asset(
                                   'assets/icons/dollar-circle.png',
                                   width: 24,
@@ -150,7 +150,7 @@ class _PrintSheetState extends State<PrintSheet> {
                               ],
                             ),
                             const SizedBox(height: 2),
-                            const Text("เติมเครดิตตามจำนวนที่คุณต้องการ", style: TextStyle(color: Colors.white70, fontSize: 14)),
+                            const Text("เติมเครดิตตามจำนวนที่คุณต้องการ", style: TextStyle(color: Colors.white70, fontSize: 11)),
                           ],
                         ),
                         ElevatedButton(
@@ -163,7 +163,7 @@ class _PrintSheetState extends State<PrintSheet> {
                             elevation: 0,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                           ),
-                          child: const Text("เติมเครดิต", style: TextStyle(fontSize: 16, color: Colors.black)),
+                          child: const Text("เติมเครดิต", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -172,7 +172,7 @@ class _PrintSheetState extends State<PrintSheet> {
                   const SizedBox(height: 24),
 
                   // รายละเอียดการสั่งพิมพ์
-                  const Text("รายละเอียดการสั่งพิมพ์", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const Text("รายละเอียดการสั่งพิมพ์", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -198,7 +198,7 @@ class _PrintSheetState extends State<PrintSheet> {
 
           // 3. Bottom Bar
           Container(
-            padding: const EdgeInsets.fromLTRB(17, 13 , 17, 30),
+            padding: const EdgeInsets.fromLTRB(15, 10 , 16, 30),
             decoration: const BoxDecoration(
               color: Colors.white,
               border: Border(top: BorderSide(color: Colors.black12)),
@@ -267,7 +267,7 @@ class _PrintSheetState extends State<PrintSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(16),
@@ -281,7 +281,7 @@ class _PrintSheetState extends State<PrintSheet> {
               Expanded(
                 child: Text(
                   address,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12, height: 1.4),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 13, height: 1.4),
                 ),
               ),
               const Icon(Icons.chevron_right, color: Colors.grey),

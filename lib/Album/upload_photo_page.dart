@@ -99,9 +99,14 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
   void _toggleSelection(MediaItem item) {
     setState(() {
-      if (selectedItems.contains(item)) {
-        selectedItems.remove(item);
+      // 🔍 ค้นหาว่ารูปนี้ (ดูจาก ID) เคยถูกเลือกหรือยัง
+      final existingIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
+
+      if (existingIndex != -1) {
+        // ✅ ถ้ามีอยู่แล้ว ให้ลบตัวเดิมออก (ใช้ index ลบ)
+        selectedItems.removeAt(existingIndex);
       } else {
+        // ✅ ถ้ายังไม่มี ให้เพิ่มเข้าไป
         if (selectedItems.length < 11) {
           selectedItems.add(item);
         } else {
@@ -287,13 +292,11 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                         itemCount: mediaList.length,
                         itemBuilder: (context, index) {
                           final item = mediaList[index];
-                          final selectionIndex = selectedItems.indexOf(item);
+                          final selectionIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
                           final isSelected = selectionIndex != -1;
-
                           final future = _thumbnailFutures[item.asset.id] ??=
-                              item.asset.thumbnailDataWithSize(
-                                  const ThumbnailSize(200, 200));
-
+                          item.asset.thumbnailDataWithSize(
+                          const ThumbnailSize(200, 200));
                           return GestureDetector(
                             onTap: () => _toggleSelection(item),
                             child: Stack(
