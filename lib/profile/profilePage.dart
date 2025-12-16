@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:wememmory/constants.dart';
-import 'package:wememmory/profile/addressPage.dart';
 import 'package:wememmory/profile/albumHistoryPage.dart';
 import 'package:wememmory/profile/bankInfoPage.dart';
 import 'package:wememmory/profile/couponPage.dart';
@@ -50,7 +49,7 @@ class ProfilePage extends StatelessWidget {
                   height: 180,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 255, 142, 94),
+                    color: const Color(0xFFF8B887),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -100,7 +99,7 @@ class ProfilePage extends StatelessWidget {
                                 );
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFEF703F),
+                                backgroundColor: const Color(0xFFEE743B),
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
@@ -188,7 +187,7 @@ class ProfilePage extends StatelessWidget {
                           title: 'สินค้าของฉัน',
                           completed: 9,
                           total: 10,
-                          themeColor: Color(0xFFEF703F), // สีส้ม
+                          themeColor: Color(0xFFEE743B),
                         ),
                       ),
                     ),
@@ -207,12 +206,7 @@ class ProfilePage extends StatelessWidget {
                           title: 'อัลบั้มของฉัน',
                           completed: 9,
                           total: 10,
-                          themeColor: Color.fromARGB(
-                            255,
-                            79,
-                            143,
-                            166,
-                          ), // สีฟ้า
+                          themeColor: Color(0xFF6BB0C5), // สีฟ้า
                         ),
                       ),
                     ),
@@ -309,6 +303,12 @@ class _HeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 1. เก็บข้อมูลความสูงไว้ใน List เพื่อให้โค้ดสั้นลงและจัดการง่าย
+    final List<double> barHeights = [
+      0.3, 0.6, 0.6, 0.8, 0.4, 0.5,
+      0.3, 0.6, 0.5, 0.9, 0.3, 0.9
+    ];
+
     return Column(
       children: [
         CircleAvatar(
@@ -354,26 +354,18 @@ class _HeaderSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
+        
+        // --- ส่วนกราฟแท่ง ---
         SizedBox(
           height: 72,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
-
-            children: [
-              _buildBar(0.3),
-              _buildBar(0.6),
-              _buildBar(0.6),
-              _buildBar(0.8),
-              _buildBar(0.4),
-              _buildBar(0.5),
-              _buildBar(0.3),
-              _buildBar(0.6),
-              _buildBar(0.5),
-              _buildBar(0.9),
-              _buildBar(0.3),
-              _buildBar(0.9),
-            ],
+            // 2. ใช้ List.generate เพื่อสร้าง Bar ตามจำนวนข้อมูล และส่ง index ไปด้วย
+            children: List.generate(
+              barHeights.length,
+              (index) => _buildBar(barHeights[index], index),
+            ),
           ),
         ),
         const SizedBox(height: 30),
@@ -381,14 +373,17 @@ class _HeaderSection extends StatelessWidget {
     );
   }
 
-  Widget _buildBar(double heightFactor) {
+  // 3. รับ index เพิ่มเข้ามาเพื่อเช็คสี
+  Widget _buildBar(double heightFactor, int index) {
     return Container(
-      width: 10,
-      height: 64 * heightFactor,
+      width: 18,
+      height: 100 * heightFactor,
       margin: const EdgeInsets.symmetric(horizontal: 2),
       decoration: BoxDecoration(
-        color: const Color(0xFFF08336),
-        borderRadius: BorderRadius.circular(3),
+        color: index % 2 == 0 
+            ? const Color(0xFFF8B887)
+            : const Color(0xFFEE743B),
+        borderRadius: BorderRadius.circular(10),
       ),
     );
   }
@@ -399,12 +394,12 @@ class _MetricBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color barColor = Color(0xFFF08336);
-    const Color gridColor = Color(0xFFEEEEEE);
+    const Color barColor = Color(0xFFEE743B);
+    const Color gridColor = Color(0xFFFFFFFF);
     const TextStyle labelStyle = TextStyle(
-      color: Colors.grey,
-      fontSize: 10,
-      fontWeight: FontWeight.w600,
+      color: Colors.black,
+      fontSize: 14,
+      fontWeight: FontWeight.w800,
     );
 
     return Container(
@@ -535,7 +530,7 @@ class _MetricBarChart extends StatelessWidget {
 class _ProgressCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    const Color cardColor = Color.fromARGB(255, 79, 143, 166);
+    const Color cardColor = Color(0xFF6BB0C5);
     const double progressValue = 0.66;
 
     return Container(
@@ -588,7 +583,7 @@ class _ProgressCard extends StatelessWidget {
                 SizedBox.expand(
                   child: CircularProgressIndicator(
                     value: progressValue,
-                    strokeWidth: 4,
+                    strokeWidth: 6,
                     backgroundColor: Colors.white.withOpacity(0.2),
                     valueColor: const AlwaysStoppedAnimation<Color>(
                       Colors.white,
@@ -787,7 +782,7 @@ class _UsageStatsSection extends StatelessWidget {
                 ),
                 const Text(
                   '#ครอบครัว #ความรัก',
-                  style: TextStyle(fontSize: 9, color: Color(0xFF5AAEE5)),
+                  style: TextStyle(fontSize: 9, color: Color(0xFF6BB0C5)),
                 ),
               ],
             ),
@@ -808,7 +803,7 @@ class _UsageStatsSection extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: 100),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 79, 143, 166),
+        color: const Color(0xFF6BB0C5),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -901,7 +896,7 @@ class _UsageStatsSection extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 50,
                           fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 79, 143, 166),
+                          color: Color(0xFF6BB0C5),
                           height: 1.0,
                         ),
                       ),

@@ -19,7 +19,7 @@ class FAQPage extends StatelessWidget {
       body: Column(
         children: [
           Container(
-            color: const Color(0xFFFF8A3D),
+            color: const Color(0xFFF29C64),
             padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
             child: ListTile(
               leading: IconButton(

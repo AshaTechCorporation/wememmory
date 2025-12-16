@@ -766,7 +766,7 @@ class _GiftCardBanner extends StatelessWidget {
               Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AlbumGiftPage()));
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF88CED8),
+              backgroundColor: const Color(0xFF6BB0C5),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24),
               shape: RoundedRectangleBorder(

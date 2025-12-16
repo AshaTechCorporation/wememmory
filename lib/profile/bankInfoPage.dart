@@ -11,9 +11,9 @@ class BankInfoPage extends StatelessWidget {
     const divider = Color(0xFFEFEFEF);
     const textGray = Color(0xFF5F5F5F);
     return Scaffold(
-      backgroundColor: kBackgroundColor, // พื้นหลังส้มด้านบน
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255), // พื้นหลังส้มด้านบน
       appBar: AppBar(
-        backgroundColor: kBackgroundColor,
+        backgroundColor: const Color(0xFFF8B887),
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white), onPressed: () => Navigator.pop(context)),
         title: const Text('ข้อมูลบัญชีธนาคาร/บัตรเครดิต', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),

@@ -30,7 +30,7 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
 
   // ✅ เพิ่มรายการรูปภาพแนวตั้งใหม่ 3 รูป (ต้องมีไฟล์รูปจริงใน folder assets นะครับ)
   final List<String> _storyImagesVertical = [
-    'assets/images/family.png', // TODO: เปลี่ยนชื่อไฟล์ให้ตรงกับที่มีจริง
+    'assets/images/family.png',
     'assets/images/Rectangle569.png',
     'assets/images/exProfile.png',
   ];
@@ -60,16 +60,15 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. ส่วนแสดงรูปภาพสินค้าด้านบน
             Container(
               width: double.infinity,
               height: 300,
-              color: const Color(0xFFBCAAA4), // พื้นหลังสีเทาอมน้ำตาล
+              color: const Color(0xFFBCAAA4),
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Image.asset(
-                    'assets/images/Rectangle1.png', // รูปสินค้าหลัก
+                    'assets/images/Rectangle1.png',
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) =>
                         const Icon(Icons.photo_album, size: 80, color: Colors.white54),

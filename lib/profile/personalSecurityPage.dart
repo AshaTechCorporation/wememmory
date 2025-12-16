@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wememmory/constants.dart';
+import 'package:wememmory/profile/usernamePage.dart'; 
+import 'package:wememmory/profile/phoneInputPage.dart';
 
 class PersonalSecurityPage extends StatefulWidget {
   const PersonalSecurityPage({super.key});
@@ -18,12 +20,12 @@ class _PersonalSecurityPageState extends State<PersonalSecurityPage> {
     const textGray = Color(0xFF5F5F5F);
 
     return Scaffold(
-      backgroundColor: kBackgroundColor, // พื้นหลังส้มด้านบน
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255), // พื้นหลังส้มด้านบน
       appBar: AppBar(
-        backgroundColor: kBackgroundColor,
+        backgroundColor: const Color(0xFFF8B887),
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white), onPressed: () => Navigator.pop(context)),
-        title: const Text('ข้อมูลส่วนบุคคลและความปลอดภัย', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+        title: const Text('ข้อมูลส่วนบุคคลและความปลอดภัย', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800,)),
       ),
       body: SafeArea(
         child: Container(
@@ -56,9 +58,18 @@ class _PersonalSecurityPageState extends State<PersonalSecurityPage> {
                 // กลุ่มรายการข้อมูลทั่วไป
                 _TitledListGroup(
                   children: [
-                    _NavRow(title: 'ชื่อผู้ใช้งาน', onTap: () {}),
+                    _NavRow(title: 'ชื่อผู้ใช้งาน', onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const UserFormScreen()), // เปลี่ยน UsernamePage เป็นชื่อคลาสหน้าแก้ไขชื่อของคุณ
+                        );}),
                     const Divider(height: 1, color: divider),
-                    _NavRow(title: 'เบอร์โทรศัพท์', onTap: () {}),
+                    _NavRow(title: 'เบอร์โทรศัพท์', onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const PhoneInputScreen()), // เปลี่ยน PhoneInputPage เป็นชื่อคลาสหน้าแก้ไขเบอร์ของคุณ
+                        );
+                    }),
                     const Divider(height: 1, color: divider),
                     _SwitchRow(
                       title: 'เปิดใช้งาน  Touch ID',

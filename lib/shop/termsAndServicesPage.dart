@@ -13,7 +13,7 @@ class TermsAndServicesPage extends StatelessWidget {
           const SizedBox(height: 8),
           const Text(
             'รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด รายละเอียด ',
-            style: TextStyle(color: Color(0xFF666666)),
+            style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
           ),
         ],
       ),
@@ -25,8 +25,8 @@ class TermsAndServicesPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('เงื่อนไขและการใช้บริการ'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: const Color(0xFFF29C64),
+        foregroundColor: const Color.fromARGB(255, 255, 255, 255),
         elevation: 0,
       ),
       backgroundColor: Colors.white,

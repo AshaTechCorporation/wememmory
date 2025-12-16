@@ -6,7 +6,7 @@ class CouponPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const orange = Color(0xFFF29C64);
+    const orange = Color(0xFFEE743B);
     return DefaultTabController(
       length: 2,
       child: Scaffold(

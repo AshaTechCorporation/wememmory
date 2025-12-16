@@ -43,7 +43,7 @@ class _MembershipHistoryPageState extends State<MembershipHistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 119, 61), // สีพื้นหลังสีส้มอ่อนด้านบน
+      backgroundColor: const Color(0xFFF29C64), // สีพื้นหลังสีส้มอ่อนด้านบน
       body: SafeArea(
         bottom: false,
         child: Column(
