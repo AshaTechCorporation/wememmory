@@ -14,7 +14,7 @@ class SummaryStrip extends StatelessWidget {
           child: PageView(
             controller: PageController(viewportFraction: 1.0),
             children: const [
-              // การ์ดที่ 1
+              // การ์ดที่ 1 (แบบ InfoCard เดิม)
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
                 child: InfoCard(
@@ -23,50 +23,41 @@ class SummaryStrip extends StatelessWidget {
                   countColor: Color(0xFF5AB6D8),
                   imagePaths: [
                     'assets/images/Hobby1.png',
-                    // 'assets/images/image2.png',
-                    // 'assets/images/image3.png',
                   ],
                   topCaptionTitle: 'ช่วงเวลาดีดี',
                   topCaptionSub: '#ครอบครัว #ความรัก',
                 ),
               ),
               
-              // การ์ดที่ 2
+              // -------------------------------------------------------
+              // ✅ การ์ดที่ 2 (แก้ไขใหม่ตามรูปภาพ 2month.jpg)
+              // -------------------------------------------------------
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
-                child: InfoCard(
-                  title: 'ทริปต่างประเทศ',
-                  count: '12',
-                  countColor: Color(0xFFFF8C66),
+                child: SubscriptionCard(
                   imagePaths: [
-                    'assets/images/image1.png',
-                    'assets/images/image5.png',
+                    
+                    'assets/images/Hobby3.png', 
+                    
                   ],
-                  topCaptionTitle: 'เที่ยวญี่ปุ่น',
-                  topCaptionSub: '#Travel #Japan',
+                  
                 ),
               ),
+              // -------------------------------------------------------
               
-              // การ์ดที่ 3
+              // การ์ดที่ 3 (แบบ Background Image)
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
-                child: InfoCard(
-                  title: 'ร้านอาหารโปรด',
-                  count: '34',
-                  countColor: Color(0xFF8BC34A),
-                  topCaptionTitle: 'อร่อยมาก',
-                  topCaptionSub: '#Food #Yummy',
+                child: BackgroundCard(
+                  backgroundImagePath: 'assets/images/buyone.png',
                 ),
               ),
-              // การ์ดที่ 4 
+
+              // การ์ดที่ 4 (แบบ Background Image)
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
-                child: InfoCard(
-                  title: 'ร้านอาหารโปรด',
-                  count: '34',
-                  countColor: Color(0xFF8BC34A),
-                  topCaptionTitle: 'อร่อยมาก',
-                  topCaptionSub: '#Food #Yummy',
+                child: BackgroundCard(
+                  backgroundImagePath: 'assets/images/promotion.png', 
                 ),
               ),
             ],
@@ -79,7 +70,150 @@ class SummaryStrip extends StatelessWidget {
 }
 
 // ---------------------------------------------------------
-// InfoCard: การ์ดสีขาวหลัก
+// (ใหม่) SubscriptionCard: การ์ดสำหรับ Layout card 2
+// ---------------------------------------------------------
+class SubscriptionCard extends StatelessWidget {
+  final List<String>? imagePaths;
+  final String topCaptionTitle;
+  final String topCaptionSub;
+
+  const SubscriptionCard({
+    super.key,
+    this.imagePaths,
+    this.topCaptionTitle = '',
+    this.topCaptionSub = '',
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: const Color.fromARGB(255, 129, 129, 129).withOpacity(0.15),
+          width: 2,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(25, 20, 30, 20),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // ส่วนรูปภาพด้านซ้าย (ใช้ _PhotoStack เดิม)
+            _PhotoStack(
+              imagePaths: imagePaths,
+              topCaptionTitle: topCaptionTitle,
+              topCaptionSub: topCaptionSub,
+            ),
+            
+            const Spacer(), 
+            
+            // ส่วนข้อความด้านขวา (จัด Layout ใหม่ตามภาพ)
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center, // จัดกึ่งกลางแนวตั้งของ Column
+              children: [
+                // ข้อความบน: สร้างอัลบั้มต่อเนื่อง
+                Text(
+                  'สร้างอัลบั้มต่อเนื่อง',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[400],
+                  ),
+                ),
+                const SizedBox(height: 5),
+                
+                // แถวล่าง: เลข 4 และ คำว่าเดือน
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // เลข 4 สีฟ้าตัวใหญ่
+                    const Text(
+                      '4',
+                      style: TextStyle(
+                        fontSize: 60,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF5AB6D8), // สีฟ้า
+                        height: 1.0, 
+                      ),
+                    ),
+                    const SizedBox(width: 9), // ระยะห่าง
+                    
+                    // แคปซูลคำว่า "เดือน"
+                    Container(
+                      margin: const EdgeInsets.only(top: 18),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEBF8FC), // พื้นหลังสีฟ้าอ่อนมากๆ
+                        borderRadius: BorderRadius.circular(20), // ความมนของแคปซูล
+                      ),
+                      child: const Text(
+                        'เดือน',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF5AB6D8), // สีตัวหนังสือสีฟ้า
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------
+// BackgroundCard (คงเดิมจากที่คุณมี)
+// ---------------------------------------------------------
+class BackgroundCard extends StatelessWidget {
+  final String backgroundImagePath;
+  final String? title;
+  final String? count;
+  final Color countColor; 
+
+  const BackgroundCard({
+    super.key,
+    required this.backgroundImagePath,
+    this.title,
+    this.count,
+    this.countColor = Colors.white,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: const Color.fromARGB(255, 129, 129, 129).withOpacity(0.15),
+          width: 2,
+        ),
+        image: DecorationImage(
+          image: AssetImage(backgroundImagePath),
+          fit: BoxFit.cover, 
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(25, 20, 35, 20),
+        child: Row(
+          children: const [Spacer()], // เว้นว่างไว้โชว์รูป background
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------
+// InfoCard (คงเดิม)
 // ---------------------------------------------------------
 class InfoCard extends StatelessWidget {
   final String title;
@@ -121,13 +255,10 @@ class InfoCard extends StatelessWidget {
               topCaptionTitle: topCaptionTitle,
               topCaptionSub: topCaptionSub,
             ),
-            
             const Spacer(), 
-            
-            // ✅ ปรับให้ข้อความจัดกึ่งกลางกันเอง
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center, // เปลี่ยนจาก .end เป็น .center
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   title,
@@ -156,9 +287,8 @@ class InfoCard extends StatelessWidget {
   }
 }
 
-// ... (ส่วน _PhotoStack และ _PhotoCard คงเดิมทุกประการ) ...
 // ---------------------------------------------------------
-// _PhotoStack
+// _PhotoStack & _PhotoCard (คงเดิมตามโค้ดของคุณ)
 // ---------------------------------------------------------
 class _PhotoStack extends StatelessWidget {
   final List<String>? imagePaths;
@@ -188,45 +318,22 @@ class _PhotoStack extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Positioned(
-            left: 15,
-            top: 5,
+            left: 20, top: 0,
             child: Transform.rotate(
-              angle: 0.12, 
-              child: _PhotoCard(
-                width: w,
-                height: h,
-                rotation: 0, 
-                imagePath: img3,
-                isBackCard: true,
-              ),
+              angle: 0.22, 
+              child: _PhotoCard(width: w, height: h, rotation: 0, imagePath: img3, isBackCard: true),
             ),
           ),
           Positioned(
-            left: 0,
-            top: 5,
+            left: 0, top: 0,
             child: Transform.rotate(
-              angle: -0.15, 
-              child: _PhotoCard(
-                width: w,
-                height: h,
-                rotation: 0,
-                imagePath: img2,
-                isBackCard: true,
-              ),
+              angle: -0.10, 
+              child: _PhotoCard(width: w, height: h, rotation: 0, imagePath: img2, isBackCard: true),
             ),
           ),
           Positioned(
-            left: 10,
-            top: 0,
-            child: _PhotoCard(
-              width: w,
-              height: h,
-              rotation: 0.0, 
-              imagePath: img1,
-              isBackCard: false, 
-              captionTitle: topCaptionTitle,
-              captionSub: topCaptionSub,
-            ),
+            left: 10, top: 0,
+            child: _PhotoCard(width: w, height: h, rotation: 0.0, imagePath: img1, isBackCard: false, captionTitle: topCaptionTitle, captionSub: topCaptionSub),
           ),
         ],
       ),
@@ -234,9 +341,6 @@ class _PhotoStack extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------
-// _PhotoCard
-// ---------------------------------------------------------
 class _PhotoCard extends StatelessWidget {
   final double width;
   final double height;
@@ -263,20 +367,13 @@ class _PhotoCard extends StatelessWidget {
       child: Container(
         width: width,
         height: height,
-        padding: const EdgeInsets.all(6),
+        padding: const EdgeInsets.fromLTRB(6, 6, 6, 6),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(
-            color: Colors.grey.withOpacity(0.2), 
-            width: 0.5,
-          ),
+          borderRadius: BorderRadius.circular(0),
+          border: Border.all(color: Colors.grey.withOpacity(0.2), width: 0.5),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.12),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
+            BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 8, offset: const Offset(0, 3)),
           ],
         ),
         child: Column(
@@ -285,57 +382,25 @@ class _PhotoCard extends StatelessWidget {
             Expanded(
               flex: 4, 
               child: Container(
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 255, 255, 255),
-                ),
+                decoration: const BoxDecoration(color: Color.fromARGB(255, 255, 255, 255)),
                 padding: const EdgeInsets.all(10), 
                 clipBehavior: Clip.antiAlias,
                 child: imagePath != null
-                    ? Image.asset(
-                        imagePath!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Center(child: Icon(Icons.broken_image, color: Colors.grey, size: 20)),
-                      )
-                    : const Center(
-                        child: Icon(Icons.photo, color: Colors.white, size: 30),
-                      ),
+                    ? Image.asset(imagePath!, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.broken_image, color: Colors.grey, size: 20)))
+                    : const Center(child: Icon(Icons.photo, color: Colors.white, size: 30)),
               ),
             ),
-            
             if (!isBackCard) ...[
-              const SizedBox(height: 8), 
+              const SizedBox(height: 2), 
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    captionTitle, 
-                    style: const TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black87,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  Text(captionTitle, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Colors.black87), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 2),
-                  Text(
-                    captionSub, 
-                    style: const TextStyle(
-                      fontSize: 7,
-                      color: Color(0xFF5AB6D8), 
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  Text(captionSub, style: const TextStyle(fontSize: 7, color: Color(0xFF5AB6D8), fontWeight: FontWeight.w500), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis),
                 ],
               )
-            ] else ...[
-               const Spacer(flex: 3), 
-            ]
+            ] else ...[const Spacer(flex: 3)]
           ],
         ),
       ),

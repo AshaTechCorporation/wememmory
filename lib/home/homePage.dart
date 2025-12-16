@@ -96,8 +96,8 @@ class _HomePageState extends State<HomePage> {
           Stack(
             alignment: Alignment.center,
             children: [
-              IconButton(onPressed: () {}, icon: const Icon(Icons.notifications, color: Colors.white, size: 28)),
-              Positioned(top: 10, right: 12, child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle))),
+              IconButton(onPressed: () {}, icon: const Icon(Icons.notifications, color: Colors.white, size: 25)),
+             
             ],
           ),
           const SizedBox(width: 12),

@@ -1,8 +1,11 @@
 import 'dart:typed_data';
-import 'dart:math'; // ใช้สำหรับสุ่มรูปภาพพื้นหลัง
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:wememmory/collection/MemorySlidePage.dart';
 import 'package:wememmory/models/media_item.dart';
+// import your new page here if it's in a separate file, e.g.:
+// import 'memory_slide_page.dart'; 
 
 class MonthDetailPage extends StatelessWidget {
   final String monthName;
@@ -16,7 +19,6 @@ class MonthDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // สุ่มเลือกรูปภาพจากรายการ items เพื่อนำมาทำเป็นพื้นหลัง
     MediaItem? bgItem;
     if (items.isNotEmpty) {
       bgItem = items[Random().nextInt(items.length)];
@@ -28,10 +30,9 @@ class MonthDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. Header Area
+            // ... (Your existing Header Stack code remains unchanged) ...
             Stack(
               children: [
-                // พื้นหลัง Header (สุ่มรูป)
                 Container(
                   height: 250,
                   width: double.infinity,
@@ -42,19 +43,17 @@ class MonthDetailPage extends StatelessWidget {
                       colors: [Color(0xFF8E8E8E), Color(0xFF4A4A4A)],
                     ),
                   ),
-                  // ✅ แสดงรูปพื้นหลังถ้ามี
                   child: bgItem != null
                       ? FutureBuilder<Uint8List?>(
-                          // เช็คว่ามีรูปแคปไหม ถ้าไม่มีก็โหลด Thumbnail ใหญ่ๆ
-                          future: bgItem.capturedImage != null 
-                              ? Future.value(bgItem.capturedImage) 
+                          future: bgItem.capturedImage != null
+                              ? Future.value(bgItem.capturedImage)
                               : bgItem.asset.thumbnailDataWithSize(const ThumbnailSize(800, 800)),
                           builder: (context, snapshot) {
                             if (snapshot.hasData && snapshot.data != null) {
                               return Image.memory(
                                 snapshot.data!,
                                 fit: BoxFit.cover,
-                                color: Colors.black.withOpacity(0.3), // ปรับให้มืดลงนิดหน่อยเพื่อให้ตัวหนังสือชัด
+                                color: Colors.black.withOpacity(0.3),
                                 colorBlendMode: BlendMode.darken,
                               );
                             }
@@ -63,8 +62,6 @@ class MonthDetailPage extends StatelessWidget {
                         )
                       : Container(),
                 ),
-                
-                // ปุ่ม Back/Forward
                 Positioned(
                   top: 50,
                   left: 16,
@@ -83,8 +80,6 @@ class MonthDetailPage extends StatelessWidget {
                     ],
                   ),
                 ),
-
-                // ข้อความชื่อเดือน
                 Positioned(
                   bottom: 60,
                   left: 0,
@@ -113,7 +108,7 @@ class MonthDetailPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 2. Action Buttons & Status (ส่วนนี้เพิ่มเข้ามาเพื่อให้ Layout สมบูรณ์ตามภาพเดิม)
+            // ... (Your existing Action Buttons code remains unchanged) ...
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Row(
@@ -125,9 +120,9 @@ class MonthDetailPage extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      _buildActionButton(Icons.print_outlined),
-                      const SizedBox(width: 12),
-                      _buildActionButton(Icons.share_outlined),
+                      _buildIconButton('assets/icons/print.png'),
+                      const SizedBox(width: 8),
+                      _buildIconButton('assets/icons/share.png'),
                     ],
                   ),
                 ],
@@ -136,7 +131,7 @@ class MonthDetailPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 3. Album Layout (Book Layout)
+            // ... (Your existing Album Layout code remains unchanged) ...
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -146,38 +141,51 @@ class MonthDetailPage extends StatelessWidget {
 
             const SizedBox(height: 40),
 
-            // 4. Bottom Cards (ส่วนล่าง)
+            // 4. Bottom Cards (Modified Section)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Card 1
+                  // -------------------------------------------------------------
+                  // ✅ Card 1: Added GestureDetector to navigate to new page
+                  // -------------------------------------------------------------
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSmallCard(
-                          // ส่งรูปแรกไปแสดง (ถ้ามี)
-                          images: items.isNotEmpty ? [items[0]] : [],
-                          title: "อากาศดี วิวสวย",
-                          subtitle: "#ครอบครัว #ความรัก",
-                        ),
-                        const SizedBox(height: 12),
-                        const Text("แท็กทั้งหมด", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        const SizedBox(height: 4),
-                        const Text("#ครอบครัว #ความรัก ...", style: TextStyle(color: Color(0xFFED7D31), fontSize: 12)),
-                      ],
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MemorySlidePage(
+                              monthName: monthName,
+                              items: items,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSmallCard(
+                            images: items.isNotEmpty ? [items[0]] : [],
+                            title: "อากาศดี วิวสวย",
+                            subtitle: "#ครอบครัว #ความรัก",
+                          ),
+                          const SizedBox(height: 12),
+                          const Text("แท็กทั้งหมด", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          const SizedBox(height: 4),
+                          const Text("#ครอบครัว #ความรัก ...", style: TextStyle(color: Color(0xFFED7D31), fontSize: 12)),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 20),
-                  // Card 2
+                  // Card 2 (Unchanged)
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildSmallCard(
-                          // ส่ง 3 รูปแรกไปทำ Stack
                           images: items.take(3).toList(),
                           title: "",
                           subtitle: "",
@@ -201,8 +209,9 @@ class MonthDetailPage extends StatelessWidget {
     );
   }
 
-  // --- Layout Helper Methods (คัดลอกมาจาก FinalPreviewSheet เพื่อให้ Layout เหมือนกัน) ---
-
+  // ... (Keep all your existing helper methods: _buildFullAlbumPreview, _buildPageContainer, _buildIconButton, _buildSmallCard, _buildPolaroidImage, _buildImage) ...
+  
+  // (Paste your existing helper methods here to keep the file complete)
   Widget _buildFullAlbumPreview() {
     return FittedBox(
       fit: BoxFit.scaleDown,
@@ -230,7 +239,7 @@ class MonthDetailPage extends StatelessWidget {
                       decoration: const BoxDecoration(color: Colors.white),
                       child: Center(
                         child: Text(
-                          monthName.split(' ')[0], // เอาแค่ชื่อเดือน
+                          monthName.split(' ')[0], 
                           style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -267,15 +276,21 @@ class MonthDetailPage extends StatelessWidget {
     return SizedBox(width: 160, height: 245, child: child);
   }
 
-  Widget _buildActionButton(IconData icon) {
+  Widget _buildIconButton(String iconPath) {
     return Container(
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8)),
+      padding: const EdgeInsets.all(10), 
+      child: Image.asset(
+        iconPath,
+        width: 20, 
+        height: 20, 
+        color: const Color(0xFF6BB0C5), 
+        fit: BoxFit.contain,
       ),
-      child: Icon(icon, color: const Color(0xFF67A5BA), size: 22),
     );
   }
 
@@ -374,11 +389,7 @@ class MonthDetailPage extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(4),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          )
+          BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 4, offset: const Offset(0, 2))
         ],
       ),
       child: Column(
@@ -412,6 +423,7 @@ class MonthDetailPage extends StatelessWidget {
   }
 }
 
+// Keep the existing _StaticPhotoSlot class
 class _StaticPhotoSlot extends StatelessWidget {
   final MediaItem item;
   const _StaticPhotoSlot({required this.item});

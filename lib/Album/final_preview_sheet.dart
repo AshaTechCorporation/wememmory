@@ -34,23 +34,22 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
       child: Column(
         children: [
           // ---------------------------------------------------------
-          // [ส่วนที่เพิ่ม] : Slide Indicator (แถบขีดด้านบน)
+          // Slide Indicator
           // ---------------------------------------------------------
-          const SizedBox(height: 12), // ระยะห่างจากขอบบนสุด
+          const SizedBox(height: 12),
           Container(
-            width: 61, // ความกว้างของขีด
-            height: 5, // ความหนาของขีด
+            width: 61,
+            height: 5,
             decoration: BoxDecoration(
-              color: Colors.grey[300], // สีเทาอ่อน
-              borderRadius: BorderRadius.circular(2.5), // ความมน
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2.5),
             ),
           ),
           // ---------------------------------------------------------
 
           // 1. Header
           Padding(
-            // ปรับระยะห่างด้านบนเป็น 10 (เดิม 20) เพื่อชดเชยพื้นที่ขีด
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+            padding: const EdgeInsets.fromLTRB(20, 13, 20, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -58,9 +57,14 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
                   'พรีวิวสุดท้าย & ยืนยัน',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
                 ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, size: 28, color: Colors.black54),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Image.asset(
+                    'assets/icons/cross.png',
+                    width: 25,
+                    height: 25,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ],
             ),
@@ -70,26 +74,50 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
 
           // 2. Steps Indicator
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.0),
+            padding: EdgeInsets.symmetric(horizontal: 7.0),
             child: Row(
               children: [
-                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true, isCompleted: true),
-                _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true, isCompleted: true),
-                _StepItem(label: 'พรีวิวสุดท้าย', isActive: true, isLast: true), 
+                // Step 1: เลือกรูปภาพ
+                _StepItem(
+                  label: 'เลือกรูปภาพ', 
+                  isActive: true,
+                  isFirst: true,
+                  isCompleted: true,
+                ),
+                // Step 2: แก้ไขและจัดเรียง
+                _StepItem(
+                  label: 'แก้ไขและจัดเรียง', 
+                  isActive: true,
+                  isCompleted: true, 
+                ),
+                // Step 3: พรีวิวสุดท้าย
+                _StepItem(
+                  label: 'พรีวิวสุดท้าย', 
+                  isActive: true, 
+                  isLast: true,
+                ),
               ],
             ),
           ),
 
           const SizedBox(height: 24),
 
-          // 3. Toggle Options
+          // 3. Toggle Options (เรียกใช้ Custom Toggle)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
               children: [
-                _buildToggleOption("พิมพ์พร้อมคำบรรยาย", _withCaption, (val) => setState(() => _withCaption = val)),
+                _buildCustomToggle(
+                  "พิมพ์พร้อมคำบรรยาย", 
+                  _withCaption, 
+                  (val) => setState(() => _withCaption = val)
+                ),
                 const SizedBox(height: 12),
-                _buildToggleOption("พิมพ์พร้อมวันที่", _withDate, (val) => setState(() => _withDate = val)),
+                _buildCustomToggle(
+                  "พิมพ์พร้อมวันที่", 
+                  _withDate, 
+                  (val) => setState(() => _withDate = val)
+                ),
               ],
             ),
           ),
@@ -105,12 +133,11 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
 
           const SizedBox(height: 16),
 
-          // 5. Album Preview Area (The Book)
+          // 5. Album Preview Area
           Expanded(
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // ✅ ใช้ Widget ที่แยกออกมาเพื่อแก้ปัญหาการกระพริบ
                   _AlbumPreviewSection(items: widget.items, monthName: widget.monthName),
 
                   const SizedBox(height: 20),
@@ -147,10 +174,10 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
 
           // 6. Bottom Buttons
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(16, 30 , 16, 99),
             decoration: const BoxDecoration(
               color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.black12)),
+              // border: Border(top: BorderSide(color: Colors.black12)),
             ),
             child: Column(
               children: [
@@ -198,23 +225,52 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
     );
   }
 
-  Widget _buildToggleOption(String label, bool value, Function(bool) onChanged) {
+  // ✅ ฟังก์ชัน Custom Toggle ที่ปรับปรุงให้ใช้ซ้ำได้
+  Widget _buildCustomToggle(String label, bool value, Function(bool) onChanged) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-        Switch(
-          value: value,
-          onChanged: onChanged,
-          activeColor: const Color.fromARGB(255, 255, 255, 255),
-          activeTrackColor: const Color(0xFFED7D31),
+        Text(
+          label, 
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)
+        ),
+        GestureDetector(
+          onTap: () => onChanged(!value),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 50,
+            height: 30,
+            padding: const EdgeInsets.all(3.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              // พื้นหลัง: สีส้ม (เปิด) / สีเทาอ่อน (ปิด)
+              color: value
+                  ? const Color(0xFFED7D31)
+                  : const Color(0xFFE0E0E0),
+            ),
+            child: AnimatedAlign(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeIn,
+              // สลับตำแหน่งซ้าย-ขวา
+              alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  // วงกลมเป็นสีขาวเมื่อเปิด, เป็นสีเทาเข้มเมื่อปิด
+                  color: value ? Colors.white : const Color(0xFFC7C7C7),
+                ),
+              ),
+            ),
+          ),
         ),
       ],
     );
   }
 }
 
-// ✅ แยก Widget แสดงผลอัลบั้มออกมาเป็น const เพื่อป้องกันการ Rebuild
+// _AlbumPreviewSection
 class _AlbumPreviewSection extends StatelessWidget {
   final List<MediaItem> items;
   final String monthName;
@@ -264,7 +320,7 @@ class _AlbumPreviewSection extends StatelessWidget {
                         // Slot 1-5: รูปภาพ
                         for (int i = 0; i < 5; i++)
                           if (i < items.length)
-                            _StaticPhotoSlot(item: items[i]) // ✅ ใช้ Widget ที่โหลดรูปแล้ว
+                            _StaticPhotoSlot(item: items[i])
                           else
                             const SizedBox(),
                       ],
@@ -304,7 +360,7 @@ class _AlbumPreviewSection extends StatelessWidget {
   }
 }
 
-// ✅ ปรับ _StaticPhotoSlot ให้เป็น Stateful เพื่อโหลดรูปครั้งเดียว
+// _StaticPhotoSlot
 class _StaticPhotoSlot extends StatefulWidget {
   final MediaItem item;
   const _StaticPhotoSlot({required this.item});
@@ -323,7 +379,6 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
   }
 
   Future<void> _loadImage() async {
-    // ถ้ามีรูปแคป ให้ใช้เลย
     if (widget.item.capturedImage != null) {
       if (mounted) {
         setState(() {
@@ -331,7 +386,6 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
         });
       }
     } else {
-      // ถ้าไม่มี ให้โหลด Thumbnail
       final data = await widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300));
       if (mounted) {
         setState(() {
@@ -356,7 +410,7 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
               if (_imageData != null)
                 Image.memory(_imageData!, fit: BoxFit.cover)
               else
-                Container(color: Colors.grey[200]), // Loading state
+                Container(color: Colors.grey[200]),
             ],
           ),
         ),
@@ -365,7 +419,7 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
   }
 }
 
-// ... _StepItem (เหมือนเดิม ไม่ต้องแก้) ...
+// _StepItem
 class _StepItem extends StatelessWidget {
   final String label;
   final bool isActive;
@@ -374,6 +428,7 @@ class _StepItem extends StatelessWidget {
   final bool isCompleted;
 
   const _StepItem({
+    super.key,
     required this.label,
     required this.isActive,
     this.isFirst = false,
@@ -383,48 +438,49 @@ class _StepItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const activeColor = Color(0xFF5AB6D8); 
-    const inactiveColor = Colors.grey;
-
     return Expanded(
       child: Column(
         children: [
           Row(
             children: [
               Expanded(
+                flex: 2,
                 child: Container(
-                  height: 2, 
-                  color: isFirst 
-                      ? Colors.transparent 
-                      : (isActive ? activeColor : Colors.grey[300]),
+                  height: 2,
+                  color: isFirst
+                      ? Colors.transparent
+                      : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]),
                 ),
               ),
+              const SizedBox(width: 40),
               Container(
-                width: 10, 
-                height: 10, 
+                width: 11,
+                height: 11,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle, 
-                  color: isActive ? activeColor : Colors.grey[300],
+                  shape: BoxShape.circle,
+                  color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300],
                 ),
               ),
+              const SizedBox(width: 40),
               Expanded(
+                flex: 2,
                 child: Container(
-                  height: 2, 
-                  color: isLast 
-                      ? Colors.transparent 
-                      : (isCompleted ? activeColor : Colors.grey[300]),
+                  height: 2,
+                  color: isLast
+                      ? Colors.transparent
+                      : (isCompleted ? const Color(0xFF5AB6D8) : Colors.grey[300]),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 5),
           Text(
-            label, 
-            textAlign: TextAlign.center, 
+            label,
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 10, 
-              color: isActive ? activeColor : Colors.grey[400], 
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              fontSize: 12,
+              color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400],
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
         ],

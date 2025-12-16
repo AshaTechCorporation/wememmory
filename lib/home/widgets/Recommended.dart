@@ -127,7 +127,7 @@ class _RecommendedState extends State<Recommended> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 420,
+      height: 416,
       width: double.infinity,
       child: Stack(
         alignment: Alignment.center,
@@ -142,7 +142,7 @@ class _RecommendedState extends State<Recommended> {
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = 330.0;
     final cardHeight = 330.0;
-    final centerPosition = (screenWidth - cardWidth) / 2;
+    final centerPosition = (screenWidth - cardWidth) / 1.8;
     final adjustedStartPosition = centerPosition - 25.0;
 
     if (index < _currentIndex) {
@@ -509,7 +509,7 @@ class _PhotoStack extends StatelessWidget {
         child: Container(
           width: polaroidWidth,
           height: polaroidHeight,
-          padding: const EdgeInsets.fromLTRB(2, 10, 2, 5),
+          padding: const EdgeInsets.fromLTRB(2, 10, 2, 9),
           decoration: BoxDecoration(
             color: color ?? Colors.white,
             boxShadow: [

@@ -5,6 +5,7 @@ import 'package:wememmory/collection/month_detail_page.dart';
 import 'package:wememmory/constants.dart';
 import 'package:wememmory/models/media_item.dart';
 
+// หน้า คอลเลกชันรูปภาพ
 class CollectionPage extends StatelessWidget {
   final List<MediaItem>? newAlbumItems;
   final String? newAlbumMonth;
