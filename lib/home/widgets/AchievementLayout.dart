@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 // --- Palette สี ---
-const Color _sidebarOrange = Color(0xFFF8B887); // สีขอบส้ม
-const Color _bgWhite = Colors.white; // สีพื้นหลังขาว
-const Color _textDark = Color(0xFF333333);
-const Color _textGrey = Color(0xFF757575);
-const Color _cardTeal = Color(0xFF6DA5B8); // สีฟ้าอมเขียว (Teal)
+const Color _sidebarOrange = Color(0xFFF8B887); 
+const Color _bgWhite = Colors.white; 
+const Color _cardTeal = Color(0xFF6DA5B8); 
+const Color _cardOrange = Color(0xFFEE743B);
+const Color _cardLightOrange = Color(0xFFF8B887);
+const Color _cardpurple = Color(0xFF8898F0);
 
 class AchievementLayout extends StatelessWidget {
   const AchievementLayout({super.key});
@@ -31,11 +32,10 @@ class AchievementLayout extends StatelessWidget {
           SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(34.0, 30.0, 0.0, 0.0),
+              padding: const EdgeInsets.fromLTRB(34.0, 3.0, 0.0, 0.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ส่วนหัว (Header)
                   const Padding(
                     padding: EdgeInsets.only(top: 50.0, right: 24.0),
                     child: _HeaderSection(),
@@ -45,46 +45,49 @@ class AchievementLayout extends StatelessWidget {
                   // ส่วน Cards
                   const Column(
                     children: [
-                      // เดือนเมษายน
+                      // เดือนเมษายน (สี Teal เดิม)
                       TimelineItem(
-                        monthLabel: 'เดือนเมษายนของคุณ',
+                        monthTitle: 'Apr', // ชื่อเดือนภาษาอังกฤษ
                         mainText: 'แชร์รูปภาพ 20 ครั้ง',
                         subText: 'แชร์รูปภาพมากที่สุดในปีนี้',
                         imagePath: 'assets/icons/shareLogo.png',
                         imgWidth: 67,
-                        imgHeight: 57.52,
+                        imgHeight: 57,
+                        cardColor: _cardTeal, // กำหนดสีการ์ด
                       ),
-                      // เดือนมีนาคม
+                      // เดือนมีนาคม (สีส้ม)
                       TimelineItem(
-                        monthLabel: 'เดือนมีนาคมของคุณ',
+                        monthTitle: 'Mar',
                         mainText: 'ใช้เวลาเพียง 15 นาที',
-                        subText: 'ในการสร้างอัลบั้มเดือนที่เร็วที่สุด',
-                        imagePath: 'assets/icons/semicircle.png',
+                        subText: 'ในการสร้างอัลบั้มเดือนนี้เร็วที่สุด',
+                        imagePath: 'assets/icons/limiter.png',
                         imgWidth: 82,
                         imgHeight: 76,
+                        cardColor: _cardOrange, // เปลี่ยนเป็นสีส้ม
                       ),
                       // เดือนกุมภาพันธ์
                       TimelineItem(
-                        monthLabel: 'เดือนกุมภาพันธ์ของคุณ',
+                        monthTitle: 'Feb',
                         mainText: 'อธิบายภาพในเดือนนี้',
                         subText: 'บันทึกเรื่องราวของเดือนนี้มากที่สุด',
-                        imagePath: 'assets/icons/percent.png',
-                        imgWidth: 82,
-                        imgHeight: 103,
-                        isFill: true, // ตัวอย่างการส่ง flag ว่า fill (ถ้าต้องการใช้)
+                        imagePath: 'assets/icons/76p.png',
+                        imgWidth: 92,
+                        imgHeight: 92,
+                        isFill: true,
+                        cardColor: _cardLightOrange,
                       ),
                       // เดือนมกราคม
                       TimelineItem(
-                        monthLabel: 'เดือนมกราคมของคุณ',
+                        monthTitle: 'Jan',
                         mainText: 'ความทรงจำครั้งแรก',
                         subText: 'สร้างความทรงจำครั้งแรก',
-                        imagePath: 'assets/icons/book2.png',
-                        imgWidth: 61,
-                        imgHeight: 90,
+                        imagePath: 'assets/icons/bookp.png',
+                        imgWidth: 76,
+                        imgHeight: 98,
+                        cardColor: _cardpurple,
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 120),
                 ],
               ),
@@ -96,56 +99,23 @@ class AchievementLayout extends StatelessWidget {
   }
 }
 
-// -----------------------------------------------------------------
-// 📌 1. Header Section
-// -----------------------------------------------------------------
+// ... _HeaderSection (คงเดิม) ...
 class _HeaderSection extends StatelessWidget {
   const _HeaderSection();
-
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ✅ ปรับ: นำรูปภาพและข้อความ "ผลงานประจำปีของคุณ" มาอยู่ใน Row เดียวกัน
         Row(
-          crossAxisAlignment: CrossAxisAlignment.center, // จัดกึ่งกลางแนวตั้ง
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/images/image2.png',
-              height: 24, // ความสูงรูปเท่าเดิม
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  color: Colors.orange,
-                  child: const Text("WE MEMORY",
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                );
-              },
-            ),
-            const SizedBox(width: 12), // ระยะห่างระหว่างรูปกับข้อความ
-            
-            // ✅ ปรับ: ข้อความ "ผลงานประจำปีของคุณ" ขนาด 32
-            const Text(
-              'ปีนี้ของเรา',
-              style: TextStyle(
-                fontSize: 32, // ขนาด 32 ตามที่ต้องการ
-                fontWeight: FontWeight.w400,
-                color: _textDark,
-              ),
+              'assets/icons/wemoryv2.png',
+              height: 103,
+              width: 154,
             ),
           ],
-        ),
-        
-        const SizedBox(height: 2), // ระยะห่างระหว่างบรรทัดบนกับบรรทัดล่าง
-        
-        const Text(
-          'เรื่องราวการเติบโตของฉัน',
-          style: TextStyle(
-            fontSize: 16,
-            color: _textGrey,
-          ),
         ),
       ],
     );
@@ -153,26 +123,28 @@ class _HeaderSection extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------
-// 📌 2. Timeline Item Structure
+// 📌 2. Timeline Item Structure (Updated)
 // -----------------------------------------------------------------
 class TimelineItem extends StatelessWidget {
-  final String monthLabel;
+  final String monthTitle; // ชื่อเดือนตัวใหญ่ (Ex: Mar)
   final String mainText;
   final String subText;
   final String imagePath;
   final double imgWidth;
   final double imgHeight;
-  final bool isFill; // สำหรับ case 'fill' ของเดือนกุมภาพันธ์ (ถ้าต้องการจัดการพิเศษ)
+  final bool isFill;
+  final Color cardColor; // สีพื้นหลังการ์ด
 
   const TimelineItem({
     super.key,
-    required this.monthLabel,
+    required this.monthTitle,
     required this.mainText,
     required this.subText,
     required this.imagePath,
     required this.imgWidth,
     required this.imgHeight,
     this.isFill = false,
+    this.cardColor = _cardTeal, // Default color
   });
 
   @override
@@ -180,38 +152,41 @@ class TimelineItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: _DetailCard(
-        monthLabel: monthLabel,
+        monthTitle: monthTitle,
         mainText: mainText,
         subText: subText,
         imagePath: imagePath,
         imgWidth: imgWidth,
         imgHeight: imgHeight,
         isFill: isFill,
+        cardColor: cardColor,
       ),
     );
   }
 }
 
 // -----------------------------------------------------------------
-// 📌 3. Detail Card UI
+// 📌 3. Detail Card UI (Updated Layout)
 // -----------------------------------------------------------------
 class _DetailCard extends StatelessWidget {
-  final String monthLabel;
+  final String monthTitle;
   final String mainText;
   final String subText;
   final String imagePath;
   final double imgWidth;
   final double imgHeight;
   final bool isFill;
+  final Color cardColor;
 
   const _DetailCard({
-    required this.monthLabel,
+    required this.monthTitle,
     required this.mainText,
     required this.subText,
     required this.imagePath,
     required this.imgWidth,
     required this.imgHeight,
     required this.isFill,
+    required this.cardColor,
   });
 
   @override
@@ -220,7 +195,7 @@ class _DetailCard extends StatelessWidget {
       width: double.infinity,
       height: 143,
       decoration: BoxDecoration(
-        color: _cardTeal,
+        color: cardColor, // ใช้สีที่ส่งมา
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           bottomLeft: Radius.circular(20),
@@ -237,38 +212,35 @@ class _DetailCard extends StatelessWidget {
       ),
       child: Stack(
         children: [
+          // 1. Month Title (ตัวหนังสือจางๆ ด้านหลัง)
+          Positioned(
+            top: -8,
+            left: 20,
+            child: Text(
+              monthTitle,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.3), // สีจางๆ
+                fontSize: 60,
+                fontWeight: FontWeight.bold,
+                height: 1.0,
+              ),
+            ),
+          ),
+          
+          // 2. Main Content (ข้อความหลัก)
           Padding(
             padding: const EdgeInsets.only(left: 20, right: 80),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Tag เดือน
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    monthLabel,
-                    style: const TextStyle(
-                      color: _cardTeal,
-                      fontSize: 12,
-                      // fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                
-                const SizedBox(height: 12),
-
+                const SizedBox(height: 30), // เว้นที่ให้ Title ด้านบนนิดนึง
                 Text(
                   mainText,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
-                    fontWeight: FontWeight.bold ,
+                    fontWeight: FontWeight.bold,
                     height: 1.2,
                   ),
                 ),
@@ -278,15 +250,16 @@ class _DetailCard extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.9),
                     fontSize: 14,
+                    fontWeight: FontWeight.w300, // ปรับน้ำหนักให้บางลงนิดหน่อยตามภาพ
                   ),
                 ),
               ],
             ),
           ),
 
-          // Icon ด้านขวา (ใช้ Image.asset)
+          // 3. Icon ด้านขวา
           Positioned(
-            right: 16,
+            right: 18,
             top: 0,
             bottom: 0,
             child: Center(
@@ -294,9 +267,8 @@ class _DetailCard extends StatelessWidget {
                 imagePath,
                 width: imgWidth,
                 height: imgHeight,
-                fit: isFill ? BoxFit.fill : BoxFit.contain, // ใช้ BoxFit ตามต้องการ
+                fit: isFill ? BoxFit.fill : BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
-                  // Fallback ถ้าหาภาพไม่เจอ
                   return const Icon(Icons.broken_image, color: Colors.white, size: 50);
                 },
               ),

@@ -1,3 +1,5 @@
+import 'dart:ui'; // ✅ จำเป็นสำหรับ ImageFilter.blur
+
 import 'package:flutter/material.dart';
 import 'package:wememmory/Album/createAlbumModal.dart';
 import 'package:wememmory/constants.dart';
@@ -8,6 +10,7 @@ import 'package:wememmory/profile/profilePage.dart';
 import 'package:wememmory/models/media_item.dart';
 
 class FirstPage extends StatefulWidget {
+  // ... (คงเดิม)
   final int initialIndex;
   final List<MediaItem>? newAlbumItems;
   final String? newAlbumMonth;
@@ -24,6 +27,7 @@ class FirstPage extends StatefulWidget {
 }
 
 class _FirstPageState extends State<FirstPage> {
+  // ... (คงเดิม)
   late int _currentIndex;
 
   @override
@@ -43,6 +47,7 @@ class _FirstPageState extends State<FirstPage> {
 
   @override
   Widget build(BuildContext context) {
+    // ... (pages list คงเดิม)
     final List<Widget> pages = [
       const HomePage(),
       CollectionPage(
@@ -65,6 +70,7 @@ class _FirstPageState extends State<FirstPage> {
               children: pages,
             ),
           ),
+          // ✅ ปรับ Positioned ให้ชิดขอบล่าง
           Positioned(
             left: 0,
             right: 0,
@@ -86,6 +92,7 @@ class _FirstPageState extends State<FirstPage> {
   }
 }
 
+// ✅✅✅ ส่วนที่ปรับปรุงหลัก: CustomBottomNavBar ✅✅✅
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
@@ -98,119 +105,147 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // กำหนดสีไอคอน
-    const Color activeIconColor = Color(0xFFEE743B); // #EE743B
-    const Color inactiveIconColor = Color(0xFFF8B887); // #F8B887
-    
-    const Color centerButtonColor = Color(0xFFFFB085);
+    // สีต่างๆ คงเดิม
+    const Color activeIconColor = Color(0xFF67A5BA); 
+    const Color inactiveIconColor = Color(0xFF555555); 
+    const Color centerButtonColor = Color(0xFFED7D31); 
+    const Color staticTextColor = Color(0xFF3C3C3B); 
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-      child: Container(
-        height: 75,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
+    // ✅ เอา Padding รอบนอกออกเพื่อให้เต็มจอ
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        // --- Layer 1: Shadow (เงาด้านบน) ---
+        Container(
+          height: 80, // ปรับความสูงเล็กน้อยให้รับกับ Safe Area ด้านล่าง
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05), // เงาบางๆ ด้านบน
+                blurRadius: 10,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // 1. หน้าหลัก (homePage.png) - w 20 x h 21.88
-            Expanded(
-              child: _buildNavItem(
-                iconPath: 'assets/icons/homePage.png',
-                label: 'หน้าหลัก',
-                index: 0,
-                isActive: currentIndex == 0,
-                activeColor: activeIconColor,
-                inactiveColor: inactiveIconColor,
-                width: 20,
-                height: 21.88,
+        // --- Layer 2: Blurred Background & Content ---
+        ClipRRect(
+          // ✅ ปรับ Radius เฉพาะด้านบน (ถ้าต้องการให้ดูมนๆ) หรือลบออกถ้าอยากได้เหลี่ยม
+          // borderRadius: const BorderRadius.only(
+          //   topLeft: Radius.circular(20),
+          //   topRight: Radius.circular(20),
+          // ),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+            child: Container(
+              height: 96, // ความสูงแถบ
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.5),
+                // border: Border(top: BorderSide(color: Colors.white.withOpacity(0.2), width: 0.5)), // ขอบบนบางๆ
               ),
-            ),
-            
-            // 2. สมุดภาพ (albumPage.png) - w 22.5 x h 25
-            Expanded(
-              child: _buildNavItem(
-                iconPath: 'assets/icons/albumPage.png',
-                label: 'สมุดภาพ',
-                index: 1,
-                isActive: currentIndex == 1,
-                activeColor: activeIconColor,
-                inactiveColor: inactiveIconColor,
-                width: 25,
-                height: 25,
-              ),
-            ),
+              child: SafeArea( // ✅ เพิ่ม SafeArea เพื่อรองรับมือถือรุ่นใหม่ (ไม่มีปุ่มโฮม)
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 12, 10, 0), // Padding ซ้ายขวาภายใน
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // 1. หน้าหลัก
+                      Expanded(
+                        child: _buildNavItem(
+                          iconPath: 'assets/icons/homePage.png',
+                          label: 'หน้าหลัก',
+                          index: 0,
+                          isActive: currentIndex == 0,
+                          activeColor: activeIconColor,
+                          inactiveColor: inactiveIconColor,
+                          textColor: staticTextColor,
+                          width: 20,
+                          height: 21.88,
+                        ),
+                      ),
+                      
+                      // 2. สมุดภาพ
+                      Expanded(
+                        child: _buildNavItem(
+                          iconPath: 'assets/icons/albumPage.png',
+                          label: 'สมุดภาพ',
+                          index: 1,
+                          isActive: currentIndex == 1,
+                          activeColor: activeIconColor,
+                          inactiveColor: inactiveIconColor,
+                          textColor: staticTextColor,
+                          width: 25,
+                          height: 25,
+                        ),
+                      ),
 
-            // 3. ปุ่มตรงกลาง (Add Button)
-            Expanded(
-              child: Center(
-                child: GestureDetector(
-                  onTap: () => onTap(2),
-                  child: Container(
-                    width: 55,
-                    height: 55,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: centerButtonColor,
-                      shape: BoxShape.circle,
-                      // boxShadow: [
-                      //   BoxShadow(
-                      //     color: centerButtonColor.withOpacity(0.4),
-                      //     blurRadius: 15,
-                      //     offset: const Offset(0, 6),
-                      //   )
-                      // ],
-                    ),
-                    child: const Icon(Icons.add, color: Colors.white, size: 40),
+                      // 3. ปุ่มตรงกลาง (Add Button)
+                      Expanded(
+                        child: Center(
+                          child: GestureDetector(
+                            onTap: () => onTap(2),
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              alignment: Alignment.center,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                              ),
+                              child: Image.asset(
+                                'assets/icons/btupload.png',
+                                width: 44,
+                                height: 44,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // 4. ร้านค้า
+                      Expanded(
+                        child: _buildNavItem(
+                          iconPath: 'assets/icons/ShopPage.png',
+                          label: 'ร้านค้า',
+                          index: 3,
+                          isActive: currentIndex == 3,
+                          activeColor: activeIconColor,
+                          inactiveColor: inactiveIconColor,
+                          textColor: staticTextColor,
+                          width: 20,
+                          height: 25,
+                        ),
+                      ),
+
+                      // 5. บัญชี
+                      Expanded(
+                        child: _buildNavItem(
+                          iconPath: 'assets/icons/ProfilePage.png',
+                          label: 'บัญชี',
+                          index: 4,
+                          isActive: currentIndex == 4,
+                          activeColor: activeIconColor,
+                          inactiveColor: inactiveIconColor,
+                          textColor: staticTextColor,
+                          width: 22.5,
+                          height: 22.5,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-
-            // 4. ร้านค้า (ShopPage.png) - w 20 x h 25
-            Expanded(
-              child: _buildNavItem(
-                iconPath: 'assets/icons/ShopPage.png',
-                label: 'ร้านค้า',
-                index: 3,
-                isActive: currentIndex == 3,
-                activeColor: activeIconColor,
-                inactiveColor: inactiveIconColor,
-                width: 20,
-                height: 25,
-              ),
-            ),
-
-            // 5. บัญชี (ProfilePage.png) - w 22.5 x h 22.5
-            Expanded(
-              child: _buildNavItem(
-                iconPath: 'assets/icons/ProfilePage.png',
-                label: 'บัญชี',
-                index: 4,
-                isActive: currentIndex == 4,
-                activeColor: activeIconColor,
-                inactiveColor: inactiveIconColor,
-                width: 22.5,
-                height: 22.5,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
-  // ✅ ฟังก์ชันสร้าง Item (ปรับปรุงให้ Label ตรงกัน)
+  // ✅ ฟังก์ชันสร้าง Item (คงเดิม)
   Widget _buildNavItem({
     required String iconPath,
     required String label,
@@ -218,6 +253,7 @@ class CustomBottomNavBar extends StatelessWidget {
     required bool isActive,
     required Color activeColor,
     required Color inactiveColor,
+    required Color textColor,
     required double width,
     required double height,
   }) {
@@ -227,9 +263,6 @@ class CustomBottomNavBar extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // ✅ ใช้ SizedBox ครอบรูปภาพด้วยความสูงคงที่ (28px)
-          // เพื่อให้พื้นที่ของ Icon เท่ากันทุกปุ่ม ไม่ว่ารูปจริงจะสูงเท่าไหร่
-          // (รูปสูงที่สุดคือ 25px ดังนั้น 28px จึงเพียงพอและเหลือช่องว่างนิดหน่อย)
           SizedBox(
             height: 28, 
             child: Center(
@@ -242,13 +275,13 @@ class CustomBottomNavBar extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 4), // ระยะห่างคงที่
+          const SizedBox(height: 2),
           Text(
             label,
             style: TextStyle(
-              color: const Color(0xFF3C3C3B), // สีดำเสมอ
-              fontSize: 12,
-              // fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              color: textColor, 
+              fontSize: 10, // ปรับขนาดตัวหนังสือให้พอดี
+              fontWeight: FontWeight.w500,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

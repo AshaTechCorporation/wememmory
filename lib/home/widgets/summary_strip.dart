@@ -87,7 +87,7 @@ class SubscriptionCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0x33C4C4C4),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: const Color.fromARGB(255, 129, 129, 129).withOpacity(0.15),
@@ -236,7 +236,7 @@ class InfoCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0x33C4C4C4),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: const Color.fromARGB(255, 129, 129, 129).withOpacity(0.15),
