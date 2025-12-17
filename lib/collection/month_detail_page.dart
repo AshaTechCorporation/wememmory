@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'dart:math'; // ใช้สำหรับสุ่มรูปภาพพื้นหลัง
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:wememmory/models/media_item.dart';
+import 'package:wememmory/models/media_item.dart'; // ตรวจสอบ path นี้ให้ถูกต้อง
 
 class MonthDetailPage extends StatelessWidget {
   final String monthName;
@@ -54,7 +54,8 @@ class MonthDetailPage extends StatelessWidget {
                               return Image.memory(
                                 snapshot.data!,
                                 fit: BoxFit.cover,
-                                color: Colors.black.withOpacity(0.3), // ปรับให้มืดลงนิดหน่อยเพื่อให้ตัวหนังสือชัด
+                                // ปรับให้มืดลงนิดหน่อยเพื่อให้ตัวหนังสือชัด
+                                color: Colors.black.withOpacity(0.3), 
                                 colorBlendMode: BlendMode.darken,
                               );
                             }
@@ -113,7 +114,7 @@ class MonthDetailPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 2. Action Buttons & Status (ส่วนนี้เพิ่มเข้ามาเพื่อให้ Layout สมบูรณ์ตามภาพเดิม)
+            // 2. Action Buttons & Status
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Row(
@@ -201,7 +202,7 @@ class MonthDetailPage extends StatelessWidget {
     );
   }
 
-  // --- Layout Helper Methods (คัดลอกมาจาก FinalPreviewSheet เพื่อให้ Layout เหมือนกัน) ---
+  // --- Layout Helper Methods ---
 
   Widget _buildFullAlbumPreview() {
     return FittedBox(

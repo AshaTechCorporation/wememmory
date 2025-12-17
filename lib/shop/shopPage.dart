@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wememmory/shop/albumGifePage.dart';
+import 'package:wememmory/shop/albumGiftPage.dart';
 import 'package:wememmory/shop/termsAndServicesPage.dart';
 import 'package:wememmory/shop/faqPage.dart';
 import 'package:wememmory/profile/membershipPayment.dart';
@@ -29,11 +29,13 @@ class _ShopAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: false, // <--- เพิ่มบรรทัดนี้เพื่อซ่อนปุ่มย้อนกลับ
       backgroundColor: Colors.white,
       elevation: 0,
       titleSpacing: 0,
       title: const Padding(
-        padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+        // ปรับ padding ซ้ายเพิ่มขึ้นนิดหน่อยเพื่อให้ไม่ชิดขอบจอเกินไปเมื่อไม่มีลูกศร
+        padding: EdgeInsets.fromLTRB(16, 8, 8, 8), 
         child: Text('ร้านความทรงจำ', style: TextStyle(color: Colors.black)),
       ),
       foregroundColor: Colors.black,
