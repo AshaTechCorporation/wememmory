@@ -19,6 +19,9 @@ class _OtpPageState extends State<OtpPage> {
       List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
+  // ✅ เพิ่มตัวแปรเช็ค Error
+  bool _hasError = false;
+
   static const Color _bgCream = Color(0xFFF4F6F8);
   static const Color _primaryOrange = Color(0xFFE18253);
   static const Color _textGrey = Color(0xFF7A7A7A);
@@ -32,6 +35,13 @@ class _OtpPageState extends State<OtpPage> {
   }
 
   void _onFieldChanged(String value, int index) {
+    // เมื่อมีการพิมพ์ ให้เคลียร์ Error ออกก่อน
+    if (_hasError) {
+      setState(() {
+        _hasError = false;
+      });
+    }
+
     if (value.length == 1 && index < 5) {
       _focusNodes[index + 1].requestFocus();
     } else if (value.isEmpty && index > 0) {
@@ -98,7 +108,8 @@ class _OtpPageState extends State<OtpPage> {
                       children: [
                         GestureDetector(
                           onTap: () => Navigator.pop(context),
-                          child: const Icon(Icons.arrow_back, color: Colors.black),
+                          child:
+                              const Icon(Icons.arrow_back, color: Colors.black),
                         ),
                         const SizedBox(height: 20),
                         const Text(
@@ -115,6 +126,8 @@ class _OtpPageState extends State<OtpPage> {
                           ),
                         ),
                         const SizedBox(height: 30),
+                        
+                        // --- OTP Fields ---
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: List.generate(6, (index) {
@@ -137,19 +150,45 @@ class _OtpPageState extends State<OtpPage> {
                                   contentPadding:
                                       const EdgeInsets.symmetric(vertical: 8),
                                   enabledBorder: UnderlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.grey.shade300),
-                                  ),
-                                  focusedBorder: const UnderlineInputBorder(
+                                    // เปลี่ยนสีเส้นเมื่อมี Error
                                     borderSide: BorderSide(
-                                        color: _primaryOrange, width: 2),
+                                        color: _hasError 
+                                            ? Colors.red 
+                                            : Colors.grey.shade300),
+                                  ),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: _hasError 
+                                            ? Colors.red 
+                                            : _primaryOrange, 
+                                        width: 2),
                                   ),
                                 ),
                               ),
                             );
                           }),
                         ),
-                        const SizedBox(height: 32),
+                        
+                        // --- ✅ ส่วนแสดงข้อความ Error (เพิ่มใหม่ตรงนี้) ---
+                        if (_hasError)
+                          const Padding(
+                            padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
+                            child: Text(
+                              'รหัส OTP ไม่ถูกต้อง กรุณาส่งรหัสใหม่อีกครั้ง',
+                              style: TextStyle(
+                                color: Color(0xFFE57373), // สีแดงอ่อนๆ ตามรูป
+                                fontSize: 14,
+                              ),
+                            ),
+                          )
+                        else
+                          // ใส่ SizedBox เปล่าๆ ไว้จองพื้นที่หรือระยะห่าง (Optional)
+                          const SizedBox(height: 24), // ถ้าไม่มี Error ให้เว้นระยะปกติ (32-8 = 24 โดยประมาณ)
+
+                        // ถ้ามี Error แล้ว เราใส่ padding ใน if แล้ว ถ้าไม่มี Error เราใช้ SizedBox ด้านบนแทน
+                        // ดังนั้นบรรทัดนี้ปรับเป็นระยะห่างที่เหลือ
+                        const SizedBox(height: 8), 
+
                         SizedBox(
                           width: double.infinity,
                           height: 46,
@@ -163,26 +202,27 @@ class _OtpPageState extends State<OtpPage> {
                               elevation: 0,
                             ),
                             onPressed: () {
-                              // ✅ 1. รวมข้อความจาก Controller ทั้ง 6 ตัว
-                              String inputOtp = _controllers.map((c) => c.text).join();
+                              String inputOtp =
+                                  _controllers.map((c) => c.text).join();
 
-                              // ✅ 2. ตรวจสอบเงื่อนไข
                               if (inputOtp == "111111") {
-                                // ถ้าถูกต้อง ให้ไปหน้าถัดไป
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const UsernamePage()),
+                                      builder: (context) =>
+                                          const UsernamePage()),
                                 );
                               } else {
-                                // ✅ 3. ถ้าผิด ให้แจ้งเตือน (SnackBar)
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('รหัส OTP ไม่ถูกต้อง กรุณาลองใหม่'),
-                                    backgroundColor: Colors.red,
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
+                                // ✅ 1. แสดง Error Text
+                                setState(() {
+                                  _hasError = true;
+                                });
+
+                                // ✅ 2. ล้างข้อมูล และกลับไปช่องแรก
+                                for (var controller in _controllers) {
+                                  controller.clear();
+                                }
+                                _focusNodes[0].requestFocus();
                               }
                             },
                             child: const Text(
@@ -196,12 +236,16 @@ class _OtpPageState extends State<OtpPage> {
                         Center(
                           child: TextButton(
                             onPressed: () {
-                                // เพิ่ม Logic ส่งรหัสใหม่ที่นี่
+                              // เมื่อกดส่งรหัสใหม่ ให้เคลียร์ Error ด้วยก็ได้
+                              setState(() {
+                                _hasError = false;
+                              });
+                              // Logic ส่งรหัสใหม่
                             },
                             child: const Text(
                               'ส่งรหัสใหม่',
-                              style:
-                                  TextStyle(color: _primaryOrange, fontSize: 14),
+                              style: TextStyle(
+                                  color: _primaryOrange, fontSize: 14),
                             ),
                           ),
                         ),
