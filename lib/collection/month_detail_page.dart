@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/collection/MemorySlidePage.dart';
 import 'package:wememmory/models/media_item.dart';
-// import your new page here if it's in a separate file, e.g.:
-// import 'memory_slide_page.dart'; 
 
 class MonthDetailPage extends StatelessWidget {
   final String monthName;
@@ -30,7 +28,9 @@ class MonthDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ... (Your existing Header Stack code remains unchanged) ...
+            // ---------------------------------------------------------
+            // 1. Header Stack (คงเดิม)
+            // ---------------------------------------------------------
             Stack(
               children: [
                 Container(
@@ -43,24 +43,28 @@ class MonthDetailPage extends StatelessWidget {
                       colors: [Color(0xFF8E8E8E), Color(0xFF4A4A4A)],
                     ),
                   ),
-                  child: bgItem != null
-                      ? FutureBuilder<Uint8List?>(
-                          future: bgItem.capturedImage != null
-                              ? Future.value(bgItem.capturedImage)
-                              : bgItem.asset.thumbnailDataWithSize(const ThumbnailSize(800, 800)),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData && snapshot.data != null) {
-                              return Image.memory(
-                                snapshot.data!,
-                                fit: BoxFit.cover,
-                                color: Colors.black.withOpacity(0.3),
-                                colorBlendMode: BlendMode.darken,
-                              );
-                            }
-                            return Container();
-                          },
-                        )
-                      : Container(),
+                  child:
+                      bgItem != null
+                          ? FutureBuilder<Uint8List?>(
+                            future:
+                                bgItem.capturedImage != null
+                                    ? Future.value(bgItem.capturedImage)
+                                    : bgItem.asset.thumbnailDataWithSize(
+                                      const ThumbnailSize(800, 800),
+                                    ),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData && snapshot.data != null) {
+                                return Image.memory(
+                                  snapshot.data!,
+                                  fit: BoxFit.cover,
+                                  color: Colors.black.withOpacity(0.3),
+                                  colorBlendMode: BlendMode.darken,
+                                );
+                              }
+                              return Container();
+                            },
+                          )
+                          : Container(),
                 ),
                 Positioned(
                   top: 50,
@@ -70,11 +74,19 @@ class MonthDetailPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                          size: 28,
+                        ),
                         onPressed: () => Navigator.pop(context),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.arrow_forward, color: Colors.white, size: 28),
+                        icon: const Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                          size: 28,
+                        ),
                         onPressed: () {},
                       ),
                     ],
@@ -92,7 +104,13 @@ class MonthDetailPage extends StatelessWidget {
                           color: Colors.white,
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          shadows: [Shadow(blurRadius: 4, color: Colors.black45, offset: Offset(0, 2))],
+                          shadows: [
+                            Shadow(
+                              blurRadius: 4,
+                              color: Colors.black45,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -108,7 +126,9 @@ class MonthDetailPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // ... (Your existing Action Buttons code remains unchanged) ...
+            // ---------------------------------------------------------
+            // 2. Action Buttons (คงเดิม)
+            // ---------------------------------------------------------
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Row(
@@ -131,7 +151,9 @@ class MonthDetailPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // ... (Your existing Album Layout code remains unchanged) ...
+            // ---------------------------------------------------------
+            // 3. Album Layout (คงเดิม)
+            // ---------------------------------------------------------
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -141,67 +163,89 @@ class MonthDetailPage extends StatelessWidget {
 
             const SizedBox(height: 40),
 
-            // 4. Bottom Cards (Modified Section)
+            // ---------------------------------------------------------
+            // 4. Bottom Cards (แก้ไขใหม่ Layout ตามภาพ)
+            // ---------------------------------------------------------
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // -------------------------------------------------------------
-                  // ✅ Card 1: Added GestureDetector to navigate to new page
-                  // -------------------------------------------------------------
+                  // ✅ Card 1: Stacked Polaroids (ซ้อนกัน 3 ใบ)
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
+                        // กดที่ภาพแล้วไปหน้า MemorySlidePage
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MemorySlidePage(
-                              monthName: monthName,
-                              items: items,
-                            ),
+                            builder:
+                                (context) => MemorySlidePage(
+                                  monthName: monthName,
+                                  items: items,
+                                ),
                           ),
                         );
                       },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildSmallCard(
-                            images: items.isNotEmpty ? [items[0]] : [],
-                            title: "อากาศดี วิวสวย",
-                            subtitle: "#ครอบครัว #ความรัก",
+                          // ส่วนรูปภาพซ้อนกัน
+                          _buildPolaroidStack(),
+                          const SizedBox(height: 16),
+                          // ส่วน Text
+                          const Text(
+                            "แท็กทั้งหมด",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
-                          const SizedBox(height: 12),
-                          const Text("แท็กทั้งหมด", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           const SizedBox(height: 4),
-                          const Text("#ครอบครัว #ความรัก ...", style: TextStyle(color: Color(0xFFED7D31), fontSize: 12)),
+                          const Text(
+                            "#ครอบครัว #ความรัก #ความรัก ...",
+                            style: TextStyle(
+                              color: Color(0xFFED7D31),
+                              fontSize: 12,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ],
                       ),
                     ),
                   ),
+
                   const SizedBox(width: 20),
-                  // Card 2 (Unchanged)
+
+                  // ✅ Card 2: Fanned Images (เรียงแบบพัด 4 รูป)
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSmallCard(
-                          images: items.take(3).toList(),
-                          title: "",
-                          subtitle: "",
-                          isPile: true,
+                        // ส่วนรูปภาพเรียงกัน
+                        _buildFanImageStack(),
+                        const SizedBox(height: 16),
+                        // ส่วน Text
+                        const Text(
+                          "การแชร์ของเดือนนี้",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                        const SizedBox(height: 12),
-                        const Text("การแชร์ของเดือนนี้", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         const SizedBox(height: 4),
-                        const Text("ผู้ที่เข้าชม 23+", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                        const Text(
+                          "ผู้ที่เข้าชม 23+",
+                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 40),
           ],
         ),
@@ -209,17 +253,168 @@ class MonthDetailPage extends StatelessWidget {
     );
   }
 
-  // ... (Keep all your existing helper methods: _buildFullAlbumPreview, _buildPageContainer, _buildIconButton, _buildSmallCard, _buildPolaroidImage, _buildImage) ...
-  
-  // (Paste your existing helper methods here to keep the file complete)
+  // ---------------------------------------------------------------------------
+  // ✅ Helper Method: Card 1 (Polaroid Stack Layout)
+  // ---------------------------------------------------------------------------
+  Widget _buildPolaroidStack() {
+    // ใช้รูปแรกเป็นรูปหลัก ถ้าไม่มีรูปให้แสดงว่างๆ
+    final mainItem = items.isNotEmpty ? items[0] : null;
+
+    return SizedBox(
+      height: 160, // ความสูงพื้นที่แสดงผล Stack
+      child: Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          // ใบที่ 1 (ล่างสุด - เอียงซ้าย)
+          Positioned(
+            left: -10,
+            child: Transform.rotate(
+              angle: -0.15,
+              child: Container(
+                width: 110,
+                height: 140,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+              ),
+            ),
+          ),
+          // ใบที่ 2 (กลาง - เอียงขวา)
+          Positioned(
+            right: -10,
+            child: Transform.rotate(
+              angle: 0.15,
+              child: Container(
+                width: 110,
+                height: 140,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+              ),
+            ),
+          ),
+          // ใบที่ 3 (บนสุด - ตรงกลาง มีรูป)
+          Container(
+            width: 110,
+            height: 150,
+            padding: const EdgeInsets.all(8), // ขอบขาว
+            decoration: BoxDecoration(
+              color: Colors.white,
+              // borderRadius: BorderRadius.circular(4),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child:
+                      mainItem != null
+                          ? ClipRRect(
+                            borderRadius: BorderRadius.circular(2),
+                            child: _buildImage(mainItem),
+                          )
+                          : Container(color: Colors.grey[200]),
+                ),
+                const SizedBox(height: 20), // พื้นที่ด้านล่างสไตล์โพลารอยด์
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // ✅ Helper Method: Card 2 (Fan Image Layout - 4 Images)
+  // ---------------------------------------------------------------------------
+  Widget _buildFanImageStack() {
+    // ดึงมาสูงสุด 4 รูป
+    final displayItems = items.take(4).toList();
+
+    return SizedBox(
+      height: 160,
+      child: Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          // สร้าง Loop แสดงรูปซ้อนกัน
+          for (int i = 0; i < 4; i++)
+            if (i < displayItems.length)
+              _buildFanItem(displayItems[i], index: i),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFanItem(MediaItem item, {required int index}) {
+    // คำนวณตำแหน่งและการหมุน
+    // index 0: ซ้ายสุด, index 3: ขวาสุด
+    double leftOffset = index * 25.0; // ขยับขวาทีละนิด
+    double angle = -0.1 + (index * 0.08); // หมุนจากซ้ายไปขวา
+    double scale = 1.0;
+
+    return Positioned(
+      left: leftOffset,
+      child: Transform.rotate(
+        angle: angle,
+        child: Container(
+          width: 90,
+          height: 90,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(2, 2),
+              ),
+            ],
+            border: Border.all(color: Colors.white, width: 2),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: _buildImage(item),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Helper Methods เดิม (คงไว้)
+  // ---------------------------------------------------------------------------
+
   Widget _buildFullAlbumPreview() {
     return FittedBox(
       fit: BoxFit.scaleDown,
       child: Container(
         padding: const EdgeInsets.all(10),
-        decoration: const BoxDecoration(
-          color: Color(0xFF555555),
-        ),
+        decoration: const BoxDecoration(color: Color(0xFF555555)),
         child: IntrinsicWidth(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -239,13 +434,19 @@ class MonthDetailPage extends StatelessWidget {
                       decoration: const BoxDecoration(color: Colors.white),
                       child: Center(
                         child: Text(
-                          monthName.split(' ')[0], 
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                          monthName.split(' ')[0],
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                     for (int i = 0; i < 5; i++)
-                      if (i < items.length) _StaticPhotoSlot(item: items[i]) else const SizedBox(),
+                      if (i < items.length)
+                        _StaticPhotoSlot(item: items[i])
+                      else
+                        const SizedBox(),
                   ],
                 ),
               ),
@@ -261,7 +462,10 @@ class MonthDetailPage extends StatelessWidget {
                   padding: EdgeInsets.zero,
                   children: [
                     for (int i = 0; i < 6; i++)
-                      if ((i + 5) < items.length) _StaticPhotoSlot(item: items[i + 5]) else const SizedBox(),
+                      if ((i + 5) < items.length)
+                        _StaticPhotoSlot(item: items[i + 5])
+                      else
+                        const SizedBox(),
                   ],
                 ),
               ),
@@ -281,127 +485,16 @@ class MonthDetailPage extends StatelessWidget {
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(8)),
-      padding: const EdgeInsets.all(10), 
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: const EdgeInsets.all(10),
       child: Image.asset(
         iconPath,
-        width: 20, 
-        height: 20, 
-        color: const Color(0xFF6BB0C5), 
+        width: 20,
+        height: 20,
+        color: const Color(0xFF6BB0C5),
         fit: BoxFit.contain,
-      ),
-    );
-  }
-
-  Widget _buildSmallCard({
-    required List<MediaItem> images,
-    required String title,
-    required String subtitle,
-    bool isPile = false,
-  }) {
-    return Container(
-      width: double.infinity,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 140,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: isPile
-                ? Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      if (images.length > 1)
-                        Positioned(
-                          left: 20, top: 15, bottom: 25,
-                          child: Transform.rotate(
-                            angle: -0.2,
-                            child: _buildPolaroidImage(images[1], width: 80, height: 80),
-                          ),
-                        ),
-                      if (images.length > 2)
-                        Positioned(
-                          right: 20, top: 15, bottom: 25,
-                          child: Transform.rotate(
-                            angle: 0.2,
-                            child: _buildPolaroidImage(images[2], width: 80, height: 80),
-                          ),
-                        ),
-                      if (images.isNotEmpty)
-                        Positioned(
-                          top: 10, bottom: 10,
-                          child: _buildPolaroidImage(images[0], width: 90, height: 90),
-                        ),
-                    ],
-                  )
-                : Column(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: AspectRatio(
-                            aspectRatio: 1.0,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: images.isNotEmpty
-                                  ? _buildImage(images[0])
-                                  : Container(color: Colors.grey[200]),
-                            ),
-                          ),
-                        ),
-                      ),
-                      if (title.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
-                          child: Column(
-                            children: [
-                              Text(title, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black87), textAlign: TextAlign.center, maxLines: 1),
-                              const SizedBox(height: 2),
-                              Text(subtitle, style: const TextStyle(fontSize: 9, color: Color(0xFF67A5BA)), textAlign: TextAlign.center, maxLines: 1),
-                            ],
-                          ),
-                        )
-                    ],
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPolaroidImage(MediaItem item, {required double width, required double height}) {
-    return Container(
-      width: width,
-      height: height + 25,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 4, offset: const Offset(0, 2))
-        ],
-      ),
-      child: Column(
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(2),
-              child: _buildImage(item),
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
       ),
     );
   }
@@ -423,7 +516,6 @@ class MonthDetailPage extends StatelessWidget {
   }
 }
 
-// Keep the existing _StaticPhotoSlot class
 class _StaticPhotoSlot extends StatelessWidget {
   final MediaItem item;
   const _StaticPhotoSlot({required this.item});
@@ -444,7 +536,9 @@ class _StaticPhotoSlot extends StatelessWidget {
                 Image.memory(item.capturedImage!, fit: BoxFit.cover)
               else
                 FutureBuilder<Uint8List?>(
-                  future: item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)),
+                  future: item.asset.thumbnailDataWithSize(
+                    const ThumbnailSize(300, 300),
+                  ),
                   builder: (context, snapshot) {
                     if (snapshot.hasData && snapshot.data != null) {
                       return Image.memory(snapshot.data!, fit: BoxFit.cover);

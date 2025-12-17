@@ -15,126 +15,137 @@ class MemorySlidePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // แบ่งข้อมูลออกเป็น 2 ชุดสำหรับ 2 แถว
+    final int halfLength = (items.length / 2).ceil();
+    final List<MediaItem> firstRowItems = items.take(halfLength).toList();
+    final List<MediaItem> secondRowItems = items.skip(halfLength).toList();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Column(
-          children: [
-            Text(
-              "ความทรงจำใน$monthName",
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Text(
-              "0 แท็กที่ใช้ไปในเดือนนี้", 
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 12,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20.0),
-        child: GridView.builder(
-          scrollDirection: Axis.horizontal, // ✅ เลื่อนแนวนอน
-          itemCount: items.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // ✅ 2 แถว
-            crossAxisSpacing: 24, // ระยะห่างระหว่างแถวบน-ล่าง
-            mainAxisSpacing: 16, // ระยะห่างระหว่างคอลัมน์ซ้าย-ขวา
-            childAspectRatio: 1.3, // สัดส่วนการ์ด (กว้าง/สูง) ปรับเลขนี้ถ้าการ์ดอ้วนหรือผอมไป
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemBuilder: (context, index) {
-            // สลับ Tag สีส้ม
-            final String tag = index % 2 == 0 ? "#ครอบครัว" : "#ความรัก";
-            
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // --- ส่วนการ์ดสีขาว ---
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start, // ให้หัวข้อชิดซ้าย
+          children: [
+            // --- ส่วนหัวข้อ (ย้ายจาก AppBar มาไว้ตรงนี้) ---
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Center(
+                // ใช้ Center เพื่อให้ข้อความอยู่กลางหน้าจอตามภาพต้นฉบับ
+                child: Column(
+                  children: [
+                    Text(
+                      "ความทรงจำใน$monthName",
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 22, // ปรับขนาดให้ใหญ่ขึ้นเล็กน้อย
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // --- Image Area (พื้นที่รูปภาพ) ---
-                        Expanded(
-                          // ✅ ปรับแก้ตรงนี้: เพิ่มค่า flex เป็น 6 (จากเดิม 4) เพื่อให้รูปใหญ่ขึ้น
-                          flex: 6, 
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0), // ลด Padding ลงเล็กน้อยเพื่อให้รูปเต็มขึ้น
-                            child: _StaticPhotoSlot(item: items[index]),
-                          ),
-                        ),
-                        
-                        // --- Caption Area (พื้นที่ข้อความ) ---
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
-                          child: Text(
-                            "อากาศดี วิวสวย ครอบครัวพร้อม", 
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.grey[800],
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
+                    const SizedBox(height: 4),
+                    const Text(
+                      "100 แท็กที่ใช้ไปในเดือนนี้",
+                      style: TextStyle(color: Colors.grey, fontSize: 16),
                     ),
-                  ),
+                  ],
                 ),
-                
-                const SizedBox(height: 6),
-                
-                // --- Tag Text (ข้อความสีส้มด้านล่าง) ---
-                Text(
-                  tag,
-                  style: const TextStyle(
-                    color: Color(0xFFED7D31),
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            );
-          },
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // --- แถวที่ 1 ---
+            _buildMemoryRow(firstRowItems, "#ครอบครัว"),
+
+            const SizedBox(height: 40), // ระยะห่างระหว่างกลุ่มแถว
+            // --- แถวที่ 2 ---
+            _buildMemoryRow(secondRowItems, "#ความรัก"),
+
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
   }
+
+  // ฟังก์ชันสร้างแถวที่มี Tag กำกับแค่คำเดียวด้านล่าง
+  Widget _buildMemoryRow(List<MediaItem> rowItems, String tagLabel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ส่วนของรายการรูปภาพที่เลื่อนได้
+        SizedBox(
+          height: 300, // ปรับความสูงของการ์ด
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: rowItems.length,
+            itemBuilder: (context, index) {
+              return Container(
+                width: 220, // ความกว้างของการ์ด
+                margin: const EdgeInsets.only(right: 16, bottom: 10, top: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: _StaticPhotoSlot(item: rowItems[index]),
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(8, 0, 8, 12),
+                      child: Text(
+                        "อากาศดี วิวสวย ครอบครัวพร้อม",
+                        style: TextStyle(fontSize: 12, color: Colors.black87),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+
+        // --- ส่วนของ Tag (แสดงแค่คำเดียวชิดซ้ายใต้แถว) ---
+        Padding(
+          padding: const EdgeInsets.only(left: 20.0, top: 8),
+          child: Text(
+            tagLabel,
+            style: const TextStyle(
+              color: Color(0xFFED7D31),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
-// ----------------------------------------------------------------------------
-// Widget ช่วยโหลดและแสดงผลรูปภาพ (เหมือนเดิม)
-// ----------------------------------------------------------------------------
+// _StaticPhotoSlot คงเดิมตามที่คุณมี...
 class _StaticPhotoSlot extends StatelessWidget {
   final MediaItem item;
   const _StaticPhotoSlot({required this.item});
@@ -142,7 +153,7 @@ class _StaticPhotoSlot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(0),
+      borderRadius: BorderRadius.circular(2),
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -150,12 +161,15 @@ class _StaticPhotoSlot extends StatelessWidget {
             Image.memory(item.capturedImage!, fit: BoxFit.cover)
           else
             FutureBuilder<Uint8List?>(
-              future: item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)),
+              future: item.asset.thumbnailDataWithSize(
+                const ThumbnailSize(400, 400),
+              ),
               builder: (context, snapshot) {
-                if (snapshot.hasData && snapshot.data != null) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.data != null) {
                   return Image.memory(snapshot.data!, fit: BoxFit.cover);
                 }
-                return Container(color: Colors.grey[200]);
+                return Container(color: Colors.grey[100]);
               },
             ),
         ],
