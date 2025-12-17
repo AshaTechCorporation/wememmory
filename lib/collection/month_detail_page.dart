@@ -126,9 +126,7 @@ class MonthDetailPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // ---------------------------------------------------------
-            // 2. Action Buttons (คงเดิม)
-            // ---------------------------------------------------------
+            // 2. Action Buttons & Status (ส่วนนี้เพิ่มเข้ามาเพื่อให้ Layout สมบูรณ์ตามภาพเดิม)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Row(

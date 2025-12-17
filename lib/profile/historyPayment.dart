@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
 
+// 1. สร้าง Enum เพื่อระบุประเภทประวัติ
+enum HistoryType {
+  subscription, // ประวัติการสมัครสมาชิก (แสดงราคา ฿) -> รูป Screenshot แรก
+  point,        // ประวัติแต้ม (แสดง +1) -> รูป Screenshot สอง
+}
+
 class MembershipHistoryPage extends StatefulWidget {
-  const MembershipHistoryPage({super.key});
+  // 2. รับค่า type เข้ามาเพื่อกำหนดรูปแบบหน้า
+  final HistoryType type;
+
+  const MembershipHistoryPage({
+    super.key,
+    this.type = HistoryType.subscription, // ค่าเริ่มต้นเป็นแบบสมัครสมาชิก
+  });
 
   @override
   State<MembershipHistoryPage> createState() => _MembershipHistoryPageState();
 }
 
 class _MembershipHistoryPageState extends State<MembershipHistoryPage> {
-  // ตัวแปรสำหรับเก็บค่าตัวเลือกในเมนู
   String _selectedFilter = 'วันที่ทั้งหมด';
 
-  // รายการตัวเลือก
   final List<String> _filterOptions = [
     'วันที่ทั้งหมด',
     '30 วันที่ผ่านมา',
@@ -21,36 +31,37 @@ class _MembershipHistoryPageState extends State<MembershipHistoryPage> {
     'ปี 2024',
   ];
 
-  // ✅ ข้อมูลรายการประวัติ (แก้ Error ตรงนี้แล้ว)
-  final List<Map<String, dynamic>> _historyItems = [
-    {
-      'name': 'แพ็กเกจเริ่มต้น',
-      'date': '01/07/2025',
-      'price': '฿899',
-    },
-    {
-      'name': 'แพ็กเกจพรีเมียม',
-      'date': '01/10/2025',
-      'price': '฿1,599',
-    },
-    {
-      'name': 'แพ็กเกจรายปี',
-      'date': '01/01/2024',
-      'price': '฿2,999',
-    },
+  // --- ข้อมูลชุดที่ 1: ประวัติการสมัคร (แสดงราคา ฿) ---
+  final List<Map<String, dynamic>> _subscriptionData = [
+    {'name': 'แพ็กเกจเริ่มต้น', 'date': '01/07/2025', 'value': '฿899'},
+    {'name': 'แพ็กเกจพรีเมียม', 'date': '01/10/2025', 'value': '฿1,599'},
+    {'name': 'แพ็กเกจรายปี', 'date': '01/01/2024', 'value': '฿2,999'},
+  ];
+
+  // --- ข้อมูลชุดที่ 2: ประวัติแต้ม (แสดง +1) ---
+  final List<Map<String, dynamic>> _pointData = [
+    {'name': 'Early Bird', 'date': '01/07/2025', 'value': '+ 1'},
+    {'name': 'Flow Master', 'date': '01/10/2025', 'value': '+ 1'},
+    {'name': 'Monthly Curation', 'date': '01/01/2024', 'value': '+ 1'},
   ];
 
   @override
   Widget build(BuildContext context) {
+    // 3. เลือกข้อมูลและสีตาม Type ที่ส่งมา
+    final bool isSubscription = widget.type == HistoryType.subscription;
+    final List<Map<String, dynamic>> currentItems = isSubscription ? _subscriptionData : _pointData;
+    
+    // กำหนดสีพื้นหลัง (ใช้สีส้มเหมือนกัน หรือจะแยกก็ได้)
+    // จากรูปทั้งสองใช้สีส้มโทนเดียวกัน
+    const Color themeColor = Color(0xFFF05A28); 
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF29C64), // สีพื้นหลังสีส้มอ่อนด้านบน
+      backgroundColor: themeColor, 
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
-            // -------------------------------------------------------
-            // 1. ส่วน Header (ปุ่มย้อนกลับ + หัวข้อ)
-            // -------------------------------------------------------
+            // --- ส่วน Header ---
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Row(
@@ -61,20 +72,14 @@ class _MembershipHistoryPageState extends State<MembershipHistoryPage> {
                   ),
                   const SizedBox(width: 16),
                   const Text(
-                    'ประวัติแพ็กเกจสมาชิก',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    'ประวัติรายการ',
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
 
-            // -------------------------------------------------------
-            // 2. ส่วนเนื้อหาสีขาว (Content Area)
-            // -------------------------------------------------------
+            // --- ส่วนเนื้อหา (Content Area) ---
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -90,63 +95,33 @@ class _MembershipHistoryPageState extends State<MembershipHistoryPage> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     
-                    // ✅ ปุ่มตัวเลือกแบบ Popup Menu (เหมือนรูปที่ 2)
+                    // ปุ่ม Dropdown
                     Align(
                       alignment: Alignment.centerRight,
                       child: PopupMenuButton<String>(
-                        // กำหนดตำแหน่งให้เมนูเด้งลงมาด้านล่างปุ่ม
                         offset: const Offset(0, 50), 
                         elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         color: Colors.white,
-                        
-                        // เมื่อเลือกรายการ
-                        onSelected: (String value) {
-                          setState(() {
-                            _selectedFilter = value;
-                          });
-                        },
-                        
-                        // รายการในเมนู
-                        itemBuilder: (BuildContext context) {
-                          return _filterOptions.map((String choice) {
-                            return PopupMenuItem<String>(
-                              value: choice,
-                              height: 45,
-                              child: Text(
-                                choice,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey.shade700,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            );
-                          }).toList();
-                        },
-                        
-                        // หน้าตาของปุ่มกด (Trigger)
+                        onSelected: (String value) => setState(() => _selectedFilter = value),
+                        itemBuilder: (context) => _filterOptions.map((c) => PopupMenuItem(value: c, height: 45, child: Text(c))).toList(),
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          width: 150,
+                          constraints: const BoxConstraints(minWidth: 140),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(color: Colors.grey.shade300),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 _selectedFilter,
-                                style: const TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                style: const TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.w500),
                               ),
+                              const SizedBox(width: 8),
                               const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 20),
                             ],
                           ),
@@ -154,56 +129,56 @@ class _MembershipHistoryPageState extends State<MembershipHistoryPage> {
                       ),
                     ),
                     
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
+                    const Divider(color: Color(0xFFEEEEEE)),
 
-                    // -------------------------------------------------------
-                    // 3. รายการประวัติ (List View)
-                    // -------------------------------------------------------
+                    // รายการ (ListView)
                     Expanded(
                       child: ListView.separated(
-                        itemCount: _historyItems.length,
-                        separatorBuilder: (context, index) => Divider(
-                          color: Colors.grey.shade200,
-                          height: 32,
-                          thickness: 1,
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        itemCount: currentItems.length,
+                        separatorBuilder: (context, index) => const Divider(color: Color(0xFFEEEEEE), height: 32, thickness: 1),
                         itemBuilder: (context, index) {
-                          final item = _historyItems[index];
+                          final item = currentItems[index];
+                          
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // ด้านซ้าย: ชื่อแพ็กเกจและวันที่
+                                // ด้านซ้าย: ชื่อและวันที่
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       item['name'],
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFF333333),
+                                        fontWeight: isSubscription ? FontWeight.w600 : FontWeight.w500, // ปรับน้ำหนัก font ตามแบบ
+                                        color: const Color(0xFF333333),
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: 6),
                                     Text(
                                       item['date'],
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 14,
-                                        color: Colors.grey,
+                                        color: isSubscription ? Colors.grey : Colors.black54, // ปรับสี font ตามแบบ
                                       ),
                                     ),
                                   ],
                                 ),
-                                // ด้านขวา: ราคา
-                                Text(
-                                  item['price'],
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF333333),
+                                // ด้านขวา: ราคาหรือแต้ม
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(
+                                    item['value'],
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF333333),
+                                    ),
                                   ),
                                 ),
                               ],

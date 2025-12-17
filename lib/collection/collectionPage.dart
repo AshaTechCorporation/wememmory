@@ -5,6 +5,14 @@ import 'package:wememmory/collection/month_detail_page.dart';
 import 'package:wememmory/constants.dart';
 import 'package:wememmory/models/media_item.dart';
 
+// [1] Import หน้า OrderPage ของคุณ (ตรวจสอบว่าไฟล์ชื่ออะไร)
+import 'package:wememmory/shop/chooseMediaItem.dart'; 
+// หรือ import 'package:wememmory/shop/selectMedia.dart';
+
+// [1] Import หน้า OrderPage ของคุณ (ตรวจสอบว่าไฟล์ชื่ออะไร)
+import 'package:wememmory/shop/chooseMediaItem.dart'; 
+// หรือ import 'package:wememmory/shop/selectMedia.dart';
+
 // หน้า สมุดภาพ 
 class CollectionPage extends StatelessWidget {
   final List<MediaItem>? newAlbumItems;
@@ -31,14 +39,19 @@ class CollectionPage extends StatelessWidget {
               const _TabSelector(),
               const SizedBox(height: 30),
 
-              _MonthSectionHeader(title: newAlbumMonth ?? "เมษายน 2025"),
+              // [2] ส่ง items ไปที่ Header เพื่อให้ปุ่ม Print ใช้ข้อมูลได้
+              _MonthSectionHeader(
+                title: newAlbumMonth ?? "เมษายน 2025",
+                items: newAlbumItems, 
+              ),
+              
               const SizedBox(height: 12),
 
+              // ส่วนแสดงพรีวิวอัลบั้ม (กดแล้วไปดูรูปรายเดือน)
               if (newAlbumItems != null && newAlbumItems!.isNotEmpty)
                 GestureDetector(
                   onTap: () {
-                    // แก้ไข: ลบโค้ด async/await และ Navigator.pop ด้านล่างออก
-                    // เพื่อให้เมื่อกดกลับจาก MonthDetailPage แล้วยังอยู่ที่หน้านี้
+                    // กดที่อัลบั้ม -> ไปหน้าดูรายละเอียด (MonthDetailPage)
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -66,6 +79,82 @@ class CollectionPage extends StatelessWidget {
   }
 }
 
+// -------------------------------------------------------------------
+// ส่วน Header ที่มีปุ่ม Print
+// -------------------------------------------------------------------
+class _MonthSectionHeader extends StatelessWidget {
+  final String title;
+  final List<MediaItem>? items; // รับรายการรูปภาพเพิ่มเข้ามา
+
+  const _MonthSectionHeader({
+    required this.title,
+    this.items, // รับค่าจาก Constructor
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title,
+            style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87)),
+        Row(
+          children: [
+            // [3] ปุ่ม Print: กดแล้วส่งรูปไปยังหน้า OrderPage
+            GestureDetector(
+              onTap: () {
+                if (items != null && items!.isNotEmpty) {
+                  print("กำลังส่งรูป ${items!.length} รูป ไปยังหน้าสั่งซื้อ");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      // เรียกใช้ OrderPage พร้อมส่ง items ที่มาจาก CollectionPage
+                      builder: (context) => OrderPage(
+                        items: items!, 
+                      ),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('ไม่มีรูปภาพในคอลเลกชันนี้')),
+                  );
+                }
+              },
+              child: _buildIconButton('assets/icons/print.png'),
+            ),
+            const SizedBox(width: 8),
+            _buildIconButton('assets/icons/share.png'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIconButton(String iconPath) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8)),
+      padding: const EdgeInsets.all(10),
+      child: Image.asset(
+        iconPath,
+        width: 20,
+        height: 20,
+        color: const Color(0xFF6BB0C5),
+        fit: BoxFit.contain,
+      ),
+    );
+  }
+}
+
+// -------------------------------------------------------------------
+// Widget อื่นๆ คงเดิม (ไม่ต้องแก้ไข)
+// -------------------------------------------------------------------
 class _AlbumPreviewSection extends StatelessWidget {
   final List<MediaItem> items;
   final String monthTitle;
@@ -204,7 +293,6 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
   }
 }
 
-// --- Widgets เดิมของ CollectionPage ---
 class _SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -283,51 +371,6 @@ class _TabSelector extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _MonthSectionHeader extends StatelessWidget {
-  final String title;
-  const _MonthSectionHeader({required this.title});
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title,
-            style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87)),
-        Row(
-          children: [
-            // ✅ ใช้ path รูปภาพแทน IconData
-            _buildIconButton('assets/icons/print.png'),
-            const SizedBox(width: 8),
-            _buildIconButton('assets/icons/share.png'),
-          ],
-        ),
-      ],
-    );
-  }
-
-  // ✅ แก้ไขให้รับ String iconPath และแสดงผล Image.asset
-  Widget _buildIconButton(String iconPath) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(8)),
-      padding: const EdgeInsets.all(10), // เพิ่ม padding เล็กน้อยเพื่อให้รูปไม่ชิดขอบเกินไป
-      child: Image.asset(
-        iconPath,
-        width: 20, // ขนาดรูป 20
-        height: 20, // ขนาดรูป 20
-        color: const Color(0xFF6BB0C5), // ยังคงสีเดิมไว้
-        fit: BoxFit.contain,
       ),
     );
   }
