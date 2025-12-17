@@ -143,8 +143,8 @@ class BenefitsPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           const Text(
-                            'รายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียด\nรายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียด\nรายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียด\nรายละเอียด',
-                            style: TextStyle(fontSize: 12, color: Color(0xFF555555), height: 1.5),
+                            'รายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียดรายละเอียด',
+                            style: TextStyle(fontSize: 16, color: Color(0xFF555555), height: 1.5),
                           ),
 
                           const SizedBox(height: 24),
@@ -228,12 +228,12 @@ class BenefitsPage extends StatelessWidget {
               children: [
                 Text(
                   item['title'],
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   item['subtitle'],
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -268,12 +268,12 @@ class BenefitsPage extends StatelessWidget {
               children: [
                 Text(
                   item['title'],
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   item['desc'],
-                  style: const TextStyle(fontSize: 12, color: Colors.grey, height: 1.4),
+                  style: const TextStyle(fontSize: 14, color: Colors.grey, height: 1.4),
                 ),
               ],
             ),
@@ -281,7 +281,7 @@ class BenefitsPage extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             item['points'],
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
           ),
         ],
       ),
