@@ -255,7 +255,7 @@ class MemoryCard extends StatelessWidget {
     if (data.backgroundImage != null) {
       return Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(0),
           border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
           image: DecorationImage(
             image: AssetImage(data.backgroundImage!),
@@ -315,7 +315,7 @@ class MemoryCard extends StatelessWidget {
     // ✅ 2. ถ้าไม่มีรูปพื้นหลัง (ส่วนของ Card 1 - คงเดิมไว้ทุกอย่าง)
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(0),
         gradient: LinearGradient(
           colors: data.gradientColors,
           begin: Alignment.topCenter,

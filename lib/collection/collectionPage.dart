@@ -2,19 +2,17 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/collection/month_detail_page.dart';
+import 'package:wememmory/collection/share_sheet.dart';
 import 'package:wememmory/constants.dart';
-import 'package:wememmory/models/media_item.dart';
-
-// [1] Import หน้า OrderPage ของคุณ (ตรวจสอบว่าไฟล์ชื่ออะไร)
-import 'package:wememmory/shop/chooseMediaItem.dart'; 
-// หรือ import 'package:wememmory/shop/selectMedia.dart';
+import 'package:wememmory/data/album_data.dart';
+import 'package:wememmory/models/media_item.dart' hide AlbumCollection;
 
 // [1] Import หน้า OrderPage ของคุณ (ตรวจสอบว่าไฟล์ชื่ออะไร)
 import 'package:wememmory/shop/chooseMediaItem.dart'; 
 // หรือ import 'package:wememmory/shop/selectMedia.dart';
 
 // หน้า สมุดภาพ 
-class CollectionPage extends StatelessWidget {
+class CollectionPage extends StatefulWidget {
   final List<MediaItem>? newAlbumItems;
   final String? newAlbumMonth;
 
@@ -25,54 +23,96 @@ class CollectionPage extends StatelessWidget {
   });
 
   @override
+  State<CollectionPage> createState() => _CollectionPageState();
+}
+
+class _CollectionPageState extends State<CollectionPage> {
+  // [ยกเลิก] List<AlbumCollection> allAlbums = []; 
+  // เราจะใช้ globalAlbumList แทนเพื่อให้ข้อมูลคงอยู่ถาวรในขณะเปิดแอป
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // ตรวจสอบข้อมูลใหม่ที่ส่งมาจากหน้า Success
+    if (widget.newAlbumItems != null && widget.newAlbumMonth != null) {
+      
+      // Logic: ตรวจสอบว่าอัลบั้มชุดนี้ถูกเพิ่มเข้า Global List หรือยัง (ป้องกันการเพิ่มซ้ำ)
+      bool isDuplicate = globalAlbumList.any((album) => 
+        album.month == widget.newAlbumMonth && album.items == widget.newAlbumItems);
+      
+      if (!isDuplicate) {
+        // เพิ่มข้อมูลใหม่เข้า Global List
+        // ใช้ insert(0, ...) เพื่อให้อัลบั้มใหม่ล่าสุดแสดงอยู่บนสุดของรายการ
+        globalAlbumList.insert(0, AlbumCollection(
+          month: widget.newAlbumMonth!,
+          items: widget.newAlbumItems!,
+        ));
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _SearchBar(),
-              const SizedBox(height: 24),
-              const _TabSelector(),
-              const SizedBox(height: 30),
-
-              // [2] ส่ง items ไปที่ Header เพื่อให้ปุ่ม Print ใช้ข้อมูลได้
-              _MonthSectionHeader(
-                title: newAlbumMonth ?? "เมษายน 2025",
-                items: newAlbumItems, 
+        child: Column(
+          children: [
+            // ส่วนที่อยู่คงที่ด้านบน (Search & Tab)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+              child: Column(
+                children: [
+                  _SearchBar(),
+                  const SizedBox(height: 24),
+                  const _TabSelector(),
+                  const SizedBox(height: 20),
+                ],
               ),
-              
-              const SizedBox(height: 12),
+            ),
 
-              // ส่วนแสดงพรีวิวอัลบั้ม (กดแล้วไปดูรูปรายเดือน)
-              if (newAlbumItems != null && newAlbumItems!.isNotEmpty)
-                GestureDetector(
-                  onTap: () {
-                    // กดที่อัลบั้ม -> ไปหน้าดูรายละเอียด (MonthDetailPage)
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MonthDetailPage(
-                          monthName: newAlbumMonth ?? "เมษายน 2025",
-                          items: newAlbumItems!,
-                        ),
-                      ),
-                    );
-                  },
-                  child: _AlbumPreviewSection(
-                    items: newAlbumItems!,
-                    monthTitle: newAlbumMonth ?? "",
-                  ),
-                )
-              else
-                const Center(
-                    child: Text("ยังไม่มีคอลเลกชัน",
-                        style: TextStyle(color: Colors.grey))),
-            ],
-          ),
+            // ส่วนรายการอัลบั้มที่ดึงมาจาก Global List
+            Expanded(
+              child: globalAlbumList.isEmpty
+                  ? const Center(child: Text("ยังไม่มีคอลเลกชัน", style: TextStyle(color: Colors.grey)))
+                  : ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
+                      itemCount: globalAlbumList.length, // ใช้จำนวนจาก Global List
+                      itemBuilder: (context, index) {
+                        final album = globalAlbumList[index]; // ดึงข้อมูลแต่ละอัลบั้ม
+                        
+                        return Column(
+                          children: [
+                            _MonthSectionHeader(
+                              title: album.month,
+                              items: album.items,
+                            ),
+                            const SizedBox(height: 12),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MonthDetailPage(
+                                      monthName: album.month,
+                                      items: album.items,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: _AlbumPreviewSection(
+                                items: album.items,
+                                monthTitle: album.month,
+                              ),
+                            ),
+                            const SizedBox(height: 30), // ระยะห่างระหว่างแต่ละอัลบั้ม
+                          ],
+                        );
+                      },
+                    ),
+            ),
+          ],
         ),
       ),
     );
@@ -126,7 +166,17 @@ class _MonthSectionHeader extends StatelessWidget {
               child: _buildIconButton('assets/icons/print.png'),
             ),
             const SizedBox(width: 8),
-            _buildIconButton('assets/icons/share.png'),
+            GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true, // เพื่อให้กำหนดความสูงเองได้
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const ShareSheet(),
+                );
+              },
+              child: _buildIconButton('assets/icons/share.png'),
+            ),
           ],
         ),
       ],
