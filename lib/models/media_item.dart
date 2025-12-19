@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:photo_manager/photo_manager.dart';
 
-// --- ย้ายโค้ดส่วน Model มาไว้ที่นี่ ---
+// ข้อมูลภาพและวิดิโอ
 
 enum MediaType { image, video }
 
@@ -25,4 +25,11 @@ class AlbumPhoto {
   final MediaItem mediaItem;
   final Uint8List? imageBytes;
   AlbumPhoto({required this.mediaItem, this.imageBytes});
+}
+
+class AlbumCollection {
+  final String month;
+  final List<MediaItem> items;
+
+  AlbumCollection({required this.month, required this.items});
 }

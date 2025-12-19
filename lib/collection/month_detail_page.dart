@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/collection/FanStackDetailPage.dart';
 import 'package:wememmory/collection/MemorySlidePage.dart';
+import 'package:wememmory/collection/share_sheet.dart';
 import 'package:wememmory/models/media_item.dart';
 
 // หน้า รายละเอียดแฟ้มภาพแต่ละเดือน
@@ -140,7 +141,17 @@ class MonthDetailPage extends StatelessWidget {
                     children: [
                       _buildIconButton('assets/icons/print.png'),
                       const SizedBox(width: 8),
-                      _buildIconButton('assets/icons/share.png'),
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true, // เพื่อให้ความสูงเป็นไปตามที่เรากำหนดใน ShareSheet
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => const ShareSheet(),
+                          );
+                        },
+                        child: _buildIconButton('assets/icons/share.png'),
+                      ),
                     ],
                   ),
                 ],

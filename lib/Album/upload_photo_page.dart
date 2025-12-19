@@ -37,6 +37,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     return "$min:$sec";
   }
 
+  // ฟังก์ชันการดึงข้อมูลจากเครื่อง
   Future<void> _loadAllMediaFromDevice() async {
     setState(() => isLoading = true);
     final ps = await PhotoManager.requestPermissionExtend();
@@ -90,6 +91,8 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     });
   }
 
+
+  
   void _toggleThisMonth(bool value) {
     setState(() {
       showThisMonthOnly = value;
@@ -136,9 +139,9 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     }
   }
 
-  // -----------------------------------------------------------
-  // [NEW] Custom Switch Widget
-  // -----------------------------------------------------------
+  
+  // ปุ่ม Switch Widget
+  
   Widget _buildCustomSwitch() {
     return GestureDetector(
       onTap: () => _toggleThisMonth(!showThisMonthOnly),
@@ -191,7 +194,8 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
       ),
       child: Column(
         children: [
-          // Slide Indicator
+          
+          // ปุ่มขีด Slide Indicator
           const SizedBox(height: 12),
           Container(
             width: 61,
