@@ -2,14 +2,10 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-
-// --- Imports จากโปรเจกต์ของคุณ ---
 import 'package:wememmory/models/media_item.dart';
-import 'package:wememmory/shop/paymentPage.dart'; 
+import 'package:wememmory/shop/paymentPage.dart';
+import 'package:wememmory/shop/cartPage.dart';
 
-// =======================================================================
-// 1. หน้า AlbumGiftPage (หน้าหลักสินค้า + แสดงรูปปกที่เลือก)
-// =======================================================================
 class AlbumGiftPage extends StatefulWidget {
   const AlbumGiftPage({super.key});
 
@@ -20,8 +16,6 @@ class AlbumGiftPage extends StatefulWidget {
 class _AlbumGiftPageState extends State<AlbumGiftPage> {
   int _quantity = 1;
   int _selectedColorIndex = 0;
-  
-  // ตัวแปรสำหรับเก็บไฟล์รูปปกที่เลือกกลับมา
   File? _selectedCoverImage;
 
   final List<Map<String, dynamic>> _colorOptions = [
@@ -43,31 +37,25 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
     'assets/images/exProfile.png',
   ];
 
-  // ฟังก์ชันเริ่มกระบวนการเลือกรูป
   Future<void> _startPickImageProcess() async {
-    // 1. ขอสิทธิ์เข้าถึงรูปภาพ
     final PermissionState ps = await PhotoManager.requestPermissionExtend();
     if (!ps.isAuth && !ps.hasAccess) {
       debugPrint("ไม่ได้รับอนุญาตให้เข้าถึงรูปภาพ");
       return;
     }
 
-    // 2. ดึงอัลบั้ม
     final List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
       type: RequestType.image,
       onlyAll: true,
     );
 
     if (albums.isNotEmpty) {
-      // 3. ดึงรูป 100 รูปแรก
       final List<AssetEntity> photos = await albums[0].getAssetListRange(start: 0, end: 100);
       
-      // 4. แปลงเป็น MediaItem
       final List<MediaItem> myItems = photos.map((asset) {
         return MediaItem(asset: asset, type: MediaType.image);
       }).toList();
 
-      // 5. ไปหน้าเลือกรูป และรอรับค่ากลับมา (await)
       if (mounted) {
         final result = await Navigator.push(
           context,
@@ -76,12 +64,11 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
           ),
         );
 
-        // 6. ถ้ามีการเลือกรูปกลับมา (result ไม่เป็น null)
         if (result != null && result is MediaItem) {
           File? file = await result.asset.file;
           if (file != null) {
             setState(() {
-              _selectedCoverImage = file; // อัปเดตรูปในหน้าจอนี้
+              _selectedCoverImage = file;
             });
           }
         }
@@ -113,7 +100,6 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ส่วนแสดงรูปสินค้าด้านบน
             Container(
               width: double.infinity,
               height: 300,
@@ -136,7 +122,6 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ตัวเลือกสี
                   SizedBox(
                     height: 50,
                     child: ListView.separated(
@@ -186,7 +171,6 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
 
                   const SizedBox(height: 20),
 
-                  // ชื่อสินค้า และ ราคา
                   const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -203,14 +187,11 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
 
                   const SizedBox(height: 24),
 
-                  // -----------------------------------------------------------
-                  // ส่วนการ์ดเลือกรูปหน้าปก (ปรับปรุงให้แสดงรูปที่เลือกมา)
-                  // -----------------------------------------------------------
                   GestureDetector(
-                    onTap: _startPickImageProcess, // กดที่การ์ดเพื่อเลือกรูปใหม่ได้
+                    onTap: _startPickImageProcess,
                     child: Container(
                       width: double.infinity,
-                      height: _selectedCoverImage != null ? 200 : null, // ถ้ามีรูปให้สูง 200
+                      height: _selectedCoverImage != null ? 200 : null,
                       padding: _selectedCoverImage != null ? EdgeInsets.zero : const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -219,7 +200,6 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
                         boxShadow: [
                           BoxShadow(color: Colors.grey.shade100, blurRadius: 10, offset: const Offset(0, 4)),
                         ],
-                        // ถ้ามีรูป ให้แสดงเป็น Background
                         image: _selectedCoverImage != null 
                           ? DecorationImage(
                               image: FileImage(_selectedCoverImage!),
@@ -230,7 +210,6 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
                       child: _selectedCoverImage != null 
                       ? Stack(
                           children: [
-                            // ปุ่มแก้ไขรูป (overlay)
                             Positioned(
                               bottom: 10,
                               right: 10,
@@ -270,7 +249,7 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
                                   ElevatedButton(
                                     onPressed: _startPickImageProcess,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF6BB0C5), // สีส้ม
+                                      backgroundColor: const Color(0xFF6BB0C5),
                                       elevation: 0,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -304,6 +283,19 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
         ),
         child: Row(
           children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF7043),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: IconButton(
+                onPressed: () {Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CartPage  ()));},
+                icon: const Icon(Icons.shopping_cart, color: Colors.white),
+              ),
+            ),
+            const SizedBox(width: 16),
             Expanded(
               flex: 3,
               child: SizedBox(
@@ -317,7 +309,7 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     elevation: 0,
                   ),
-                  child: const Text('฿ 599', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                  child: const Text('สั่งซื้อ', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
             ),
@@ -380,9 +372,6 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
   }
 }
 
-// =======================================================================
-// 2. หน้า AlbumCoverSelectionPage (เลือกรูปปก)
-// =======================================================================
 class AlbumCoverSelectionPage extends StatefulWidget {
   final List<MediaItem> items;
 
@@ -464,7 +453,6 @@ class _AlbumCoverSelectionPageState extends State<AlbumCoverSelectionPage> {
               onPressed: _selectedIndex == null
                   ? null
                   : () {
-                      // ส่ง MediaItem ที่เลือกกลับไปหน้าก่อนหน้า (AlbumGiftPage)
                       Navigator.pop(context, widget.items[_selectedIndex!]);
                     },
               style: ElevatedButton.styleFrom(
@@ -482,9 +470,6 @@ class _AlbumCoverSelectionPageState extends State<AlbumCoverSelectionPage> {
   }
 }
 
-// =======================================================================
-// 3. Widget Shared: แสดงรูปภาพพร้อม Error Handling
-// =======================================================================
 class _DebugCoverImageTile extends StatefulWidget {
   final MediaItem item;
   final int index;
@@ -521,7 +506,6 @@ class _DebugCoverImageTileState extends State<_DebugCoverImageTile> {
       final data = await asset.thumbnailDataWithSize(const ThumbnailSize(300, 300), quality: 80);
       if (data != null) { if (mounted) setState(() => _imageData = data); } else { if (mounted) setState(() => _hasError = true); }
     } catch (e) {
-      print("Error loading image index ${widget.index}: $e");
       if (mounted) setState(() => _hasError = true);
     }
   }
