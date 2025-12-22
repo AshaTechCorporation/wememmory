@@ -1,6 +1,7 @@
 
 import '../models/media_item.dart';
 
+//ฐานเก็บข้อมูล อัลบั้ม
 class AlbumCollection {
   final String month;
   final List<MediaItem> items;

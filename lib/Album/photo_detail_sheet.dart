@@ -22,10 +22,13 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
   final GlobalKey _cropKey = GlobalKey();
   final TransformationController _transformationController = TransformationController();
   BoxFit _currentFit = BoxFit.contain;
+  
+  Color _selectedTextColor = Colors.black;
+  Color? _dropdownValue;
 
   final List<String> _allTags = ["family", "kid", "home", "lover", "favor"];
   
-  // ✅ เพิ่มตัวแปรเก็บรูปภาพ เพื่อไม่ให้โหลดใหม่ทุกครั้งที่ setState
+  // เพิ่มตัวแปรเก็บรูปภาพ เพื่อไม่ให้โหลดใหม่ทุกครั้งที่ setState
   Uint8List? _imageData;
   bool _isLoadingImage = true;
 
@@ -34,21 +37,16 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
     super.initState();
     _captionController = TextEditingController(text: widget.item.caption);
     _selectedTags = List.from(widget.item.tags);
-    
-    // ✅ โหลดรูปภาพทีเดียวตอนเริ่มต้น
     _loadImage();
   }
 
-  // ✅ ฟังก์ชันโหลดรูปภาพ
   Future<void> _loadImage() async {
-    // ถ้ามีรูปที่แคปไว้แล้ว ให้ใช้รูปนั้นเลย
     if (widget.item.capturedImage != null) {
       setState(() {
         _imageData = widget.item.capturedImage;
         _isLoadingImage = false;
       });
     } else {
-      // ถ้าไม่มี ให้โหลดจาก Asset (ความละเอียดสูง)
       final data = await widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(1000, 1000));
       if (mounted) {
         setState(() {
@@ -87,6 +85,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
     });
   }
 
+  // ✅ ฟังก์ชันบันทึกข้อมูลแบบ Pass by Reference
   Future<void> _saveData() async {
     try {
       RenderRepaintBoundary boundary = _cropKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
@@ -94,16 +93,18 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
       ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
 
       if (byteData != null) {
+        // อัปเดตข้อมูลลงใน Item ตัวเดิมโดยตรง
         widget.item.capturedImage = byteData.buffer.asUint8List();
         widget.item.caption = _captionController.text;
         widget.item.tags = List.from(_selectedTags);
 
         if (mounted) {
-          Navigator.pop(context);
+          Navigator.pop(context); // ปิดหน้าเพื่อกลับไปรีเฟรชที่ AlbumLayoutPage
         }
       }
     } catch (e) {
       debugPrint("Error capturing photo: $e");
+      // กรณี Error ก็ยังเซฟ Text/Tags ได้
       widget.item.caption = _captionController.text;
       widget.item.tags = List.from(_selectedTags);
       if (mounted) Navigator.pop(context);
@@ -153,7 +154,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: Image.asset(
-                    'assets/icons/cross.png', // อ้างอิง Path ในโปรเจกต์
+                    'assets/icons/cross.png',
                     width: 25,
                     height: 25,
                     fit: BoxFit.contain,
@@ -170,25 +171,9 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
             padding: EdgeInsets.symmetric(horizontal: 7.0),
             child: Row(
               children: [
-                // Step 1: เลือกรูปภาพ
-                _StepItem(
-                  label: 'เลือกรูปภาพ', 
-                  isActive: true,
-                  isFirst: true,
-                  isCompleted: true,
-                ),
-                // Step 2: แก้ไขและจัดเรียง
-                _StepItem(
-                  label: 'แก้ไขและจัดเรียง', 
-                  isActive: true,
-                  isCompleted: false, // ยังไม่เสร็จ (เส้นขวาจะเป็นสีเทา)
-                ),
-                // Step 3: พรีวิวสุดท้าย
-                _StepItem(
-                  label: 'พรีวิวสุดท้าย', 
-                  isActive: false,
-                  isLast: true,
-                ),
+                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true, isCompleted: true),
+                _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true, isCompleted: false),
+                _StepItem(label: 'พรีวิวสุดท้าย', isActive: false, isLast: true),
               ],
             ),
           ),
@@ -213,12 +198,10 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
-                            // InteractiveViewer
                             InteractiveViewer(
                               transformationController: _transformationController,
                               minScale: 1.0,
                               maxScale: 4.0,
-                              // ✅ ใช้ _imageData ที่โหลดมาแล้วแทน FutureBuilder
                               child: _isLoadingImage
                                   ? const Center(child: CircularProgressIndicator())
                                   : _imageData != null
@@ -230,8 +213,6 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                                         )
                                       : const Center(child: Text("ไม่สามารถโหลดรูปภาพได้")),
                             ),
-                            
-                            // Grid Overlay
                             IgnorePointer(
                               child: Stack(
                                 children: [
@@ -260,21 +241,111 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
 
                   const SizedBox(height: 10),
 
-                  // ปุ่มขยายภาพ
-                  SizedBox(
-                    height: 45,
-                    child: ElevatedButton(
-                      onPressed: _toggleImageScale,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF67A5BA),
-                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                        elevation: 0,
+                  // ส่วนควบคุม: ปุ่มขยายภาพ และ Dropdown เลือกสี
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: SizedBox(
+                          height: 45,
+                          child: ElevatedButton(
+                            onPressed: _toggleImageScale,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF67A5BA),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              elevation: 0,
+                            ),
+                            child: Text(
+                              _currentFit == BoxFit.contain ? "ขยายภาพเต็มจอ" : "แสดงภาพทั้งหมด",
+                              style: const TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                          ),
+                        ),
                       ),
-                      child: Text(
-                        _currentFit == BoxFit.contain ? "ขยายภาพเต็มกรอบ" : "แสดงภาพทั้งหมด",
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                      const SizedBox(width: 10), 
+                      Expanded(
+                        flex: 2,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            return PopupMenuButton<Color>(
+                              constraints: BoxConstraints.tightFor(width: constraints.maxWidth),
+                              offset: const Offset(0, 50),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              color: Colors.white,
+                              elevation: 4,
+                              onSelected: (Color value) {
+                                setState(() {
+                                  _dropdownValue = value;
+                                  _selectedTextColor = value;
+                                });
+                              },
+                              itemBuilder: (BuildContext context) => [
+                                PopupMenuItem<Color>(
+                                  value: Colors.black,
+                                  child: Row(
+                                    children: [
+                                      const Text("สีดำ", style: TextStyle(fontSize: 14)),
+                                      const Spacer(),
+                                      Container(
+                                        width: 21,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: const Color(0xFF95989A), width: 1),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuItem<Color>(
+                                  value: Colors.white,
+                                  child: Row(
+                                    children: [
+                                      const Text("สีขาว", style: TextStyle(fontSize: 14)),
+                                      const Spacer(),
+                                      Container(
+                                        width: 21,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: Colors.grey[300]!),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                              child: Container(
+                                height: 45,
+                                padding: const EdgeInsets.symmetric(horizontal: 14),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: Colors.grey[300]!),
+                                  color: Colors.white,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      _dropdownValue == null
+                                          ? "เลือกสีฟอนต์"
+                                          : (_dropdownValue == Colors.black ? "สีดำ" : "สีขาว"),
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: _dropdownValue == null ? 16 : 14,
+                                      ),
+                                    ),
+                                    const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+                        ),
                       ),
-                    ),
+                    ],
                   ),
 
                   const SizedBox(height: 10),
@@ -288,6 +359,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                     child: TextField(
                       controller: _captionController,
                       maxLines: 4,
+                      style: TextStyle(color: _selectedTextColor), 
                       decoration: InputDecoration(
                         hintText: "เขียนความรู้สึกหรือเรื่องราวเล็ก ๆ ที่ซ่อนอยู่หลังภาพนี้.....",
                         hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
@@ -314,7 +386,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
 
           // 4. Bottom Button (Save)
           Container(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 38),
+            padding: const EdgeInsets.fromLTRB(20, 13, 20, 38),
             decoration: const BoxDecoration(
               border: Border(top: BorderSide(color: Colors.transparent)),
             ),
@@ -322,7 +394,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                onPressed: _saveData,
+                onPressed: _saveData, // เรียกใช้ฟังก์ชันบันทึกที่แก้ไขแล้ว
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFED7D31),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
@@ -342,16 +414,13 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
 
   Widget _buildTagChip(String label) {
     bool isSelected = _selectedTags.contains(label);
-    
     return GestureDetector(
       onTap: () => _toggleTag(label),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: isSelected ? const Color(0xFFED7D31) : Colors.grey[300]!,
-          ),
+          border: Border.all(color: isSelected ? const Color(0xFFED7D31) : Colors.grey[300]!),
           borderRadius: BorderRadius.circular(20),
           color: isSelected ? const Color(0xFFED7D31) : Colors.white,
         ),
@@ -391,21 +460,14 @@ class _StepItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              // --- เส้นซ้าย ---
               Expanded(
                 flex: 2,
                 child: Container(
                   height: 2,
-                  // ถ้า Active เส้นซ้ายเป็นสีฟ้า
-                  color: isFirst
-                      ? Colors.transparent
-                      : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]),
+                  color: isFirst ? Colors.transparent : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]),
                 ),
               ),
-              
               const SizedBox(width: 40),
-              
-              // --- จุดวงกลม ---
               Container(
                 width: 11,
                 height: 11,
@@ -414,18 +476,12 @@ class _StepItem extends StatelessWidget {
                   color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300],
                 ),
               ),
-              
               const SizedBox(width: 40),
-              
-              // --- เส้นขวา ---
               Expanded(
                 flex: 2,
                 child: Container(
                   height: 2,
-                  // Logic: ถ้าไม่ใช่ตัวสุดท้าย และ isCompleted เป็นจริง ให้เป็นสีฟ้า
-                  color: isLast
-                      ? Colors.transparent
-                      : (isCompleted ? const Color(0xFF5AB6D8) : Colors.grey[300]),
+                  color: isLast ? Colors.transparent : (isCompleted ? const Color(0xFF5AB6D8) : Colors.grey[300]),
                 ),
               ),
             ],

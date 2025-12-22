@@ -5,8 +5,8 @@ import 'package:wememmory/models/media_item.dart';
 
 // หน้า สำเร็จการสั่ง print
 class OrderSuccessPage extends StatelessWidget {
-  final List<MediaItem> items;
-  final String monthName;
+  final List<MediaItem> items; //รับภาพจาก order_success_page.dart
+  final String monthName; //รับชื่อเดือนมาจาก print_sheet.dart
 
   const OrderSuccessPage({
     super.key,
@@ -23,9 +23,6 @@ class OrderSuccessPage extends StatelessWidget {
           children: [
             const Spacer(flex: 1), // ดันเนื้อหาลงมาตรงกลาง
 
-            // -------------------------------------------------------
-            // 1. เปลี่ยน Icon เป็นรูปภาพ Success.png
-            // -------------------------------------------------------
             Image.asset(
               'assets/icons/Success.png',
               width: 180, 
@@ -38,7 +35,7 @@ class OrderSuccessPage extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            // หัวข้อ "100 คะแนน"
+            
             const Text(
               '100 คะแนน',
               style: TextStyle(

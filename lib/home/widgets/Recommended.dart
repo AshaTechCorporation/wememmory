@@ -9,7 +9,7 @@ class Recommended extends StatefulWidget {
   final String? albumMonth;
 
   const Recommended({Key? key, this.albumItems, this.albumMonth})
-    : super(key: key);
+      : super(key: key);
 
   @override
   State<Recommended> createState() => _RecommendedState();
@@ -35,10 +35,10 @@ class _RecommendedState extends State<Recommended> {
   }
 
   void _initData() {
+    String displayMonth = widget.albumMonth ?? 'เดือนล่าสุด';
+
     _items = [
-      // ---------------------------------------------------
-      // Card ใบที่ 1 (แบบเดิม)
-      // ---------------------------------------------------
+      // Card 1
       MemoryCardData(
         topTitle: 'เติมเรื่องราวครึ่งปีแรกด้วยอัลบั้มใหม่กัน',
         mainTitle: 'พฤษภาคมของฉัน',
@@ -52,10 +52,7 @@ class _RecommendedState extends State<Recommended> {
           'assets/images/Hobby1.png',
         ],
       ),
-
-      // ---------------------------------------------------
-      // ✅ Card ใบที่ 2 (แบบใหม่: แสดงรูปพื้นหลัง + ข้อความ)
-      // ---------------------------------------------------
+      // Card 2
       MemoryCardData(
         topTitle: 'เมษายน',
         mainTitle: 'ให้รูปภาพเป็นได้มากกว่า\nความทรงจำ',
@@ -64,36 +61,63 @@ class _RecommendedState extends State<Recommended> {
         gradientColors: [],
         accentColor: Colors.transparent,
         backgroundImage: 'assets/images/Hobby3.png',
-        showTextOverlay: true, // เพิ่มตัวเลือกให้แสดงข้อความ
+        showTextOverlay: true,
       ),
-
-      // ---------------------------------------------------
-      // Card ใบที่ 3 (แบบเดิม)
-      // ---------------------------------------------------
+      // Card 3
       MemoryCardData(
         topTitle: 'เมษายน',
-        mainTitle: 'ให้รูปภาพเป็นได้มากกว่า\nความทรงจำ',
+        mainTitle: 'ความทรงจำที่\nน่าจดจำ',
         subTitle: '',
         footerText: '',
         gradientColors: [],
         accentColor: Colors.transparent,
         backgroundImage: 'assets/images/Hobby1.png',
-        showTextOverlay: true, // เพิ่มตัวเลือกให้แสดงข้อความ
+        showTextOverlay: true,
       ),
     ];
 
-    // Logic สำหรับอัปเดตการ์ดใบแรกถ้ามีข้อมูลส่งมา
     if (widget.albumItems != null && widget.albumItems!.isNotEmpty) {
-      String displayTitle = widget.albumMonth ?? 'เดือนล่าสุด';
+      final items = widget.albumItems!;
+      
+      // Card 1: รูปจาก AlbumItems
       _items[0] = MemoryCardData(
-        topTitle: 'เติมเรื่องราวด้วยอัลบั้มใหม่กัน',
-        mainTitle: displayTitle,
+        topTitle: 'อัลบั้มล่าสุดของคุณ',
+        mainTitle: displayMonth,
         subTitle: 'เพิ่มความทรงจำ',
-        footerText: 'อีกมากกว่า 23+ ที่เพิ่มรูปภาพเดือนนี้',
+        footerText: 'บันทึกความทรงจำในเดือนนี้',
         gradientColors: [const Color(0xFF424242), const Color(0xFF212121)],
         accentColor: const Color(0xFFFF7043),
-        imageItems: widget.albumItems,
+        imageItems: items,
       );
+
+      // Card 2: รูป Index 0 เป็น Background
+      if (items.isNotEmpty) {
+        _items[1] = MemoryCardData(
+          topTitle: displayMonth,
+          mainTitle: 'ภาพแห่งความทรงจำ\nใบแรก',
+          subTitle: '',
+          footerText: '',
+          gradientColors: [],
+          accentColor: Colors.transparent,
+          backgroundMediaItem: items[0],
+          showTextOverlay: true,
+        );
+      }
+
+      // Card 3: รูป Index 1 (หรือ 0) เป็น Background
+      if (items.isNotEmpty) {
+         final bgItem = items.length > 1 ? items[1] : items[0];
+         _items[2] = MemoryCardData(
+          topTitle: displayMonth,
+          mainTitle: 'ช่วงเวลาดีๆ\nในเดือนนี้',
+          subTitle: '',
+          footerText: '',
+          gradientColors: [],
+          accentColor: Colors.transparent,
+          backgroundMediaItem: bgItem,
+          showTextOverlay: true,
+        );
+      }
     }
 
     if (mounted) setState(() {});
@@ -111,7 +135,6 @@ class _RecommendedState extends State<Recommended> {
     }
   }
 
-  //  ฟังก์ชันเปิด CreateAlbumModal
   void _openCreateAlbumModal() {
     showModalBottomSheet(
       context: context,
@@ -128,16 +151,15 @@ class _RecommendedState extends State<Recommended> {
       width: double.infinity,
       child: Stack(
         alignment: Alignment.center,
-        children:
-            _items
-                .asMap()
-                .entries
-                .map((entry) {
-                  return _buildCardItem(entry.key, entry.value);
-                })
-                .toList()
-                .reversed
-                .toList(),
+        children: _items
+            .asMap()
+            .entries
+            .map((entry) {
+              return _buildCardItem(entry.key, entry.value);
+            })
+            .toList()
+            .reversed
+            .toList(),
       ),
     );
   }
@@ -199,7 +221,6 @@ class _RecommendedState extends State<Recommended> {
                   absorbing: relativeIndex > 0,
                   child: MemoryCard(
                     data: item,
-                    // ✅ ส่ง callback ให้การ์ดแรกเท่านั้น
                     onButtonTap: index == 0 ? _openCreateAlbumModal : null,
                   ),
                 ),
@@ -212,7 +233,73 @@ class _RecommendedState extends State<Recommended> {
   }
 }
 
-// ✅ เพิ่มตัวแปร showTextOverlay
+// ---------------------------------------------------------------------------
+// ✅ Widget ใหม่: ช่วยโหลดรูปภาพแบบ Async และเก็บ State ไว้ไม่ให้กระตุก
+// ---------------------------------------------------------------------------
+class AsyncImageLoader extends StatefulWidget {
+  final MediaItem item;
+  final BoxFit fit;
+  final int quality; // ขนาด Thumbnail (เช่น 300 หรือ 600)
+
+  const AsyncImageLoader({
+    Key? key,
+    required this.item,
+    this.fit = BoxFit.cover,
+    this.quality = 300,
+  }) : super(key: key);
+
+  @override
+  State<AsyncImageLoader> createState() => _AsyncImageLoaderState();
+}
+
+class _AsyncImageLoaderState extends State<AsyncImageLoader> {
+  Uint8List? _imageData;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant AsyncImageLoader oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // โหลดใหม่เฉพาะถ้ารูปเปลี่ยน
+    if (widget.item.asset.id != oldWidget.item.asset.id ||
+        widget.item.capturedImage != oldWidget.item.capturedImage) {
+      _load();
+    }
+  }
+
+  Future<void> _load() async {
+    // 1. ถ้ามีรูปที่แต่งแล้ว ใช้เลย
+    if (widget.item.capturedImage != null) {
+      if (mounted) setState(() => _imageData = widget.item.capturedImage);
+      return;
+    }
+    // 2. ถ้าไม่มี ให้โหลดจาก Asset
+    final data = await widget.item.asset.thumbnailDataWithSize(
+      ThumbnailSize(widget.quality, widget.quality),
+    );
+    if (mounted) {
+      setState(() => _imageData = data);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_imageData != null) {
+      return Image.memory(
+        _imageData!,
+        fit: widget.fit,
+        gaplessPlayback: true, // ✅ สำคัญ: ช่วยกันภาพกะพริบตอน rebuild
+      );
+    }
+    // แสดง Placeholder สีเทาระหว่างรอ
+    return Container(color: Colors.grey[200]);
+  }
+}
+
 class MemoryCardData {
   final String topTitle;
   final String mainTitle;
@@ -223,7 +310,8 @@ class MemoryCardData {
   final List<MediaItem>? imageItems;
   final List<String>? assetImages;
   final String? backgroundImage;
-  final bool showTextOverlay; // เพิ่มตัวแปรนี้
+  final MediaItem? backgroundMediaItem;
+  final bool showTextOverlay;
 
   MemoryCardData({
     required this.topTitle,
@@ -235,55 +323,64 @@ class MemoryCardData {
     this.imageItems,
     this.assetImages,
     this.backgroundImage,
-    this.showTextOverlay = false, // ค่า default เป็น false
+    this.backgroundMediaItem,
+    this.showTextOverlay = false,
   });
 }
 
-// ---------------------------------------------------------------------------
-// MemoryCard Widget
-// ---------------------------------------------------------------------------
 class MemoryCard extends StatelessWidget {
   final MemoryCardData data;
   final VoidCallback? onButtonTap;
 
   const MemoryCard({Key? key, required this.data, this.onButtonTap})
-    : super(key: key);
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // ✅ 1. เช็คว่ามีรูปพื้นหลังไหม (ส่วนของ Card 2 และ 3)
-    if (data.backgroundImage != null) {
+    // ----------------------------------------------------------------------
+    // CASE A: มี Background Image (สำหรับ Card 2, 3)
+    // ----------------------------------------------------------------------
+    if (data.backgroundImage != null || data.backgroundMediaItem != null) {
       return Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(0),
-          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
-          image: DecorationImage(
-            image: AssetImage(data.backgroundImage!),
-            fit: BoxFit.cover,
-          ),
-        ),
-        //  ถ้า showTextOverlay = true แสดงข้อความทับรูป
-        child:
-            data.showTextOverlay
-                ? Container(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // --- Layer 1: รูปภาพพื้นหลัง ---
+              if (data.backgroundMediaItem != null)
+                // ✅ เรียกใช้ Widget ใหม่ที่สร้างขึ้น (คุณภาพ 600px)
+                AsyncImageLoader(
+                  item: data.backgroundMediaItem!,
+                  fit: BoxFit.cover,
+                  quality: 600,
+                )
+              else
+                Image.asset(
+                  data.backgroundImage!,
+                  fit: BoxFit.cover,
+                ),
+
+              // --- Layer 2: Gradient Overlay + Text ---
+              if (data.showTextOverlay)
+                Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(28),
                     gradient: LinearGradient(
                       colors: [
-                        Colors.black.withOpacity(0.5),
+                        Colors.black.withOpacity(0.6),
                         Colors.transparent,
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.3),
                       ],
+                      stops: const [0.0, 0.4, 0.7, 1.0],
                       begin: Alignment.topCenter,
-                      end: Alignment.center,
+                      end: Alignment.bottomCenter,
                     ),
                   ),
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // -----------------------------------------------------
-                      // ✨ แก้ไขจุดนี้: เอา Container ออก เหลือแค่ Text
-                      // -----------------------------------------------------
                       Text(
                         data.topTitle,
                         style: const TextStyle(
@@ -292,10 +389,7 @@ class MemoryCard extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-
-                      // -----------------------------------------------------
                       const SizedBox(height: 12),
-                      // Main Title
                       Text(
                         data.mainTitle,
                         style: const TextStyle(
@@ -307,15 +401,19 @@ class MemoryCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                )
-                : null,
+                ),
+            ],
+          ),
+        ),
       );
     }
 
-    // ✅ 2. ถ้าไม่มีรูปพื้นหลัง (ส่วนของ Card 1 - คงเดิมไว้ทุกอย่าง)
+    // ----------------------------------------------------------------------
+    // CASE B: แบบปกติ (Card 1)
+    // ----------------------------------------------------------------------
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(0),
+        borderRadius: BorderRadius.circular(28),
         gradient: LinearGradient(
           colors: data.gradientColors,
           begin: Alignment.topCenter,
@@ -349,19 +447,14 @@ class MemoryCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // 1. Top Title (อันนี้ยังคงมี Container ตามเดิม)
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(
-                        255,
-                        203,
-                        203,
-                        203,
-                      ).withOpacity(0.15),
+                      color: const Color.fromARGB(255, 203, 203, 203)
+                          .withOpacity(0.15),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
@@ -375,8 +468,6 @@ class MemoryCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-
-                  // 2. Main Title
                   Text(
                     data.mainTitle,
                     style: const TextStyle(
@@ -389,8 +480,6 @@ class MemoryCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 6),
-
-                  // 3. Footer Text
                   Text(
                     data.footerText,
                     style: TextStyle(
@@ -400,8 +489,6 @@ class MemoryCard extends StatelessWidget {
                     ),
                     textAlign: TextAlign.center,
                   ),
-
-                  // 4. Photo Stack
                   SizedBox(
                     height: 138,
                     width: 280,
@@ -411,8 +498,6 @@ class MemoryCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // 5. Button
                   GestureDetector(
                     onTap: onButtonTap,
                     child: Container(
@@ -450,9 +535,6 @@ class MemoryCard extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Photo Stack (คงเดิม)
-// ---------------------------------------------------------------------------
 class _PhotoStack extends StatelessWidget {
   final List<MediaItem>? items;
   final List<String>? assetImages;
@@ -542,7 +624,7 @@ class _PhotoStack extends StatelessWidget {
   Widget _buildImageContent(dynamic item) {
     if (item == null) {
       return const Center(
-        child: Icon(Icons.image, color: Colors.white, size: 24),
+        child: Icon(Icons.image, color: Colors.grey, size: 24),
       );
     }
 
@@ -554,38 +636,25 @@ class _PhotoStack extends StatelessWidget {
         child: Image.asset(
           item,
           fit: BoxFit.cover,
-          errorBuilder:
-              (context, error, stackTrace) => const Center(
-                child: Icon(Icons.broken_image, color: Colors.grey, size: 24),
-              ),
+          errorBuilder: (context, error, stackTrace) => const Center(
+            child: Icon(Icons.broken_image, color: Colors.grey, size: 24),
+          ),
         ),
       );
     }
 
     if (item is MediaItem) {
-      return FutureBuilder<Uint8List?>(
-        future:
-            item.capturedImage != null
-                ? Future.value(item.capturedImage)
-                : item.asset.thumbnailDataWithSize(
-                  const ThumbnailSize(300, 300),
-                ),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            return Padding(
-              padding: const EdgeInsets.all(imagePadding),
-              child: Image.memory(snapshot.data!, fit: BoxFit.cover),
-            );
-          }
-          return const Center(child: SizedBox());
-        },
+      // ✅ ใช้ AsyncImageLoader แทน FutureBuilder เพื่อลดการกระตุก
+      return Padding(
+        padding: const EdgeInsets.all(imagePadding),
+        child: AsyncImageLoader(
+          item: item,
+          fit: BoxFit.cover,
+          quality: 300, // รูปเล็กใช้ความละเอียดน้อยหน่อยก็ได้
+        ),
       );
     }
 
     return const SizedBox();
   }
 }
-
-// ---------------------------------------------------------------------------
-// CreateAlbumModal Widget (ตัวอย่าง)
-// ---------------------------------------------------------------------------

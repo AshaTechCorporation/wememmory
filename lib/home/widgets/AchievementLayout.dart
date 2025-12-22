@@ -58,7 +58,7 @@ class AchievementLayout extends StatelessWidget {
                       // เดือนมีนาคม (สีส้ม)
                       TimelineItem(
                         monthTitle: 'Mar',
-                        mainText: 'ใช้เวลาเพียง 15 นาที',
+                        mainText: 'ใช้เวลา 5.47 นาที',
                         subText: 'ในการสร้างอัลบั้มเดือนนี้เร็วที่สุด',
                         imagePath: 'assets/icons/limiter.png',
                         imgWidth: 82,
@@ -68,7 +68,7 @@ class AchievementLayout extends StatelessWidget {
                       // เดือนกุมภาพันธ์
                       TimelineItem(
                         monthTitle: 'Feb',
-                        mainText: 'อธิบายภาพในเดือนนี้',
+                        mainText: 'อธิบายภาพเดือนนี้',
                         subText: 'บันทึกเรื่องราวของเดือนนี้มากที่สุด',
                         imagePath: 'assets/icons/76p.png',
                         imgWidth: 92,
@@ -108,6 +108,7 @@ class _HeaderSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(
@@ -115,6 +116,17 @@ class _HeaderSection extends StatelessWidget {
               height: 103,
               width: 154,
             ),
+            Padding(
+              padding: const EdgeInsets.only(top: 70.0), // ปรับค่าตรงนี้เพื่อเลื่อน Text ลงมา
+              child: Text(
+                "Beginner",
+                style: const TextStyle(
+                  color: Color(0xFFEE743B),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
           ],
         ),
       ],
@@ -214,7 +226,7 @@ class _DetailCard extends StatelessWidget {
         children: [
           // 1. Month Title (ตัวหนังสือจางๆ ด้านหลัง)
           Positioned(
-            top: -8,
+            top: 8,
             left: 20,
             child: Text(
               monthTitle,
@@ -229,7 +241,7 @@ class _DetailCard extends StatelessWidget {
           
           // 2. Main Content (ข้อความหลัก)
           Padding(
-            padding: const EdgeInsets.only(left: 20, right: 80),
+            padding: const EdgeInsets.only(left: 20, right: 80,top: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -244,7 +256,7 @@ class _DetailCard extends StatelessWidget {
                     height: 1.2,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 1),
                 Text(
                   subText,
                   style: TextStyle(

@@ -6,13 +6,15 @@ import 'package:wememmory/home/widgets/summary_strip.dart';
 import 'package:wememmory/models/media_item.dart';
 
 class HomePage extends StatefulWidget {
-  final List<MediaItem>? albumItems;
-  final String? albumMonth;
+  // ✅ 1. ประกาศตัวแปรรับค่าให้ถูกต้อง (ลบอันเก่าที่ซ้ำซ้อนออก)
+  final List<MediaItem>? newAlbumItems;
+  final String? newAlbumMonth;
 
   const HomePage({
     super.key,
-    this.albumItems,
-    this.albumMonth,
+    // ✅ 2. รับค่าผ่าน Constructor
+    this.newAlbumItems,
+    this.newAlbumMonth,
   });
 
   @override
@@ -20,34 +22,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // ตัวแปร State สำหรับจัดการข้อมูลภายในหน้านี้
   List<MediaItem>? _currentAlbumItems;
   String? _currentAlbumMonth;
 
   @override
   void initState() {
     super.initState();
-    _currentAlbumItems = widget.albumItems;
-    _currentAlbumMonth = widget.albumMonth;
+    // ✅ 3. กำหนดค่าเริ่มต้นจาก widget ที่รับมา
+    _currentAlbumItems = widget.newAlbumItems;
+    _currentAlbumMonth = widget.newAlbumMonth;
   }
 
-  Future<void> _navigateToCollection() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CollectionPage(
-          newAlbumItems: _currentAlbumItems,
-          newAlbumMonth: _currentAlbumMonth,
-        ),
-      ),
-    );
-
-    if (result != null && result is Map) {
-      setState(() {
-        _currentAlbumItems = result['items'] as List<MediaItem>?;
-        _currentAlbumMonth = result['month'] as String?;
-      });
-    }
-  }
+  // (ฟังก์ชัน _navigateToCollection ไม่ได้ถูกใช้ในหน้านี้ อาจลบออกได้ถ้าไม่จำเป็น)
+  // แต่ถ้าจะเก็บไว้เผื่ออนาคตก็ไม่เสียหายครับ
 
   @override
   Widget build(BuildContext context) {
@@ -60,27 +48,24 @@ class _HomePageState extends State<HomePage> {
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.elliptical(420, 70)),
         ),
-        // ✅ ปรับ Layout ใหม่: เอา Leading เดิมออก และจัด Layout ใน Title ด้วย Row
         automaticallyImplyLeading: false, 
-        titleSpacing: 24, // เว้นระยะจากซ้าย
+        titleSpacing: 24,
         title: Row(
           children: [
-            // 1. รูปโปรไฟล์ / โลโก้
+            // รูปโปรไฟล์
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle, 
-                image: const DecorationImage(
-                  // ✅ ใช้รูปจาก Asset ที่ระบุ
+                image: DecorationImage(
                   image: AssetImage('assets/images/userpic.png'), 
                   fit: BoxFit.cover,
                 ),
               ),
             ),
-            const SizedBox(width: 14), // ระยะห่างระหว่างรูปกับชื่อ
-            
-            // 2. ชื่อ korawit
+            const SizedBox(width: 14),
+            // ชื่อผู้ใช้
             const Text(
               'korawit',
               style: TextStyle(
@@ -97,7 +82,6 @@ class _HomePageState extends State<HomePage> {
             alignment: Alignment.center,
             children: [
               IconButton(onPressed: () {}, icon: const Icon(Icons.notifications, color: Colors.white, size: 25)),
-             
             ],
           ),
           const SizedBox(width: 12),
@@ -105,15 +89,14 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SafeArea(
         bottom: false,
-        // ✅ ใช้ CustomScrollView เพื่อจัดการ Layout ยืดหยุ่น
         child: CustomScrollView(
           slivers: [
-            // ส่วนบน: Recommended และ Summary
             SliverToBoxAdapter(
               child: Column(
                 children: [
+                  // 4. ส่งค่า _currentAlbumItems/Month ไปยัง Recommended
                   Recommended(
-                    albumItems: _currentAlbumItems,
+                    albumItems: _currentAlbumItems, // ใช้ตัวแปร state ที่รับค่ามาแล้ว
                     albumMonth: _currentAlbumMonth,
                   ),
                   const SummaryStrip(),
@@ -122,9 +105,8 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             
-            // ✅ ส่วนล่าง: AchievementLayout ยืดเต็มพื้นที่ที่เหลือ
             const SliverFillRemaining(
-              hasScrollBody: false, // สำคัญ: เพื่อให้มันยืดโดยไม่คิดว่าเป็น List
+              hasScrollBody: false, 
               child: AchievementLayout(),
             ),
           ],
