@@ -10,18 +10,19 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Wememory', // ตั้งชื่อแอป
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        // ✅ ส่วนนี้จะทำให้ Text ปกติทั้งแอปเป็น Prompt
         textTheme: GoogleFonts.promptTextTheme(
-          Theme.of(context).textTheme,),
+          Theme.of(context).textTheme,
+        ),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const LoginPage(),
+      home: const LoginPage(), // หรือ FirstPage() ตาม Flow ของคุณ
     );
   }
 }

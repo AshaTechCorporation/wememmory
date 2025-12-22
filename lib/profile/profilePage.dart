@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:wememmory/profile/albumDetailPage.dart';
 import 'package:wememmory/profile/historyPayment.dart';
 import 'package:wememmory/profile/membershipPackage.dart';
@@ -26,6 +27,7 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const SizedBox(height: 24),
               const _HeaderSection(),
               const SizedBox(height: 24),
               const _TicketCard(),
@@ -52,77 +54,63 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 20),
               const _PointCard(),
               const SizedBox(height: 16),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //   children: [
-              //     Container(
-              //       padding: const EdgeInsets.symmetric(
-              //         horizontal: 12,
-              //         vertical: 6,
-              //       ),
-              //       decoration: BoxDecoration(
-              //         color: const Color(0xFFFDF1E6),
-              //         borderRadius: BorderRadius.circular(8),
-              //       ),
-              //       child: const Text(
-              //         'เงื่อนไขการสะสม Point',
-              //         style: TextStyle(fontSize: 12, color: Colors.black87),
-              //       ),
-              //     ),
-              //     InkWell(
-              //       onTap: () {},
-              //       child: Row(
-              //         children: const [
-              //           Text(
-              //             'อ่านเพิ่มเติม',
-              //             style: TextStyle(
-              //               fontSize: 12,
-              //               color: Colors.black54,
-              //               fontWeight: FontWeight.bold,
-              //             ),
-              //           ),
-              //           Icon(
-              //             Icons.arrow_forward_ios,
-              //             size: 10,
-              //             color: Colors.black54,
-              //           ),
-              //         ],
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              // const SizedBox(height: 30),
 
-              // Banner
-              Center(
-                child: Image.asset(
-                  'assets/images/wemorylogo.png',
-                  height: 100,
-                  errorBuilder:
-                      (context, error, stackTrace) => const SizedBox(),
-                ),
+              // =========================================================
+              // ✅ ส่วน Header: Logo + Beginner
+              // =========================================================
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Image.asset(
+                    'assets/images/wemorylogo.png',
+                    height: 80,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => const SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: Icon(Icons.image_not_supported, color: Colors.grey),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      'Beginner',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFEE743B),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
 
               const SizedBox(height: 12),
+              
+              // 1. กราฟ
               const _MetricBarChart(),
 
               const SizedBox(height: 24),
 
-              // ส่วนสถิติ (Grid สีฟ้า)
-              const _UsageStatsSection(),
+              // 2. การ์ดเรื่องราวที่น่าจดจำ (อยู่ใต้กราฟ)
+              const _MemorableStoryCard(),
 
               const SizedBox(height: 24),
 
-              // =========================================================
-              // ✅ ส่วนเพิ่มใหม่: การ์ดสินค้าของฉัน (ตามรูปภาพ)
-              // =========================================================
+              // 3. ส่วนสถิติ (Grid สีฟ้า)
+              const _UsageStatsSection(),
+
+              const SizedBox(height: 24),
+              
+              // 4. สินค้าของฉัน
               const _ProductStatusCard(),
 
               const SizedBox(height: 30),
               const Divider(),
               const SizedBox(height: 10),
 
+              // เมนู
               MenuSection(
                 items: const [
                   'ส่วนลด',
@@ -136,54 +124,25 @@ class ProfilePage extends StatelessWidget {
                 onItemTap: (item, index) {
                   switch (index) {
                     case 0:
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => CouponPage()),
-                      );
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => CouponPage()));
                       break;
                     case 1:
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PersonalSecurityPage(),
-                        ),
-                      );
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => PersonalSecurityPage()));
                       break;
                     case 2:
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddressSelectionPage(),
-                        ),
-                      );
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => AddressSelectionPage()));
                       break;
                     case 3:
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => BankInfoPage()),
-                      );
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => BankInfoPage()));
                       break;
                     case 4:
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LanguageSelectionScreen(),
-                        ),
-                      );
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => LanguageSelectionScreen()));
                       break;
                     case 5:
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TermsAndServicesPage(),
-                        ),
-                      );
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => TermsAndServicesPage()));
                       break;
                     case 6:
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => FAQPage()),
-                      );
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => FAQPage()));
                       break;
                   }
                 },
@@ -197,19 +156,146 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// ✅ Widget ใหม่: การ์ดสินค้าของฉัน (สีส้ม)
-// ---------------------------------------------------------------------------
-class _ProductStatusCard extends StatelessWidget {
-  const _ProductStatusCard();
+class _MemorableStoryCard extends StatelessWidget {
+  const _MemorableStoryCard();
+
+  Widget _buildStackedImages() {
+    return SizedBox(
+      width: 140,
+      height: 160,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Transform.rotate(
+            angle: -0.15,
+            child: Container(
+              width: 90,
+              height: 110,
+              margin: const EdgeInsets.only(right: 30, bottom: 20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [const BoxShadow(color: Colors.black12, blurRadius: 4)],
+                border: Border.all(color: Colors.white, width: 3),
+              ),
+            ),
+          ),
+          Transform.rotate(
+            angle: 0.1,
+            child: Container(
+              width: 90,
+              height: 110,
+              margin: const EdgeInsets.only(left: 30, bottom: 20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [const BoxShadow(color: Colors.black12, blurRadius: 4)],
+                border: Border.all(color: Colors.white, width: 3),
+              ),
+            ),
+          ),
+          Container(
+            width: 100,
+            height: 130,
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+              boxShadow: [
+                const BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(2),
+                    child: Image.asset(
+                      'assets/images/exProfile.png',
+                      fit: BoxFit.cover,
+                      errorBuilder: (c, o, s) => Container(color: Colors.grey[200]),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'อากาศดี วิวสวย',
+                  style: GoogleFonts.chakraPetch(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '#ครอบครัว #ความรัก',
+                  style: GoogleFonts.chakraPetch(
+                    fontSize: 8,
+                    color: const Color(0xFF58A3B6),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    // กำหนดค่าความคืบหน้าตัวอย่าง (9/10)
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F5F5), // สีพื้นหลังเทาอ่อน
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: [
+          _buildStackedImages(),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'เรื่องราวที่น่าจดจำ',
+                  style: GoogleFonts.chakraPetch(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF58A3B6),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '88',
+                  style: GoogleFonts.chakraPetch(
+                    fontSize: 60,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF58A3B6),
+                    height: 1.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProductStatusCard extends StatelessWidget {
+  const _ProductStatusCard();
+  @override
+  Widget build(BuildContext context) {
     const int completed = 9;
     const int total = 10;
     const double progress = completed / total;
-
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -221,8 +307,7 @@ class _ProductStatusCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: const Color(0xFFEE743B), // สีส้มตามภาพ
-          borderRadius: BorderRadius.circular(12),
+          color: const Color(0xFFEE743B),
           boxShadow: [
             BoxShadow(
               color: Colors.orange.withOpacity(0.3),
@@ -243,20 +328,15 @@ class _ProductStatusCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-
-            // Progress Bar
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: LinearProgressIndicator(
                 value: progress,
                 minHeight: 12,
-                // สีพื้นหลังของ Bar (สีเนื้อ/น้ำตาลอ่อนๆ ตามภาพ)
                 backgroundColor: const Color(0xFFD68F72),
-                // สีของ Bar (สีขาว)
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
               ),
             ),
-
             const SizedBox(height: 10),
             const Text(
               'จัดส่งสำเร็จ $completed/$total รายการ',
@@ -272,8 +352,6 @@ class _ProductStatusCard extends StatelessWidget {
     );
   }
 }
-
-// ... (ส่วนอื่นๆ _HeaderSection, _TicketCard, _PointCard, _MetricBarChart, _UsageStatsSection เหมือนเดิม) ...
 
 class _HeaderSection extends StatelessWidget {
   const _HeaderSection();
@@ -327,13 +405,13 @@ class _TicketCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
                 'Ticket',
                 style: TextStyle(
                   fontSize: 48,
                   fontWeight: FontWeight.w400,
-                  color: Color(0x404A4A4A),
+                  color: const Color(0x404A4A4A),
                   height: 1.0,
                 ),
               ),
@@ -341,7 +419,7 @@ class _TicketCard extends StatelessWidget {
                 '10',
                 style: TextStyle(
                   fontSize: 48,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: Colors.white,
                   height: 1.0,
                 ),
@@ -352,12 +430,11 @@ class _TicketCard extends StatelessWidget {
             children: [
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed:
-                      () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const MembershipPackagePage(),
-                        ),
-                      ),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const MembershipPackagePage(),
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE86A3E),
                     foregroundColor: Colors.white,
@@ -369,18 +446,16 @@ class _TicketCard extends StatelessWidget {
                   ),
                   icon: Image.asset(
                     'assets/icons/wallet-3.png',
-
-                    width: 25, // ปรับขนาดตามความเหมาะสม
-
-                    height: 25,
-
-                    color:
-                        Colors
-                            .white, // ใส่สีขาวเพื่อให้เข้ากับธีม (ถ้า icon เป็นสีดำ)
+                    width: 24,
+                    height: 24,
+                    color: Colors.white,
                   ),
-                  label: const Text(
+                  label: Text(
                     'Buy Ticket',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.prompt(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -388,13 +463,14 @@ class _TicketCard extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    // ✅ ใส่โค้ดเชื่อมหน้าตรงนี้
                     Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => const MembershipHistoryPage(type: HistoryType.subscription),
-  ),
-);
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MembershipHistoryPage(
+                          type: HistoryType.subscription,
+                        ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -410,9 +486,12 @@ class _TicketCard extends StatelessWidget {
                     size: 20,
                     color: Colors.black87,
                   ),
-                  label: const Text(
+                  label: Text(
                     'ดูประวัติทั้งหมด',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.prompt(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -467,12 +546,14 @@ class _PointCard extends StatelessWidget {
             children: [
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => const BenefitsPage(),
-  ),
-);},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BenefitsPage(),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE86A3E),
                     foregroundColor: Colors.white,
@@ -484,14 +565,9 @@ class _PointCard extends StatelessWidget {
                   ),
                   icon: Image.asset(
                     'assets/icons/wallet-3.png',
-
-                    width: 25, // ปรับขนาดตามความเหมาะสม
-
+                    width: 25,
                     height: 25,
-
-                    color:
-                        Colors
-                            .white, // ใส่สีขาวเพื่อให้เข้ากับธีม (ถ้า icon เป็นสีดำ)
+                    color: Colors.white,
                   ),
                   label: const Text(
                     'แลกรางวัล',
@@ -503,13 +579,14 @@ class _PointCard extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    // ✅ ใส่โค้ดเชื่อมหน้าตรงนี้
                     Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => const MembershipHistoryPage(type: HistoryType.point),
-  ),
-);
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MembershipHistoryPage(
+                          type: HistoryType.point,
+                        ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -652,165 +729,28 @@ class _MetricBarChart extends StatelessWidget {
 class _UsageStatsSection extends StatelessWidget {
   const _UsageStatsSection();
 
-  Widget _buildStackedImages() {
-    return SizedBox(
-      width: 140,
-      height: 160,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Transform.rotate(
-            angle: -0.15,
-            child: Container(
-              width: 90,
-              height: 110,
-              margin: const EdgeInsets.only(right: 30, bottom: 20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
-                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-                border: Border.all(color: Colors.white, width: 3),
-              ),
-            ),
-          ),
-          Transform.rotate(
-            angle: 0.1,
-            child: Container(
-              width: 90,
-              height: 110,
-              margin: const EdgeInsets.only(left: 30, bottom: 20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
-                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-                border: Border.all(color: Colors.white, width: 3),
-              ),
-            ),
-          ),
-          Container(
-            width: 100,
-            height: 130,
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
-                    child: Image.asset(
-                      'assets/images/exProfile.png',
-                      fit: BoxFit.cover,
-                      errorBuilder:
-                          (c, o, s) => Container(color: Colors.grey[200]),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'อากาศดี วิวสวย',
-                  style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold),
-                ),
-                const Text(
-                  '#ครอบครัว #ความรัก',
-                  style: TextStyle(fontSize: 7, color: Color(0xFF58A3B6)),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  TextStyle get _digitalTextStyle => GoogleFonts.orbitron(
+    fontSize: 30,
+    fontWeight: FontWeight.w900,
+    color: Colors.white,
+    letterSpacing: 1.5,
+    height: 1.0,
+  );
 
-  Widget _buildBlueCard({
-    required String iconPath,
-    required String title,
-    String? value,
-    bool isQuote = false,
-    double iconSize = 32.0,
-    double titleSize = 14.0,
-    double valueSize = 30.0,
-  }) {
-    return Container(
-      height: 100,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF58A3B6),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Image.asset(
-            iconPath,
-            width: iconSize,
-            height: iconSize,
-            color: Colors.white,
-            errorBuilder:
-                (context, error, stackTrace) =>
-                    Icon(Icons.error, color: Colors.white, size: iconSize),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: titleSize,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                if (isQuote)
-                  Text(
-                    '“เรื่องราว ”',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: valueSize * 0.7,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  )
-                else
-                  Text(
-                    value ?? '',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: valueSize,
-                      fontWeight: FontWeight.bold,
-                      height: 1.0,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  TextStyle get _digitalDateStyle => GoogleFonts.orbitron(
+    fontSize: 37,
+    fontWeight: FontWeight.w900,
+    color: const Color(0xFF4A4A4A),
+    letterSpacing: 0.5,
+    height: 1.0,
+  );
+
+  TextStyle get _headerThaiStyle => const TextStyle(
+    fontSize: 40,
+    fontWeight: FontWeight.bold,
+    color: Colors.white,
+    height: 1.0,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -818,169 +758,199 @@ class _UsageStatsSection extends StatelessWidget {
       children: [
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5F5F5),
-            borderRadius: BorderRadius.circular(24),
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          decoration: const BoxDecoration(color: Color(0xFFF9A675)),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _buildStackedImages(),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [
-                    Text(
-                      'เรื่องราวที่น่าจดจำ',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF58A3B6),
-                        fontWeight: FontWeight.bold,
-                      ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('บันทึก', style: _headerThaiStyle),
+                  const Text(
+                    'ความทรงจำแรก',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                      fontWeight: FontWeight.w500,
                     ),
-                    SizedBox(height: 4),
-                    Text(
-                      '88',
-                      style: TextStyle(
-                        fontSize: 60,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF58A3B6),
-                        height: 1.0,
-                      ),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('10 Jan', style: _digitalDateStyle),
+                  Text('2025', style: _digitalDateStyle),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatBlock(
+                icon: Icons.calendar_month,
+                title: 'เดือนที่ทำต่อเนื่อง',
+                value: '7',
+                isDigitalFont: true,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildStatBlock(
+                icon: Icons.qr_code,
+                title: 'จำนวนคนที่ใช้โค้ด',
+                value: '10',
+                isDigitalFont: true,
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatBlock(
+                icon: Icons.share,
+                title: 'แชร์อัลบั้มทั้งหมด',
+                value: '20',
+                isDigitalFont: true,
+                iconSize: 28,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildStatBlock(
+                icon: Icons.speed,
+                title: 'เวลาเลือกรูป(นาที)',
+                value: '300.45',
+                isDigitalFont: true,
+                valueFontSize: 20,
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 12),
+
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          decoration: const BoxDecoration(color: Color(0xFFF9A675)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('บันทึก', style: _headerThaiStyle),
+                  const Text(
+                    'เรื่องราว',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
                     ),
-                  ],
+                  ),
+                ],
+              ),
+              Text(
+                '80',
+                style: GoogleFonts.orbitron(
+                  fontSize: 60,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  letterSpacing: 2.0,
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _buildBlueCard(
-                iconPath: 'assets/icons/Vector.png',
-                title: 'ความทรงจำแรก',
-                value: '10/1/2568',
-                iconSize: 50,
-              ),
-            ),
-          ],
-        ),
+
         const SizedBox(height: 12),
+
         Row(
           children: [
             Expanded(
-              child: _buildBlueCard(
-                iconPath: 'assets/icons/calendar2.png',
-                title: 'สร้างอัลบั้ม',
-                value: '10',
-                iconSize: 45,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                height: 100,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF58A3B6),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 12),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'บันทึก',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          '“เรื่องราว ”',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 23,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              child: _buildStatBlock(
+                icon: Icons.calendar_today,
+                title: 'เดือนที่ทำทั้งหมด',
+                value: '8',
+                isDigitalFont: true,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _buildBlueCard(
-                iconPath: 'assets/icons/carendar.png',
+              child: _buildStatBlock(
+                icon: Icons.image,
                 title: 'วันที่สร้างมากที่สุด',
                 value: 'อาทิตย์',
-                iconSize: 32,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildBlueCard(
-                iconPath: 'assets/icons/Vector.png',
-                title: 'แชร์รูปภาพ',
-                value: '10',
-                iconSize: 32,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildBlueCard(
-                iconPath: 'assets/icons/calendar2.png',
-                title: 'เวลาที่ใช้ทั้งหมด',
-                value: '10',
-                iconSize: 32,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildBlueCard(
-                iconPath: 'assets/icons/carendar.png',
-                title: 'วันที่สร้างมากที่สุด',
-                value: 'อาทิตย์',
-                iconSize: 32,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildBlueCard(
-                iconPath: 'assets/icons/carendar.png',
-                title: 'วันที่สร้างมากที่สุด',
-                value: 'อาทิตย์',
-                iconSize: 32,
+                isDigitalFont: false,
+                valueFontSize: 30,
               ),
             ),
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildStatBlock({
+    required IconData icon,
+    required String title,
+    required String value,
+    bool isDigitalFont = false,
+    double iconSize = 32,
+    double valueFontSize = 40,
+  }) {
+    return Container(
+      height: 100,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF58A3B6),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.white, size: iconSize),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  textAlign: TextAlign.right,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style:
+                      isDigitalFont
+                          ? _digitalTextStyle.copyWith(fontSize: valueFontSize)
+                          : GoogleFonts.prompt(
+                            fontSize: valueFontSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                  textAlign: TextAlign.right,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

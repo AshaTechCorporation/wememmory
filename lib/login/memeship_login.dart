@@ -46,8 +46,8 @@ class _MembershipPageState extends State<MembershipPage> {
         children: [
           // 1. ภาพพื้นหลัง
           Positioned.fill(
-            child: Image.network(
-              'https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=2070&auto=format&fit=crop',
+            child: Image.asset(
+              'assets/images/membershipBackground.png',
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) =>
                   Container(color: Colors.grey.shade900),

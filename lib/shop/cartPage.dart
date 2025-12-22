@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:wememmory/shop/paymentPage.dart';
 
-// กำหนดสีหลักที่ใช้ (สมมติว่ากำหนดใน constants.dart)
 const Color kPrimaryColor = Color(0xFFED7D31);
 const Color kBackgroundColor = Color(0xFFF5F5F5);
-
-// ---------------------------------------------------------------------------
-// CartPage Widget
-// ---------------------------------------------------------------------------
 
 class CartPage extends StatelessWidget {
   const CartPage({super.key});
@@ -19,9 +14,8 @@ class CartPage extends StatelessWidget {
       
       // 1. App Bar
       appBar: AppBar(
-        // ปรับสีพื้นหลังให้เป็นสีขาวตามรูปภาพ
         backgroundColor: Colors.white, 
-        elevation: 0.5, // ให้มีเงาเล็กน้อยเพื่อแยกจากพื้นหลัง
+        elevation: 0.5,
         centerTitle: false,
         title: const Text(
           'ตะกร้าสินค้า',
@@ -33,31 +27,27 @@ class CartPage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context); // ใช้สำหรับย้อนกลับ
+            Navigator.pop(context);
           },
         ),
       ),
-      
-      // 2. Body
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(top: 8.0),
         child: Column(
           children: [
-            // ส่วนหัว: เลือกทั้งหมด
             _buildSelectAllSection(),
             
             const Divider(height: 1, color: Colors.grey),
             
             // รายการสินค้า
             _buildCartItem(
-              imageUrl: 'assets/album_placeholder.jpg', // ต้องเปลี่ยนเป็น path รูปจริง
+              imageUrl: 'assets/images/Rectangle2.png', // ต้องเปลี่ยนเป็น path รูปจริง
               productName: 'อัลบั้มรูป',
               price: 599,
               quantity: 1,
             ),
             
-            // สามารถเพิ่มรายการสินค้าอื่น ๆ ได้ที่นี่
-            // _buildCartItem(...),
             
           ],
         ),
@@ -76,10 +66,9 @@ class CartPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       child: Row(
         children: [
-          // Radio Button/Checkbox Placeholder (ใช้ Radio ธรรมดาตามรูป)
           Radio(
             value: 1,
-            groupValue: 1, // กำหนดให้เลือกไว้
+            groupValue: 1,
             onChanged: (val) {},
             activeColor: kPrimaryColor,
           ),
@@ -112,7 +101,6 @@ class CartPage extends StatelessWidget {
             activeColor: kPrimaryColor,
           ),
           
-          // รูปภาพสินค้า
           Container(
             width: 80,
             height: 80,
@@ -121,7 +109,7 @@ class CartPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               image: const DecorationImage(
                 // ⚠️ ต้องเปลี่ยนเป็นรูปภาพจริงของคุณ
-                image: AssetImage('assets/album_placeholder.jpg'), 
+                image: AssetImage('assets/images/Rectangle2.png'), 
                 fit: BoxFit.cover,
               ),
             ),
@@ -129,7 +117,6 @@ class CartPage extends StatelessWidget {
           
           const SizedBox(width: 12),
           
-          // รายละเอียดสินค้าและราคาสินค้า
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,9 +195,6 @@ class CartPage extends StatelessWidget {
       ),
     );
   }
-
-
-  // ... (ส่วนโค้ดอื่นๆ ที่อยู่ด้านบน)
 
   Widget _buildBottomCheckoutBar(BuildContext context) {
     return Container(

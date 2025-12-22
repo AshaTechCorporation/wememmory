@@ -3,43 +3,16 @@ import 'package:wememmory/shop/albumGiftPage.dart';
 import 'package:wememmory/shop/termsAndServicesPage.dart';
 import 'package:wememmory/shop/faqPage.dart';
 import 'package:wememmory/profile/membershipPayment.dart';
-// import 'package:wememmory/shop/cartPage.dart';
+import 'package:wememmory/shop/cartPage.dart';
 
 class ShopPage extends StatelessWidget {
   const ShopPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(50),
-        child: _ShopAppBar(),
-      ),
-      body: const _ShopBody(),
-    );
-  }
-}
-
-/* =============================== APP BAR =============================== */
-
-class _ShopAppBar extends StatelessWidget {
-  const _ShopAppBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      automaticallyImplyLeading: false, // <--- เพิ่มบรรทัดนี้เพื่อซ่อนปุ่มย้อนกลับ
-      backgroundColor: Colors.white,
-      elevation: 0,
-      titleSpacing: 0,
-      title: const Padding(
-        // ปรับ padding ซ้ายเพิ่มขึ้นนิดหน่อยเพื่อให้ไม่ชิดขอบจอเกินไปเมื่อไม่มีลูกศร
-        padding: EdgeInsets.fromLTRB(16, 8, 8, 8), 
-        child: Text('ร้านความทรงจำ', style: TextStyle(color: Colors.black)),
-      ),
-      foregroundColor: Colors.black,
-      iconTheme: const IconThemeData(color: Colors.black),
+      body: _ShopBody(),
     );
   }
 }
@@ -51,20 +24,51 @@ class _ShopBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. สร้างรายการรูปภาพตรงนี้
     final List<String> promoImages = [
       'assets/images/promo1.png',
-      'assets/images/promo2.png', // เปลี่ยนเป็นชื่อไฟล์รูปอื่นของคุณ
+      'assets/images/promo2.png',
       'assets/images/promo3.png',
-      // เพิ่มรูปได้เรื่อยๆ ตามต้องการ
     ];
 
     return CustomScrollView(
-      primary: false,
       slivers: [
+        SliverAppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0, // ป้องกันสีเปลี่ยนเวลาเลื่อนผ่าน
+          automaticallyImplyLeading: false,
+          
+          // --- การตั้งค่าการเลื่อน ---
+          floating: true,
+          snap: true,
+          pinned: false,
+          
+          titleSpacing: 0,
+          title: const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 8, 8),
+            child: Text(
+              'ร้านความทรงจำ',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
+              },
+              icon: const Icon(Icons.shopping_cart_outlined, color: Colors.black),
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
+
+        // ✅ 2. เนื้อหาอื่นๆ ตามเดิม
         const SliverToBoxAdapter(child: _BannerCarousel()),
 
-        // ส่วนลด (horizontal scroll)
         // ส่วนลด (horizontal scroll)
         SliverToBoxAdapter(
           child: Padding(
@@ -75,13 +79,8 @@ class _ShopBody extends StatelessWidget {
                 child: ListView.separated(
                   primary: false,
                   scrollDirection: Axis.horizontal,
-                  
-                  // 2.1 เปลี่ยนเลขคงที่ เป็นจำนวนรูปใน List
-                  itemCount: promoImages.length, 
-                  
+                  itemCount: promoImages.length,
                   separatorBuilder: (_, __) => const SizedBox(width: 8),
-                  
-                  // 2.2 ส่งรูปภาพไปยัง _PromoCard
                   itemBuilder: (_, i) => _PromoCard(imagePath: promoImages[i]),
                 ),
               ),
@@ -89,7 +88,7 @@ class _ShopBody extends StatelessWidget {
           ),
         ),
 
-        // ส่วนแพ็กเกจสมาชิก (New UI แก้ไขแล้ว)
+        // ส่วนแพ็กเกจสมาชิก
         const SliverToBoxAdapter(child: _MembershipPackageSection()),
 
         const SliverToBoxAdapter(child: SizedBox(height: 32)),
@@ -98,7 +97,7 @@ class _ShopBody extends StatelessWidget {
 
         const SliverToBoxAdapter(child: _GiftCardBanner()),
         const SliverToBoxAdapter(child: SizedBox(height: 16)),
-        const SliverToBoxAdapter(child: _GiftCardBanner(type: GiftCardType.photoFrame),),
+        const SliverToBoxAdapter(child: _GiftCardBanner(type: GiftCardType.photoFrame)),
         const SliverToBoxAdapter(child: SizedBox(height: 24)),
         const SliverToBoxAdapter(child: _SupportLinks()),
 
@@ -391,11 +390,12 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      // ส่วนบน
+                                      // --- ส่วนบน (แก้ไขใหม่) ---
                                       Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
+                                          // แถวที่ 1: ราคาหลัก และ Tag
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -418,49 +418,64 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
                                                 ),
                                             ],
                                           ),
-                                          if (monthPrice.isNotEmpty)
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                top: 8,
-                                              ),
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 4,
-                                                    ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white24,
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                ),
-                                                child: Text(
-                                                  monthPrice,
-                                                  style: const TextStyle(
-                                                    fontSize: 11,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
+                                          
+                                          // แถวที่ 2: ราคาเดิม และ ป้ายประหยัด (วางคู่กัน)
+                                          if (originalPrice.isNotEmpty || monthPrice.isNotEmpty)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 6,
                                             ),
+                                            child: Row(
+                                              children: [
+                                                // 1. ราคาเดิม (ขีดฆ่า) -> วางก่อน
+                                                if (originalPrice.isNotEmpty)
+                                                  Text(
+                                                    originalPrice,
+                                                    style: const TextStyle(
+                                                      color: Colors.white60,
+                                                      fontSize: 13,
+                                                      decoration:
+                                                          TextDecoration.lineThrough,
+                                                    ),
+                                                  ),
+                                                  
+                                                // เว้นระยะถ้ามีทั้งคู่
+                                                if (originalPrice.isNotEmpty && monthPrice.isNotEmpty)
+                                                  const SizedBox(width: 8),
+                                                  
+                                                // 2. ป้ายประหยัด / ราคาต่อเดือน -> วางทีหลัง
+                                                if (monthPrice.isNotEmpty)
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white24,
+                                                      borderRadius:
+                                                          BorderRadius.circular(6),
+                                                    ),
+                                                    child: Text(
+                                                      monthPrice,
+                                                      style: const TextStyle(
+                                                        fontSize: 11,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
                                         ],
                                       ),
 
-                                      // ส่วนล่าง
+                                      // --- ส่วนล่าง (แก้ไขใหม่) ---
                                       Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            originalPrice,
-                                            style: const TextStyle(
-                                              color: Colors.white60,
-                                              fontSize: 13,
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 6),
+                                          // เอา originalPrice ออกจากตรงนี้
                                           Text(
                                             desc,
                                             maxLines: 1,
@@ -482,28 +497,22 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
 
                         const SizedBox(height: 24),
 
-                        // --- ปุ่มยืนยัน (แก้ไขใหม่) ---
+                        // --- ปุ่มยืนยัน ---
                         SizedBox(
                           width: double.infinity,
                           height: 52,
                           child: ElevatedButton(
                             onPressed: () {
-                              // 1. ดึงข้อมูลแพ็กเกจปัจจุบันที่ user เลือก
                               final selectedPkg =
                                   _packages[_selectedPackageIndex];
-                              
-                              // ดึงค่าออกมา (ใช้ ?? "" กันค่า null)
                               final String period = selectedPkg['period'] ?? "";
                               final String price = selectedPkg['price'] ?? "0";
 
-                              // 2. ส่งข้อมูลไปหน้า PaymentPage
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder:
                                       (_) => PaymentPage(
-                                        // ส่งชื่อแพ็กเกจ (เช่น "แพ็กเกจ 3 เดือน")
                                         packageName: "แพ็กเกจ $period",
-                                        // ส่งราคา
                                         price: price,
                                       ),
                                 ),
