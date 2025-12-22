@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/models/media_item.dart';
 
-// หน้า รูปภาพความจาก แท็กทั้งหมด
+// หน้า รูปภาพจากแท็คสามารถเลือน slide ได้
 class MemorySlidePage extends StatelessWidget {
   final String monthName;
   final List<MediaItem> items;

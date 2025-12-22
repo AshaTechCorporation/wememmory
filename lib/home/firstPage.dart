@@ -10,7 +10,7 @@ import 'package:wememmory/profile/profilePage.dart';
 import 'package:wememmory/models/media_item.dart';
 
 class FirstPage extends StatefulWidget {
-  // ... (คงเดิม)
+  
   final int initialIndex;
   final List<MediaItem>? newAlbumItems;
   final String? newAlbumMonth;
@@ -49,7 +49,10 @@ class _FirstPageState extends State<FirstPage> {
   Widget build(BuildContext context) {
     // ... (pages list คงเดิม)
     final List<Widget> pages = [
-      const HomePage(),
+      HomePage(
+        newAlbumItems: widget.newAlbumItems,
+        newAlbumMonth: widget.newAlbumMonth,
+      ),
       CollectionPage(
         newAlbumItems: widget.newAlbumItems,
         newAlbumMonth: widget.newAlbumMonth,

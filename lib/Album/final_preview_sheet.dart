@@ -1,13 +1,14 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:wememmory/Album/photo_readonly_page.dart';
 import 'package:wememmory/Album/print_sheet.dart'; 
 import 'package:wememmory/models/media_item.dart';
 
 // หน้า พรีวิวสุดท้าย & ยืนยัน
 class FinalPreviewSheet extends StatefulWidget {
-  final List<MediaItem> items;
-  final String monthName;
+  final List<MediaItem> items; //รับรูปภาพมาแสดง มาจาก album_layout_page.dart
+  final String monthName; //รับตัวแปร ชื่อเดือนมา มาจาก album_layout_page.dart
 
   const FinalPreviewSheet({
     super.key,
@@ -397,28 +398,75 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(color: Colors.white),
-      padding: const EdgeInsets.all(4.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(6.0),
-        child: Container(
-          color: Colors.grey[200],
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              if (_imageData != null)
-                Image.memory(_imageData!, fit: BoxFit.cover)
-              else
-                Container(color: Colors.grey[200]),
-            ],
+    // ✅ เช็คว่ามีการแก้ไขหรือไม่ (มี caption หรือ tags)
+    bool isEdited = widget.item.caption.isNotEmpty || widget.item.tags.isNotEmpty;
+
+    return GestureDetector(
+      // ✅ ถ้ามีการแก้ไข ให้กดแล้วไปหน้า PhotoReadonlyPage
+      onTap: isEdited ? () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PhotoReadonlyPage(item: widget.item),
+          ),
+        );
+      } : null,
+      child: Container(
+        decoration: const BoxDecoration(color: Colors.white),
+        padding: const EdgeInsets.all(4.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(6.0),
+          child: Container(
+            color: Colors.grey[200],
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // แสดงรูปภาพ
+                if (_imageData != null)
+                  Image.memory(_imageData!, fit: BoxFit.cover)
+                else
+                  Container(color: Colors.grey[200]),
+
+                // ✅ แสดง Overlay "แตะเพื่ออ่าน" เฉพาะรูปที่มีการแก้ไข
+                if (isEdited)
+                  Positioned(
+                    bottom: 10,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.3), // พื้นหลังสีดำจางๆ
+                          borderRadius: BorderRadius.circular(20),
+                          // border: Border.all(color: Colors.white.withOpacity(0.5), width: 1),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                             Icon(Icons.priority_high, color: Colors.white, size: 11), // ไอคอนตกใจ (!)
+                            //  SizedBox(width: 2),
+                             Text(
+                              "แตะเพื่ออ่าน",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-
 // _StepItem
 class _StepItem extends StatelessWidget {
   final String label;

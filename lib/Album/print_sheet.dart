@@ -6,8 +6,8 @@ import 'package:wememmory/models/media_item.dart';
 
 // หน้า สั่งพิมพ์อัลบั้มรูป
 class PrintSheet extends StatefulWidget {
-  final List<MediaItem> items;
-  final String monthName;
+  final List<MediaItem> items; //รับตัวแปรมาแสดงภาพ จาก final_preview_sheet.dart
+  final String monthName; //รับชื่อเดือนมาแสดง จาก final_preview_sheet.dart
 
   const PrintSheet({
     super.key,

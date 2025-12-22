@@ -3,14 +3,14 @@ import 'package:photo_manager/photo_manager.dart';
 
 // ข้อมูลภาพและวิดิโอ
 
-enum MediaType { image, video }
+enum MediaType { image, video }   //ตัวระบุประเภทของไฟล์
 
 class MediaItem {
-  final AssetEntity asset;
-  final MediaType type;
-  String caption; 
-  List<String> tags;
-  Uint8List? capturedImage;
+  final AssetEntity asset; //ใช้ดึงรูป Thumbnail, ดึงไฟล์ต้นฉบับ, หรือดูวันที่ถ่าย
+  final MediaType type;  //เก็บค่าจาก enum 
+  String caption;   //เก็บ "คำบรรยาย" หรือความรู้สึกที่ user พิมพ์ใส่
+  List<String> tags; //เก็บแท็กต่างๆ
+  Uint8List? capturedImage; //รูปที่แคปแล้ว
 
   MediaItem({
     required this.asset,

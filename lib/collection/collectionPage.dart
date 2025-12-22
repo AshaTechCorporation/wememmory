@@ -6,10 +6,8 @@ import 'package:wememmory/collection/share_sheet.dart';
 import 'package:wememmory/constants.dart';
 import 'package:wememmory/data/album_data.dart';
 import 'package:wememmory/models/media_item.dart' hide AlbumCollection;
-
-// [1] Import หน้า OrderPage ของคุณ (ตรวจสอบว่าไฟล์ชื่ออะไร)
 import 'package:wememmory/shop/chooseMediaItem.dart'; 
-// หรือ import 'package:wememmory/shop/selectMedia.dart';
+
 
 // หน้า สมุดภาพ 
 class CollectionPage extends StatefulWidget {
@@ -27,7 +25,7 @@ class CollectionPage extends StatefulWidget {
 }
 
 class _CollectionPageState extends State<CollectionPage> {
-  // [ยกเลิก] List<AlbumCollection> allAlbums = []; 
+  
   // เราจะใช้ globalAlbumList แทนเพื่อให้ข้อมูลคงอยู่ถาวรในขณะเปิดแอป
 
   @override

@@ -16,8 +16,8 @@ class UploadPhotoPage extends StatefulWidget {
 }
 
 class _UploadPhotoPageState extends State<UploadPhotoPage> {
-  final List<MediaItem> mediaList = [];
-  final List<MediaItem> selectedItems = [];
+  final List<MediaItem> mediaList = []; //เก็บข้อมูลรูปภาพ และวิดิโอทั้งหมด
+  final List<MediaItem> selectedItems = []; //เก็บเฉพาะรูปภาพที่ผู้ใช้ "กดเลือก" (Tap) เท่านั้น (สูงสุด 11 รูปตามโค้ด)
   final Map<String, Future<Uint8List?>> _thumbnailFutures = {};
 
   bool showThisMonthOnly = false;
@@ -102,14 +102,14 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
   void _toggleSelection(MediaItem item) {
     setState(() {
-      // 🔍 ค้นหาว่ารูปนี้ (ดูจาก ID) เคยถูกเลือกหรือยัง
+      // ค้นหาว่ารูปนี้ (ดูจาก ID) เคยถูกเลือกหรือยัง
       final existingIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
 
       if (existingIndex != -1) {
-        // ✅ ถ้ามีอยู่แล้ว ให้ลบตัวเดิมออก (ใช้ index ลบ)
+        // ถ้ามีอยู่แล้ว ให้ลบตัวเดิมออก (ใช้ index ลบ)
         selectedItems.removeAt(existingIndex);
       } else {
-        // ✅ ถ้ายังไม่มี ให้เพิ่มเข้าไป
+        // ถ้ายังไม่มี ให้เพิ่มเข้าไป
         if (selectedItems.length < 11) {
           selectedItems.add(item);
         } else {
@@ -132,6 +132,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
         builder: (context) => AlbumLayoutPage(
+          // จุดนี้คือการส่งค่าข้ามหน้า (Constructor Injection)
           selectedItems: selectedItems,
           monthName: widget.selectedMonth,
         ),
@@ -425,7 +426,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   }
 }
 
-// _StepItem (แก้ไขให้เส้นแยกออกจากจุด)
+// _StepItem แทบ Processbar
 class _StepItem extends StatelessWidget {
   final String label;
   final bool isActive;

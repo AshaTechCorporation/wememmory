@@ -6,9 +6,6 @@ import 'package:wememmory/Album/photo_detail_sheet.dart';
 import 'package:wememmory/Album/video_detail_sheet.dart';
 import 'package:wememmory/Album/final_preview_sheet.dart'; 
 
-// หน้าแฟ้มโชว์การจัดวางอัลบั้มรูป
-
-// --- Data Model สำหรับการลากย้าย ---
 class PhotoDragData {
   final int index;
   PhotoDragData(this.index);
@@ -16,7 +13,7 @@ class PhotoDragData {
 
 class AlbumLayoutPage extends StatefulWidget {
   final List<MediaItem> selectedItems;
-  final String monthName;
+  final String monthName; 
 
   const AlbumLayoutPage({
     super.key,
@@ -29,7 +26,7 @@ class AlbumLayoutPage extends StatefulWidget {
 }
 
 class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
-  late List<MediaItem> _items;
+  late List<MediaItem> _items; 
   bool _isDragging = false;
 
   final double _imageRadius = 6.0; 
@@ -50,10 +47,10 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
     });
   }
 
+  // ✅ แก้ไข: รอรับการกลับมาจากการแก้ไขรูป แล้วสั่ง setState
   Future<void> _handlePhotoTap(int index) async {
     final selectedItem = _items[index];
     
-    // รอจนกว่า Sheet จะถูกปิด
     if (selectedItem.type == MediaType.video) {
       await showModalBottomSheet(
         context: context,
@@ -70,7 +67,7 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
       );
     }
 
-    // เมื่อ Sheet ปิดลง ให้รีเฟรชหน้า
+    // เมื่อ Sheet ปิดลง ให้รีเฟรชหน้า (เพื่อให้รูปที่เพิ่งแก้แสดงผล)
     setState(() {});
   }
 
@@ -86,9 +83,6 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
       ),
       child: Column(
         children: [
-          // ---------------------------------------------------------
-          // Slide Indicator (แถบขีดด้านบน)
-          // ---------------------------------------------------------
           const SizedBox(height: 12),
           Container(
             width: 61,
@@ -98,9 +92,7 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
               borderRadius: BorderRadius.circular(2.5),
             ),
           ),
-          // ---------------------------------------------------------
 
-          // Header
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 13, 20, 0),
             child: Row(
@@ -125,50 +117,26 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
 
           const SizedBox(height: 16),
 
-          // Steps Indicator
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 7.0),
             child: Row(
               children: [
-                // Step 1: เลือกรูปภาพ
-                _StepItem(
-                  label: 'เลือกรูปภาพ', 
-                  isActive: true,
-                  isFirst: true,
-                  isCompleted: true,
-                ),
-                // Step 2: แก้ไขและจัดเรียง
-                _StepItem(
-                  label: 'แก้ไขและจัดเรียง', 
-                  isActive: true,
-                  isCompleted: false, // ยังไม่เสร็จ (เส้นขวาจะเป็นสีเทา)
-                ),
-                // Step 3: พรีวิวสุดท้าย
-                _StepItem(
-                  label: 'พรีวิวสุดท้าย', 
-                  isActive: false,
-                  isLast: true,
-                ),
+                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true, isCompleted: true),
+                _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true, isCompleted: false),
+                _StepItem(label: 'พรีวิวสุดท้าย', isActive: false, isLast: true),
               ],
             ),
           ),
 
           const SizedBox(height: 20),
 
-          // Hint Text
           const Text.rich(
             TextSpan(
               style: TextStyle(fontSize: 13, color: Colors.grey),
               children: [
-                TextSpan(
-                  text: "แตะ",
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 121, 121, 121)),
-                ),
+                TextSpan(text: "แตะ", style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 121, 121, 121))),
                 TextSpan(text: "เพื่อแก้ไข • "),
-                TextSpan(
-                  text: "ลาก",
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 121, 121, 121)),
-                ),
+                TextSpan(text: "ลาก", style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 121, 121, 121))),
                 TextSpan(text: "เพื่อจัดลำดับ"),
               ],
             ),
@@ -176,7 +144,6 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
 
           const SizedBox(height: 12),
 
-          // Album Layout Area
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -196,7 +163,6 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // หน้าซ้าย
                                 _buildPageContainer(
                                   child: GridView.count(
                                     crossAxisCount: 2,
@@ -206,23 +172,15 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                                     shrinkWrap: true,
                                     physics: const NeverScrollableScrollPhysics(),
                                     children: [
-                                      // Slot 0: ชื่อเดือน
                                       Container(
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                        ),
+                                        decoration: const BoxDecoration(color: Colors.white),
                                         child: Center(
                                           child: Text(
                                             monthTitle,
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black87,
-                                            ),
+                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87),
                                           ),
                                         ),
                                       ),
-                                      // Slot 1-5: รูปภาพ
                                       for (int i = 0; i < 5; i++)
                                         if (i < _items.length)
                                           _ReorderableSlot(
@@ -244,7 +202,6 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
 
                                 const SizedBox(width: 20),
 
-                                // หน้าขวา
                                 _buildPageContainer(
                                   child: GridView.count(
                                     crossAxisCount: 2,
@@ -254,7 +211,6 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                                     shrinkWrap: true,
                                     physics: const NeverScrollableScrollPhysics(),
                                     children: [
-                                      // Slots 6-11: รูปภาพ
                                       for (int i = 0; i < 6; i++)
                                         if ((i + 5) < _items.length)
                                           _ReorderableSlot(
@@ -299,13 +255,11 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
             ),
           ),
 
-          // Bottom Buttons (ส่วนที่แก้ไข)
+          // Bottom Buttons
           Container(
-            // ✅ แก้ไข: ปรับ Padding ด้านล่างเป็น 50 เพื่อดันปุ่มขึ้นมา (จากเดิม 20)
             padding: const EdgeInsets.fromLTRB(20, 25, 20, 50),
             decoration: const BoxDecoration(
               color: Colors.white,
-              // border: Border(top: BorderSide(color: Colors.black12)),
             ),
             child: Column(
               children: [
@@ -314,6 +268,7 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
+                      // ✅ เมื่อกดบันทึก ส่ง _items ไปยังหน้า FinalPreviewSheet
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
@@ -362,7 +317,11 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
   }
 }
 
-// ... _ReorderableSlot ...
+// ... (ส่วน _ReorderableSlot, _PhotoSlot, _StepItem เหมือนเดิม ไม่ต้องแก้)
+// ถ้าต้องการ ผมสามารถรวมส่วน Widget ย่อยทั้งหมดให้ในคำตอบเดียวได้ครับ 
+// แต่เพื่อความกระชับ สามารถใช้ Widget ย่อยเดิมจากคำตอบก่อนหน้าได้เลย
+
+// _ReorderableSlot (ตัวจัดการการลาก) 
 class _ReorderableSlot extends StatelessWidget {
   final MediaItem item;
   final int index;
