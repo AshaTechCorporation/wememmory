@@ -443,8 +443,14 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
-                             Icon(Icons.priority_high, color: Colors.white, size: 11), // ไอคอนตกใจ (!)
+                          children:  [
+                             Image.asset(
+                               'assets/icons/alert.png',
+                               width: 11,
+                               height: 11,
+                               color: Colors.white, // ใส่สีขาวเพื่อให้เห็นชัดบนพื้นดำ (ลบออกได้ถ้ารูปมีสีอยู่แล้ว)
+                               fit: BoxFit.contain,
+                             ),
                             //  SizedBox(width: 2),
                              Text(
                               "แตะเพื่ออ่าน",

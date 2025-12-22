@@ -28,7 +28,6 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
 
   final List<String> _allTags = ["family", "kid", "home", "lover", "favor"];
   
-  // เพิ่มตัวแปรเก็บรูปภาพ เพื่อไม่ให้โหลดใหม่ทุกครั้งที่ setState
   Uint8List? _imageData;
   bool _isLoadingImage = true;
 
@@ -85,26 +84,24 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
     });
   }
 
-  // ✅ ฟังก์ชันบันทึกข้อมูลแบบ Pass by Reference
   Future<void> _saveData() async {
     try {
+      // จับภาพเฉพาะสิ่งที่อยู่ใน RepaintBoundary (ซึ่งตอนนี้หุ้มแค่รูปภาพแล้ว)
       RenderRepaintBoundary boundary = _cropKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
       ui.Image image = await boundary.toImage(pixelRatio: 3.0); 
       ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
 
       if (byteData != null) {
-        // อัปเดตข้อมูลลงใน Item ตัวเดิมโดยตรง
         widget.item.capturedImage = byteData.buffer.asUint8List();
         widget.item.caption = _captionController.text;
         widget.item.tags = List.from(_selectedTags);
 
         if (mounted) {
-          Navigator.pop(context); // ปิดหน้าเพื่อกลับไปรีเฟรชที่ AlbumLayoutPage
+          Navigator.pop(context);
         }
       }
     } catch (e) {
       debugPrint("Error capturing photo: $e");
-      // กรณี Error ก็ยังเซฟ Text/Tags ได้
       widget.item.caption = _captionController.text;
       widget.item.tags = List.from(_selectedTags);
       if (mounted) Navigator.pop(context);
@@ -130,6 +127,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
               borderRadius: BorderRadius.circular(2.5),
             ),
           ),
+          
           // 1. Header
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 13, 16, 0),
@@ -167,7 +165,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
           const SizedBox(height: 16),
 
           // 2. Steps Indicator
-           const Padding(
+          const Padding(
             padding: EdgeInsets.symmetric(horizontal: 7.0),
             child: Row(
               children: [
@@ -187,18 +185,20 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  RepaintBoundary(
-                    key: _cropKey, 
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        height: 350,
-                        width: double.infinity,
-                        color: Colors.grey[200],
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            InteractiveViewer(
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      height: 350,
+                      width: double.infinity,
+                      color: Colors.grey[200],
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          // ✅ 1. ย้าย RepaintBoundary มาหุ้มเฉพาะ InteractiveViewer (รูปภาพ)
+                          // ทำให้เวลาบันทึก จะได้เฉพาะส่วนนี้ ไม่รวม Grid ด้านล่าง
+                          RepaintBoundary(
+                            key: _cropKey, 
+                            child: InteractiveViewer(
                               transformationController: _transformationController,
                               minScale: 1.0,
                               maxScale: 4.0,
@@ -213,35 +213,37 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                                         )
                                       : const Center(child: Text("ไม่สามารถโหลดรูปภาพได้")),
                             ),
-                            IgnorePointer(
-                              child: Stack(
-                                children: [
-                                  Column(
-                                    children: [
-                                      Expanded(child: Container(decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
-                                      Expanded(child: Container(decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
-                                      Expanded(child: Container()),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Expanded(child: Container(decoration: BoxDecoration(border: Border(right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
-                                      Expanded(child: Container(decoration: BoxDecoration(border: Border(right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
-                                      Expanded(child: Container()),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                          ),
+                          
+                          // ✅ 2. Grid Overlay (เส้นตาราง) อยู่นอก RepaintBoundary
+                          // ทำให้แสดงผลให้เห็น แต่ไม่ถูกบันทึกไปด้วย
+                          IgnorePointer(
+                            child: Stack(
+                              children: [
+                                Column(
+                                  children: [
+                                    Expanded(child: Container(decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
+                                    Expanded(child: Container(decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
+                                    Expanded(child: Container()),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Expanded(child: Container(decoration: BoxDecoration(border: Border(right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
+                                    Expanded(child: Container(decoration: BoxDecoration(border: Border(right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
+                                    Expanded(child: Container()),
+                                  ],
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
 
+                  // ... (ส่วนควบคุมด้านล่างเหมือนเดิม) ...
                   const SizedBox(height: 10),
-
-                  // ส่วนควบคุม: ปุ่มขยายภาพ และ Dropdown เลือกสี
                   Row(
                     children: [
                       Expanded(
@@ -350,7 +352,6 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
 
                   const SizedBox(height: 10),
 
-                  // ช่องกรอกข้อความ
                   Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey[200]!),
@@ -371,7 +372,6 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
 
                   const SizedBox(height: 16),
 
-                  // Tags
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -394,7 +394,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                onPressed: _saveData, // เรียกใช้ฟังก์ชันบันทึกที่แก้ไขแล้ว
+                onPressed: _saveData,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFED7D31),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
@@ -437,6 +437,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
   }
 }
 
+// ... _StepItem class (เหมือนเดิม) ...
 class _StepItem extends StatelessWidget {
   final String label;
   final bool isActive;

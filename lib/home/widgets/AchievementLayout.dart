@@ -58,7 +58,7 @@ class AchievementLayout extends StatelessWidget {
                       // เดือนมีนาคม (สีส้ม)
                       TimelineItem(
                         monthTitle: 'Mar',
-                        mainText: 'ใช้เวลา 5.47 นาที',
+                        mainText: 'ใช้เวลา 5.47นาที',
                         subText: 'ในการสร้างอัลบั้มเดือนนี้เร็วที่สุด',
                         imagePath: 'assets/icons/limiter.png',
                         imgWidth: 82,
@@ -68,7 +68,7 @@ class AchievementLayout extends StatelessWidget {
                       // เดือนกุมภาพันธ์
                       TimelineItem(
                         monthTitle: 'Feb',
-                        mainText: 'อธิบายภาพเดือนนี้',
+                        mainText: 'อธิบายภาพในเดือนนี้',
                         subText: 'บันทึกเรื่องราวของเดือนนี้มากที่สุด',
                         imagePath: 'assets/icons/76p.png',
                         imgWidth: 92,
