@@ -704,7 +704,7 @@ class _GiftCardBanner extends StatelessWidget {
       children: [
         // 1. รูปด้านหลัง (เอียงซ้าย)
         Transform.rotate(
-          angle: -0.12,
+          angle: 0.1,
           child: Container(
             width: size * 1,
             height: size * 0.9,
@@ -726,7 +726,7 @@ class _GiftCardBanner extends StatelessWidget {
 
         // 2. รูปด้านหน้า (เอียงขวานิดๆ)
         Transform.rotate(
-          angle: 0.08,
+          angle: -0.1,
           child: Container(
             width: size * 1,
             height: size * 0.9,
