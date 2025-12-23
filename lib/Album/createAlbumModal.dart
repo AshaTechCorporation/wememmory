@@ -85,44 +85,44 @@ class CreateAlbumModal extends StatelessWidget {
               physics: const BouncingScrollPhysics(), 
               children: const [
                 // --- 2026 (อนาคต - ตัวอย่าง) ---
-                _AlbumOptionItem(month: "มกราคม 2569", statusText: "สร้างอัลบั้ม", isDone: false),
+                _AlbumOptionItem(month: "มกราคม 2024", statusText: "สร้างอัลบั้ม", isDone: false),
                 Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
 
                 // --- 2025 ---
-                _AlbumOptionItem(month: "ธันวาคม 2568", statusText: "สร้างอัลบั้ม", isDone: false),
+                _AlbumOptionItem(month: "ธันวาคม 2025", statusText: "สร้างอัลบั้ม", isDone: false),
                 Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
                 
-                _AlbumOptionItem(month: "พฤศจิกายน 2568", statusText: "สร้างอัลบั้ม", isDone: false),
+                _AlbumOptionItem(month: "พฤศจิกายน 2025", statusText: "สร้างอัลบั้ม", isDone: false),
                 Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
 
-                _AlbumOptionItem(month: "ตุลาคม 2568", statusText: "สร้างอัลบั้ม", isDone: false),
+                _AlbumOptionItem(month: "ตุลาคม 2025", statusText: "สร้างอัลบั้ม", isDone: false),
                 Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
                 
-                _AlbumOptionItem(month: "กันยายน 2568", statusText: "สร้างอัลบั้มสำเร็จ", isDone: true),
+                _AlbumOptionItem(month: "กันยายน 2025", statusText: "สร้างอัลบั้มสำเร็จ", isDone: true),
                 Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
                 
-                _AlbumOptionItem(month: "สิงหาคม 2568", statusText: "สร้างอัลบั้มสำเร็จ", isDone: true),
+                _AlbumOptionItem(month: "สิงหาคม 2025", statusText: "สร้างอัลบั้มสำเร็จ", isDone: true),
                 Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
                 
-                _AlbumOptionItem(month: "กรกฎาคม 2568", statusText: "สร้างอัลบั้มสำเร็จ", isDone: true),
+                _AlbumOptionItem(month: "กรกฎาคม 2025", statusText: "สร้างอัลบั้มสำเร็จ", isDone: true),
                 Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
                 
-                _AlbumOptionItem(month: "มิถุนายน 2568", statusText: "สร้างอัลบั้ม", isDone: false),
+                _AlbumOptionItem(month: "มิถุนายน 2025", statusText: "สร้างอัลบั้ม", isDone: false),
                 Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
                 
-                _AlbumOptionItem(month: "พฤษภาคม 2568", statusText: "สร้างอัลบั้ม", isDone: false),
+                _AlbumOptionItem(month: "พฤษภาคม 2025", statusText: "สร้างอัลบั้ม", isDone: false),
                 Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
 
-                _AlbumOptionItem(month: "เมษายน 2568", statusText: "สร้างอัลบั้ม", isDone: false),
+                _AlbumOptionItem(month: "เมษายน 2025", statusText: "สร้างอัลบั้ม", isDone: false),
                 Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
 
-                _AlbumOptionItem(month: "มีนาคม 2568", statusText: "สร้างอัลบั้ม", isDone: false),
+                _AlbumOptionItem(month: "มีนาคม 2025", statusText: "สร้างอัลบั้ม", isDone: false),
                 Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
 
-                _AlbumOptionItem(month: "กุมภาพันธ์ 2568", statusText: "สร้างอัลบั้ม", isDone: false),
+                _AlbumOptionItem(month: "กุมภาพันธ์ 2025", statusText: "สร้างอัลบั้ม", isDone: false),
                 Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
 
-                _AlbumOptionItem(month: "มกราคม 2568", statusText: "สร้างอัลบั้มสำเร็จ", isDone: true),
+                _AlbumOptionItem(month: "มกราคม 2025", statusText: "สร้างอัลบั้มสำเร็จ", isDone: true),
               ],
             ),
           ),

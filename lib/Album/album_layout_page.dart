@@ -386,9 +386,7 @@ class _ReorderableSlot extends StatelessWidget {
       },
     );
   }
-}
-
-class _PhotoSlot extends StatefulWidget {
+}class _PhotoSlot extends StatefulWidget {
   final MediaItem item;
   final double frameRadius;
   final double imageRadius;
@@ -416,12 +414,14 @@ class _PhotoSlotState extends State<_PhotoSlot> {
   @override
   void didUpdateWidget(covariant _PhotoSlot oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // เช็คว่า item เปลี่ยน หรือ capturedImage เปลี่ยนหรือไม่ เพื่อโหลดใหม่
     if (oldWidget.item != widget.item || oldWidget.item.capturedImage != widget.item.capturedImage) {
       _loadThumbnail();
     }
   }
 
   void _loadThumbnail() {
+    // ถ้ามีรูปที่ capture มาแล้ว (แก้ไขแล้ว) ไม่ต้องโหลด thumbnail เดิม
     if (widget.item.capturedImage != null) {
       if (mounted) setState(() {}); 
       return;
@@ -438,8 +438,15 @@ class _PhotoSlotState extends State<_PhotoSlot> {
 
   @override
   Widget build(BuildContext context) {
+    // -----------------------------------------------------------------
+    // [LOGIC ตรวจสอบสถานะ]: รูปนี้ถูกแก้ไขหรือยัง?
+    // เช็คว่ามี capturedImage (รูปที่แต่งแล้ว) หรือมี caption (คำบรรยาย) หรือไม่
+    // -----------------------------------------------------------------
+    bool isModified = widget.item.capturedImage != null || 
+                      (widget.item.caption != null && widget.item.caption!.isNotEmpty);
+
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
       ),
       padding: const EdgeInsets.all(4.0),
@@ -450,12 +457,38 @@ class _PhotoSlotState extends State<_PhotoSlot> {
           child: Stack(
             fit: StackFit.expand,
             children: [
+              // 1. แสดงรูปภาพ (ลำดับล่างสุด)
               if (widget.item.capturedImage != null)
                 Image.memory(widget.item.capturedImage!, fit: BoxFit.cover)
               else if (_thumbnailData != null)
                 Image.memory(_thumbnailData!, fit: BoxFit.cover)
               else
                 Container(color: Colors.grey[200]),
+
+              // 2. [ส่วนที่เพิ่ม] : ไอคอน Status Update (มุมขวาบน)
+              if (isModified)
+                Positioned(
+                  top: 5,
+                  right: 5,
+                  child: Container(
+                    // ใส่เงาเล็กน้อยเพื่อให้มองเห็นชัดบนพื้นหลังสีขาวหรือดำ
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 2,
+                          offset: const Offset(0, 1),
+                        )
+                      ],
+                    ),
+                    child: Image.asset(
+                      'assets/icons/statusupdate.png', // path รูปไอคอน
+                      width: 18, // ขนาดไอคอน
+                      height: 18,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -463,6 +496,8 @@ class _PhotoSlotState extends State<_PhotoSlot> {
     );
   }
 }
+
+
 
 class _StepItem extends StatelessWidget {
   final String label;
