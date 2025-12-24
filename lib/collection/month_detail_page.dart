@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:wememmory/collection/AlbumPhotoViewPage.dart';
 import 'package:wememmory/collection/FanStackDetailPage.dart';
 import 'package:wememmory/collection/MemorySlidePage.dart';
 import 'package:wememmory/collection/share_sheet.dart';
@@ -876,7 +877,11 @@ class MonthDetailPage extends StatelessWidget {
                     ),
                     for (int i = 0; i < 5; i++)
                       if (i < items.length)
-                        _StaticPhotoSlot(item: items[i])
+                        _StaticPhotoSlot(
+                          item: items[i] ,
+                          monthName: monthName,
+                          )
+                        
                       else
                         const SizedBox(),
                   ],
@@ -895,9 +900,12 @@ class MonthDetailPage extends StatelessWidget {
                   children: [
                     for (int i = 0; i < 6; i++)
                       if ((i + 5) < items.length)
-                        _StaticPhotoSlot(item: items[i + 5])
+                        _StaticPhotoSlot(
+                          item: items[i + 5],
+                          monthName: monthName, // ✅ 2. เติมตรงนี้ด้วย
+                        )
                       else
-                        const SizedBox(),
+                      const SizedBox(),
                   ],
                 ),
               ),
@@ -948,37 +956,72 @@ class MonthDetailPage extends StatelessWidget {
   }
 }
 
-class _StaticPhotoSlot extends StatelessWidget {
+class _StaticPhotoSlot extends StatefulWidget {
   final MediaItem item;
-  const _StaticPhotoSlot({required this.item});
+  
+  // ✅ เพิ่มตัวแปร monthName เพื่อส่งต่อไปยังหน้าดูรูป
+  final String monthName; 
+
+  const _StaticPhotoSlot({
+    required this.item,
+    required this.monthName, // ✅ รับค่าเข้ามา
+  });
+
+  @override
+  State<_StaticPhotoSlot> createState() => _StaticPhotoSlotState();
+}
+
+class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
+  Uint8List? _imageData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadImage();
+  }
+
+  Future<void> _loadImage() async {
+    // ... (โค้ดโหลดรูปคงเดิม) ...
+    if (widget.item.capturedImage != null) {
+      if (mounted) setState(() => _imageData = widget.item.capturedImage);
+    } else {
+      final data = await widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300));
+      if (mounted) setState(() => _imageData = data);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(color: Colors.white),
-      padding: const EdgeInsets.all(4.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(6.0),
-        child: Container(
-          color: Colors.grey[200],
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              if (item.capturedImage != null)
-                Image.memory(item.capturedImage!, fit: BoxFit.cover)
-              else
-                FutureBuilder<Uint8List?>(
-                  future: item.asset.thumbnailDataWithSize(
-                    const ThumbnailSize(300, 300),
-                  ),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData && snapshot.data != null) {
-                      return Image.memory(snapshot.data!, fit: BoxFit.cover);
-                    }
-                    return Container(color: Colors.grey[200]);
-                  },
-                ),
-            ],
+    // ✅ เพิ่ม GestureDetector เพื่อดักจับการกด
+    return GestureDetector(
+      onTap: () {
+        // นำทางไปยังหน้า AlbumPhotoViewPage ที่สร้างใหม่ในขั้นตอนที่ 1
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AlbumPhotoViewPage(
+              item: widget.item,
+              monthName: widget.monthName,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        decoration: const BoxDecoration(color: Colors.white),
+        padding: const EdgeInsets.all(4.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(6.0),
+          child: Container(
+            color: Colors.grey[200],
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if (_imageData != null)
+                  Image.memory(_imageData!, fit: BoxFit.cover)
+                else
+                  Container(color: Colors.grey[200]),
+              ],
+            ),
           ),
         ),
       ),

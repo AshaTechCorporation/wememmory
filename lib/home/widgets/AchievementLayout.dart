@@ -6,7 +6,7 @@ const Color _bgWhite = Colors.white;
 const Color _cardTeal = Color(0xFF6DA5B8); 
 const Color _cardOrange = Color(0xFFEE743B);
 const Color _cardLightOrange = Color(0xFFF8B887);
-const Color _cardpurple = Color(0xFF8898F0);
+const Color _cardpurple = Color(0xFF6988AC);
 
 class AchievementLayout extends StatelessWidget {
   const AchievementLayout({super.key});
