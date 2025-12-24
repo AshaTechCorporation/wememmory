@@ -5,49 +5,51 @@ import 'package:wememmory/collection/month_detail_page.dart';
 import 'package:wememmory/collection/share_sheet.dart';
 import 'package:wememmory/constants.dart';
 import 'package:wememmory/data/album_data.dart';
+import 'package:wememmory/home/service/homeservice.dart';
+import 'package:wememmory/models/albumModel.dart';
 import 'package:wememmory/models/media_item.dart' hide AlbumCollection;
-import 'package:wememmory/shop/chooseMediaItem.dart'; 
+import 'package:wememmory/shop/chooseMediaItem.dart';
 
-
-// หน้า สมุดภาพ 
+// หน้า สมุดภาพ
 class CollectionPage extends StatefulWidget {
-  final List<MediaItem>? newAlbumItems;
-  final String? newAlbumMonth;
+  // final List<MediaItem>? newAlbumItems;
+  // final String? newAlbumMonth;
 
-  const CollectionPage({
-    super.key,
-    this.newAlbumItems,
-    this.newAlbumMonth,
-  });
+  const CollectionPage({super.key});
 
   @override
   State<CollectionPage> createState() => _CollectionPageState();
 }
 
 class _CollectionPageState extends State<CollectionPage> {
-  
   // เราจะใช้ globalAlbumList แทนเพื่อให้ข้อมูลคงอยู่ถาวรในขณะเปิดแอป
+  List<AlbumModel> albums = [];
 
   @override
   void initState() {
     super.initState();
-    
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await getAlbums();
+    });
+
     // ตรวจสอบข้อมูลใหม่ที่ส่งมาจากหน้า Success
-    if (widget.newAlbumItems != null && widget.newAlbumMonth != null) {
-      
-      // Logic: ตรวจสอบว่าอัลบั้มชุดนี้ถูกเพิ่มเข้า Global List หรือยัง (ป้องกันการเพิ่มซ้ำ)
-      bool isDuplicate = globalAlbumList.any((album) => 
-        album.month == widget.newAlbumMonth && album.items == widget.newAlbumItems);
-      
-      if (!isDuplicate) {
-        // เพิ่มข้อมูลใหม่เข้า Global List
-        // ใช้ insert(0, ...) เพื่อให้อัลบั้มใหม่ล่าสุดแสดงอยู่บนสุดของรายการ
-        globalAlbumList.insert(0, AlbumCollection(
-          month: widget.newAlbumMonth!,
-          items: widget.newAlbumItems!,
-        ));
-      }
-    }
+    // if (widget.newAlbumItems != null && widget.newAlbumMonth != null) {
+    //   // Logic: ตรวจสอบว่าอัลบั้มชุดนี้ถูกเพิ่มเข้า Global List หรือยัง (ป้องกันการเพิ่มซ้ำ)
+    //   bool isDuplicate = globalAlbumList.any((album) => album.month == widget.newAlbumMonth && album.items == widget.newAlbumItems);
+
+    //   if (!isDuplicate) {
+    //     // เพิ่มข้อมูลใหม่เข้า Global List
+    //     // ใช้ insert(0, ...) เพื่อให้อัลบั้มใหม่ล่าสุดแสดงอยู่บนสุดของรายการ
+    //     globalAlbumList.insert(0, AlbumCollection(month: widget.newAlbumMonth!, items: widget.newAlbumItems!));
+    //   }
+    // }
+  }
+
+  Future getAlbums() async {
+    final album1 = await HomeService.getAlbums();
+    setState(() {
+      albums = album1;
+    });
   }
 
   @override
@@ -58,57 +60,57 @@ class _CollectionPageState extends State<CollectionPage> {
         child: Column(
           children: [
             // ส่วนที่อยู่คงที่ด้านบน (Search & Tab)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-              child: Column(
-                children: [
-                  _SearchBar(),
-                  const SizedBox(height: 24),
-                  const _TabSelector(),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
+            Padding(padding: const EdgeInsets.fromLTRB(16, 20, 16, 0), child: Column(children: [_SearchBar(), const SizedBox(height: 24), const _TabSelector(), const SizedBox(height: 20)])),
 
             // ส่วนรายการอัลบั้มที่ดึงมาจาก Global List
             Expanded(
-              child: globalAlbumList.isEmpty
-                  ? const Center(child: Text("ยังไม่มีคอลเลกชัน", style: TextStyle(color: Colors.grey)))
-                  : ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
-                      itemCount: globalAlbumList.length, // ใช้จำนวนจาก Global List
-                      itemBuilder: (context, index) {
-                        final album = globalAlbumList[index]; // ดึงข้อมูลแต่ละอัลบั้ม
-                        
-                        return Column(
-                          children: [
-                            _MonthSectionHeader(
-                              title: album.month,
-                              items: album.items,
-                            ),
-                            const SizedBox(height: 12),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => MonthDetailPage(
-                                      monthName: album.month,
-                                      items: album.items,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: _AlbumPreviewSection(
-                                items: album.items,
-                                monthTitle: album.month,
+              child:
+                  albums.isEmpty
+                      ? const Center(child: Text("ยังไม่มีคอลเลกชัน", style: TextStyle(color: Colors.grey)))
+                      : ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
+                        itemCount: albums.length, // ใช้จำนวนจาก Global List
+                        itemBuilder: (context, index) {
+                          final album = albums[index]; // ดึงข้อมูลแต่ละอัลบั้ม
+
+                          return Column(
+                            children: [
+                              _MonthSectionHeader(title: album.month.toString(), items: album),
+                              const SizedBox(height: 12),
+                              GestureDetector(
+                                onTap: () {
+                                  // Navigator.push(context, MaterialPageRoute(builder: (context) => MonthDetailPage(monthName: album.month, items: album.items)));
+                                },
+                                child: _AlbumPreviewSection(items: album, monthTitle: album.month.toString()),
                               ),
-                            ),
-                            const SizedBox(height: 30), // ระยะห่างระหว่างแต่ละอัลบั้ม
-                          ],
-                        );
-                      },
-                    ),
+                              const SizedBox(height: 30), // ระยะห่างระหว่างแต่ละอัลบั้ม
+                            ],
+                          );
+                        },
+                      ),
+              //    globalAlbumList.isEmpty
+              // ? const Center(child: Text("ยังไม่มีคอลเลกชัน", style: TextStyle(color: Colors.grey)))
+              // : ListView.builder(
+              //   padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
+              //   itemCount: globalAlbumList.length, // ใช้จำนวนจาก Global List
+              //   itemBuilder: (context, index) {
+              //     final album = globalAlbumList[index]; // ดึงข้อมูลแต่ละอัลบั้ม
+
+              //     return Column(
+              //       children: [
+              //         _MonthSectionHeader(title: album.month, items: album.items),
+              //         const SizedBox(height: 12),
+              //         GestureDetector(
+              //           onTap: () {
+              //             Navigator.push(context, MaterialPageRoute(builder: (context) => MonthDetailPage(monthName: album.month, items: album.items)));
+              //           },
+              //           child: _AlbumPreviewSection(items: album.items, monthTitle: album.month),
+              //         ),
+              //         const SizedBox(height: 30), // ระยะห่างระหว่างแต่ละอัลบั้ม
+              //       ],
+              //     );
+              //   },
+              // ),
             ),
           ],
         ),
@@ -122,7 +124,7 @@ class _CollectionPageState extends State<CollectionPage> {
 // -------------------------------------------------------------------
 class _MonthSectionHeader extends StatelessWidget {
   final String title;
-  final List<MediaItem>? items; // รับรายการรูปภาพเพิ่มเข้ามา
+  final AlbumModel? items; // รับรายการรูปภาพเพิ่มเข้ามา
 
   const _MonthSectionHeader({
     required this.title,
@@ -134,32 +136,24 @@ class _MonthSectionHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title,
-            style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87)),
+        Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)),
         Row(
           children: [
             // [3] ปุ่ม Print: กดแล้วส่งรูปไปยังหน้า OrderPage
             GestureDetector(
               onTap: () {
-                if (items != null && items!.isNotEmpty) {
-                  print("กำลังส่งรูป ${items!.length} รูป ไปยังหน้าสั่งซื้อ");
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      // เรียกใช้ OrderPage พร้อมส่ง items ที่มาจาก CollectionPage
-                      builder: (context) => OrderPage(
-                        items: items!, 
-                      ),
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('ไม่มีรูปภาพในคอลเลกชันนี้')),
-                  );
-                }
+                // if (items != null && items.isNotEmpty) {
+                //   print("กำลังส่งรูป ${items!.length} รูป ไปยังหน้าสั่งซื้อ");
+                //   // Navigator.push(
+                //   //   context,
+                //   //   MaterialPageRoute(
+                //   //     // เรียกใช้ OrderPage พร้อมส่ง items ที่มาจาก CollectionPage
+                //   //     builder: (context) => OrderPage(items: items!),
+                //   //   ),
+                //   // );
+                // } else {
+                //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ไม่มีรูปภาพในคอลเลกชันนี้')));
+                // }
               },
               child: _buildIconButton('assets/icons/print.png'),
             ),
@@ -185,17 +179,9 @@ class _MonthSectionHeader extends StatelessWidget {
     return Container(
       width: 40,
       height: 40,
-      decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(8)),
       padding: const EdgeInsets.all(10),
-      child: Image.asset(
-        iconPath,
-        width: 20,
-        height: 20,
-        color: const Color(0xFF6BB0C5),
-        fit: BoxFit.contain,
-      ),
+      child: Image.asset(iconPath, width: 20, height: 20, color: const Color(0xFF6BB0C5), fit: BoxFit.contain),
     );
   }
 }
@@ -204,7 +190,7 @@ class _MonthSectionHeader extends StatelessWidget {
 // Widget อื่นๆ คงเดิม (ไม่ต้องแก้ไข)
 // -------------------------------------------------------------------
 class _AlbumPreviewSection extends StatelessWidget {
-  final List<MediaItem> items;
+  final AlbumModel items;
   final String monthTitle;
 
   const _AlbumPreviewSection({required this.items, required this.monthTitle});
@@ -216,9 +202,7 @@ class _AlbumPreviewSection extends StatelessWidget {
         fit: BoxFit.scaleDown,
         child: Container(
           padding: const EdgeInsets.all(10),
-          decoration: const BoxDecoration(
-            color: Color(0xFF555555),
-          ),
+          decoration: const BoxDecoration(color: Color(0xFF555555)),
           child: IntrinsicWidth(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -233,21 +217,9 @@ class _AlbumPreviewSection extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
-                      Container(
-                        decoration: const BoxDecoration(color: Colors.white),
-                        child: Center(
-                          child: Text(
-                            monthTitle,
-                            style: const TextStyle(
-                                fontSize: 13, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
+                      Container(decoration: const BoxDecoration(color: Colors.white), child: Center(child: Text(monthTitle, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)))),
                       for (int i = 0; i < 5; i++)
-                        if (i < items.length)
-                          _StaticPhotoSlot(item: items[i])
-                        else
-                          const SizedBox(),
+                        if (i < items.photos!.length) _StaticPhotoSlot(item: items.photos![i].image!) else const SizedBox(),
                     ],
                   ),
                 ),
@@ -262,10 +234,7 @@ class _AlbumPreviewSection extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
                       for (int i = 0; i < 6; i++)
-                        if ((i + 5) < items.length)
-                          _StaticPhotoSlot(item: items[i + 5])
-                        else
-                          const SizedBox(),
+                        if ((i + 5) < items.photos!.length) _StaticPhotoSlot(item: items.photos![i + 5].image!) else const SizedBox(),
                     ],
                   ),
                 ),
@@ -283,7 +252,7 @@ class _AlbumPreviewSection extends StatelessWidget {
 }
 
 class _StaticPhotoSlot extends StatefulWidget {
-  final MediaItem item;
+  final String item;
   const _StaticPhotoSlot({required this.item});
 
   @override
@@ -296,26 +265,25 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
   @override
   void initState() {
     super.initState();
-    _loadImage();
+    // _loadImage();
   }
 
-  Future<void> _loadImage() async {
-    if (widget.item.capturedImage != null) {
-      if (mounted) {
-        setState(() {
-          _imageData = widget.item.capturedImage;
-        });
-      }
-    } else {
-      final data = await widget.item.asset
-          .thumbnailDataWithSize(const ThumbnailSize(300, 300));
-      if (mounted) {
-        setState(() {
-          _imageData = data;
-        });
-      }
-    }
-  }
+  // Future<void> _loadImage() async {
+  //   if (widget.item.capturedImage != null) {
+  //     if (mounted) {
+  //       setState(() {
+  //         _imageData = widget.item.capturedImage;
+  //       });
+  //     }
+  //   } else {
+  //     final data = await widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300));
+  //     if (mounted) {
+  //       setState(() {
+  //         _imageData = data;
+  //       });
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -330,9 +298,9 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
             fit: StackFit.expand,
             children: [
               if (_imageData != null)
-                Image.memory(_imageData!, fit: BoxFit.cover)
+                Image.network(widget.item, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Center(child: Image.asset('assets/icons/fire.png')))
               else
-                Container(color: Colors.grey[200]),
+                Image.network(widget.item, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Center(child: Image.asset('assets/icons/fire.png'))),
             ],
           ),
         ),
@@ -346,29 +314,17 @@ class _SearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 44,
-      decoration: BoxDecoration(
-        color: const Color(0x0D6BB0C5),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: const Color(0x0D6BB0C5), borderRadius: BorderRadius.circular(12)),
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         children: [
-          Image.asset(
-            'assets/icons/Search.png',
-            width: 18,
-            height: 18,
-            color: Colors.black,
-          ),
+          Image.asset('assets/icons/Search.png', width: 18, height: 18, color: Colors.black),
           const SizedBox(width: 10),
           const Expanded(
             child: TextField(
               cursorColor: Colors.black,
               style: TextStyle(color: Colors.black, fontSize: 14.5),
-              decoration: InputDecoration(
-                hintText: 'ค้นหาความทรงจำตามแท็กและโน้ต.....',
-                isDense: true,
-                border: InputBorder.none,
-              ),
+              decoration: InputDecoration(hintText: 'ค้นหาความทรงจำตามแท็กและโน้ต.....', isDense: true, border: InputBorder.none),
             ),
           ),
         ],
@@ -387,37 +343,19 @@ class _TabSelector extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade300),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2)),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))],
       ),
       child: Row(
         children: [
           Expanded(
             child: Container(
               margin: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(8),
-              ),
+              decoration: BoxDecoration(color: Colors.orange, borderRadius: BorderRadius.circular(8)),
               alignment: Alignment.center,
-              child: const Text("ปี",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16)),
+              child: const Text("ปี", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
             ),
           ),
-          Expanded(
-            child: Container(
-              alignment: Alignment.center,
-              child: Text("เดือน",
-                  style: TextStyle(color: Colors.grey.shade700, fontSize: 16)),
-            ),
-          ),
+          Expanded(child: Container(alignment: Alignment.center, child: Text("เดือน", style: TextStyle(color: Colors.grey.shade700, fontSize: 16)))),
         ],
       ),
     );

@@ -7,6 +7,9 @@ const mainBorderColor = Color(0xFF6BB0C5);
 const ccardGradient1 = Color(0xFFFDDC85);
 const ccardGradient2 = Color(0xFFFECD7F);
 
+const publicUrl = 'wemory.dev-asha9.com';
+const baseUrl = 'whttps://wemory.dev-asha9.com';
+
 const List<Map<String, dynamic>> wedata = [
   {
     "id": 1,

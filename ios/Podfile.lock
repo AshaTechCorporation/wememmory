@@ -1,4 +1,7 @@
 PODS:
+  - awesome_notifications (0.10.0):
+    - Flutter
+    - IosAwnCore (~> 0.10.0)
   - Flutter (1.0.0)
   - flutter_local_notifications (0.0.1):
     - Flutter
@@ -6,6 +9,7 @@ PODS:
     - Flutter
   - image_picker_ios (0.0.1):
     - Flutter
+  - IosAwnCore (0.10.0)
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -17,6 +21,7 @@ PODS:
     - FlutterMacOS
 
 DEPENDENCIES:
+  - awesome_notifications (from `.symlinks/plugins/awesome_notifications/ios`)
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_timezone (from `.symlinks/plugins/flutter_timezone/ios`)
@@ -25,7 +30,13 @@ DEPENDENCIES:
   - photo_manager (from `.symlinks/plugins/photo_manager/darwin`)
   - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/darwin`)
 
+SPEC REPOS:
+  trunk:
+    - IosAwnCore
+
 EXTERNAL SOURCES:
+  awesome_notifications:
+    :path: ".symlinks/plugins/awesome_notifications/ios"
   Flutter:
     :path: Flutter
   flutter_local_notifications:
@@ -42,10 +53,12 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/video_player_avfoundation/darwin"
 
 SPEC CHECKSUMS:
+  awesome_notifications: 0f432b28098d193920b11a44cfa9d2d9313a3888
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_local_notifications: ad39620c743ea4c15127860f4b5641649a988100
   flutter_timezone: ee50ce7786b5fde27e2fe5375bbc8c9661ffc13f
   image_picker_ios: e0ece4aa2a75771a7de3fa735d26d90817041326
+  IosAwnCore: 653786a911089012092ce831f2945cd339855a89
   path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
   photo_manager: fe4cbb0808b96f8be4af7ce6ae18dcd9c9b983c6
   video_player_avfoundation: dd410b52df6d2466a42d28550e33e4146928280a

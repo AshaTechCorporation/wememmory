@@ -10,23 +10,19 @@ import 'package:wememmory/profile/profilePage.dart';
 import 'package:wememmory/models/media_item.dart';
 
 class FirstPage extends StatefulWidget {
-  
   final int initialIndex;
   final List<MediaItem>? newAlbumItems;
   final String? newAlbumMonth;
 
-  const FirstPage({
-    super.key,
-    this.initialIndex = 0,
-    this.newAlbumItems,
-    this.newAlbumMonth,
-  });
+  const FirstPage({super.key, this.initialIndex = 0, this.newAlbumItems, this.newAlbumMonth});
 
   @override
   State<FirstPage> createState() => _FirstPageState();
 }
 
 class _FirstPageState extends State<FirstPage> {
+  final PageStorageBucket bucket = PageStorageBucket();
+  late Widget currentPage = HomePage(newAlbumItems: widget.newAlbumItems, newAlbumMonth: widget.newAlbumMonth);
   // ... (คงเดิม)
   late int _currentIndex;
 
@@ -37,42 +33,22 @@ class _FirstPageState extends State<FirstPage> {
   }
 
   void _showCreateAlbumModal() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const CreateAlbumModal(),
-    );
+    showModalBottomSheet(context: context, isScrollControlled: true, backgroundColor: Colors.transparent, builder: (context) => const CreateAlbumModal());
+
+    final List<Widget> pages = [HomePage(newAlbumItems: widget.newAlbumItems, newAlbumMonth: widget.newAlbumMonth), CollectionPage(), const SizedBox(), const ShopPage(), const ProfilePage()];
   }
 
   @override
   Widget build(BuildContext context) {
     // ... (pages list คงเดิม)
-    final List<Widget> pages = [
-      HomePage(
-        newAlbumItems: widget.newAlbumItems,
-        newAlbumMonth: widget.newAlbumMonth,
-      ),
-      CollectionPage(
-        newAlbumItems: widget.newAlbumItems,
-        newAlbumMonth: widget.newAlbumMonth,
-      ),
-      const SizedBox(),
-      const ShopPage(),
-      const ProfilePage(),
-    ];
 
     return Scaffold(
       backgroundColor: kBackgroundColor,
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: IndexedStack(
-              index: _currentIndex,
-              children: pages,
-            ),
-          ),
+          PageStorage(bucket: bucket, child: currentPage),
+          // Positioned.fill(child: IndexedStack(index: _currentIndex, children: pages)),
           // ✅ ปรับ Positioned ให้ชิดขอบล่าง
           Positioned(
             left: 0,
@@ -85,6 +61,17 @@ class _FirstPageState extends State<FirstPage> {
                   _showCreateAlbumModal();
                 } else {
                   setState(() => _currentIndex = index);
+                  if (_currentIndex == 0) {
+                    currentPage = HomePage(newAlbumItems: widget.newAlbumItems, newAlbumMonth: widget.newAlbumMonth);
+                  } else if (_currentIndex == 1) {
+                    currentPage = CollectionPage();
+                  } else if (_currentIndex == 2) {
+                    currentPage = SizedBox();
+                  } else if (_currentIndex == 3) {
+                    currentPage = ShopPage();
+                  } else if (_currentIndex == 4) {
+                    currentPage = ProfilePage();
+                  }
                 }
               },
             ),
@@ -100,19 +87,15 @@ class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
 
-  const CustomBottomNavBar({
-    super.key,
-    required this.currentIndex,
-    required this.onTap,
-  });
+  const CustomBottomNavBar({super.key, required this.currentIndex, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     // สีต่างๆ คงเดิม
-    const Color activeIconColor = Color(0xFF67A5BA); 
-    const Color inactiveIconColor = Color(0xFF555555); 
-    const Color centerButtonColor = Color(0xFFED7D31); 
-    const Color staticTextColor = Color(0xFF3C3C3B); 
+    const Color activeIconColor = Color(0xFF67A5BA);
+    const Color inactiveIconColor = Color(0xFF555555);
+    const Color centerButtonColor = Color(0xFFED7D31);
+    const Color staticTextColor = Color(0xFF3C3C3B);
 
     // ✅ เอา Padding รอบนอกออกเพื่อให้เต็มจอ
     return Stack(
@@ -147,7 +130,8 @@ class CustomBottomNavBar extends StatelessWidget {
                 color: Colors.white.withOpacity(0.5),
                 // border: Border(top: BorderSide(color: Colors.white.withOpacity(0.2), width: 0.5)), // ขอบบนบางๆ
               ),
-              child: SafeArea( // ✅ เพิ่ม SafeArea เพื่อรองรับมือถือรุ่นใหม่ (ไม่มีปุ่มโฮม)
+              child: SafeArea(
+                // ✅ เพิ่ม SafeArea เพื่อรองรับมือถือรุ่นใหม่ (ไม่มีปุ่มโฮม)
                 top: false,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 12, 10, 0), // Padding ซ้ายขวาภายใน
@@ -169,7 +153,7 @@ class CustomBottomNavBar extends StatelessWidget {
                           height: 21.88,
                         ),
                       ),
-                      
+
                       // 2. สมุดภาพ
                       Expanded(
                         child: _buildNavItem(
@@ -194,15 +178,8 @@ class CustomBottomNavBar extends StatelessWidget {
                               width: 44,
                               height: 44,
                               alignment: Alignment.center,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                              ),
-                              child: Image.asset(
-                                'assets/icons/btupload.png',
-                                width: 44,
-                                height: 44,
-                                fit: BoxFit.contain,
-                              ),
+                              decoration: const BoxDecoration(shape: BoxShape.circle),
+                              child: Image.asset('assets/icons/btupload.png', width: 44, height: 44, fit: BoxFit.contain),
                             ),
                           ),
                         ),
@@ -266,23 +243,12 @@ class CustomBottomNavBar extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            height: 28, 
-            child: Center(
-              child: Image.asset(
-                iconPath,
-                width: width,
-                height: height,
-                color: isActive ? activeColor : inactiveColor,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
+          SizedBox(height: 28, child: Center(child: Image.asset(iconPath, width: width, height: height, color: isActive ? activeColor : inactiveColor, fit: BoxFit.contain))),
           const SizedBox(height: 2),
           Text(
             label,
             style: TextStyle(
-              color: textColor, 
+              color: textColor,
               fontSize: 10, // ปรับขนาดตัวหนังสือให้พอดี
               fontWeight: FontWeight.w500,
             ),

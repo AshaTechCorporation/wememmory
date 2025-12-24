@@ -5,18 +5,14 @@ import 'username_page.dart';
 class OtpPage extends StatefulWidget {
   final String phoneNumber;
 
-  const OtpPage({
-    super.key,
-    this.phoneNumber = "+66 94 031 8888",
-  });
+  OtpPage({super.key, required this.phoneNumber});
 
   @override
   State<OtpPage> createState() => _OtpPageState();
 }
 
 class _OtpPageState extends State<OtpPage> {
-  final List<TextEditingController> _controllers =
-      List.generate(6, (_) => TextEditingController());
+  final List<TextEditingController> _controllers = List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
   // ✅ เพิ่มตัวแปรเช็ค Error
@@ -66,23 +62,8 @@ class _OtpPageState extends State<OtpPage> {
             children: [
               Stack(
                 children: [
-                  SizedBox(
-                    height: bannerHeight,
-                    width: double.infinity,
-                    child: Image.asset(
-                      'assets/images/Hobby.png',
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                  Positioned(
-                    left: size.width * 0.18,
-                    top: insetTop + 12,
-                    child: Image.asset(
-                      'assets/images/image2.png',
-                      height: 40,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
+                  SizedBox(height: bannerHeight, width: double.infinity, child: Image.asset('assets/images/Hobby.png', fit: BoxFit.fill)),
+                  Positioned(left: size.width * 0.18, top: insetTop + 12, child: Image.asset('assets/images/image2.png', height: 40, fit: BoxFit.contain)),
                 ],
               ),
               Transform.translate(
@@ -94,39 +75,19 @@ class _OtpPageState extends State<OtpPage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(_radius),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x1F000000),
-                          blurRadius: 16,
-                          offset: Offset(0, 8),
-                        )
-                      ],
+                      boxShadow: const [BoxShadow(color: Color(0x1F000000), blurRadius: 16, offset: Offset(0, 8))],
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child:
-                              const Icon(Icons.arrow_back, color: Colors.black),
-                        ),
+                        GestureDetector(onTap: () => Navigator.pop(context), child: const Icon(Icons.arrow_back, color: Colors.black)),
                         const SizedBox(height: 20),
-                        const Text(
-                          'กรอกรหัส OTP ที่ส่งไปยังหมายเลขโทรศัพท์',
-                          style: TextStyle(color: _textGrey, fontSize: 14),
-                        ),
+                        const Text('กรอกรหัส OTP ที่ส่งไปยังหมายเลขโทรศัพท์', style: TextStyle(color: _textGrey, fontSize: 14)),
                         const SizedBox(height: 8),
-                        Text(
-                          widget.phoneNumber,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
+                        Text(widget.phoneNumber, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
                         const SizedBox(height: 30),
-                        
+
                         // --- OTP Fields ---
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -138,37 +99,22 @@ class _OtpPageState extends State<OtpPage> {
                                 focusNode: _focusNodes[index],
                                 textAlign: TextAlign.center,
                                 keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  LengthLimitingTextInputFormatter(1),
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                onChanged: (value) =>
-                                    _onFieldChanged(value, index),
-                                style: const TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
+                                inputFormatters: [LengthLimitingTextInputFormatter(1), FilteringTextInputFormatter.digitsOnly],
+                                onChanged: (value) => _onFieldChanged(value, index),
+                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                 decoration: InputDecoration(
-                                  contentPadding:
-                                      const EdgeInsets.symmetric(vertical: 8),
+                                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
                                   enabledBorder: UnderlineInputBorder(
                                     // เปลี่ยนสีเส้นเมื่อมี Error
-                                    borderSide: BorderSide(
-                                        color: _hasError 
-                                            ? Colors.red 
-                                            : Colors.grey.shade300),
+                                    borderSide: BorderSide(color: _hasError ? Colors.red : Colors.grey.shade300),
                                   ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: _hasError 
-                                            ? Colors.red 
-                                            : _primaryOrange, 
-                                        width: 2),
-                                  ),
+                                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: _hasError ? Colors.red : _primaryOrange, width: 2)),
                                 ),
                               ),
                             );
                           }),
                         ),
-                        
+
                         // --- ✅ ส่วนแสดงข้อความ Error (เพิ่มใหม่ตรงนี้) ---
                         if (_hasError)
                           const Padding(
@@ -184,10 +130,9 @@ class _OtpPageState extends State<OtpPage> {
                         else
                           // ใส่ SizedBox เปล่าๆ ไว้จองพื้นที่หรือระยะห่าง (Optional)
                           const SizedBox(height: 24), // ถ้าไม่มี Error ให้เว้นระยะปกติ (32-8 = 24 โดยประมาณ)
-
                         // ถ้ามี Error แล้ว เราใส่ padding ใน if แล้ว ถ้าไม่มี Error เราใช้ SizedBox ด้านบนแทน
                         // ดังนั้นบรรทัดนี้ปรับเป็นระยะห่างที่เหลือ
-                        const SizedBox(height: 8), 
+                        const SizedBox(height: 8),
 
                         SizedBox(
                           width: double.infinity,
@@ -196,22 +141,14 @@ class _OtpPageState extends State<OtpPage> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: _primaryOrange,
                               foregroundColor: Colors.white,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.zero,
-                              ),
+                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                               elevation: 0,
                             ),
                             onPressed: () {
-                              String inputOtp =
-                                  _controllers.map((c) => c.text).join();
+                              String inputOtp = _controllers.map((c) => c.text).join();
 
                               if (inputOtp == "111111") {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const UsernamePage()),
-                                );
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const UsernamePage()));
                               } else {
                                 // ✅ 1. แสดง Error Text
                                 setState(() {
@@ -225,11 +162,7 @@ class _OtpPageState extends State<OtpPage> {
                                 _focusNodes[0].requestFocus();
                               }
                             },
-                            child: const Text(
-                              'ยืนยัน',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w600),
-                            ),
+                            child: const Text('ยืนยัน', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -242,11 +175,7 @@ class _OtpPageState extends State<OtpPage> {
                               });
                               // Logic ส่งรหัสใหม่
                             },
-                            child: const Text(
-                              'ส่งรหัสใหม่',
-                              style: TextStyle(
-                                  color: _primaryOrange, fontSize: 14),
-                            ),
+                            child: const Text('ส่งรหัสใหม่', style: TextStyle(color: _primaryOrange, fontSize: 14)),
                           ),
                         ),
                       ],
