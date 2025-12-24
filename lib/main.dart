@@ -24,7 +24,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     // ✅ เรียกฟังก์ชันตั้งค่าเมื่อเข้าแอป
-    // _setupNotifications();
+   _setupNotifications();
   }
 
   Future<void> _setupNotifications() async {

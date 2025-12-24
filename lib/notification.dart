@@ -3,28 +3,29 @@ import 'package:flutter/material.dart';
 
 class NotificationHelper {
   
-  // 1. เริ่มต้นระบบ
   static Future<void> init() async {
     await AwesomeNotifications().initialize(
       null, 
       [
         NotificationChannel(
-          channelKey: 'daily_alert_channel', 
-          channelName: 'Minute Notifications', // เปลี่ยนชื่อนิดหน่อย
+          channelKey: 'minute_channel',
+          channelName: 'Minute Alerts',
           channelDescription: 'แจ้งเตือนทุกนาที',
           defaultColor: Colors.deepPurple,
           ledColor: Colors.white,
-          importance: NotificationImportance.Max, 
+          
+          // ✅ ใช้ Importance.High แทน Max (Max บางทีมันค้างนาน)
+          importance: NotificationImportance.High, 
+          
           channelShowBadge: true,
-          locked: true, 
-          criticalAlerts: true, 
+          locked: false, // ให้ปัดทิ้งได้
+          criticalAlerts: false, // ❌ ปิดตัวนี้ (ถ้าเปิด มันจะบังคับให้สนใจ)
         )
       ],
       debug: true,
     );
   }
 
-  // 2. ตรวจสอบและขออนุญาต
   static Future<void> checkPermission() async {
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
     if (!isAllowed) {
@@ -32,34 +33,31 @@ class NotificationHelper {
     }
   }
 
-  // 3. ✅ ฟังก์ชันแจ้งเตือน: ทุกๆ 1 นาที
-  static Future<void> scheduleEveryMinute() async {
-    // ลบตารางเวลาเก่าทิ้งก่อน
+static Future<void> scheduleEveryMinute() async {
     await AwesomeNotifications().cancelAllSchedules();
-
     String localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
     
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
-        id: 888, 
-        channelKey: 'daily_alert_channel',
-        title: 'Wememmory',
-        body: 'ผ่านไปอีก 1 นาทีแล้ว อย่าลืมเข้ามาเช็คนะครับ', // เปลี่ยนข้อความให้เข้ากับสถานการณ์
+        id: 777, 
+        channelKey: 'minute_channel',
+        title: 'Wememory',
+        body: 'ปิดแอปอยู่ก็แจ้งเตือนนะ!',
         notificationLayout: NotificationLayout.Default,
-        wakeUpScreen: true,       
-        category: NotificationCategory.Alarm, 
-        fullScreenIntent: true,   
-        criticalAlert: true,
+        wakeUpScreen: true,
+        category: NotificationCategory.Reminder, // หรือ Alarm
+        autoDismissible: true,
       ),
-      // ⚠️ จุดที่เปลี่ยน: ใช้ NotificationInterval แทน NotificationCalendar
       schedule: NotificationInterval(
-        interval: const Duration(seconds: 60), // หน่วยเป็นวินาที (ขั้นต่ำต้อง 60 วินาทีตามกฎ Android)
+        interval: const Duration(seconds: 60), 
         timeZone: localTimeZone, 
-        repeats: true, // สั่งให้ทำซ้ำไปเรื่อยๆ
-        allowWhileIdle: true,
-        preciseAlarm: true, 
+        repeats: true, 
+        
+        // ✅ 2 บรรทัดนี้สำคัญมากสำหรับการทำงานตอนปิดแอป
+        allowWhileIdle: true, // อนุญาตให้ทำงานแม้เครื่องพักหน้าจอ (Doze mode)
+        preciseAlarm: true,   // บังคับให้ปลุกตรงเวลาเป๊ะๆ
       ),
     );
-    debugPrint("✅ ตั้งเวลาแจ้งเตือนซ้ำทุก 1 นาที เรียบร้อยแล้ว");
+    debugPrint("✅ ตั้งเวลาแจ้งเตือน (รองรับ Background Mode)");
   }
 }
