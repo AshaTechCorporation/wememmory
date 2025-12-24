@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/collection/month_detail_page.dart';
 import 'package:wememmory/collection/share_sheet.dart';
@@ -9,6 +10,8 @@ import 'package:wememmory/home/service/homeservice.dart';
 import 'package:wememmory/models/albumModel.dart';
 import 'package:wememmory/models/media_item.dart' hide AlbumCollection;
 import 'package:wememmory/shop/chooseMediaItem.dart';
+import 'package:wememmory/widgets/ApiExeption.dart';
+import 'package:wememmory/widgets/dialog.dart';
 
 // หน้า สมุดภาพ
 class CollectionPage extends StatefulWidget {
@@ -45,11 +48,56 @@ class _CollectionPageState extends State<CollectionPage> {
     // }
   }
 
-  Future getAlbums() async {
-    final album1 = await HomeService.getAlbums();
-    setState(() {
-      albums = album1;
-    });
+  getAlbums() async {
+    try {
+      // LoadingDialog.open(context);
+
+      final album1 = await HomeService.getAlbums();
+
+      setState(() {
+        albums = album1;
+      });
+      // LoadingDialog.close(context);
+    } on ClientException catch (e) {
+      if (!mounted) return;
+      // LoadingDialog.close(context);
+      showDialog(
+        context: context,
+        builder:
+            (context) => DialogError(
+              title: '$e',
+              pressYes: () {
+                Navigator.pop(context, true);
+              },
+            ),
+      );
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      // LoadingDialog.close(context);
+      showDialog(
+        context: context,
+        builder:
+            (context) => DialogError(
+              title: '$e',
+              pressYes: () {
+                Navigator.pop(context, true);
+              },
+            ),
+      );
+    } on Exception catch (e) {
+      if (!mounted) return;
+      // LoadingDialog.close(context);
+      showDialog(
+        context: context,
+        builder:
+            (context) => DialogError(
+              title: '$e',
+              pressYes: () {
+                Navigator.pop(context, true);
+              },
+            ),
+      );
+    }
   }
 
   @override
