@@ -1,39 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:wememmory/home/firstPage.dart';
 import 'package:wememmory/login/loginPage.dart';
-
-// ✅ 1. Import ไฟล์แจ้งเตือนที่เราสร้างไว้
-// (ตรวจสอบ path ให้ตรงกับที่คุณเซฟไฟล์ไว้นะครับ เช่น 'utils/notification_helper.dart' หรือ 'shop/notification_helper.dart')
 import 'notification.dart'; 
 
-void main() async { // ✅ 2. เปลี่ยน main เป็น async เพื่อให้รอการตั้งค่าได้
-  
-  // ✅ 3. ต้องเพิ่มบรรทัดนี้เสมอเมื่อใช้ async ใน main
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ 4. เริ่มระบบแจ้งเตือน + ตั้งเวลา 8 โมงเช้า
+  // 1. เริ่มระบบ
   await NotificationHelper.init();
-  await NotificationHelper.scheduleDaily8AM();
 
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  
+  @override
+  void initState() {
+    super.initState();
+    // ✅ เรียกฟังก์ชันตั้งค่าเมื่อเข้าแอป
+    _setupNotifications();
+  }
+
+  Future<void> _setupNotifications() async {
+    // ขออนุญาต (ถ้ายังไม่เคยขอ)
+    await NotificationHelper.checkPermission();
+    
+    // ตั้งเวลา 8 โมงเช้า (ทำงานเบื้องหลัง)
+    await NotificationHelper.scheduleEveryMinute();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Wememory', // ตั้งชื่อแอป
+      title: 'Wememory',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // ส่วนนี้จะทำให้ Text ปกติทั้งแอปเป็น Prompt
         textTheme: GoogleFonts.promptTextTheme(
           Theme.of(context).textTheme,
         ),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
+      // ✅ กลับมาใช้หน้า Login ปกติ
       home: const LoginPage(), 
     );
   }
