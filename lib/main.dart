@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> {
     await NotificationHelper.checkPermission();
 
     // ตั้งเวลา 8 โมงเช้า (ทำงานเบื้องหลัง)
-    await NotificationHelper.scheduleEveryMinute();
+    await NotificationHelper.scheduleDaily10AM();
   }
 
   @override
