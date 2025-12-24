@@ -35,6 +35,12 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
   void initState() {
     super.initState();
     _captionController = TextEditingController(text: widget.item.caption);
+    
+    // เพิ่ม Listener: อัปเดตหน้าจอทันทีเมื่อพิมพ์
+    _captionController.addListener(() {
+      setState(() {});
+    });
+
     _selectedTags = List.from(widget.item.tags);
     _loadImage();
   }
@@ -86,13 +92,15 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
 
   Future<void> _saveData() async {
     try {
-      // จับภาพเฉพาะสิ่งที่อยู่ใน RepaintBoundary (ซึ่งตอนนี้หุ้มแค่รูปภาพแล้ว)
+      // จับภาพเฉพาะ RepaintBoundary (หุ้มแค่รูปภาพ ไม่รวมข้อความ Overlay)
       RenderRepaintBoundary boundary = _cropKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
       ui.Image image = await boundary.toImage(pixelRatio: 3.0); 
       ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
 
       if (byteData != null) {
         widget.item.capturedImage = byteData.buffer.asUint8List();
+        
+        // บันทึก Caption แยกต่างหาก
         widget.item.caption = _captionController.text;
         widget.item.tags = List.from(_selectedTags);
 
@@ -194,8 +202,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          // ✅ 1. ย้าย RepaintBoundary มาหุ้มเฉพาะ InteractiveViewer (รูปภาพ)
-                          // ทำให้เวลาบันทึก จะได้เฉพาะส่วนนี้ ไม่รวม Grid ด้านล่าง
+                          // 1. รูปภาพ (ถูกหุ้มด้วย RepaintBoundary เพื่อบันทึก)
                           RepaintBoundary(
                             key: _cropKey, 
                             child: InteractiveViewer(
@@ -214,9 +221,37 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                                       : const Center(child: Text("ไม่สามารถโหลดรูปภาพได้")),
                             ),
                           ),
+
+                          // ✅ 2. ข้อความ Overlay: แก้ไขให้แสดง Placeholder ถ้ายังไม่มีข้อความ
+                          Positioned(
+                            bottom: 20, 
+                            left: 10,
+                            right: 10,
+                            child: IgnorePointer(
+                              child: Text(
+                                // ✅ ถ้า text ว่าง ให้แสดง placeholder, ถ้ามีข้อความ ให้แสดงข้อความ
+                                _captionController.text.isEmpty 
+                                    ? "เขียนความรู้สึกหรือเรื่องราวเล็กๆ ที่ซ่อนอยู่หลังภาพนี้...." 
+                                    : _captionController.text, 
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  // ✅ ใช้สีที่เลือกจาก Dropdown (หรือจะปรับ Opacity ให้จางลงถ้าเป็น Placeholder ก็ทำได้ตรงนี้)
+                                  color: _selectedTextColor.withOpacity(_captionController.text.isEmpty ? 0.7 : 1.0), 
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  shadows: [
+                                    Shadow(
+                                      blurRadius: 2.0,
+                                      color: (_selectedTextColor == Colors.black) ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.5),
+                                      offset: const Offset(1.0, 1.0),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                           
-                          // ✅ 2. Grid Overlay (เส้นตาราง) อยู่นอก RepaintBoundary
-                          // ทำให้แสดงผลให้เห็น แต่ไม่ถูกบันทึกไปด้วย
+                          // 3. เส้นตาราง Grid (ไม่ถูกบันทึก)
                           IgnorePointer(
                             child: Stack(
                               children: [
@@ -242,8 +277,9 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                     ),
                   ),
 
-                  // ... (ส่วนควบคุมด้านล่างเหมือนเดิม) ...
                   const SizedBox(height: 10),
+                  
+                  // ปุ่มควบคุม Scale และ สี Font
                   Row(
                     children: [
                       Expanded(
@@ -278,7 +314,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                               onSelected: (Color value) {
                                 setState(() {
                                   _dropdownValue = value;
-                                  _selectedTextColor = value;
+                                  _selectedTextColor = value; 
                                 });
                               },
                               itemBuilder: (BuildContext context) => [
@@ -352,6 +388,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
 
                   const SizedBox(height: 10),
 
+                  // ช่องพิมพ์ข้อความ
                   Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey[200]!),
@@ -360,9 +397,9 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                     child: TextField(
                       controller: _captionController,
                       maxLines: 4,
-                      style: TextStyle(color: _selectedTextColor), 
+                      style: const TextStyle(color: Colors.black), 
                       decoration: InputDecoration(
-                        hintText: "เขียนความรู้สึกหรือเรื่องราวเล็ก ๆ ที่ซ่อนอยู่หลังภาพนี้.....",
+                        hintText: "เขียนความรู้สึกหรือเรื่องราวเล็กๆ ที่ซ่อนอยู่หลังภาพนี้....",
                         hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.all(12),

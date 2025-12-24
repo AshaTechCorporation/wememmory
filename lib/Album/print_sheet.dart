@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/Album/order_success_page.dart';
+import 'package:wememmory/Album/photo_readonly_page.dart'; // ✅ อย่าลืม import หน้านี้
 import 'package:wememmory/models/media_item.dart';
 
 // หน้า สั่งพิมพ์อัลบั้มรูป
@@ -410,7 +411,9 @@ class _PrintPreviewSection extends StatelessWidget {
   }
 }
 
-// ... _StaticPhotoSlot ... (ส่วนนี้เหมือนเดิม)
+// ----------------------------------------------------------------------------------
+// ✅ แก้ไข Class _StaticPhotoSlot ด้านล่างนี้ ให้ทำงานเหมือน FinalPreviewSheet
+// ----------------------------------------------------------------------------------
 class _StaticPhotoSlot extends StatefulWidget {
   final MediaItem item;
   const _StaticPhotoSlot({required this.item});
@@ -447,21 +450,73 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(color: Colors.white),
-      padding: const EdgeInsets.all(4.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(6.0),
-        child: Container(
-          color: Colors.grey[200],
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              if (_imageData != null)
-                Image.memory(_imageData!, fit: BoxFit.cover)
-              else
-                Container(color: Colors.grey[200]),
-            ],
+    // ✅ 1. ตรวจสอบว่ามีการแก้ไขหรือไม่
+    bool isEdited = widget.item.caption.isNotEmpty || widget.item.tags.isNotEmpty;
+
+    return GestureDetector(
+      // ✅ 2. ถ้ามีการแก้ไข ให้กดเพื่อไปหน้าอ่านได้
+      onTap: isEdited ? () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PhotoReadonlyPage(item: widget.item),
+          ),
+        );
+      } : null,
+      child: Container(
+        decoration: const BoxDecoration(color: Colors.white),
+        padding: const EdgeInsets.all(4.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(6.0),
+          child: Container(
+            color: Colors.grey[200],
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // แสดงรูปภาพ
+                if (_imageData != null)
+                  Image.memory(_imageData!, fit: BoxFit.cover)
+                else
+                  Container(color: Colors.grey[200]),
+
+                // ✅ 3. แสดง Overlay "แตะเพื่ออ่าน" เฉพาะรูปที่มีการแก้ไข
+                if (isEdited)
+                  Positioned(
+                    bottom: 10,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.3), // พื้นหลังสีดำจางๆ
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/icons/alert.png', // ต้องมั่นใจว่ามีไฟล์นี้
+                              width: 11,
+                              height: 11,
+                              color: Colors.white,
+                              fit: BoxFit.contain,
+                            ),
+                            const Text(
+                              "แตะเพื่ออ่าน",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

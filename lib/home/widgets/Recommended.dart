@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/Album/createAlbumModal.dart';
@@ -19,6 +20,11 @@ class _RecommendedState extends State<Recommended> {
   int _currentIndex = 0;
   late List<MemoryCardData> _items;
 
+  // ตัวแปรสำหรับจับเวลา
+  Timer? _timer;
+  DateTime? _targetDate;
+  String _timeRemainingString = "7 วัน 00 ชม. 00 นาที 00 วิ"; // ค่าเริ่มต้น
+
   @override
   void initState() {
     super.initState();
@@ -26,33 +32,121 @@ class _RecommendedState extends State<Recommended> {
   }
 
   @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   void didUpdateWidget(covariant Recommended oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // ตรวจสอบว่าข้อมูลเปลี่ยนไปหรือไม่ ถ้าเปลี่ยนให้คำนวณใหม่
     if (widget.albumItems != oldWidget.albumItems ||
         widget.albumMonth != oldWidget.albumMonth) {
       _initData();
     }
   }
 
-  void _initData() {
-    String displayMonth = widget.albumMonth ?? 'พฤษภาคม';
+  // ✅ 1. Logic ใหม่: หาวันที่จาก 'uploadedAt' (วันที่อัปโหลด) + 7 วัน
+  void _calculateTargetAndInitialString() {
+    // เช็คว่ามีรูปหรือไม่
+    if (widget.albumItems != null && widget.albumItems!.isNotEmpty) {
+      
+      // ✅ แก้ไข: เปลี่ยนจาก item.asset.createDateTime เป็น item.uploadedAt
+      // (ต้องมั่นใจว่าแก้ไฟล์ MediaItem ตามขั้นตอนที่ 1 แล้ว)
+      DateTime latestDate = widget.albumItems!
+          .map((item) => item.uploadedAt) // <--- ใช้เวลาอัปโหลด
+          .reduce((a, b) => a.isAfter(b) ? a : b); // หาเวลาที่ล่าสุดที่สุด
+
+      // กำหนดเป้าหมายคือ 7 วันหลังจากวันที่อัปโหลดล่าสุด
+      _targetDate = latestDate.add(const Duration(days: 7));
+      
+      // คำนวณเวลาครั้งแรกทันที
+      _updateTimeStringInternal();
+    } else {
+      // กรณีไม่มีรูป: ไม่นับเวลา
+      _targetDate = null;
+      _timeRemainingString = "7 วัน 00 ชม. 00 นาที 00 วิ"; 
+    }
+  }
+
+  // ✅ 2. ฟังก์ชันคำนวณเวลา (คงเดิม)
+  void _updateTimeStringInternal() {
+    if (_targetDate == null) {
+       _timeRemainingString = "7 วัน 00 ชม. 00 นาที 00 วิ";
+       return;
+    }
+
+    final now = DateTime.now();
+    final difference = _targetDate!.difference(now);
+
+    if (difference.isNegative) {
+      _timeRemainingString = "หมดเวลาเก็บความทรงจำ";
+    } else {
+      final days = difference.inDays;
+      final hours = difference.inHours % 24;
+      final minutes = difference.inMinutes % 60;
+      final seconds = difference.inSeconds % 60;
+      _timeRemainingString = "$days วัน $hours ชม. $minutes นาที $seconds วิ";
+    }
+  }
+
+  // ✅ 3. Timer Loop (คงเดิม)
+  void _onTimerTick() {
+    if (_targetDate == null) return;
+
+    _updateTimeStringInternal(); // คำนวณค่าใหม่
     
+    // อัปเดต UI เฉพาะส่วน Card 2
+    if (mounted && _items.length > 1) {
+      setState(() {
+         if (_items[1].type == CardType.ticket) {
+            _updateCardTwoTitle(); 
+         }
+      });
+    }
+  }
+
+  void _updateCardTwoTitle() {
+    try {
+      final oldCard = _items[1];
+      // เช็คว่าค่า String เปลี่ยนไปจริงไหมค่อยสร้าง Object ใหม่ (Performance Optimization)
+      if (oldCard.mainTitle != _timeRemainingString) {
+        _items[1] = MemoryCardData(
+          type: oldCard.type,
+          topTitle: oldCard.topTitle,
+          mainTitle: _timeRemainingString, 
+          subTitle: oldCard.subTitle,
+          footerText: oldCard.footerText,
+          currentProgress: oldCard.currentProgress,
+          maxProgress: oldCard.maxProgress,
+          gradientColors: oldCard.gradientColors,
+          accentColor: oldCard.accentColor,
+          backgroundColor: oldCard.backgroundColor,
+        );
+      }
+    } catch (e) {
+      print("Error updating card: $e");
+    }
+  }
+
+  void _initData() {
+    // STEP 1: คำนวณเวลาก่อน
+    _calculateTargetAndInitialString();
+    
+    String displayMonth = widget.albumMonth ?? 'พฤษภาคม';
     int currentCount = widget.albumItems?.length ?? 0;
     int targetCount = 11;
 
+    // STEP 2: สร้าง List ข้อมูลการ์ด
     _items = [
-      // ------------------------------------------------
-      // Card 1: ปรับ Data ให้เข้ากับ Layout ใหม่
-      // ------------------------------------------------
+      // Card 1: Standard
       MemoryCardData(
         type: CardType.standard,
-        // ย้ายเดือนมาไว้ TopTitle เพื่อให้ตัวใหญ่และอยู่มุมซ้าย
-        topTitle: '$displayMonth\nของฉัน', 
-        mainTitle: '', // ไม่ใช้แล้วสำหรับ layout ใหม่
-        // ย้ายข้อความอธิบายมาไว้ subTitle
-        subTitle: 'อีกมากกว่า 23+ ที่เพิ่มรูปภาพเดือนนี้', 
-        // ใส่ Ticket ID ที่นี่เพื่อให้ไปอยู่มุมขวาบน
-        footerText: 'Ticket 10', 
+        topTitle: '$displayMonth\nของฉัน',
+        mainTitle: '',
+        subTitle: 'อีกมากกว่า 23+ ที่เพิ่มรูปภาพเดือนนี้',
+        footerText: 'Ticket 10',
         gradientColors: [const Color(0xFF424242), const Color(0xFF212121)],
         accentColor: const Color(0xFFFF7043),
         assetImages: [
@@ -61,26 +155,22 @@ class _RecommendedState extends State<Recommended> {
           'assets/images/Hobby1.png',
         ],
       ),
-      
-      // ------------------------------------------------
-      // Card 2: Ticket Layout
-      // ------------------------------------------------
+
+      // Card 2: Ticket Layout (ตัวที่แสดงเวลานับถอยหลัง)
       MemoryCardData(
         type: CardType.ticket,
         topTitle: '$displayMonth\nของฉัน',
-        mainTitle: '5 วัน 23 ชม. 34 นาที 55 วิ',
-        subTitle: 'อีกมากกว่า 23+ ที่เพิ่มรูปภาพเดือนนี้',
+        mainTitle: _timeRemainingString, // ใช้ค่าที่คำนวณแล้ว
+        subTitle: 'เหลือเวลาเก็บความทรงจำอีก 7 วัน',
         footerText: 'Ticket 10',
         currentProgress: currentCount,
         maxProgress: targetCount,
-        gradientColors: [], 
+        gradientColors: [],
         accentColor: const Color(0xFFFF7043),
-        backgroundColor: const Color(0xFF111111), 
+        backgroundColor: const Color(0xFF111111),
       ),
 
-      // ------------------------------------------------
-      // Card 3: Background Image Layout
-      // ------------------------------------------------
+      // Card 3: Background Image
       MemoryCardData(
         type: CardType.backgroundImage,
         topTitle: 'เมษายน',
@@ -96,8 +186,8 @@ class _RecommendedState extends State<Recommended> {
 
     if (widget.albumItems != null && widget.albumItems!.isNotEmpty) {
       final items = widget.albumItems!;
-      
-      // Update Card 1 Data (เมื่อมีรูปจริง)
+
+      // Update Card 1 Data
       _items[0] = MemoryCardData(
         type: CardType.standard,
         topTitle: '$displayMonth\nของฉัน',
@@ -109,24 +199,24 @@ class _RecommendedState extends State<Recommended> {
         imageItems: items,
       );
 
-      // Card 2: Update Data
-       _items[1] = MemoryCardData(
+      // Update Card 2 Data
+      _items[1] = MemoryCardData(
         type: CardType.ticket,
         topTitle: '$displayMonth\nของฉัน',
-        mainTitle: '5 วัน 23 ชม. 34 นาที 55 วิ', 
-        subTitle: 'อีกมากกว่า 23+ ที่เพิ่มรูปภาพเดือนนี้',
+        mainTitle: _timeRemainingString, 
+        subTitle: 'เหลือเวลาเก็บความทรงจำ',
         footerText: 'Ticket 10',
         currentProgress: items.length,
         maxProgress: targetCount,
-        gradientColors: [], 
+        gradientColors: [],
         accentColor: const Color(0xFFFF7043),
         backgroundColor: const Color(0xFF111111),
       );
 
-      // Card 3: Update Data
+      // Update Card 3 Data
       if (items.isNotEmpty) {
-          final bgItem = items.length > 1 ? items[1] : items[0];
-          _items[2] = MemoryCardData(
+        final bgItem = items.length > 1 ? items[1] : items[0];
+        _items[2] = MemoryCardData(
           type: CardType.backgroundImage,
           topTitle: displayMonth,
           mainTitle: 'ช่วงเวลาดีๆ\nในเดือนนี้',
@@ -139,11 +229,19 @@ class _RecommendedState extends State<Recommended> {
         );
       }
     }
+    
+    // STEP 3: เริ่ม Timer ถ้ายังไม่ได้เริ่ม
+    if (_timer == null) {
+       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+         _onTimerTick();
+       });
+    }
 
     if (mounted) setState(() {});
   }
 
-  // ... (Functions _nextCard, _previousCard, _openCreateAlbumModal, build, _buildCardItem คงเดิม) ...
+  // ... (ส่วนอื่นๆ ของ Class เหมือนเดิม) ...
+  
   void _nextCard() {
     if (_currentIndex < _items.length - 1) {
       setState(() => _currentIndex++);
@@ -167,7 +265,7 @@ class _RecommendedState extends State<Recommended> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+      return SizedBox(
       height: 416,
       width: double.infinity,
       child: Stack(
@@ -186,13 +284,13 @@ class _RecommendedState extends State<Recommended> {
   }
 
   Widget _buildCardItem(int index, MemoryCardData item) {
+    // Copy โค้ดส่วนนี้จากอันเดิมได้เลยครับ ไม่มีการเปลี่ยนแปลง Logic
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = 330.0;
     final cardHeight = 330.0;
     final centerPosition = (screenWidth - cardWidth) / 1.8;
     final adjustedStartPosition = centerPosition - 25.0;
 
-    // 1. กำหนดค่าตัวแปรตามสถานะ (Active vs Past)
     double left;
     double top;
     double scale;
@@ -202,16 +300,14 @@ class _RecommendedState extends State<Recommended> {
     VoidCallback? onTapButton;
 
     if (index < _currentIndex) {
-      // --- สถานะ: การ์ดที่ถูกปัดไปทางซ้ายแล้ว (Past) ---
       left = -350;
       top = 35;
       scale = 0.9;
-      opacity = 0.0; // ซ่อนไว้
-      isAbsorbing = true; // ป้องกันการกด
-      onDragEnd = null; // ปิดการลาก
+      opacity = 0.0;
+      isAbsorbing = true;
+      onDragEnd = null;
       onTapButton = null; 
     } else {
-      // --- สถานะ: การ์ดปัจจุบันและใบถัดไป (Active/Future) ---
       final int relativeIndex = index - _currentIndex;
       scale = 1.0 - (relativeIndex * 0.15);
       final double rightShift = relativeIndex * 71.0;
@@ -219,7 +315,7 @@ class _RecommendedState extends State<Recommended> {
       left = adjustedStartPosition + rightShift;
       top = 42;
       opacity = relativeIndex > 2 ? 0.0 : 1.0;
-      isAbsorbing = relativeIndex > 0; // ยอมให้กดได้เฉพาะใบหน้าสุด (relative 0)
+      isAbsorbing = relativeIndex > 0;
 
       onDragEnd = (details) {
         if (details.primaryVelocity! < 0) {
@@ -229,22 +325,18 @@ class _RecommendedState extends State<Recommended> {
         }
       };
 
-      // เงื่อนไขปุ่มกด (ตาม Logic เดิม)
       if (index == 0 || item.type == CardType.ticket) {
         onTapButton = _openCreateAlbumModal;
       }
     }
 
-    // 2. ใช้โครงสร้าง Widget เดียวกันเสมอ (Unified Structure)
     return AnimatedPositioned(
-      // ✅ สำคัญ: ใส่ Key เพื่อให้ Flutter จำได้ว่าเป็น Widget เดิม ไม่ต้องสร้างใหม่
       key: ValueKey(index), 
       duration: const Duration(milliseconds: 500),
       curve: index < _currentIndex ? Curves.easeOutCubic : Curves.easeOutBack,
       top: top,
       left: left,
       child: GestureDetector(
-        // ใช้ตัวแปร onDragEnd แทนการลบ Widget ทิ้ง
         onHorizontalDragEnd: onDragEnd, 
         child: Transform.scale(
           scale: scale,
@@ -255,7 +347,6 @@ class _RecommendedState extends State<Recommended> {
               width: cardWidth,
               height: cardHeight,
               child: AbsorbPointer(
-                // ใช้ตัวแปร isAbsorbing แทนการลบ Widget ทิ้ง
                 absorbing: isAbsorbing, 
                 child: MemoryCard(
                   data: item,
@@ -270,7 +361,7 @@ class _RecommendedState extends State<Recommended> {
   }
 }
 
-// ... (Enum และ MemoryCardData คงเดิม แต่ Data ถูกแก้ใน _initData แล้ว) ...
+// ... (Classes ที่เหลือ MemoryCardData, TicketMemoryCard, MemoryCard, AsyncImageLoader, _PhotoStack เหมือนเดิม) ...
 enum CardType { standard, ticket, backgroundImage }
 
 class MemoryCardData {
@@ -309,7 +400,7 @@ class MemoryCardData {
   });
 }
 
-// ... (TicketMemoryCard คงเดิม) ...
+// Card 2 นับเวลานับรูปภาพ
 class TicketMemoryCard extends StatelessWidget {
   final MemoryCardData data;
   final VoidCallback? onButtonTap;
@@ -324,7 +415,7 @@ class TicketMemoryCard extends StatelessWidget {
         : 0.0;
 
     return Container(
-      padding: const EdgeInsets.all(24), // เพิ่ม padding ให้เท่า Card 1 ใหม่
+      padding: const EdgeInsets.all(26),
       decoration: BoxDecoration(
         color: data.backgroundColor ?? const Color(0xFF111111),
         borderRadius: BorderRadius.circular(0),
@@ -369,7 +460,7 @@ class TicketMemoryCard extends StatelessWidget {
               data.mainTitle,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 23, 
+                fontSize: 21, 
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.5,
               ),
@@ -418,7 +509,7 @@ class TicketMemoryCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 35),
           GestureDetector(
             onTap: onButtonTap,
             child: Container(
@@ -452,9 +543,6 @@ class TicketMemoryCard extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Main MemoryCard Wrapper (ปรับปรุง Layout Card 1)
-// ---------------------------------------------------------------------------
 class MemoryCard extends StatelessWidget {
   final MemoryCardData data;
   final VoidCallback? onButtonTap;
@@ -464,12 +552,10 @@ class MemoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ CASE 1: เรียกใช้ Class ใหม่สำหรับ Ticket Layout (Card 2)
     if (data.type == CardType.ticket) {
       return TicketMemoryCard(data: data, onButtonTap: onButtonTap);
     }
 
-    // ✅ CASE 2: มี Background Image (Card 3) -- แก้ไขตรงนี้ครับ --
     if (data.type == CardType.backgroundImage || 
         data.backgroundImage != null || 
         data.backgroundMediaItem != null) {
@@ -510,25 +596,22 @@ class MemoryCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ✅ แก้ไข: topTitle เป็นตัวใหญ่และหนา (32px, Bold)
                       Text(
                         data.topTitle,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 32, // ปรับเป็น 32
-                          fontWeight: FontWeight.bold, // ปรับเป็นตัวหนา
+                          fontSize: 32, 
+                          fontWeight: FontWeight.bold, 
                           height: 1.1,
                         ),
                       ),
-                      const SizedBox(height: 8), // ลดระยะห่างลงนิดหน่อยให้สวยงาม
-                      
-                      // ✅ แก้ไข: mainTitle เป็นตัวเล็ก (16px)
+                      const SizedBox(height: 8), 
                       Text(
                         data.mainTitle,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 16, // ปรับเป็น 16
-                          fontWeight: FontWeight.w400, // ปรับน้ำหนักปกติ
+                          fontSize: 16, 
+                          fontWeight: FontWeight.w400, 
                           height: 1.2,
                         ),
                       ),
@@ -541,7 +624,6 @@ class MemoryCard extends StatelessWidget {
       );
     }
 
-    // ✅ CASE 3: Standard (Card 1) - คงเดิม
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(0),
@@ -556,7 +638,6 @@ class MemoryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(26),
         child: Stack(
           children: [
-            // Background Circle Decor
             Positioned(
               top: -100,
               right: -50,
@@ -572,13 +653,11 @@ class MemoryCard extends StatelessWidget {
               ),
             ),
             
-            // Content Layout
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Row ส่วนหัว: Title (ซ้าย) + Ticket ID (ขวา)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -603,7 +682,6 @@ class MemoryCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   
-                  // Subtitle ด้านล่าง Title
                   Text(
                     data.subTitle,
                     style: TextStyle(
@@ -612,10 +690,8 @@ class MemoryCard extends StatelessWidget {
                     ),
                   ),
 
-                  // Spacer ดันรูปภาพมาตรงกลางพื้นที่ว่าง
                   const Spacer(),
 
-                  // รูปภาพ
                   Center(
                     child: SizedBox(
                       height: 138,
@@ -627,10 +703,8 @@ class MemoryCard extends StatelessWidget {
                     ),
                   ),
                   
-                  // Spacer ดันปุ่มลงล่าง
                   const Spacer(),
 
-                  // ปุ่มกด
                   const SizedBox(height: 16),
                   GestureDetector(
                     onTap: onButtonTap,
@@ -669,7 +743,6 @@ class MemoryCard extends StatelessWidget {
   }
 }
 
-// ... (AsyncImageLoader และ _PhotoStack คงเดิมไว้ได้เลยครับ) ...
 class AsyncImageLoader extends StatefulWidget {
   final MediaItem item;
   final BoxFit fit;

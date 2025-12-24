@@ -11,14 +11,20 @@ class MediaItem {
   String caption;   //เก็บ "คำบรรยาย" หรือความรู้สึกที่ user พิมพ์ใส่
   List<String> tags; //เก็บแท็กต่างๆ
   Uint8List? capturedImage; //รูปที่แคปแล้ว
+  
+  // ✅ เพิ่มตัวแปรเก็บเวลาที่อัปโหลด
+  final DateTime uploadedAt; 
 
   MediaItem({
     required this.asset,
     required this.type,
     this.caption = '',     // ค่าเริ่มต้นว่าง
     this.tags = const [],
-    this.capturedImage,  // ค่าเริ่มต้น list ว่าง
-  });
+    this.capturedImage,  
+    
+    // ✅ รับค่าเวลาที่อัปโหลด (ถ้าไม่ส่งมา จะใช้เวลาปัจจุบันทันที)
+    DateTime? uploadedAt, 
+  }) : uploadedAt = uploadedAt ?? DateTime.now();
 }
 
 class AlbumPhoto {
