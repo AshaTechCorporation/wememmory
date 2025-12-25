@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wememmory/collection/collectionPage.dart';
 import 'package:wememmory/home/service/homeController.dart';
 import 'package:wememmory/home/widgets/AchievementLayout.dart';
@@ -18,6 +20,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late SharedPreferences prefs;
   // ตัวแปร State สำหรับจัดการข้อมูลภายในหน้านี้
   List<MediaItem>? _currentAlbumItems;
   String? _currentAlbumMonth;
@@ -28,6 +31,32 @@ class _HomePageState extends State<HomePage> {
     // ✅ 3. กำหนดค่าเริ่มต้นจาก widget ที่รับมา
     _currentAlbumItems = widget.newAlbumItems;
     _currentAlbumMonth = widget.newAlbumMonth;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await fristLoad();
+    });
+  }
+
+  Future<void> fristLoad() async {
+    prefs = await SharedPreferences.getInstance();
+    final _token = prefs.getString('token');
+    final userID1 = prefs.getInt('userID');
+    if (userID1 != null) {
+      await getUser(userID1);
+    }
+  }
+
+  Future<void> getUser(int id) async {
+    if (!mounted) return;
+    try {
+      await context.read<HomeController>().getuser(id: id);
+      setState(() {});
+    } on ClientException catch (e) {
+      if (!mounted) return;
+      print(e);
+    } on Exception catch (e) {
+      if (!mounted) return;
+      print(e);
+    }
   }
 
   @override
