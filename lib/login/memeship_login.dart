@@ -90,7 +90,14 @@ class _MembershipPageState extends State<MembershipPage> {
                         child: IconButton(
                           icon: const Icon(Icons.close,
                               color: Colors.white, size: 20),
-                          onPressed: () => Navigator.pop(context),
+                         onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FirstPage(),
+                          ),
+                        );
+                      },
                         ),
                       ),
                       GestureDetector(

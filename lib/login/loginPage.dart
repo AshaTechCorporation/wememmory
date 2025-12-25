@@ -6,6 +6,7 @@ import 'package:wememmory/widgets/ApiExeption.dart';
 import 'package:wememmory/widgets/LoadingDialog.dart';
 import 'package:wememmory/widgets/dialog.dart';
 import 'otp_page.dart';
+import 'package:wememmory/login/registerPage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -198,8 +199,29 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
 
-                      const SizedBox(height: 24),
 
+                      
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('ยังไม่มีบัญชีใช่ไหม? ', style: TextStyle(color: _textGrey, fontSize: 14)),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const RegisterPage()),
+                              );
+                            },
+                            child: const Text(
+                              'สมัครสมาชิก',
+                              style: TextStyle(color: _primaryOrange, fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
                       // เส้นคั่น "หรือ"
                       Row(
                         children: [
