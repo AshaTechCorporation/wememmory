@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart'; // ✅ 2. Import Image Picker
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wememmory/login/service/LoginService.dart';
 import 'package:wememmory/login/service/RegisterService.dart';
+import 'package:wememmory/models/albumModel.dart';
 import 'package:wememmory/widgets/ApiExeption.dart';
 import 'package:wememmory/widgets/dialog.dart';
 import 'package:wememmory/widgets/LoadingDialog.dart';
@@ -17,7 +19,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
-  
+
   // Controllers
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -31,6 +33,10 @@ class _RegisterPageState extends State<RegisterPage> {
   static const Color _primaryOrange = Color(0xFFE18253);
   static const Color _textGrey = Color(0xFF7A7A7A);
   static const double _radius = 14;
+
+  List<PhotoModel> photos = [];
+
+  List<AlbumModel> albums = [];
 
   @override
   void dispose() {
@@ -83,15 +89,7 @@ class _RegisterPageState extends State<RegisterPage> {
           labelText: label,
           labelStyle: const TextStyle(color: _textGrey),
           prefixIcon: Icon(icon, color: _primaryOrange),
-          suffixIcon: isPassword
-              ? IconButton(
-                  icon: Icon(
-                    (obscureText ?? true) ? Icons.visibility_off : Icons.visibility,
-                    color: _textGrey,
-                  ),
-                  onPressed: onToggleVisibility,
-                )
-              : null,
+          suffixIcon: isPassword ? IconButton(icon: Icon((obscureText ?? true) ? Icons.visibility_off : Icons.visibility, color: _textGrey), onPressed: onToggleVisibility) : null,
           contentPadding: const EdgeInsets.symmetric(vertical: 12),
           enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade300)),
           focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: _primaryOrange, width: 2)),
@@ -119,16 +117,8 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               Stack(
                 children: [
-                  SizedBox(
-                    height: bannerHeight,
-                    width: double.infinity,
-                    child: Image.asset('assets/images/Hobby.png', fit: BoxFit.fill),
-                  ),
-                  Positioned(
-                    left: size.width * 0.18,
-                    top: insetTop + 12,
-                    child: Image.asset('assets/images/image2.png', height: 40, fit: BoxFit.contain),
-                  ),
+                  SizedBox(height: bannerHeight, width: double.infinity, child: Image.asset('assets/images/Hobby.png', fit: BoxFit.fill)),
+                  Positioned(left: size.width * 0.18, top: insetTop + 12, child: Image.asset('assets/images/image2.png', height: 40, fit: BoxFit.contain)),
                 ],
               ),
 
@@ -148,15 +138,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: const Icon(Icons.arrow_back, color: Colors.black),
-                            ),
-                          ),
+                          Align(alignment: Alignment.centerLeft, child: GestureDetector(onTap: () => Navigator.pop(context), child: const Icon(Icons.arrow_back, color: Colors.black))),
                           const SizedBox(height: 10),
-                          
+
                           // ✅ 5. ส่วน UI แสดงรูปโปรไฟล์ (เพิ่มใหม่ตรงนี้)
                           Center(
                             child: Stack(
@@ -170,13 +154,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                       shape: BoxShape.circle,
                                       color: Colors.grey.shade200,
                                       border: Border.all(color: _primaryOrange, width: 2),
-                                      image: _avatar != null
-                                          ? DecorationImage(image: FileImage(_avatar!), fit: BoxFit.cover)
-                                          : null,
+                                      image: _avatar != null ? DecorationImage(image: FileImage(_avatar!), fit: BoxFit.cover) : null,
                                     ),
-                                    child: _avatar == null
-                                        ? const Icon(Icons.person, size: 60, color: Colors.grey)
-                                        : null,
+                                    child: _avatar == null ? const Icon(Icons.person, size: 60, color: Colors.grey) : null,
                                   ),
                                 ),
                                 Positioned(
@@ -186,10 +166,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     onTap: _pickImage,
                                     child: Container(
                                       padding: const EdgeInsets.all(6),
-                                      decoration: const BoxDecoration(
-                                        color: _primaryOrange,
-                                        shape: BoxShape.circle,
-                                      ),
+                                      decoration: const BoxDecoration(color: _primaryOrange, shape: BoxShape.circle),
                                       child: const Icon(Icons.camera_alt, color: Colors.white, size: 18),
                                     ),
                                   ),
@@ -198,16 +175,10 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          
-                          const Text(
-                            'สร้างบัญชีใหม่',
-                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22),
-                          ),
+
+                          const Text('สร้างบัญชีใหม่', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
                           const SizedBox(height: 8),
-                          const Text(
-                            'กรอกข้อมูลด้านล่างเพื่อเริ่มต้นใช้งาน',
-                            style: TextStyle(color: _textGrey, fontSize: 14),
-                          ),
+                          const Text('กรอกข้อมูลด้านล่างเพื่อเริ่มต้นใช้งาน', style: TextStyle(color: _textGrey, fontSize: 14)),
                           const SizedBox(height: 30),
 
                           _buildTextField(
@@ -245,63 +216,45 @@ class _RegisterPageState extends State<RegisterPage> {
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
                                   try {
+                                    String image = '';
                                     LoadingDialog.open(context);
 
-                                    String avatarUrl = 'https://example.com/avatar.jpg'; 
                                     if (_avatar != null) {
-                                       // avatarUrl = await uploadImage(_avatar!); // ตัวอย่าง function อัพโหลด
+                                      image = await LoginService.addImage(file: _avatar, path: 'images/asset/'); // ตัวอย่าง function อัพโหลด
                                     }
-
                                     final register = await Registerservice.register(
                                       fullname: _nameController.text,
                                       username: _phoneController.text,
-                                      avatar: avatarUrl, // ส่ง URL หรือ Path
-                                      language: 'th'
+                                      avatar: image, // ส่ง URL หรือ Path
+                                      language: 'th',
                                     );
-
                                     if (!mounted) return;
                                     LoadingDialog.close(context);
                                     Navigator.pop(context, true);
-                                    
                                   } on ApiException catch (e) {
                                     if (!mounted) return;
                                     LoadingDialog.close(context);
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => DialogError(
-                                        title: '$e',
-                                        pressYes: () => Navigator.pop(context, true),
-                                      ),
-                                    );
+                                    showDialog(context: context, builder: (context) => DialogError(title: '$e', pressYes: () => Navigator.pop(context, true)));
                                   } catch (e) {
                                     if (!mounted) return;
                                     LoadingDialog.close(context);
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => DialogError(
-                                        title: 'เกิดข้อผิดพลาด: $e',
-                                        pressYes: () => Navigator.pop(context, true),
-                                      ),
-                                    );
+                                    showDialog(context: context, builder: (context) => DialogError(title: 'เกิดข้อผิดพลาด: $e', pressYes: () => Navigator.pop(context, true)));
                                   }
                                 }
                               },
                               child: const Text('สมัครสมาชิก', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                             ),
                           ),
-                          
+
                           const SizedBox(height: 16),
-                          
+
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text('มีบัญชีอยู่แล้ว? ', style: TextStyle(color: _textGrey, fontSize: 14)),
                               GestureDetector(
                                 onTap: () => Navigator.pop(context),
-                                child: const Text(
-                                  'เข้าสู่ระบบ',
-                                  style: TextStyle(color: _primaryOrange, fontWeight: FontWeight.bold, fontSize: 14),
-                                ),
+                                child: const Text('เข้าสู่ระบบ', style: TextStyle(color: _primaryOrange, fontWeight: FontWeight.bold, fontSize: 14)),
                               ),
                             ],
                           ),

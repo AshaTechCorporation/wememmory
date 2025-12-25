@@ -19,7 +19,7 @@ class HomeService {
       final response = await http.get(headers: headers, url);
       if (response.statusCode == 200) {
         final data = convert.jsonDecode(response.body);
-        return data['data'];
+        return AlbumModel.fromJson(data['data']);
       } else if (response.statusCode == 500 || response.statusCode == 501 || response.statusCode == 502) {
         throw ApiException('ระบบขัดข้อง\nกรุณารอสักครู่แล้วลองใหม่อีกครั้ง');
       } else {

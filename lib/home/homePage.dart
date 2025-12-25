@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
     _currentAlbumItems = widget.newAlbumItems;
     _currentAlbumMonth = widget.newAlbumMonth;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await fristLoad();
+      // await fristLoad();
     });
   }
 
@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(width: 14),
                       // ชื่อผู้ใช้
-                      Text(controller.user['name'] ?? 'Guest', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w400, height: 1.2)),
+                      Text('Guest', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w400, height: 1.2)),
                     ],
                   ),
                   actions: [
