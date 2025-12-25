@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wememmory/constants.dart';
+import 'package:wememmory/login/loginPage.dart';
 import 'package:wememmory/profile/albumDetailPage.dart';
 import 'package:wememmory/profile/historyPayment.dart';
 import 'package:wememmory/profile/membershipPackage.dart';
@@ -15,6 +18,7 @@ import 'package:wememmory/profile/languagePage.dart';
 import 'package:wememmory/shop/termsAndServicesPage.dart';
 import 'package:wememmory/profile/benefitsPage.dart';
 import 'package:wememmory/shop/faqPage.dart';
+import 'package:wememmory/widgets/dialog.dart';
 import 'widgets/index.dart';
 import 'package:wememmory/home/service/homeController.dart';
 import 'package:wememmory/home/widgets/AchievementLayout.dart';
@@ -151,8 +155,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       'ภาษา',
                       'ข้อตกลงและเงื่อนไขในการใช้บริการ',
                       'คำถามที่พบบ่อย',
+                      'ออกจากระบบ',
                     ],
-                    onItemTap: (item, index) {
+                    onItemTap: (item, index) async {
                       switch (index) {
                         case 0:
                           Navigator.push(
@@ -208,6 +213,32 @@ class _ProfilePageState extends State<ProfilePage> {
                             MaterialPageRoute(builder: (context) => FAQPage()),
                           );
                           break;
+                        case 7:
+                          final out = await showDialog(
+                            context: context,
+                            builder:
+                                (context) => DialogYesNo(
+                                  title: 'แจ้งเตือน',
+                                  description: 'ต้องการออกจากระบบใช่ไหม',
+                                  pressYes: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  pressNo: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                ),
+                          );
+                          if (out == true) {
+                            clearToken();
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginPage(),
+                              ),
+                              (route) => false,
+                            );
+                          }
+                          break;
                       }
                     },
                   ),
@@ -222,6 +253,14 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
+
+Future<void> clearToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance() ;
+    prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+  }
+  
 // =========================================================
 // ✅ ส่วน Header ที่แก้ไขตามโจทย์
 // =========================================================
@@ -239,14 +278,24 @@ class _HeaderSection extends StatelessWidget {
 
     return Column(
       children: [
-        CircleAvatar(
-          radius: 50,
-          backgroundColor: Colors.grey.shade200,
-          // ✅ ถ้ามีรูปจาก Server ให้ใช้ NetworkImage, ถ้าไม่มีใช้รูปเดิม
-          backgroundImage:
-              hasAvatar
-                  ? NetworkImage(user!.avatar!) as ImageProvider
-                  : const AssetImage('assets/images/userpic.png'),
+        // --- ส่วนรูปโปรไฟล์ ---
+        Container(
+          width: 125,
+          height: 125,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white24, // ใส่สีรองพื้นเผื่อรูปโหลดไม่ทัน
+            image: DecorationImage(
+              image:
+                  user?.avatar != null
+                      ? NetworkImage('$baseUrl/public/${user?.avatar!}')
+                      : AssetImage('assets/images/userpic.png'),
+              fit: BoxFit.cover,
+              onError:
+                  (exception, stackTrace) =>
+                      Icon(Icons.image_not_supported, size: 50),
+            ),
+          ),
         ),
         const SizedBox(height: 12),
         // ✅ ชื่อแสดงตาม Server
