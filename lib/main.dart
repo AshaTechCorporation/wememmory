@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:wememmory/home/service/homeController.dart';
 import 'package:wememmory/login/loginPage.dart';
 import 'notification.dart';
 
@@ -24,7 +26,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     // ✅ เรียกฟังก์ชันตั้งค่าเมื่อเข้าแอป
-   _setupNotifications();
+    _setupNotifications();
   }
 
   Future<void> _setupNotifications() async {
@@ -37,12 +39,15 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Wememory',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(textTheme: GoogleFonts.promptTextTheme(Theme.of(context).textTheme), colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
-      // ✅ กลับมาใช้หน้า Login ปกติ
-      home: const LoginPage(),
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (context) => HomeController())],
+      child: MaterialApp(
+        title: 'Wememory',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(textTheme: GoogleFonts.promptTextTheme(Theme.of(context).textTheme), colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
+        // ✅ กลับมาใช้หน้า Login ปกติ
+        home: const LoginPage(),
+      ),
     );
   }
 }

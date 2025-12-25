@@ -10,6 +10,34 @@ import 'package:wememmory/widgets/ApiExeption.dart';
 class HomeService {
   const HomeService();
 
+  static Future<dynamic> getUserById({required int id}) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      var headers = {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'};
+      final url = Uri.https(publicUrl, '/api/member/$id');
+      final response = await http.get(headers: headers, url);
+      if (response.statusCode == 200) {
+        final data = convert.jsonDecode(response.body);
+        return data['data'];
+      } else if (response.statusCode == 500 || response.statusCode == 501 || response.statusCode == 502) {
+        throw ApiException('ระบบขัดข้อง\nกรุณารอสักครู่แล้วลองใหม่อีกครั้ง');
+      } else {
+        final data = convert.jsonDecode(response.body);
+        throw ApiException(data['message']);
+      }
+    } on SocketException {
+      // ไม่มีเน็ต
+      throw ApiException('ไม่สามารถเชื่อมต่ออินเทอร์เน็ตได้');
+    } on TimeoutException {
+      // รอ response เกินเวลา
+      throw ApiException('คำขอหมดเวลา โปรดลองอีกครั้ง');
+    } catch (e) {
+      // error อื่น ๆ
+      throw ApiException('เกิดข้อผิดพลาด: $e');
+    }
+  }
+
   static Future<List<AlbumModel>> getAlbums() async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
