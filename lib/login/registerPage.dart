@@ -1,0 +1,275 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wememmory/login/service/RegisterService.dart';
+import 'package:wememmory/widgets/ApiExeption.dart';
+import 'package:wememmory/widgets/dialog.dart';
+import 'package:wememmory/widgets/LoadingDialog.dart';
+
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  // Key สำหรับตรวจสอบ Form
+  final _formKey = GlobalKey<FormState>();
+
+  // Controllers สำหรับเก็บค่า
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  // ตัวแปรสำหรับซ่อน/แสดง Password
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
+  static const Color _bgCream = Color(0xFFF4F6F8);
+  static const Color _primaryOrange = Color(0xFFE18253);
+  static const Color _textGrey = Color(0xFF7A7A7A);
+  static const double _radius = 14;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  // ฟังก์ชัน Helper สำหรับสร้าง TextField เพื่อลดโค้ดซ้ำ
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool isPassword = false,
+    bool? obscureText,
+    VoidCallback? onToggleVisibility,
+    TextInputType inputType = TextInputType.text,
+    List<TextInputFormatter>? formatters,
+    String? Function(String?)? validator,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: TextFormField(
+        controller: controller,
+        obscureText: isPassword ? (obscureText ?? true) : false,
+        keyboardType: inputType,
+        inputFormatters: formatters,
+        validator: validator,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: _textGrey),
+          prefixIcon: Icon(icon, color: _primaryOrange),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    (obscureText ?? true) ? Icons.visibility_off : Icons.visibility,
+                    color: _textGrey,
+                  ),
+                  onPressed: onToggleVisibility,
+                )
+              : null,
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          focusedBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: _primaryOrange, width: 2),
+          ),
+          errorBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.red),
+          ),
+          focusedErrorBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.red, width: 2),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final insetTop = MediaQuery.of(context).padding.top;
+    const double bannerHeight = 380;
+    final double cardSidePadding = size.width * 0.06;
+
+    return Scaffold(
+      backgroundColor: _bgCream,
+      body: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            children: [
+              // --- ส่วน Banner ด้านบน (เหมือนเดิม) ---
+              Stack(
+                children: [
+                  SizedBox(
+                    height: bannerHeight,
+                    width: double.infinity,
+                    child: Image.asset('assets/images/Hobby.png', fit: BoxFit.fill),
+                  ),
+                  Positioned(
+                    left: size.width * 0.18,
+                    top: insetTop + 12,
+                    child: Image.asset('assets/images/image2.png', height: 40, fit: BoxFit.contain),
+                  ),
+                ],
+              ),
+
+              // --- ส่วน Card Input ---
+              Transform.translate(
+                offset: const Offset(0, -58),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: cardSidePadding),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 30), // ปรับ Padding ให้เหมาะกับ Form
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(_radius),
+                      boxShadow: const [
+                        BoxShadow(color: Color(0x1F000000), blurRadius: 16, offset: Offset(0, 8))
+                      ],
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: const Icon(Icons.arrow_back, color: Colors.black),
+                          ),
+                          const SizedBox(height: 20),
+                          const Text(
+                            'สร้างบัญชีใหม่',
+                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'กรอกข้อมูลด้านล่างเพื่อเริ่มต้นใช้งาน',
+                            style: TextStyle(color: _textGrey, fontSize: 14),
+                          ),
+                          const SizedBox(height: 30),
+
+                          // --- Form Fields ---
+                          
+                          // 1. ชื่อผู้ใช้งาน
+                          _buildTextField(
+                            controller: _nameController,
+                            label: 'ชื่อผู้ใช้งาน',
+                            icon: Icons.person_outline,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) return 'กรุณากรอกชื่อผู้ใช้งาน';
+                              return null;
+                            },
+                          ),
+
+                          // 2. เบอร์โทรศัพท์
+                          _buildTextField(
+                            controller: _phoneController,
+                            label: 'เบอร์โทรศัพท์',
+                            icon: Icons.phone_android,
+                            inputType: TextInputType.phone,
+                            formatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(10)],
+                            validator: (value) {
+                              if (value == null || value.isEmpty) return 'กรุณากรอกเบอร์โทรศัพท์';
+                              if (value.length < 9) return 'เบอร์โทรศัพท์ไม่ถูกต้อง';
+                              return null;
+                            },
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // --- ปุ่ม Register ---
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48, // ปรับให้สูงขึ้นนิดนึง
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _primaryOrange,
+                                foregroundColor: Colors.white,
+                                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                                elevation: 0,
+                              ),
+                              onPressed: () async {
+                            try {
+                              LoadingDialog.open(context);
+                              final register = await Registerservice.register(fullname: _nameController.text,username: _phoneController.text, avatar: 'https://example.com/avatar.jpg', language: 'th');
+                              LoadingDialog.close(context);
+                              Navigator.pop(context, true);
+                              // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => OtpPage(phoneNumber: _phoneController.text)), (route) => false);
+                            } on ApiException catch (e) {
+                              if (!mounted) return;
+                              LoadingDialog.close(context);
+                              showDialog(
+                                context: context,
+                                builder:
+                                    (context) => DialogError(
+                                      title: '$e',
+                                      pressYes: () {
+                                        Navigator.pop(context, true);
+                                      },
+                                    ),
+                              );
+                            } on Exception catch (e) {
+                              if (!mounted) return;
+                              LoadingDialog.close(context);
+                              showDialog(
+                                context: context,
+                                builder:
+                                    (context) => DialogError(
+                                      title: '$e',
+                                      pressYes: () {
+                                        Navigator.pop(context, true);
+                                      },
+                                    ),
+                              );
+                            }
+                          },
+                              child: const Text('สมัครสมาชิก', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                            ),
+                          ),
+                          
+                          const SizedBox(height: 16),
+                          
+                          // ลิงก์ไปหน้า Login กรณีมีบัญชีแล้ว
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('มีบัญชีอยู่แล้ว? ', style: TextStyle(color: _textGrey, fontSize: 14)),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context); // หรือ Navigate ไปหน้า Login
+                                },
+                                child: const Text(
+                                  'เข้าสู่ระบบ',
+                                  style: TextStyle(color: _primaryOrange, fontWeight: FontWeight.bold, fontSize: 14),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
