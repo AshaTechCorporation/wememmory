@@ -3,6 +3,7 @@ import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wememmory/collection/collectionPage.dart';
+import 'package:wememmory/constants.dart';
 import 'package:wememmory/home/service/homeController.dart';
 import 'package:wememmory/home/widgets/AchievementLayout.dart';
 import 'package:wememmory/home/widgets/Recommended.dart';
@@ -86,11 +87,7 @@ class _HomePageState extends State<HomePage> {
                 pinned: false,
                 floating: false,
                 snap: false,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                    bottom: Radius.elliptical(420, 70),
-                  ),
-                ),
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(bottom: Radius.elliptical(420, 70))),
                 automaticallyImplyLeading: false,
                 titleSpacing: 24,
                 title: Row(
@@ -103,72 +100,28 @@ class _HomePageState extends State<HomePage> {
                         shape: BoxShape.circle,
                         color: Colors.white24, // ใส่สีรองพื้นเผื่อรูปโหลดไม่ทัน
                         image: DecorationImage(
-                          image:
-                              hasAvatar
-                                  ? NetworkImage(user!.avatar!) as ImageProvider
-                                  : const AssetImage(
-                                    'assets/images/userpic.png',
-                                  ),
+                          image: user?.avatar != null ? NetworkImage('$baseUrl/public/${user?.avatar!}') : AssetImage('assets/images/userpic.png'),
                           fit: BoxFit.cover,
-                          onError: (exception, stackTrace) {
-                            print("Error loading avatar: $exception");
-                          },
+                          onError: (exception, stackTrace) => Icon(Icons.image_not_supported, size: 50),
                         ),
                       ),
                     ),
                     const SizedBox(width: 14),
 
                     // --- ส่วนชื่อผู้ใช้ ---
-                    Expanded(
-                      child: Text(
-                        displayName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w400,
-                          height: 1.2,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+                    Expanded(child: Text(displayName, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w400, height: 1.2), overflow: TextOverflow.ellipsis)),
                   ],
                 ),
                 actions: [
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.notifications,
-                          color: Colors.white,
-                          size: 25,
-                        ),
-                      ),
-                    ],
-                  ),
+                  Stack(alignment: Alignment.center, children: [IconButton(onPressed: () {}, icon: const Icon(Icons.notifications, color: Colors.white, size: 25))]),
                   const SizedBox(width: 12),
                 ],
               ),
 
               // ส่วนเนื้อหาเดิม
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    Recommended(
-                      albumItems: _currentAlbumItems,
-                      albumMonth: _currentAlbumMonth,
-                    ),
-                    const SummaryStrip(),
-                    const SizedBox(height: 37),
-                  ],
-                ),
-              ),
+              SliverToBoxAdapter(child: Column(children: [Recommended(albumItems: _currentAlbumItems, albumMonth: _currentAlbumMonth), const SummaryStrip(), const SizedBox(height: 37)])),
 
-              const SliverFillRemaining(
-                hasScrollBody: false,
-                child: AchievementLayout(),
-              ),
+              const SliverFillRemaining(hasScrollBody: false, child: AchievementLayout()),
             ],
           ),
         );

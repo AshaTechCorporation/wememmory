@@ -9,13 +9,14 @@ import 'package:wememmory/widgets/ApiExeption.dart';
 
 class Registerservice {
   const Registerservice();
-  static Future register({required String fullname,required String username, required String avatar, required String language}) async {
+  static Future register({required String fullname, required String username, required String avatar, required String language}) async {
     try {
-
       final url = Uri.https(publicUrl, '/public/api/member');
-      final response = await http.post(url, body: {'full_name': fullname,'username': username, 'phone': username,'password': username,'avatar': avatar,'language':language,},).timeout(const Duration(minutes: 1));
+      final response = await http
+          .post(url, body: {'full_name': fullname, 'username': username, 'phone': username, 'password': username, 'avatar': avatar, 'language': language})
+          .timeout(const Duration(minutes: 1));
 
-      if (response.statusCode == 200||response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = convert.jsonDecode(response.body);
         return data;
       } else if (response.statusCode == 500 || response.statusCode == 501 || response.statusCode == 502) {

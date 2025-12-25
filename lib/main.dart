@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wememmory/home/firstPage.dart';
 import 'package:wememmory/home/service/homeController.dart';
 import 'package:wememmory/login/loginPage.dart';
 import 'notification.dart';
+
+late SharedPreferences prefs;
+String? token;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 1. เริ่มระบบ
   await NotificationHelper.init();
+  prefs = await SharedPreferences.getInstance();
+  token = prefs.getString('token');
 
   runApp(const MyApp());
 }
@@ -46,7 +53,7 @@ class _MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(textTheme: GoogleFonts.promptTextTheme(Theme.of(context).textTheme), colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
         // ✅ กลับมาใช้หน้า Login ปกติ
-        home: const LoginPage(),
+        home: token != null ? FirstPage() : LoginPage(),
       ),
     );
   }
