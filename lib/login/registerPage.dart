@@ -1,11 +1,10 @@
-import 'dart:io'; // ✅ 1. Import สำหรับจัดการไฟล์
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart'; // ✅ 2. Import Image Picker
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:wememmory/login/service/LoginService.dart';
 import 'package:wememmory/login/service/RegisterService.dart';
-import 'package:wememmory/models/albumModel.dart';
+import 'package:wememmory/models/albumModel.dart'; // ถ้าไม่ได้ใช้ ลบออกได้ครับ
 import 'package:wememmory/widgets/ApiExeption.dart';
 import 'package:wememmory/widgets/dialog.dart';
 import 'package:wememmory/widgets/LoadingDialog.dart';
@@ -23,9 +22,8 @@ class _RegisterPageState extends State<RegisterPage> {
   // Controllers
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  // (Password controllers ถูกลบออกตามโค้ดล่าสุดของคุณ)
 
-  // ✅ 3. ตัวแปรสำหรับเก็บไฟล์รูปภาพ
+  // ตัวแปรสำหรับเก็บไฟล์รูปภาพ
   File? _avatar;
   final ImagePicker _picker = ImagePicker();
 
@@ -35,7 +33,6 @@ class _RegisterPageState extends State<RegisterPage> {
   static const double _radius = 14;
 
   List<PhotoModel> photos = [];
-
   List<AlbumModel> albums = [];
 
   @override
@@ -45,12 +42,12 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  // ✅ 4. ฟังก์ชันเลือกรูปภาพจาก Gallery
-  Future<void> _pickImage() async {
+  // ✅ 1. แก้ไขฟังก์ชันนี้ให้รับค่า source (Camera/Gallery)
+  Future<void> _pickImage(ImageSource source) async {
     try {
       final XFile? pickedFile = await _picker.pickImage(
-        source: ImageSource.gallery, // หรือเปลี่ยนเป็น ImageSource.camera เพื่อถ่ายรูป
-        maxWidth: 800, // บีบอัดขนาดรูปไม่ให้ใหญ่เกินไป
+        source: source, 
+        maxWidth: 800, 
         maxHeight: 800,
       );
 
@@ -64,6 +61,41 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  // ✅ 2. เพิ่มฟังก์ชันแสดงตัวเลือก (Bottom Sheet)
+  void _showImagePickerOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_camera, color: _primaryOrange),
+                title: const Text('ถ่ายรูป', style: TextStyle(fontFamily: 'Kanit')),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library, color: _primaryOrange),
+                title: const Text('เลือกจากอัลบั้ม', style: TextStyle(fontFamily: 'Kanit')),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -75,7 +107,6 @@ class _RegisterPageState extends State<RegisterPage> {
     List<TextInputFormatter>? formatters,
     String? Function(String?)? validator,
   }) {
-    // ... (Code ส่วน TextField เหมือนเดิมเป๊ะ)
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: TextFormField(
@@ -89,7 +120,11 @@ class _RegisterPageState extends State<RegisterPage> {
           labelText: label,
           labelStyle: const TextStyle(color: _textGrey),
           prefixIcon: Icon(icon, color: _primaryOrange),
-          suffixIcon: isPassword ? IconButton(icon: Icon((obscureText ?? true) ? Icons.visibility_off : Icons.visibility, color: _textGrey), onPressed: onToggleVisibility) : null,
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon((obscureText ?? true) ? Icons.visibility_off : Icons.visibility, color: _textGrey),
+                  onPressed: onToggleVisibility)
+              : null,
           contentPadding: const EdgeInsets.symmetric(vertical: 12),
           enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade300)),
           focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: _primaryOrange, width: 2)),
@@ -141,12 +176,12 @@ class _RegisterPageState extends State<RegisterPage> {
                           Align(alignment: Alignment.centerLeft, child: GestureDetector(onTap: () => Navigator.pop(context), child: const Icon(Icons.arrow_back, color: Colors.black))),
                           const SizedBox(height: 10),
 
-                          // ✅ 5. ส่วน UI แสดงรูปโปรไฟล์ (เพิ่มใหม่ตรงนี้)
+                          // ✅ 3. แก้ไข UI เรียก _showImagePickerOptions
                           Center(
                             child: Stack(
                               children: [
                                 GestureDetector(
-                                  onTap: _pickImage, // กดที่รูปเพื่อเปลี่ยน
+                                  onTap: () => _showImagePickerOptions(context), // เรียกเมนูเลือก
                                   child: Container(
                                     width: 100,
                                     height: 100,
@@ -163,7 +198,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   bottom: 0,
                                   right: 0,
                                   child: GestureDetector(
-                                    onTap: _pickImage,
+                                    onTap: () => _showImagePickerOptions(context), // เรียกเมนูเลือก
                                     child: Container(
                                       padding: const EdgeInsets.all(6),
                                       decoration: const BoxDecoration(color: _primaryOrange, shape: BoxShape.circle),
@@ -219,15 +254,18 @@ class _RegisterPageState extends State<RegisterPage> {
                                     String image = '';
                                     LoadingDialog.open(context);
 
+                                    // Logic เดิมของคุณ: อัพโหลดรูปก่อนแล้วค่อย Register
                                     if (_avatar != null) {
-                                      image = await LoginService.addImage(file: _avatar, path: 'images/asset/'); // ตัวอย่าง function อัพโหลด
+                                      image = await LoginService.addImage(file: _avatar, path: 'images/asset/'); 
                                     }
+                                    
                                     final register = await Registerservice.register(
                                       fullname: _nameController.text,
                                       username: _phoneController.text,
-                                      avatar: image, // ส่ง URL หรือ Path
+                                      avatar: image,
                                       language: 'th',
                                     );
+                                    
                                     if (!mounted) return;
                                     LoadingDialog.close(context);
                                     Navigator.pop(context, true);
