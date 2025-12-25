@@ -1,20 +1,23 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/Album/order_success_page.dart';
 import 'package:wememmory/Album/photo_readonly_page.dart'; // ✅ อย่าลืม import หน้านี้
+import 'package:wememmory/home/service/homeservice.dart';
+import 'package:wememmory/login/service/LoginService.dart';
 import 'package:wememmory/models/media_item.dart';
+import 'package:wememmory/models/photo_item.dart';
+import 'package:wememmory/widgets/ApiExeption.dart';
+import 'package:wememmory/widgets/LoadingDialog.dart';
+import 'package:wememmory/widgets/dialog.dart';
 
 // หน้า สั่งพิมพ์อัลบั้มรูป
 class PrintSheet extends StatefulWidget {
   final List<MediaItem> items; //รับตัวแปรมาแสดงภาพ จาก final_preview_sheet.dart
   final String monthName; //รับชื่อเดือนมาแสดง จาก final_preview_sheet.dart
 
-  const PrintSheet({
-    super.key,
-    required this.items,
-    required this.monthName,
-  });
+  const PrintSheet({super.key, required this.items, required this.monthName});
 
   @override
   State<PrintSheet> createState() => _PrintSheetState();
@@ -55,7 +58,11 @@ class _PrintSheetState extends State<PrintSheet> {
               children: [
                 const Text(
                   'สั่งพิมพ์',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
@@ -71,8 +78,8 @@ class _PrintSheetState extends State<PrintSheet> {
           ),
           const SizedBox(height: 9),
           Divider(
-            height: 1,       
-            color: Colors.grey.withOpacity(0.2), 
+            height: 1,
+            color: Colors.grey.withOpacity(0.2),
             indent: 20,
             endIndent: 20,
           ),
@@ -85,18 +92,25 @@ class _PrintSheetState extends State<PrintSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // หัวข้ออัลบั้ม
-                  const Text("อัลบั้มรูปของคุณ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  const Text(
+                    "อัลบั้มรูปของคุณ",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                   const SizedBox(height: 12),
 
                   // ส่วนแสดงรูป (ใช้ Widget ที่แยกไว้)
-                  _PrintPreviewSection(items: widget.items, monthName: widget.monthName),
+                  _PrintPreviewSection(
+                    items: widget.items,
+                    monthName: widget.monthName,
+                  ),
 
                   const SizedBox(height: 24),
 
                   // 1. ที่อยู่ผู้ส่ง (แสดงตลอด)
                   _buildAddressCard(
                     title: "ที่อยู่",
-                    address: "หมู่บ้าน สุวรรณภูมิทาวน์ซอย ลาดกระบัง 54/3 ถนนลาดกระบัง\nแขวงลาดกระบัง เขตลาดกระบัง กรุงเทพมหานคร",
+                    address:
+                        "หมู่บ้าน สุวรรณภูมิทาวน์ซอย ลาดกระบัง 54/3 ถนนลาดกระบัง\nแขวงลาดกระบัง เขตลาดกระบัง กรุงเทพมหานคร",
                   ),
 
                   const SizedBox(height: 24),
@@ -105,11 +119,17 @@ class _PrintSheetState extends State<PrintSheet> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("ส่งของขวัญ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const Text(
+                        "ส่งของขวัญ",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       // ✅ เรียกใช้ Custom Switch ตรงนี้
                       _buildCustomSwitch(
-                        _isGift, 
-                        (val) => setState(() => _isGift = val)
+                        _isGift,
+                        (val) => setState(() => _isGift = val),
                       ),
                     ],
                   ),
@@ -127,7 +147,10 @@ class _PrintSheetState extends State<PrintSheet> {
 
                   // กล่องยอดเครดิต
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF67A5BA),
                       borderRadius: BorderRadius.circular(8),
@@ -140,18 +163,37 @@ class _PrintSheetState extends State<PrintSheet> {
                           children: [
                             Row(
                               children: [
-                                const Text("ยอดเครดิตคงเหลือ : ", style: TextStyle(color: Colors.white, fontSize: 14)),
+                                const Text(
+                                  "ยอดเครดิตคงเหลือ : ",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
+                                ),
                                 Image.asset(
                                   'assets/icons/dollar-circle.png',
                                   width: 24,
                                   height: 24,
                                 ),
                                 const SizedBox(width: 4),
-                                const Text("10", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                                const Text(
+                                  "10",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 2),
-                            const Text("เติมเครดิตตามจำนวนที่คุณต้องการ", style: TextStyle(color: Colors.white70, fontSize: 11)),
+                            const Text(
+                              "เติมเครดิตตามจำนวนที่คุณต้องการ",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 11,
+                              ),
+                            ),
                           ],
                         ),
                         ElevatedButton(
@@ -162,9 +204,17 @@ class _PrintSheetState extends State<PrintSheet> {
                             minimumSize: const Size(80, 32),
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             elevation: 0,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6),
+                            ),
                           ),
-                          child: const Text("เติมเครดิต", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                          child: const Text(
+                            "เติมเครดิต",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -173,12 +223,18 @@ class _PrintSheetState extends State<PrintSheet> {
                   const SizedBox(height: 24),
 
                   // รายละเอียดการสั่งพิมพ์
-                  const Text("รายละเอียดการสั่งพิมพ์", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text(
+                    "รายละเอียดการสั่งพิมพ์",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("อัลบั้มรูปของคุณ", style: TextStyle(color: Colors.black87, fontSize: 14)),
+                      const Text(
+                        "อัลบั้มรูปของคุณ",
+                        style: TextStyle(color: Colors.black87, fontSize: 14),
+                      ),
                       Row(
                         children: [
                           Image.asset(
@@ -187,7 +243,13 @@ class _PrintSheetState extends State<PrintSheet> {
                             height: 24,
                           ),
                           const SizedBox(width: 4),
-                          const Text("10", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          const Text(
+                            "10",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -199,7 +261,7 @@ class _PrintSheetState extends State<PrintSheet> {
 
           // 3. Bottom Bar
           Container(
-            padding: const EdgeInsets.fromLTRB(15, 10 , 16, 30),
+            padding: const EdgeInsets.fromLTRB(15, 10, 16, 30),
             decoration: const BoxDecoration(
               color: Colors.white,
               border: Border(top: BorderSide(color: Colors.black12)),
@@ -212,7 +274,11 @@ class _PrintSheetState extends State<PrintSheet> {
                   children: [
                     const Text(
                       "เครดิตที่ต้องใช้",
-                      style: TextStyle(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.normal),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                     const SizedBox(width: 8),
                     Image.asset(
@@ -223,7 +289,11 @@ class _PrintSheetState extends State<PrintSheet> {
                     const SizedBox(width: 6),
                     const Text(
                       "10",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
                     ),
                   ],
                 ),
@@ -233,16 +303,83 @@ class _PrintSheetState extends State<PrintSheet> {
                   width: 140,
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OrderSuccessPage(
-                            items: widget.items,
-                            monthName: widget.monthName,
+                    onPressed: () async {
+                      try {
+                        LoadingDialog.open(context);
+                        List<PhotoItem> photoAPI = [];
+                        if (widget.items.isNotEmpty) {
+                          for (var i = 0; i < widget.items.length; i++) {
+                            File? resultFile = await widget.items[i].asset.file;
+                            final photoupload = await LoginService.addImage(
+                              file: resultFile,
+                              path: 'images/asset/',
+                            );
+                            final imageData = PhotoItem(
+                              seq: i + 1,
+                              image: photoupload,
+                              caption: widget.items[i].caption,
+                            );
+                            photoAPI.add(imageData);
+                          }
+                        }
+
+                        await HomeService.createOrder(
+                          year: DateTime.now().year,
+                          month: thaiMonthToNumber(widget.monthName),
+                          note: '',
+                          photos: photoAPI,
+                        );
+                        LoadingDialog.close(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => OrderSuccessPage(
+                                  items: widget.items,
+                                  monthName: widget.monthName,
+                                ),
                           ),
-                        ),
-                      );
+                        );
+                      } on ApiException catch (e) {
+                        if (!mounted) return;
+                        LoadingDialog.close(context);
+                        showDialog(
+                          context: context,
+                          builder:
+                              (context) => DialogError(
+                                title: '$e',
+                                pressYes: () {
+                                  Navigator.pop(context, true);
+                                },
+                              ),
+                        );
+                      } on Exception catch (e) {
+                        if (!mounted) return;
+                        LoadingDialog.close(context);
+                        showDialog(
+                          context: context,
+                          builder:
+                              (context) => DialogError(
+                                title: '$e',
+                                pressYes: () {
+                                  Navigator.pop(context, true);
+                                },
+                              ),
+                        );
+                      } catch (e) {
+                        if (!mounted) return;
+                        LoadingDialog.close(context);
+                        showDialog(
+                          context: context,
+                          builder:
+                              (context) => DialogError(
+                                title: '$e',
+                                pressYes: () {
+                                  Navigator.pop(context, true);
+                                },
+                              ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFED7D31),
@@ -251,7 +388,11 @@ class _PrintSheetState extends State<PrintSheet> {
                     ),
                     child: const Text(
                       "สั่งพิมพ์",
-                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -263,12 +404,45 @@ class _PrintSheetState extends State<PrintSheet> {
     );
   }
 
+  int thaiMonthToNumber(String monthName) {
+    // 1. สร้าง List รายชื่อเดือนเรียงตามลำดับ (ม.ค. - ธ.ค.)
+    const List<String> months = [
+      'มกราคม',
+      'กุมภาพันธ์',
+      'มีนาคม',
+      'เมษายน',
+      'พฤษภาคม',
+      'มิถุนายน',
+      'กรกฎาคม',
+      'สิงหาคม',
+      'กันยายน',
+      'ตุลาคม',
+      'พฤศจิกายน',
+      'ธันวาคม',
+    ];
+
+    // 2. ค้นหาตำแหน่งของชื่อเดือนที่ส่งเข้ามา (จะได้ค่า 0-11)
+    // .trim() ช่วยตัดช่องว่างหน้าหลังเผื่อมีติดมา
+    int index = months.indexOf(monthName.trim());
+
+    // 3. ถ้าหาเจอให้บวก 1 (เพราะ index เริ่มที่ 0 แต่เดือนเริ่มที่ 1)
+    if (index != -1) {
+      return index + 1;
+    } else {
+      // กรณีหาไม่เจอ (เช่น พิมพ์ผิด) ให้ return 0 หรือจะ throw error ก็ได้
+      return 0;
+    }
+  }
+
   // ✅ Helper Widget สำหรับสร้างกล่องที่อยู่
   Widget _buildAddressCard({required String title, required String address}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(16),
@@ -282,7 +456,11 @@ class _PrintSheetState extends State<PrintSheet> {
               Expanded(
                 child: Text(
                   address,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 13, height: 1.4),
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
                 ),
               ),
               const Icon(Icons.chevron_right, color: Colors.grey),
@@ -305,9 +483,7 @@ class _PrintSheetState extends State<PrintSheet> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           // พื้นหลัง: สีส้ม (เปิด) / สีเทาอ่อน (ปิด)
-          color: value
-              ? const Color(0xFFED7D31)
-              : const Color(0xFFE0E0E0),
+          color: value ? const Color(0xFFED7D31) : const Color(0xFFE0E0E0),
         ),
         child: AnimatedAlign(
           duration: const Duration(milliseconds: 200),
@@ -334,10 +510,7 @@ class _PrintPreviewSection extends StatelessWidget {
   final List<MediaItem> items;
   final String monthName;
 
-  const _PrintPreviewSection({
-    required this.items,
-    required this.monthName,
-  });
+  const _PrintPreviewSection({required this.items, required this.monthName});
 
   @override
   Widget build(BuildContext context) {
@@ -346,9 +519,7 @@ class _PrintPreviewSection extends StatelessWidget {
         fit: BoxFit.scaleDown,
         child: Container(
           padding: const EdgeInsets.all(10),
-          decoration: const BoxDecoration(
-            color: Color(0xFF555555),
-          ),
+          decoration: const BoxDecoration(color: Color(0xFF555555)),
           child: IntrinsicWidth(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -368,13 +539,16 @@ class _PrintPreviewSection extends StatelessWidget {
                         child: Center(
                           child: Text(
                             monthName,
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
                       for (int i = 0; i < 5; i++)
                         if (i < items.length)
-                          _StaticPhotoSlot(item: items[i]) 
+                          _StaticPhotoSlot(item: items[i])
                         else
                           const SizedBox(),
                     ],
@@ -439,7 +613,9 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
         });
       }
     } else {
-      final data = await widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300));
+      final data = await widget.item.asset.thumbnailDataWithSize(
+        const ThumbnailSize(300, 300),
+      );
       if (mounted) {
         setState(() {
           _imageData = data;
@@ -451,18 +627,22 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
   @override
   Widget build(BuildContext context) {
     // ✅ 1. ตรวจสอบว่ามีการแก้ไขหรือไม่
-    bool isEdited = widget.item.caption.isNotEmpty || widget.item.tags.isNotEmpty;
+    bool isEdited =
+        widget.item.caption.isNotEmpty || widget.item.tags.isNotEmpty;
 
     return GestureDetector(
       // ✅ 2. ถ้ามีการแก้ไข ให้กดเพื่อไปหน้าอ่านได้
-      onTap: isEdited ? () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PhotoReadonlyPage(item: widget.item),
-          ),
-        );
-      } : null,
+      onTap:
+          isEdited
+              ? () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PhotoReadonlyPage(item: widget.item),
+                  ),
+                );
+              }
+              : null,
       child: Container(
         decoration: const BoxDecoration(color: Colors.white),
         padding: const EdgeInsets.all(4.0),
@@ -487,9 +667,14 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
                     right: 0,
                     child: Center(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 2,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.3), // พื้นหลังสีดำจางๆ
+                          color: Colors.black.withOpacity(
+                            0.3,
+                          ), // พื้นหลังสีดำจางๆ
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(

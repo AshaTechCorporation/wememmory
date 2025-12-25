@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wememmory/constants.dart';
 import 'package:wememmory/models/albumModel.dart';
+import 'package:wememmory/models/photo_item.dart';
 import 'package:wememmory/widgets/ApiExeption.dart';
 
 import '../../models/userModel.dart';
@@ -68,5 +69,49 @@ class HomeService {
       // error อื่น ๆ
       throw ApiException('เกิดข้อผิดพลาด: $e');
     }
+
+    
   }
+
+    static Future createOrder({
+    int? year,
+    int? month,
+    List<PhotoItem>? photos,
+    String? note,
+ 
+  }) async {
+    try {
+      final url = Uri.https(publicUrl, '/public/api/album_months');
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      var headers = {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'};
+      final response = await http.post(url,
+          headers: headers,
+          body: convert.jsonEncode({
+            "year": year,
+            "month": month,
+            "photos": photos,
+            "note": note,
+         
+          }));
+      if (response.statusCode == 200) {
+        final data = convert.jsonDecode(response.body);
+        return data;
+      } else {
+        final data = convert.jsonDecode(response.body);
+        throw ApiException(data['message']);
+      }
+    } on SocketException {
+      // ไม่มีเน็ต
+      throw ApiException('ไม่สามารถเชื่อมต่ออินเทอร์เน็ตได้');
+    } on TimeoutException {
+      // รอ response เกินเวลา
+      throw ApiException('คำขอหมดเวลา โปรดลองอีกครั้ง');
+    } catch (e) {
+      // error อื่น ๆ
+      throw ApiException('เกิดข้อผิดพลาด: $e');
+    }
+  }
+
+    
 }

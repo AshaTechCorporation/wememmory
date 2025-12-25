@@ -1,9 +1,13 @@
+import 'dart:developer';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/Album/photo_readonly_page.dart';
 import 'package:wememmory/Album/print_sheet.dart';
 import 'package:wememmory/models/media_item.dart';
+import 'package:wememmory/models/photo_item.dart';
+import 'package:wememmory/widgets/LoadingDialog.dart';
 
 // หน้า พรีวิวสุดท้าย & ยืนยัน
 class FinalPreviewSheet extends StatefulWidget {
@@ -93,7 +97,10 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  _AlbumPreviewSection(items: widget.items, monthName: widget.monthName),
+                  _AlbumPreviewSection(
+                    items: widget.items,
+                    monthName: widget.monthName,
+                  ),
 
                   const SizedBox(height: 20),
 
@@ -161,8 +168,13 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
     );
   }
 
+ 
   // ✅ ฟังก์ชัน Custom Toggle ที่ปรับปรุงให้ใช้ซ้ำได้
-  Widget _buildCustomToggle(String label, bool value, Function(bool) onChanged) {
+  Widget _buildCustomToggle(
+    String label,
+    bool value,
+    Function(bool) onChanged,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -300,7 +312,9 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
         });
       }
     } else {
-      final data = await widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300));
+      final data = await widget.item.asset.thumbnailDataWithSize(
+        const ThumbnailSize(300, 300),
+      );
       if (mounted) {
         setState(() {
           _imageData = data;
@@ -312,7 +326,8 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
   @override
   Widget build(BuildContext context) {
     // ✅ เช็คว่ามีการแก้ไขหรือไม่ (มี caption หรือ tags)
-    bool isEdited = widget.item.caption.isNotEmpty || widget.item.tags.isNotEmpty;
+    bool isEdited =
+        widget.item.caption.isNotEmpty || widget.item.tags.isNotEmpty;
 
     return GestureDetector(
       // ✅ ถ้ามีการแก้ไข ให้กดแล้วไปหน้า PhotoReadonlyPage
@@ -343,9 +358,14 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
                     right: 0,
                     child: Center(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 2,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.3), // พื้นหลังสีดำจางๆ
+                          color: Colors.black.withOpacity(
+                            0.3,
+                          ), // พื้นหลังสีดำจางๆ
                           borderRadius: BorderRadius.circular(20),
                           // border: Border.all(color: Colors.white.withOpacity(0.5), width: 1),
                         ),

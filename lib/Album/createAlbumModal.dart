@@ -1,38 +1,93 @@
 import 'package:flutter/material.dart';
 import 'package:wememmory/Album/upload_photo_page.dart';
+import 'package:wememmory/home/service/homeservice.dart'; // ✅ Import Service
+import 'package:wememmory/models/albumModel.dart';       // ✅ Import Model
 
-// หน้าสร้างอัลบั้มรูป
-class CreateAlbumModal extends StatelessWidget {
+class CreateAlbumModal extends StatefulWidget {
   const CreateAlbumModal({super.key});
 
   @override
+  State<CreateAlbumModal> createState() => _CreateAlbumModalState();
+}
+
+class _CreateAlbumModalState extends State<CreateAlbumModal> {
+  // ตัวแปรเก็บรายการอัลบั้มที่ดึงมาจาก Server
+  List<AlbumModel> _existingAlbums = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAlbumStatus();
+  }
+
+  // ฟังก์ชันดึงข้อมูล (เลียนแบบ CollectionPage)
+  Future<void> _fetchAlbumStatus() async {
+    try {
+      final albums = await HomeService.getAlbums();
+      if (mounted) {
+        setState(() {
+          _existingAlbums = albums;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("Error fetching albums: $e");
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  // ฟังก์ชันเช็คสถานะของแต่ละเดือน
+  // return true ถ้าเดือนนั้นมีอัลบั้มและมีรูปครบ 11 รูปแล้ว
+  bool _checkIfMonthCompleted(String monthName) {
+    // ค้นหาอัลบั้มที่ชื่อเดือนตรงกัน
+    final foundAlbum = _existingAlbums.firstWhere(
+      (album) => album.month == monthName,
+      orElse: () => AlbumModel(month: null, photos: []), // คืนค่าว่างถ้าไม่เจอ
+    );
+
+    // เช็คเงื่อนไข: ต้องมีอัลบั้มจริง (month ไม่ว่าง) และมีรูป >= 11
+    if (foundAlbum.month != '' && (foundAlbum.photos?.length ?? 0) >= 11) {
+      return true;
+    }
+    return false;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // รายชื่อเดือนทั้งหมดที่จะแสดง (คุณอาจจะ Gen แบบ Dynamic ก็ได้)
+    final List<String> allMonths = [
+      "มกราคม 2026",
+      "ธันวาคม 2025", "พฤศจิกายน 2025", "ตุลาคม 2025",
+      "กันยายน 2025", "สิงหาคม 2025", "กรกฎาคม 2025",
+      "มิถุนายน 2025", "พฤษภาคม 2025", "เมษายน 2025",
+      "มีนาคม 2025", "กุมภาพันธ์ 2025", "มกราคม 2025"
+    ];
+
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75, // สูง 75% ของจอ
+      height: MediaQuery.of(context).size.height * 0.75,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
       child: Column(
         children: [
-          // ---------------------------------------------------------
-          // [ส่วนที่เพิ่ม] : Slide Indicator (แถบขีดด้านบน)
-          // ---------------------------------------------------------
-          const SizedBox(height: 12), // ระยะห่างจากขอบบนสุด
+          // --- Slide Indicator ---
+          const SizedBox(height: 12),
           Container(
-            width: 61, // ความกว้างของขีด
-            height: 5, // ความหนาของขีด
+            width: 61,
+            height: 5,
             decoration: BoxDecoration(
-              color: Colors.grey[300], // สีเทาอ่อน
-              borderRadius: BorderRadius.circular(2.5), // ความมน
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2.5),
             ),
           ),
-          // ---------------------------------------------------------
 
-          // 1. Header (ชื่อหน้า + ปุ่มปิด)
+          // --- Header ---
           Padding(
-            // ปรับ padding ด้านบน (top) เหลือ 10 เพราะมีขีดด้านบนกินที่ไปแล้ว (เดิม 24)
-            padding: const EdgeInsets.fromLTRB(24, 10, 24, 10), 
+            padding: const EdgeInsets.fromLTRB(24, 10, 24, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -52,7 +107,7 @@ class CreateAlbumModal extends StatelessWidget {
             ),
           ),
 
-          // 2. Credit Info (ส่วนเครดิต)
+          // --- Credit Info ---
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             child: Column(
@@ -74,57 +129,32 @@ class CreateAlbumModal extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 10),
           const Divider(height: 1, color: Colors.black12),
 
-          // 3. List of Months (รายการเดือน - Scrollable)
+          // --- List of Months ---
           Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              physics: const BouncingScrollPhysics(), 
-              children: const [
-                // --- 2026 (อนาคต - ตัวอย่าง) ---
-                _AlbumOptionItem(month: "มกราคม 2024", statusText: "สร้างอัลบั้ม", isDone: false),
-                Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
+            child: _isLoading 
+                ? const Center(child: CircularProgressIndicator()) // แสดง Loading ระหว่างดึงข้อมูล
+                : ListView.separated(
+                    padding: EdgeInsets.zero,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: allMonths.length,
+                    separatorBuilder: (context, index) => const Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
+                    itemBuilder: (context, index) {
+                      final monthName = allMonths[index];
+                      
+                      // ✅ เรียกใช้ฟังก์ชันตรวจสอบสถานะจริงจาก API
+                      final bool isDone = _checkIfMonthCompleted(monthName);
 
-                // --- 2025 ---
-                _AlbumOptionItem(month: "ธันวาคม 2025", statusText: "สร้างอัลบั้ม", isDone: false),
-                Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
-                
-                _AlbumOptionItem(month: "พฤศจิกายน 2025", statusText: "สร้างอัลบั้ม", isDone: false),
-                Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
-
-                _AlbumOptionItem(month: "ตุลาคม 2025", statusText: "สร้างอัลบั้ม", isDone: false),
-                Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
-                
-                _AlbumOptionItem(month: "กันยายน 2025", statusText: "สร้างอัลบั้มสำเร็จ", isDone: true),
-                Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
-                
-                _AlbumOptionItem(month: "สิงหาคม 2025", statusText: "สร้างอัลบั้มสำเร็จ", isDone: true),
-                Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
-                
-                _AlbumOptionItem(month: "กรกฎาคม 2025", statusText: "สร้างอัลบั้มสำเร็จ", isDone: true),
-                Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
-                
-                _AlbumOptionItem(month: "มิถุนายน 2025", statusText: "สร้างอัลบั้ม", isDone: false),
-                Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
-                
-                _AlbumOptionItem(month: "พฤษภาคม 2025", statusText: "สร้างอัลบั้ม", isDone: false),
-                Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
-
-                _AlbumOptionItem(month: "เมษายน 2025", statusText: "สร้างอัลบั้ม", isDone: false),
-                Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
-
-                _AlbumOptionItem(month: "มีนาคม 2025", statusText: "สร้างอัลบั้ม", isDone: false),
-                Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
-
-                _AlbumOptionItem(month: "กุมภาพันธ์ 2025", statusText: "สร้างอัลบั้ม", isDone: false),
-                Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
-
-                _AlbumOptionItem(month: "มกราคม 2025", statusText: "สร้างอัลบั้มสำเร็จ", isDone: true),
-              ],
-            ),
+                      return _AlbumOptionItem(
+                        month: monthName,
+                        statusText: isDone ? "สร้างอัลบั้มสำเร็จ" : "สร้างอัลบั้ม",
+                        isDone: isDone,
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -132,7 +162,7 @@ class CreateAlbumModal extends StatelessWidget {
   }
 }
 
-// Widget ย่อยสำหรับแต่ละแถว (Row Item) - (คงเดิม ไม่มีการเปลี่ยนแปลง)
+// Widget ย่อยสำหรับแต่ละแถว (Row Item)
 class _AlbumOptionItem extends StatelessWidget {
   final String month;
   final String statusText;
@@ -156,11 +186,11 @@ class _AlbumOptionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: isDone ? null : () {
-        Navigator.pop(context); 
+      onTap: isDone ? null : () { // ถ้าเสร็จแล้ว (isDone = true) ห้ามกด
+        Navigator.pop(context);
         Future.delayed(const Duration(milliseconds: 150), () {
           if (context.mounted) {
-            _showUploadPhotoSheet(context); 
+            _showUploadPhotoSheet(context);
           }
         });
       },
@@ -172,11 +202,25 @@ class _AlbumOptionItem extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(month, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: isDone ? Colors.grey[600] : Colors.black87)),
+                Text(
+                  month, 
+                  style: TextStyle(
+                    fontSize: 16, 
+                    fontWeight: FontWeight.w500, 
+                    color: isDone ? Colors.grey[600] : Colors.black87
+                  )
+                ),
                 const SizedBox(height: 4),
-                Text(statusText, style: TextStyle(fontSize: 13, color: isDone ? const Color(0xFF66BB6A) : Colors.grey[600])),
+                Text(
+                  statusText, 
+                  style: TextStyle(
+                    fontSize: 13, 
+                    color: isDone ? const Color(0xFF66BB6A) : Colors.grey[600]
+                  )
+                ),
               ],
             ),
+            // ✅ แสดงไอคอนติ๊กถูกถ้าเสร็จแล้ว
             if (isDone) const Icon(Icons.check_circle, color: Color(0xFF66BB6A), size: 24),
           ],
         ),

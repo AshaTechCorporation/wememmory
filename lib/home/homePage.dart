@@ -14,7 +14,11 @@ class HomePage extends StatefulWidget {
   final List<MediaItem>? newAlbumItems;
   final String? newAlbumMonth;
 
-  const HomePage({super.key, this.newAlbumItems, this.newAlbumMonth});
+  const HomePage({
+    super.key,
+    this.newAlbumItems,
+    this.newAlbumMonth,
+  });
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -22,6 +26,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late SharedPreferences prefs;
+  // ตัวแปร State สำหรับจัดการข้อมูลภายในหน้านี้
   List<MediaItem>? _currentAlbumItems;
   String? _currentAlbumMonth;
 

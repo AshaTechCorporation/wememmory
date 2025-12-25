@@ -1,5 +1,4 @@
-import 'dart:ui'; // ✅ จำเป็นสำหรับ ImageFilter.blur
-
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:wememmory/Album/createAlbumModal.dart';
 import 'package:wememmory/constants.dart';
@@ -21,35 +20,52 @@ class FirstPage extends StatefulWidget {
 }
 
 class _FirstPageState extends State<FirstPage> {
-  final PageStorageBucket bucket = PageStorageBucket();
-  late Widget currentPage = HomePage(newAlbumItems: widget.newAlbumItems, newAlbumMonth: widget.newAlbumMonth);
-  // ... (คงเดิม)
+  // ❌ ลบ PageStorageBucket ออก เพราะ IndexedStack จัดการให้แล้ว
+  // final PageStorageBucket bucket = PageStorageBucket();
+  
   late int _currentIndex;
+  
+  // ✅ 1. ประกาศ List ของหน้าทั้งหมดเตรียมไว้
+  late List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
+
+    // ✅ 2. โหลดหน้าทั้งหมดเตรียมไว้ครั้งเดียว (Cache ไว้)
+    _pages = [
+      HomePage(newAlbumItems: widget.newAlbumItems, newAlbumMonth: widget.newAlbumMonth), // index 0
+      const CollectionPage(), // index 1
+      const SizedBox(), // index 2 (หน้าว่าง ไว้สำหรับปุ่มตรงกลาง)
+      const ShopPage(), // index 3
+      const ProfilePage(), // index 4
+    ];
   }
 
   void _showCreateAlbumModal() {
-    showModalBottomSheet(context: context, isScrollControlled: true, backgroundColor: Colors.transparent, builder: (context) => const CreateAlbumModal());
-
-    final List<Widget> pages = [HomePage(newAlbumItems: widget.newAlbumItems, newAlbumMonth: widget.newAlbumMonth), CollectionPage(), const SizedBox(), const ShopPage(), const ProfilePage()];
+    showModalBottomSheet(
+      context: context, 
+      isScrollControlled: true, 
+      backgroundColor: Colors.transparent, 
+      builder: (context) => const CreateAlbumModal()
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // ... (pages list คงเดิม)
-
     return Scaffold(
       backgroundColor: kBackgroundColor,
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          PageStorage(bucket: bucket, child: currentPage),
-          // Positioned.fill(child: IndexedStack(index: _currentIndex, children: pages)),
-          // ✅ ปรับ Positioned ให้ชิดขอบล่าง
+          // ✅ 3. ใช้ IndexedStack แทน PageStorage
+          // มันจะ "ซ่อน" หน้าอื่นไว้ แต่ไม่ทำลายทิ้ง ทำให้ข้อมูลยังอยู่ครบ
+          IndexedStack(
+            index: _currentIndex,
+            children: _pages,
+          ),
+          
           Positioned(
             left: 0,
             right: 0,
@@ -60,18 +76,10 @@ class _FirstPageState extends State<FirstPage> {
                 if (index == 2) {
                   _showCreateAlbumModal();
                 } else {
-                  setState(() => _currentIndex = index);
-                  if (_currentIndex == 0) {
-                    currentPage = HomePage(newAlbumItems: widget.newAlbumItems, newAlbumMonth: widget.newAlbumMonth);
-                  } else if (_currentIndex == 1) {
-                    currentPage = CollectionPage();
-                  } else if (_currentIndex == 2) {
-                    currentPage = SizedBox();
-                  } else if (_currentIndex == 3) {
-                    currentPage = ShopPage();
-                  } else if (_currentIndex == 4) {
-                    currentPage = ProfilePage();
-                  }
+                  setState(() {
+                    // ✅ 4. แค่เปลี่ยน index ก็พอ ไม่ต้อง assign currentPage ใหม่
+                    _currentIndex = index;
+                  });
                 }
               },
             ),
@@ -82,182 +90,164 @@ class _FirstPageState extends State<FirstPage> {
   }
 }
 
-// ✅✅✅ ส่วนที่ปรับปรุงหลัก: CustomBottomNavBar ✅✅✅
+// ... (Class CustomBottomNavBar ใช้โค้ดเดิมได้เลยครับ ไม่ต้องแก้) ...
 class CustomBottomNavBar extends StatelessWidget {
-  final int currentIndex;
-  final Function(int) onTap;
+    // Copy โค้ด CustomBottomNavBar เดิมของคุณมาวางตรงนี้ได้เลย
+    // (เพราะส่วน UI ของ NavBar ถูกต้องแล้ว)
+    final int currentIndex;
+    final Function(int) onTap;
 
-  const CustomBottomNavBar({super.key, required this.currentIndex, required this.onTap});
+    const CustomBottomNavBar({super.key, required this.currentIndex, required this.onTap});
 
-  @override
-  Widget build(BuildContext context) {
-    // สีต่างๆ คงเดิม
-    const Color activeIconColor = Color(0xFF67A5BA);
-    const Color inactiveIconColor = Color(0xFF555555);
-    const Color centerButtonColor = Color(0xFFED7D31);
-    const Color staticTextColor = Color(0xFF3C3C3B);
+    @override
+    Widget build(BuildContext context) {
+        // ... ใส่โค้ดเดิม ...
+        const Color activeIconColor = Color(0xFF67A5BA);
+        const Color inactiveIconColor = Color(0xFF555555);
+        const Color centerButtonColor = Color(0xFFED7D31);
+        const Color staticTextColor = Color(0xFF3C3C3B);
 
-    // ✅ เอา Padding รอบนอกออกเพื่อให้เต็มจอ
-    return Stack(
-      alignment: Alignment.bottomCenter,
-      children: [
-        // --- Layer 1: Shadow (เงาด้านบน) ---
-        Container(
-          height: 80, // ปรับความสูงเล็กน้อยให้รับกับ Safe Area ด้านล่าง
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05), // เงาบางๆ ด้านบน
-                blurRadius: 10,
-                offset: const Offset(0, -5),
-              ),
-            ],
-          ),
-        ),
-        // --- Layer 2: Blurred Background & Content ---
-        ClipRRect(
-          // ✅ ปรับ Radius เฉพาะด้านบน (ถ้าต้องการให้ดูมนๆ) หรือลบออกถ้าอยากได้เหลี่ยม
-          // borderRadius: const BorderRadius.only(
-          //   topLeft: Radius.circular(20),
-          //   topRight: Radius.circular(20),
-          // ),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-            child: Container(
-              height: 96, // ความสูงแถบ
+        return Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Container(
+              height: 80,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.5),
-                // border: Border(top: BorderSide(color: Colors.white.withOpacity(0.2), width: 0.5)), // ขอบบนบางๆ
+                color: Colors.transparent,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
               ),
-              child: SafeArea(
-                // ✅ เพิ่ม SafeArea เพื่อรองรับมือถือรุ่นใหม่ (ไม่มีปุ่มโฮม)
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 12, 10, 0), // Padding ซ้ายขวาภายใน
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // 1. หน้าหลัก
-                      Expanded(
-                        child: _buildNavItem(
-                          iconPath: 'assets/icons/homePage.png',
-                          label: 'หน้าหลัก',
-                          index: 0,
-                          isActive: currentIndex == 0,
-                          activeColor: activeIconColor,
-                          inactiveColor: inactiveIconColor,
-                          textColor: staticTextColor,
-                          width: 20,
-                          height: 21.88,
-                        ),
-                      ),
-
-                      // 2. สมุดภาพ
-                      Expanded(
-                        child: _buildNavItem(
-                          iconPath: 'assets/icons/albumPage.png',
-                          label: 'สมุดภาพ',
-                          index: 1,
-                          isActive: currentIndex == 1,
-                          activeColor: activeIconColor,
-                          inactiveColor: inactiveIconColor,
-                          textColor: staticTextColor,
-                          width: 25,
-                          height: 25,
-                        ),
-                      ),
-
-                      // 3. ปุ่มตรงกลาง (Add Button)
-                      Expanded(
-                        child: Center(
-                          child: GestureDetector(
-                            onTap: () => onTap(2),
-                            child: Container(
-                              width: 44,
-                              height: 44,
-                              alignment: Alignment.center,
-                              decoration: const BoxDecoration(shape: BoxShape.circle),
-                              child: Image.asset('assets/icons/btupload.png', width: 44, height: 44, fit: BoxFit.contain),
+            ),
+            ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(
+                  height: 96,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.5),
+                  ),
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 12, 10, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: _buildNavItem(
+                              iconPath: 'assets/icons/homePage.png',
+                              label: 'หน้าหลัก',
+                              index: 0,
+                              isActive: currentIndex == 0,
+                              activeColor: activeIconColor,
+                              inactiveColor: inactiveIconColor,
+                              textColor: staticTextColor,
+                              width: 20,
+                              height: 21.88,
                             ),
                           ),
-                        ),
+                          Expanded(
+                            child: _buildNavItem(
+                              iconPath: 'assets/icons/albumPage.png',
+                              label: 'สมุดภาพ',
+                              index: 1,
+                              isActive: currentIndex == 1,
+                              activeColor: activeIconColor,
+                              inactiveColor: inactiveIconColor,
+                              textColor: staticTextColor,
+                              width: 25,
+                              height: 25,
+                            ),
+                          ),
+                          Expanded(
+                            child: Center(
+                              child: GestureDetector(
+                                onTap: () => onTap(2),
+                                child: Container(
+                                  width: 44,
+                                  height: 44,
+                                  alignment: Alignment.center,
+                                  decoration: const BoxDecoration(shape: BoxShape.circle),
+                                  child: Image.asset('assets/icons/btupload.png', width: 44, height: 44, fit: BoxFit.contain),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildNavItem(
+                              iconPath: 'assets/icons/ShopPage.png',
+                              label: 'ร้านค้า',
+                              index: 3,
+                              isActive: currentIndex == 3,
+                              activeColor: activeIconColor,
+                              inactiveColor: inactiveIconColor,
+                              textColor: staticTextColor,
+                              width: 20,
+                              height: 25,
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildNavItem(
+                              iconPath: 'assets/icons/ProfilePage.png',
+                              label: 'บัญชี',
+                              index: 4,
+                              isActive: currentIndex == 4,
+                              activeColor: activeIconColor,
+                              inactiveColor: inactiveIconColor,
+                              textColor: staticTextColor,
+                              width: 22.5,
+                              height: 22.5,
+                            ),
+                          ),
+                        ],
                       ),
-
-                      // 4. ร้านค้า
-                      Expanded(
-                        child: _buildNavItem(
-                          iconPath: 'assets/icons/ShopPage.png',
-                          label: 'ร้านค้า',
-                          index: 3,
-                          isActive: currentIndex == 3,
-                          activeColor: activeIconColor,
-                          inactiveColor: inactiveIconColor,
-                          textColor: staticTextColor,
-                          width: 20,
-                          height: 25,
-                        ),
-                      ),
-
-                      // 5. บัญชี
-                      Expanded(
-                        child: _buildNavItem(
-                          iconPath: 'assets/icons/ProfilePage.png',
-                          label: 'บัญชี',
-                          index: 4,
-                          isActive: currentIndex == 4,
-                          activeColor: activeIconColor,
-                          inactiveColor: inactiveIconColor,
-                          textColor: staticTextColor,
-                          width: 22.5,
-                          height: 22.5,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ),
-      ],
-    );
-  }
+          ],
+        );
+    }
 
-  // ✅ ฟังก์ชันสร้าง Item (คงเดิม)
-  Widget _buildNavItem({
-    required String iconPath,
-    required String label,
-    required int index,
-    required bool isActive,
-    required Color activeColor,
-    required Color inactiveColor,
-    required Color textColor,
-    required double width,
-    required double height,
-  }) {
-    return GestureDetector(
-      onTap: () => onTap(index),
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(height: 28, child: Center(child: Image.asset(iconPath, width: width, height: height, color: isActive ? activeColor : inactiveColor, fit: BoxFit.contain))),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 10, // ปรับขนาดตัวหนังสือให้พอดี
-              fontWeight: FontWeight.w500,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
+    Widget _buildNavItem({
+        required String iconPath,
+        required String label,
+        required int index,
+        required bool isActive,
+        required Color activeColor,
+        required Color inactiveColor,
+        required Color textColor,
+        required double width,
+        required double height,
+      }) {
+        return GestureDetector(
+          onTap: () => onTap(index),
+          behavior: HitTestBehavior.opaque,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: 28, child: Center(child: Image.asset(iconPath, width: width, height: height, color: isActive ? activeColor : inactiveColor, fit: BoxFit.contain))),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        );
+      }
 }
