@@ -3,21 +3,31 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wememmory/Album/album_layout_page.dart';
+import 'package:wememmory/home/firstPage.dart';
 import 'package:wememmory/models/media_item.dart';
 
 // หน้าการอัปโหลดรูปภาพจากอุปกรณ์
 class UploadPhotoPage extends StatefulWidget {
   final String selectedMonth;
+  
+  // ✅ 1. เพิ่มตัวแปรรับรูปภาพที่เคยเลือกไว้ (Optional)
+  final List<MediaItem>? initialSelectedItems; 
 
-  const UploadPhotoPage({super.key, required this.selectedMonth});
+  const UploadPhotoPage({
+    super.key, 
+    required this.selectedMonth,
+    this.initialSelectedItems, // รับค่าตรงนี้
+  });
 
   @override
   State<UploadPhotoPage> createState() => _UploadPhotoPageState();
 }
 
 class _UploadPhotoPageState extends State<UploadPhotoPage> {
-  final List<MediaItem> mediaList = []; //เก็บข้อมูลรูปภาพ และวิดิโอทั้งหมด
-  final List<MediaItem> selectedItems = []; //เก็บเฉพาะรูปภาพที่ผู้ใช้ "กดเลือก" (Tap) เท่านั้น (สูงสุด 11 รูปตามโค้ด)
+  final List<MediaItem> mediaList = []; 
+  // ✅ 2. เอา final ออก หรือแก้ให้เป็น List ที่ add ข้อมูลได้
+  final List<MediaItem> selectedItems = []; 
+  
   final Map<String, Future<Uint8List?>> _thumbnailFutures = {};
 
   bool showThisMonthOnly = false;
@@ -26,6 +36,13 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   @override
   void initState() {
     super.initState();
+    
+    // ✅ 3. ใน initState: เช็คว่ามีรูปส่งมาไหม? ถ้ามีให้ยัดใส่ selectedItems ทันที
+    // ผลลัพธ์: เมื่อรูปโหลดเสร็จ มันจะขึ้นติ๊กถูกให้เองตาม ID ของรูป
+    if (widget.initialSelectedItems != null) {
+      selectedItems.addAll(widget.initialSelectedItems!);
+    }
+
     _loadAllMediaFromDevice();
   }
 
@@ -125,17 +142,36 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     });
   }
 
-  void _onNextPressed() {
-    if (selectedItems.isNotEmpty) {
+ void _onNextPressed() {
+    if (selectedItems.isEmpty) return;
+
+    if (selectedItems.length == 11) {
+      // กรณีครบ 11 รูป -> ไปหน้า AlbumLayoutPage (เหมือนเดิม)
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
         builder: (context) => AlbumLayoutPage(
-          // จุดนี้คือการส่งค่าข้ามหน้า (Constructor Injection)
           selectedItems: selectedItems,
           monthName: widget.selectedMonth,
         ),
+      );
+    } else {
+      // -------------------------------------------------------
+      // ✅ แก้ไขตรงนี้: เลือกไม่ครบ 11 รูป
+      // ให้ไปที่ FirstPage (ซึ่งเป็นตัวที่มี NavBar) 
+      // และส่งข้อมูลรูปผ่าน Constructor ไป
+      // -------------------------------------------------------
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FirstPage(
+            initialIndex: 0, // บังคับให้เปิด Tab 0 (หน้า Home)
+            newAlbumItems: selectedItems, // ส่งรูปที่เลือกไป
+            newAlbumMonth: widget.selectedMonth, // ส่งชื่อเดือนไป
+          ),
+        ),
+        (route) => false,
       );
     }
   }

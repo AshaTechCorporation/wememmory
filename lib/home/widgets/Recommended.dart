@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/Album/createAlbumModal.dart';
+import 'package:wememmory/Album/upload_photo_page.dart';
 import 'package:wememmory/models/media_item.dart';
+
 
 class Recommended extends StatefulWidget {
   final List<MediaItem>? albumItems;
@@ -70,6 +72,31 @@ class _RecommendedState extends State<Recommended> {
     }
   }
 
+  void _continueSelection() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // จำเป็นต้องใส่เพื่อให้กำหนดความสูงได้
+      backgroundColor: Colors.transparent, // พื้นหลังใสเพื่อให้เห็นมุมโค้ง
+      builder: (context) => Container(
+        // 🔹 กำหนดความสูงที่นี่ (0.9 คือ 90% ของหน้าจอ = ไม่เต็มจอ)
+        height: MediaQuery.of(context).size.height * 0.9, 
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // มุมโค้งมนด้านบน
+        ),
+        // 🔹 ClipRRect เพื่อให้เนื้อหาข้างในไม่ล้นมุมโค้ง
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          child: UploadPhotoPage(
+            // แก้คำว่า Unknown Month เป็นค่าว่าง หรือชื่อเดือนที่ถูกต้อง
+            selectedMonth: widget.albumMonth ?? "", 
+            initialSelectedItems: widget.albumItems,
+          ),
+        ),
+      ),
+    );
+  }
+
   // ✅ 2. ฟังก์ชันคำนวณเวลา (คงเดิม)
   void _updateTimeStringInternal() {
     if (_targetDate == null) {
@@ -129,6 +156,8 @@ class _RecommendedState extends State<Recommended> {
       print("Error updating card: $e");
     }
   }
+
+  
 
   void _initData() {
     // STEP 1: คำนวณเวลาก่อน
@@ -325,8 +354,11 @@ class _RecommendedState extends State<Recommended> {
         }
       };
 
-      if (index == 0 || item.type == CardType.ticket) {
+      if (index == 0) {
         onTapButton = _openCreateAlbumModal;
+      } else if (item.type == CardType.ticket) {
+        // ถ้าเป็นการ์ด Ticket (นับรูป) ให้เรียกฟังก์ชันไปเลือกรูปต่อ
+        onTapButton = _continueSelection;
       }
     }
 
