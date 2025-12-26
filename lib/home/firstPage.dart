@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/Album/createAlbumModal.dart';
 import 'package:wememmory/Album/upload_photo_page.dart'; // อย่าลืม import หน้า Upload
 import 'package:wememmory/constants.dart';
@@ -31,6 +32,7 @@ class _FirstPageState extends State<FirstPage> {
   @override
   void initState() {
     super.initState();
+    requestPermission();
     _currentIndex = widget.initialIndex;
 
     // ✅ 2. ส่ง Key ให้ CollectionPage
@@ -43,19 +45,35 @@ class _FirstPageState extends State<FirstPage> {
     ];
   }
 
+  Future<bool> requestPermission() async {
+    // ขอ Permission แบบ Extend เพื่อรองรับ Android 14
+    final PermissionState result = await PhotoManager.requestPermissionExtend();
+
+    // เช็คสถานะ
+    if (result.isAuth) {
+      // กรณี: อนุญาตทั้งหมด (Authorized)
+      // หรือ อนุญาตบางรูป (Limited - Android 14) -> ถือว่าผ่าน ใช้งานได้
+      return true;
+    } else {
+      // กรณี: ปฏิเสธ (Denied) หรือ Restricted
+      // แนะนำให้เปิดหน้า Setting ให้ผู้ใช้ไปเปิดเอง
+      await PhotoManager.openSetting();
+      return false;
+    }
+  }
+
   // ✅ 3. ปรับแก้ฟังก์ชันเปิด Modal และจัดการ Flow ทั้งหมด
   void _showCreateAlbumModal() async {
     // 3.1 เปิด Modal และรอรับค่า String กลับมา (เช่น "มกราคม 2026")
     final String? resultMonthString = await showModalBottomSheet<String>(
-      context: context, 
-      isScrollControlled: true, 
-      backgroundColor: Colors.transparent, 
-      builder: (context) => const CreateAlbumModal()
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const CreateAlbumModal(),
     );
 
     // 3.2 ถ้ามีการเลือกเดือนกลับมา (User ไม่ได้กดปิดไปเฉยๆ)
     if (resultMonthString != null && mounted) {
-      
       // แยกปีออกมาจาก String (เช่น "มกราคม 2026" -> แยกได้ "2026")
       final parts = resultMonthString.split(' ');
       String yearOnly = DateTime.now().year.toString(); // Default
@@ -65,24 +83,19 @@ class _FirstPageState extends State<FirstPage> {
 
       // ✅ 3.3 สั่ง CollectionPage ให้เปลี่ยนปีและโหลดข้อมูลใหม่ "ทันที"
       // (เพื่อให้เมื่อ user กลับมาหน้านี้ จะเห็นข้อมูลของปีที่เพิ่งเลือก)
-      _collectionPageKey.currentState?.updateYearAndRefresh(yearOnly);
+      // _collectionPageKey.currentState?.updateYearAndRefresh(yearOnly);
 
       // 3.4 เปิดหน้า Upload รูปต่อทันที (Flow ต่อเนื่อง)
-      await showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (context) => UploadPhotoPage(selectedMonth: resultMonthString),
-      );
+      await showModalBottomSheet(context: context, isScrollControlled: true, backgroundColor: Colors.transparent, builder: (context) => UploadPhotoPage(selectedMonth: resultMonthString));
 
-      // 3.5 เมื่อ Upload เสร็จ (หรือปิดหน้า Upload ลงมา) 
+      // 3.5 เมื่อ Upload เสร็จ (หรือปิดหน้า Upload ลงมา)
       // เราจะสลับหน้าจอไปที่หน้า Collection (Index 1) โดยอัตโนมัติ
       setState(() {
         _currentIndex = 1;
       });
-      
+
       // สั่งรีเฟรชข้อมูลอีกรอบเพื่อความมั่นใจ (เผื่อรูปเพิ่งอัปโหลดเสร็จ)
-      _collectionPageKey.currentState?.updateYearAndRefresh(yearOnly);
+      // _collectionPageKey.currentState?.updateYearAndRefresh(yearOnly);
     }
   }
 
@@ -94,11 +107,8 @@ class _FirstPageState extends State<FirstPage> {
       body: Stack(
         children: [
           // ใช้ IndexedStack เพื่อรักษาสถานะของหน้าต่างๆ
-          IndexedStack(
-            index: _currentIndex,
-            children: _pages,
-          ),
-          
+          IndexedStack(index: _currentIndex, children: _pages),
+
           Positioned(
             left: 0,
             right: 0,
@@ -142,27 +152,13 @@ class CustomBottomNavBar extends StatelessWidget {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
-        Container(
-          height: 80,
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, -5),
-              ),
-            ],
-          ),
-        ),
+        Container(height: 80, decoration: BoxDecoration(color: Colors.transparent, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))])),
         ClipRRect(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
             child: Container(
               height: 96,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.5),
-              ),
+              decoration: BoxDecoration(color: Colors.white.withOpacity(0.5)),
               child: SafeArea(
                 top: false,
                 child: Padding(
@@ -267,17 +263,7 @@ class CustomBottomNavBar extends StatelessWidget {
         children: [
           SizedBox(height: 28, child: Center(child: Image.asset(iconPath, width: width, height: height, color: isActive ? activeColor : inactiveColor, fit: BoxFit.contain))),
           const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-          ),
+          Text(label, style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.w500), maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
         ],
       ),
     );

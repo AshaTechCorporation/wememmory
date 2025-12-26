@@ -1,17 +1,17 @@
-import 'dart:typed_data';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:photo_manager/photo_manager.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:wememmory/collection/AlbumPhotoViewPage.dart';
 import 'package:wememmory/collection/FanStackDetailPage.dart';
 import 'package:wememmory/collection/MemorySlidePage.dart';
 import 'package:wememmory/collection/share_sheet.dart';
-import 'package:wememmory/models/media_item.dart';
+import 'package:wememmory/Album/print_sheet.dart'; // Import หน้า PrintSheet (ถ้ามี)
 
 // หน้า รายละเอียดแฟ้มภาพแต่ละเดือน
 class MonthDetailPage extends StatelessWidget {
   final String monthName;
-  final List<MediaItem> items;
+  // ✅ รับข้อมูลเป็น dynamic เพื่อรองรับข้อมูลจาก Server
+  final List<dynamic> items;
 
   const MonthDetailPage({
     super.key,
@@ -21,7 +21,7 @@ class MonthDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MediaItem? bgItem;
+    dynamic bgItem;
     if (items.isNotEmpty) {
       bgItem = items[Random().nextInt(items.length)];
     }
@@ -33,7 +33,7 @@ class MonthDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ---------------------------------------------------------
-            // 1. Header Stack (คงเดิม)
+            // 1. Header Stack
             // ---------------------------------------------------------
             Stack(
               children: [
@@ -47,25 +47,9 @@ class MonthDetailPage extends StatelessWidget {
                       colors: [Color(0xFF8E8E8E), Color(0xFF4A4A4A)],
                     ),
                   ),
+                  // ✅ แสดงภาพพื้นหลังด้วย CachedNetworkImage
                   child: bgItem != null
-                      ? FutureBuilder<Uint8List?>(
-                          future: bgItem.capturedImage != null
-                              ? Future.value(bgItem.capturedImage)
-                              : bgItem.asset.thumbnailDataWithSize(
-                                  const ThumbnailSize(800, 800),
-                                ),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData && snapshot.data != null) {
-                              return Image.memory(
-                                snapshot.data!,
-                                fit: BoxFit.cover,
-                                color: Colors.black.withOpacity(0.3),
-                                colorBlendMode: BlendMode.darken,
-                              );
-                            }
-                            return Container();
-                          },
-                        )
+                      ? _buildHeaderImage(bgItem)
                       : Container(),
                 ),
                 Positioned(
@@ -128,7 +112,7 @@ class MonthDetailPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 2. Action Buttons & Status (ส่วนนี้เพิ่มเข้ามาเพื่อให้ Layout สมบูรณ์ตามภาพเดิม)
+            // 2. Action Buttons & Status
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Row(
@@ -146,7 +130,7 @@ class MonthDetailPage extends StatelessWidget {
                         onTap: () {
                           showModalBottomSheet(
                             context: context,
-                            isScrollControlled: true, // เพื่อให้ความสูงเป็นไปตามที่เรากำหนดใน ShareSheet
+                            isScrollControlled: true,
                             backgroundColor: Colors.transparent,
                             builder: (context) => const ShareSheet(),
                           );
@@ -162,29 +146,28 @@ class MonthDetailPage extends StatelessWidget {
             const SizedBox(height: 20),
 
             // ---------------------------------------------------------
-            // 3. Album Layout (คงเดิม)
+            // 3. Album Layout
             // ---------------------------------------------------------
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: _buildFullAlbumPreview(),
+                child: _buildFullAlbumPreview(context),
               ),
             ),
 
             const SizedBox(height: 40),
 
             // ---------------------------------------------------------
-            // 4. Bottom Cards (คงเดิม)
+            // 4. Bottom Cards
             // ---------------------------------------------------------
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: Column(
                 children: [
-                  // --- Row 1: Cards ---
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ✅ Card 1: Polaroid Stack
+                      // Card 1: Polaroid Stack
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
@@ -193,7 +176,9 @@ class MonthDetailPage extends StatelessWidget {
                               MaterialPageRoute(
                                 builder: (context) => MemorySlidePage(
                                   monthName: monthName,
-                                  items: items,
+                                  // ⚠️ แก้ไขชั่วคราว: ส่ง [] ไปก่อน เพราะหน้า MemorySlidePage ยังรับ MediaItem อยู่
+                                  // คุณต้องไปแก้ MemorySlidePage ให้รับ List<dynamic> เหมือนหน้านี้
+                                  items: [], 
                                 ),
                               ),
                             );
@@ -204,7 +189,7 @@ class MonthDetailPage extends StatelessWidget {
                       
                       const SizedBox(width: 20),
                       
-                      // ✅ Card 2: Fan Image Stack
+                      // Card 2: Fan Image Stack
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
@@ -213,7 +198,8 @@ class MonthDetailPage extends StatelessWidget {
                               MaterialPageRoute(
                                 builder: (context) => FanStackDetailPage(
                                   monthName: monthName,
-                                  items: items,
+                                  // ⚠️ แก้ไขชั่วคราว: ส่ง [] ไปก่อน
+                                  items: [], 
                                 ),
                               ),
                             );
@@ -226,11 +212,10 @@ class MonthDetailPage extends StatelessWidget {
 
                   const SizedBox(height: 10),
 
-                  // --- Row 2: Headers ---
+                  // Headers
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Left: แท็กทั้งหมด
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
@@ -239,23 +224,23 @@ class MonthDetailPage extends StatelessWidget {
                               MaterialPageRoute(
                                 builder: (context) => MemorySlidePage(
                                   monthName: monthName,
-                                  items: items,
+                                  items: [], // ⚠️ แก้ไขชั่วคราว
                                 ),
                               ),
                             );
                           },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
+                            children: const [
+                              Text(
                                 "แท็กทั้งหมด",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              const Text(
+                              SizedBox(height: 4),
+                              Text(
                                 "#ครอบครัว #ความรัก #ความรัก ...",
                                 style: TextStyle(
                                   color: Color(0xFFED7D31),
@@ -269,20 +254,19 @@ class MonthDetailPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 20),
-                      // Right: การแชร์ของเดือนนี้
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
+                          children: const [
+                            Text(
                               "การแชร์ของเดือนนี้",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            const Text(
+                            SizedBox(height: 4),
+                            Text(
                               "ผู้ที่เข้าชม 23+",
                               style: TextStyle(
                                 color: Colors.grey, 
@@ -300,9 +284,7 @@ class MonthDetailPage extends StatelessWidget {
 
             const SizedBox(height: 60),
 
-            // ---------------------------------------------------------
-            // 5. ✅ NEW SECTION: Stats & Charts (จากภาพ ส่วนด้านล่าง.jpg)
-            // ---------------------------------------------------------
+            // 5. Stats & Charts
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2),
               child: _buildBottomStatsSection(),
@@ -315,6 +297,23 @@ class MonthDetailPage extends StatelessWidget {
     );
   }
 
+  // ✅ Helper method สร้างรูป Header จาก URL
+  Widget _buildHeaderImage(dynamic item) {
+    // ดึง URL จาก Model หรือ Map ตามโครงสร้างข้อมูลของคุณ
+    // สมมติว่า item เป็น PhotoModel ที่มี field 'image' ที่เป็น String URL
+    // หรือถ้าเป็น Map ให้ใช้ item['image']
+    final String imageUrl = (item.image is String) ? item.image : "";
+
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      fit: BoxFit.cover,
+      color: Colors.black.withOpacity(0.3),
+      colorBlendMode: BlendMode.darken,
+      placeholder: (context, url) => Container(color: Colors.grey[400]),
+      errorWidget: (context, url, error) => const Icon(Icons.error),
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // Helper Methods: Bottom Stats Section
   // ---------------------------------------------------------------------------
@@ -323,20 +322,17 @@ class MonthDetailPage extends StatelessWidget {
       children: [
         // 1. Card: ต่อเนื่อง 4 เดือน
         Container(
-          // padding: const EdgeInsets.all(2),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white,
           ),
           child: Row(
             children: [
-              // ใช้รูป Icon ไฟจาก Assets
               Image.asset(
                 'assets/icons/MainFlame.png',
                 width: 128,
                 height: 128,
                 fit: BoxFit.contain,
               ),
-              // const SizedBox(width: 2),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
@@ -411,11 +407,8 @@ class MonthDetailPage extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              // --- Background Grid Lines (เส้นประ) ---
               Column(
-                // กระจายเส้นให้เต็มความสูงพื้นที่กราฟ
                 children: [
-                  // เว้นที่ด้านบนเล็กน้อย
                   const SizedBox(height: 2), 
                   _buildDashedGridLine(label: "100"),
                   const Spacer(),
@@ -424,23 +417,17 @@ class MonthDetailPage extends StatelessWidget {
                   _buildDashedGridLine(label: "25"),
                   const Spacer(),
                   _buildDashedGridLine(label: "0"),
-                  // เว้นที่ด้านล่างสำหรับ Label แกน X
                   const SizedBox(height: 20), 
                 ],
               ),
-              
-              // --- Bars ---
               Padding(
-                padding: const EdgeInsets.only(bottom: 0, left: 25), // เว้นซ้ายให้แกน Y
+                padding: const EdgeInsets.only(bottom: 0, left: 25), 
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    // แท่งที่ 1: ความสม่ำเสมอ (สูง 160)
                     _buildFixedBar(height: 160, label: "ความสม่ำเสมอ", color: const Color(0xFFED7D31)),
-                    // แท่งที่ 2: ตรงตามเวลา (สูง 86)
                     _buildFixedBar(height: 86, label: "ตรงตามเวลา", color: const Color(0xFFED7D31)),
-                    // แท่งที่ 3: อัพรูปครบ (สูง 86)
                     _buildFixedBar(height: 86, label: "อัพรูปครบ", color: const Color(0xFFED7D31)),
                   ],
                 ),
@@ -458,7 +445,6 @@ class MonthDetailPage extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            // เพิ่มเงาให้เหมือนการ์ดอื่น
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
@@ -466,162 +452,95 @@ class MonthDetailPage extends StatelessWidget {
                 offset: const Offset(0, 2),
               ),
             ],
-            // border: Border.all(color: Colors.grey.shade100), // ใส่หรือไม่ใส่ก็ได้ตามชอบ
           ),
           child: Column(
             children: [
-              // ส่วนบน: ข้อมูลเวลา และ Gauge Chart
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // --- ฝั่งซ้าย: Text ข้อมูล ---
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
                         "เวลาในการสร้างอัลบั้ม",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Colors.black87,
-                        ),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black87),
                       ),
                       const SizedBox(height: 12),
                       const Text(
                         "15.00 นาที",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24, // เพิ่มขนาดตัวเลขให้ใหญ่ชัดเจน
-                          color: Colors.black,
-                        ),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.black),
                       ),
                       const SizedBox(height: 8),
                       Container(
-                        padding: const EdgeInsets.only(top: 8), // เส้นขีดคั่น
+                        padding: const EdgeInsets.only(top: 8), 
                         decoration: const BoxDecoration(
                           border: Border(top: BorderSide(color: Color(0xFFEEEEEE), width: 1)),
                         ),
-                        child: const Text(
-                          "สูงสุด 30.00 นาที",
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 10,
-                          ),
-                        ),
+                        child: const Text("สูงสุด 30.00 นาที", style: TextStyle(color: Colors.grey, fontSize: 10)),
                       ),
                     ],
                   ),
-                  
-                  // --- ฝั่งขวา: Gauge Chart ---
                   SizedBox(
-                    width: 120, // ปรับขนาดให้เหมาะสม
-                    height: 60, // ครึ่งวงกลม สูงครึ่งหนึ่งของกว้าง
+                    width: 120, height: 60,
                     child: Stack(
                       alignment: Alignment.bottomCenter,
                       children: [
-                        // 1. Background Arc (สีครีม - เต็มวง)
                         Container(
-                          width: 120,
-                          height: 60,
+                          width: 120, height: 60,
                           decoration: const BoxDecoration(
-                            color: Color(0xFFFFF0E0), // สีครีมอ่อนๆ
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(60),
-                              topRight: Radius.circular(60),
-                            ),
+                            color: Color(0xFFFFF0E0), 
+                            borderRadius: BorderRadius.only(topLeft: Radius.circular(60), topRight: Radius.circular(60)),
                           ),
                         ),
-                        // 2. Active Arc (สีส้ม - ครึ่งซ้าย)
                         Positioned(
                           left: 0,
                           child: Container(
-                            width: 60, // ครึ่งหนึ่งของ width รวม
-                            height: 60,
+                            width: 60, height: 60,
                             decoration: const BoxDecoration(
-                              color: Color(0xFFED7D31), // สีส้มเข้ม
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(60),
-                                topRight: Radius.circular(0),
-                              ),
+                              color: Color(0xFFED7D31), 
+                              borderRadius: BorderRadius.only(topLeft: Radius.circular(60), topRight: Radius.circular(0)),
                             ),
                           ),
                         ),
-                        // 3. Inner White Circle (เพื่อทำเป็นโดนัท)
                         Container(
-                          width: 80, // เล็กกว่าวงนอก (120-80 = ขอบหนา 20px)
-                          height: 40,
+                          width: 80, height: 40,
                           decoration: const BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(40),
-                              topRight: Radius.circular(40),
-                            ),
+                            borderRadius: BorderRadius.only(topLeft: Radius.circular(40), topRight: Radius.circular(40)),
                           ),
                         ),
-                        // 4. Text ตรงกลาง Gauge
                         const Positioned(
                           bottom: 0,
-                          child: Text(
-                            "15.00 นาที",
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
+                          child: Text("15.00 นาที", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87)),
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-              
               const SizedBox(height: 24),
-              
-              // ส่วนล่าง: ข้อความสรุป
-              const Text(
-                "เร็วกว่าค่าเฉลี่ย 15.00 นาที",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                  color: Colors.black,
-                ),
-              ),
+              const Text("เร็วกว่าค่าเฉลี่ย 15.00 นาที", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.black)),
             ],
           ),
         ),
         
         const SizedBox(height: 20),
 
-        // 5. Card: Donut Chart (สร้างอัลบั้มวันที่ 1)
+        // 5. Card: Donut Chart
         Container(
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              // ใช้รูปภาพแทน Stack ของ CircularProgressIndicator
               SizedBox(
-                width: 235, 
-                height: 235,
-                child: Image.asset(
-                  'assets/icons/Frame 25.png', // path รูปภาพ
-                  fit: BoxFit.contain, // ปรับขนาดให้พอดี
-                ),
-              ),
-              
-              const SizedBox(height: 20),
-              const Text(
-                "สร้างอัลบั้มวันที่ 1", 
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40)
+                width: 235, height: 235,
+                child: Image.asset('assets/icons/Frame 25.png', fit: BoxFit.contain),
               ),
               const SizedBox(height: 20),
-              const Text(
-                "คุณสร้างอัลบั้มวันที่ 1 มากถึง 54%", 
-                style: TextStyle(color: Colors.grey, fontSize: 20, fontWeight: FontWeight.w800)
-              ),
+              const Text("สร้างอัลบั้มวันที่ 1", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40)),
+              const SizedBox(height: 20),
+              const Text("คุณสร้างอัลบั้มวันที่ 1 มากถึง 54%", style: TextStyle(color: Colors.grey, fontSize: 20, fontWeight: FontWeight.w800)),
               const SizedBox(height: 50),
-              
-              // Legend (คงเดิม)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -638,8 +557,7 @@ class MonthDetailPage extends StatelessWidget {
       ],
     );
   }
-  
-  // เส้นประกราฟ
+
   Widget _buildDashedGridLine({required String label}) {
     return Row(
       children: [
@@ -678,26 +596,23 @@ class MonthDetailPage extends StatelessWidget {
     );
   }
 
-  
-
-  // สร้างแท่งกราฟแบบกำหนดความสูง (Fixed Height)
   Widget _buildFixedBar({required double height, required String label, required Color color}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Container(
-          width: 59, // ความกว้าง 59 ตามสเปค
-          height: height, // ความสูงตามที่กำหนด (160, 86)
+          width: 59,
+          height: height,
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        const SizedBox(height: 12), // ระยะห่างแท่งกับตัวหนังสือ
+        const SizedBox(height: 12),
         Text(
           label,
           style: const TextStyle(
-            fontSize: 12, // เพิ่มขนาดตัวอักษรเล็กน้อยให้อ่านง่าย
+            fontSize: 12,
             fontWeight: FontWeight.bold,
             color: Colors.black87
           ),
@@ -715,10 +630,6 @@ class MonthDetailPage extends StatelessWidget {
       ],
     );
   }
-
-  // ---------------------------------------------------------------------------
-  // Helper Methods เดิม (คงไว้)
-  // ---------------------------------------------------------------------------
 
   Widget _buildPolaroidStack() {
     final mainItem = items.isNotEmpty ? items[0] : null;
@@ -762,6 +673,7 @@ class MonthDetailPage extends StatelessWidget {
               children: [
                 AspectRatio(
                   aspectRatio: 1.0, 
+                  // ✅ แสดงภาพด้วยฟังก์ชันที่รองรับ URL
                   child: mainItem != null
                       ? _buildImage(mainItem)
                       : Container(color: Colors.grey[200]),
@@ -816,7 +728,7 @@ class MonthDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFanItem(MediaItem item, {required int index}) {
+  Widget _buildFanItem(dynamic item, {required int index}) {
     const double cardWidth = 92.0;
     const double cardHeight = 80.0;
     List<double> rotations = [0.08, -0.1, 0.08, -0.1];
@@ -838,6 +750,7 @@ class MonthDetailPage extends StatelessWidget {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
+            // ✅ ใช้ฟังก์ชันแสดงภาพจาก URL
             child: _buildImage(item),
           ),
         ),
@@ -845,7 +758,7 @@ class MonthDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFullAlbumPreview() {
+  Widget _buildFullAlbumPreview(BuildContext context) {
     return FittedBox(
       fit: BoxFit.scaleDown,
       child: Container(
@@ -878,10 +791,9 @@ class MonthDetailPage extends StatelessWidget {
                     for (int i = 0; i < 5; i++)
                       if (i < items.length)
                         _StaticPhotoSlot(
-                          item: items[i] ,
+                          item: items[i],
                           monthName: monthName,
-                          )
-                        
+                        )
                       else
                         const SizedBox(),
                   ],
@@ -902,10 +814,10 @@ class MonthDetailPage extends StatelessWidget {
                       if ((i + 5) < items.length)
                         _StaticPhotoSlot(
                           item: items[i + 5],
-                          monthName: monthName, // ✅ 2. เติมตรงนี้ด้วย
+                          monthName: monthName,
                         )
                       else
-                      const SizedBox(),
+                        const SizedBox(),
                   ],
                 ),
               ),
@@ -939,69 +851,46 @@ class MonthDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildImage(MediaItem item) {
-    if (item.capturedImage != null) {
-      return Image.memory(item.capturedImage!, fit: BoxFit.cover);
-    } else {
-      return FutureBuilder<Uint8List?>(
-        future: item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            return Image.memory(snapshot.data!, fit: BoxFit.cover);
-          }
-          return Container(color: Colors.grey[200]);
-        },
-      );
-    }
+  // ✅ Helper method สำหรับแสดงรูปภาพจาก URL
+  Widget _buildImage(dynamic item) {
+    // ดึง URL (ปรับตาม structure จริงของคุณ)
+    // ตรงนี้ถ้า item.image เป็น String ให้ใช้เลย 
+    final String imageUrl = (item.image is String) ? item.image : "";
+
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      fit: BoxFit.cover,
+      placeholder: (context, url) => Container(color: Colors.grey[200]),
+      errorWidget: (context, url, error) => const Center(
+        child: Icon(Icons.broken_image, color: Colors.grey),
+      ),
+    );
   }
 }
 
-class _StaticPhotoSlot extends StatefulWidget {
-  final MediaItem item;
-  
-  // ✅ เพิ่มตัวแปร monthName เพื่อส่งต่อไปยังหน้าดูรูป
-  final String monthName; 
+// ✅ ปรับปรุง class นี้ให้รับ dynamic item และแสดง CachedNetworkImage
+class _StaticPhotoSlot extends StatelessWidget {
+  final dynamic item;
+  final String monthName;
 
   const _StaticPhotoSlot({
     required this.item,
-    required this.monthName, // ✅ รับค่าเข้ามา
+    required this.monthName,
   });
 
   @override
-  State<_StaticPhotoSlot> createState() => _StaticPhotoSlotState();
-}
-
-class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
-  Uint8List? _imageData;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadImage();
-  }
-
-  Future<void> _loadImage() async {
-    // ... (โค้ดโหลดรูปคงเดิม) ...
-    if (widget.item.capturedImage != null) {
-      if (mounted) setState(() => _imageData = widget.item.capturedImage);
-    } else {
-      final data = await widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300));
-      if (mounted) setState(() => _imageData = data);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // ✅ เพิ่ม GestureDetector เพื่อดักจับการกด
+    // ดึง URL
+    final String imageUrl = (item.image is String) ? item.image : "";
+
     return GestureDetector(
       onTap: () {
-        // นำทางไปยังหน้า AlbumPhotoViewPage ที่สร้างใหม่ในขั้นตอนที่ 1
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => AlbumPhotoViewPage(
-              item: widget.item,
-              monthName: widget.monthName,
+              item: item, // ต้องแก้ AlbumPhotoViewPage ให้รับ dynamic ด้วย
+              monthName: monthName,
             ),
           ),
         );
@@ -1013,15 +902,12 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
           borderRadius: BorderRadius.circular(6.0),
           child: Container(
             color: Colors.grey[200],
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                if (_imageData != null)
-                  Image.memory(_imageData!, fit: BoxFit.cover)
-                else
-                  Container(color: Colors.grey[200]),
-              ],
-            ),
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(color: Colors.grey[200]),
+              errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
+            )
           ),
         ),
       ),
