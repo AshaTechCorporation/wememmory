@@ -8,19 +8,21 @@ import 'package:wememmory/models/albumModel.dart';
 import 'package:wememmory/models/photo_item.dart';
 import 'package:wememmory/widgets/ApiExeption.dart';
 
+import '../../models/userModel.dart';
+
 class HomeService {
   const HomeService();
 
-  static Future<dynamic> getUserById({required int id}) async {
+  static Future<UserModel> getUserById({required int id}) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       var headers = {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'};
-      final url = Uri.https(publicUrl, '/api/member/$id');
+      final url = Uri.https(publicUrl, 'public/api/member/$id');
       final response = await http.get(headers: headers, url);
       if (response.statusCode == 200) {
         final data = convert.jsonDecode(response.body);
-        return data['data'];
+        return UserModel.fromJson(data['data']);
       } else if (response.statusCode == 500 || response.statusCode == 501 || response.statusCode == 502) {
         throw ApiException('ระบบขัดข้อง\nกรุณารอสักครู่แล้วลองใหม่อีกครั้ง');
       } else {

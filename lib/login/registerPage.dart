@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:wememmory/login/service/LoginService.dart';
 import 'package:wememmory/login/service/RegisterService.dart';
+import 'package:wememmory/models/albumModel.dart'; // ถ้าไม่ได้ใช้ ลบออกได้ครับ
 import 'package:wememmory/widgets/ApiExeption.dart';
 import 'package:wememmory/widgets/dialog.dart';
 import 'package:wememmory/widgets/LoadingDialog.dart';
@@ -14,36 +17,85 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  // Key สำหรับตรวจสอบ Form
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers สำหรับเก็บค่า
+  // Controllers
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
 
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-
-  // ตัวแปรสำหรับซ่อน/แสดง Password
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
+  // ตัวแปรสำหรับเก็บไฟล์รูปภาพ
+  File? _avatar;
+  final ImagePicker _picker = ImagePicker();
 
   static const Color _bgCream = Color(0xFFF4F6F8);
   static const Color _primaryOrange = Color(0xFFE18253);
   static const Color _textGrey = Color(0xFF7A7A7A);
   static const double _radius = 14;
 
+  List<PhotoModel> photos = [];
+  List<AlbumModel> albums = [];
+
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  // ฟังก์ชัน Helper สำหรับสร้าง TextField เพื่อลดโค้ดซ้ำ
+  // ✅ 1. แก้ไขฟังก์ชันนี้ให้รับค่า source (Camera/Gallery)
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: source, 
+        maxWidth: 800, 
+        maxHeight: 800,
+      );
+
+      if (pickedFile != null) {
+        setState(() {
+          _avatar = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      print("Error picking image: $e");
+    }
+  }
+
+  // ✅ 2. เพิ่มฟังก์ชันแสดงตัวเลือก (Bottom Sheet)
+  void _showImagePickerOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_camera, color: _primaryOrange),
+                title: const Text('ถ่ายรูป', style: TextStyle(fontFamily: 'Kanit')),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library, color: _primaryOrange),
+                title: const Text('เลือกจากอัลบั้ม', style: TextStyle(fontFamily: 'Kanit')),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -70,26 +122,14 @@ class _RegisterPageState extends State<RegisterPage> {
           prefixIcon: Icon(icon, color: _primaryOrange),
           suffixIcon: isPassword
               ? IconButton(
-                  icon: Icon(
-                    (obscureText ?? true) ? Icons.visibility_off : Icons.visibility,
-                    color: _textGrey,
-                  ),
-                  onPressed: onToggleVisibility,
-                )
+                  icon: Icon((obscureText ?? true) ? Icons.visibility_off : Icons.visibility, color: _textGrey),
+                  onPressed: onToggleVisibility)
               : null,
           contentPadding: const EdgeInsets.symmetric(vertical: 12),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.shade300),
-          ),
-          focusedBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: _primaryOrange, width: 2),
-          ),
-          errorBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.red),
-          ),
-          focusedErrorBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.red, width: 2),
-          ),
+          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade300)),
+          focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: _primaryOrange, width: 2)),
+          errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+          focusedErrorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.red, width: 2)),
         ),
       ),
     );
@@ -110,72 +150,79 @@ class _RegisterPageState extends State<RegisterPage> {
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
-              // --- ส่วน Banner ด้านบน (เหมือนเดิม) ---
               Stack(
                 children: [
-                  SizedBox(
-                    height: bannerHeight,
-                    width: double.infinity,
-                    child: Image.asset('assets/images/Hobby.png', fit: BoxFit.fill),
-                  ),
-                  Positioned(
-                    left: size.width * 0.18,
-                    top: insetTop + 12,
-                    child: Image.asset('assets/images/image2.png', height: 40, fit: BoxFit.contain),
-                  ),
+                  SizedBox(height: bannerHeight, width: double.infinity, child: Image.asset('assets/images/Hobby.png', fit: BoxFit.fill)),
+                  Positioned(left: size.width * 0.18, top: insetTop + 12, child: Image.asset('assets/images/image2.png', height: 40, fit: BoxFit.contain)),
                 ],
               ),
 
-              // --- ส่วน Card Input ---
               Transform.translate(
                 offset: const Offset(0, -58),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: cardSidePadding),
                   child: Container(
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 30), // ปรับ Padding ให้เหมาะกับ Form
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 30),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(_radius),
-                      boxShadow: const [
-                        BoxShadow(color: Color(0x1F000000), blurRadius: 16, offset: Offset(0, 8))
-                      ],
+                      boxShadow: const [BoxShadow(color: Color(0x1F000000), blurRadius: 16, offset: Offset(0, 8))],
                     ),
                     child: Form(
                       key: _formKey,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: const Icon(Icons.arrow_back, color: Colors.black),
+                          Align(alignment: Alignment.centerLeft, child: GestureDetector(onTap: () => Navigator.pop(context), child: const Icon(Icons.arrow_back, color: Colors.black))),
+                          const SizedBox(height: 10),
+
+                          // ✅ 3. แก้ไข UI เรียก _showImagePickerOptions
+                          Center(
+                            child: Stack(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => _showImagePickerOptions(context), // เรียกเมนูเลือก
+                                  child: Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.grey.shade200,
+                                      border: Border.all(color: _primaryOrange, width: 2),
+                                      image: _avatar != null ? DecorationImage(image: FileImage(_avatar!), fit: BoxFit.cover) : null,
+                                    ),
+                                    child: _avatar == null ? const Icon(Icons.person, size: 60, color: Colors.grey) : null,
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: GestureDetector(
+                                    onTap: () => _showImagePickerOptions(context), // เรียกเมนูเลือก
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: const BoxDecoration(color: _primaryOrange, shape: BoxShape.circle),
+                                      child: const Icon(Icons.camera_alt, color: Colors.white, size: 18),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            'สร้างบัญชีใหม่',
-                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22),
-                          ),
+                          const SizedBox(height: 10),
+
+                          const Text('สร้างบัญชีใหม่', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
                           const SizedBox(height: 8),
-                          const Text(
-                            'กรอกข้อมูลด้านล่างเพื่อเริ่มต้นใช้งาน',
-                            style: TextStyle(color: _textGrey, fontSize: 14),
-                          ),
+                          const Text('กรอกข้อมูลด้านล่างเพื่อเริ่มต้นใช้งาน', style: TextStyle(color: _textGrey, fontSize: 14)),
                           const SizedBox(height: 30),
 
-                          // --- Form Fields ---
-                          
-                          // 1. ชื่อผู้ใช้งาน
                           _buildTextField(
                             controller: _nameController,
                             label: 'ชื่อผู้ใช้งาน',
                             icon: Icons.person_outline,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) return 'กรุณากรอกชื่อผู้ใช้งาน';
-                              return null;
-                            },
+                            validator: (value) => (value == null || value.isEmpty) ? 'กรุณากรอกชื่อผู้ใช้งาน' : null,
                           ),
 
-                          // 2. เบอร์โทรศัพท์
                           _buildTextField(
                             controller: _phoneController,
                             label: 'เบอร์โทรศัพท์',
@@ -191,10 +238,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
                           const SizedBox(height: 10),
 
-                          // --- ปุ่ม Register ---
                           SizedBox(
                             width: double.infinity,
-                            height: 48, // ปรับให้สูงขึ้นนิดนึง
+                            height: 48,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: _primaryOrange,
@@ -203,59 +249,50 @@ class _RegisterPageState extends State<RegisterPage> {
                                 elevation: 0,
                               ),
                               onPressed: () async {
-                            try {
-                              LoadingDialog.open(context);
-                              final register = await Registerservice.register(fullname: _nameController.text,username: _phoneController.text, avatar: 'https://example.com/avatar.jpg', language: 'th');
-                              LoadingDialog.close(context);
-                              Navigator.pop(context, true);
-                              // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => OtpPage(phoneNumber: _phoneController.text)), (route) => false);
-                            } on ApiException catch (e) {
-                              if (!mounted) return;
-                              LoadingDialog.close(context);
-                              showDialog(
-                                context: context,
-                                builder:
-                                    (context) => DialogError(
-                                      title: '$e',
-                                      pressYes: () {
-                                        Navigator.pop(context, true);
-                                      },
-                                    ),
-                              );
-                            } on Exception catch (e) {
-                              if (!mounted) return;
-                              LoadingDialog.close(context);
-                              showDialog(
-                                context: context,
-                                builder:
-                                    (context) => DialogError(
-                                      title: '$e',
-                                      pressYes: () {
-                                        Navigator.pop(context, true);
-                                      },
-                                    ),
-                              );
-                            }
-                          },
+                                if (_formKey.currentState!.validate()) {
+                                  try {
+                                    String image = '';
+                                    LoadingDialog.open(context);
+
+                                    // Logic เดิมของคุณ: อัพโหลดรูปก่อนแล้วค่อย Register
+                                    if (_avatar != null) {
+                                      image = await LoginService.addImage(file: _avatar, path: 'images/asset/'); 
+                                    }
+                                    
+                                    final register = await Registerservice.register(
+                                      fullname: _nameController.text,
+                                      username: _phoneController.text,
+                                      avatar: image,
+                                      language: 'th',
+                                    );
+                                    
+                                    if (!mounted) return;
+                                    LoadingDialog.close(context);
+                                    Navigator.pop(context, true);
+                                  } on ApiException catch (e) {
+                                    if (!mounted) return;
+                                    LoadingDialog.close(context);
+                                    showDialog(context: context, builder: (context) => DialogError(title: '$e', pressYes: () => Navigator.pop(context, true)));
+                                  } catch (e) {
+                                    if (!mounted) return;
+                                    LoadingDialog.close(context);
+                                    showDialog(context: context, builder: (context) => DialogError(title: 'เกิดข้อผิดพลาด: $e', pressYes: () => Navigator.pop(context, true)));
+                                  }
+                                }
+                              },
                               child: const Text('สมัครสมาชิก', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                             ),
                           ),
-                          
+
                           const SizedBox(height: 16),
-                          
-                          // ลิงก์ไปหน้า Login กรณีมีบัญชีแล้ว
+
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text('มีบัญชีอยู่แล้ว? ', style: TextStyle(color: _textGrey, fontSize: 14)),
                               GestureDetector(
-                                onTap: () {
-                                  Navigator.pop(context); // หรือ Navigate ไปหน้า Login
-                                },
-                                child: const Text(
-                                  'เข้าสู่ระบบ',
-                                  style: TextStyle(color: _primaryOrange, fontWeight: FontWeight.bold, fontSize: 14),
-                                ),
+                                onTap: () => Navigator.pop(context),
+                                child: const Text('เข้าสู่ระบบ', style: TextStyle(color: _primaryOrange, fontWeight: FontWeight.bold, fontSize: 14)),
                               ),
                             ],
                           ),

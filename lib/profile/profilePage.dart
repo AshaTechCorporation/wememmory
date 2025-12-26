@@ -1,6 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wememmory/constants.dart';
+import 'package:wememmory/login/loginPage.dart';
 import 'package:wememmory/profile/albumDetailPage.dart';
 import 'package:wememmory/profile/historyPayment.dart';
 import 'package:wememmory/profile/membershipPackage.dart';
@@ -12,149 +18,311 @@ import 'package:wememmory/profile/languagePage.dart';
 import 'package:wememmory/shop/termsAndServicesPage.dart';
 import 'package:wememmory/profile/benefitsPage.dart';
 import 'package:wememmory/shop/faqPage.dart';
+import 'package:wememmory/widgets/dialog.dart';
 import 'widgets/index.dart';
+import 'package:wememmory/home/service/homeController.dart';
+import 'package:wememmory/home/widgets/AchievementLayout.dart';
+import 'package:wememmory/home/widgets/Recommended.dart';
+import 'package:wememmory/home/widgets/summary_strip.dart';
+import 'package:wememmory/models/user_model.dart'; // ✅ อย่าลืม import model
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 24),
-              const _HeaderSection(),
-              const SizedBox(height: 24),
-              const _TicketCard(),
-              const SizedBox(height: 12),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 16,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFDF1E6),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  '1 Ticket ต่อการพิมพ์รูป 1 ครั้ง (11 รูป)',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const _PointCard(),
-              const SizedBox(height: 16),
+  State<ProfilePage> createState() => _ProfilePageState();
+}
 
-              // =========================================================
-              // ✅ ส่วน Header: Logo + Beginner
-              // =========================================================
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
+class _ProfilePageState extends State<ProfilePage> {
+  @override
+  void initState() {
+    super.initState();
+    // ✅ สั่งโหลดข้อมูลเมื่อเข้าหน้านี้
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = context.read<HomeController>();
+      if (controller.user == null) {
+        _loadUserData();
+      }
+    });
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('userId');
+    if (userId != null && mounted) {
+      context.read<HomeController>().getuser(id: userId);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // ✅ ใช้ Consumer ดึงข้อมูล User
+    return Consumer<HomeController>(
+      builder: (context, controller, child) {
+        final user = controller.user;
+
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    'assets/images/wemorylogo.png',
-                    height: 80,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => const SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: Icon(Icons.image_not_supported, color: Colors.grey),
+                  const SizedBox(height: 24),
+
+                  // ✅ ส่ง user ไปให้ HeaderSection
+                  _HeaderSection(user: user),
+
+                  const SizedBox(height: 24),
+                  const _TicketCard(),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 16,
                     ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      'Beginner',
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFDF1E6),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      '1 Ticket ต่อการพิมพ์รูป 1 ครั้ง (11 รูป)',
                       style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFEE743B),
+                        fontSize: 12,
+                        color: Colors.black87,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
+                  const SizedBox(height: 20),
+                  const _PointCard(),
+                  const SizedBox(height: 16),
+
+                  // ส่วน Beginner
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Image.asset(
+                        'assets/images/wemorylogo.png',
+                        height: 80,
+                        fit: BoxFit.contain,
+                        errorBuilder:
+                            (context, error, stackTrace) => const SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: Icon(
+                                Icons.image_not_supported,
+                                color: Colors.grey,
+                              ),
+                            ),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 4),
+                        child: Text(
+                          'Beginner',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFEE743B),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+                  const _MetricBarChart(),
+                  const SizedBox(height: 24),
+                  const _MemorableStoryCard(),
+                  const SizedBox(height: 24),
+                  const _UsageStatsSection(),
+                  const SizedBox(height: 24),
+                  const _ProductStatusCard(),
+                  const SizedBox(height: 30),
+                  const Divider(),
+                  const SizedBox(height: 10),
+
+                  // เมนู
+                  MenuSection(
+                    items: const [
+                      'ส่วนลด',
+                      'ข้อมูลส่วนบุคคลและความปลอดภัย',
+                      'ที่อยู่ของฉัน',
+                      'ข้อมูลบัญชีธนาคาร/บัตรเครดิต',
+                      'ภาษา',
+                      'ข้อตกลงและเงื่อนไขในการใช้บริการ',
+                      'คำถามที่พบบ่อย',
+                      'ออกจากระบบ',
+                    ],
+                    onItemTap: (item, index) async {
+                      switch (index) {
+                        case 0:
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CouponPage(),
+                            ),
+                          );
+                          break;
+                        case 1:
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PersonalSecurityPage(),
+                            ),
+                          );
+                          break;
+                        case 2:
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddressSelectionPage(),
+                            ),
+                          );
+                          break;
+                        case 3:
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BankInfoPage(),
+                            ),
+                          );
+                          break;
+                        case 4:
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LanguageSelectionScreen(),
+                            ),
+                          );
+                          break;
+                        case 5:
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TermsAndServicesPage(),
+                            ),
+                          );
+                          break;
+                        case 6:
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => FAQPage()),
+                          );
+                          break;
+                        case 7:
+                          final out = await showDialog(
+                            context: context,
+                            builder:
+                                (context) => DialogYesNo(
+                                  title: 'แจ้งเตือน',
+                                  description: 'ต้องการออกจากระบบใช่ไหม',
+                                  pressYes: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  pressNo: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                ),
+                          );
+                          if (out == true) {
+                            clearToken();
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginPage(),
+                              ),
+                              (route) => false,
+                            );
+                          }
+                          break;
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 50),
                 ],
               ),
-
-              const SizedBox(height: 12),
-              
-              // 1. กราฟ
-              const _MetricBarChart(),
-
-              const SizedBox(height: 24),
-
-              // 2. การ์ดเรื่องราวที่น่าจดจำ (อยู่ใต้กราฟ)
-              const _MemorableStoryCard(),
-
-              const SizedBox(height: 24),
-
-              // 3. ส่วนสถิติ (Grid สีฟ้า)
-              const _UsageStatsSection(),
-
-              const SizedBox(height: 24),
-              
-              // 4. สินค้าของฉัน
-              const _ProductStatusCard(),
-
-              const SizedBox(height: 30),
-              const Divider(),
-              const SizedBox(height: 10),
-
-              // เมนู
-              MenuSection(
-                items: const [
-                  'ส่วนลด',
-                  'ข้อมูลส่วนบุคคลและความปลอดภัย',
-                  'ที่อยู่ของฉัน',
-                  'ข้อมูลบัญชีธนาคาร/บัตรเครดิต',
-                  'ภาษา',
-                  'ข้อตกลงและเงื่อนไขในการใช้บริการ',
-                  'คำถามที่พบบ่อย',
-                ],
-                onItemTap: (item, index) {
-                  switch (index) {
-                    case 0:
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => CouponPage()));
-                      break;
-                    case 1:
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => PersonalSecurityPage()));
-                      break;
-                    case 2:
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => AddressSelectionPage()));
-                      break;
-                    case 3:
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => BankInfoPage()));
-                      break;
-                    case 4:
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => LanguageSelectionScreen()));
-                      break;
-                    case 5:
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => TermsAndServicesPage()));
-                      break;
-                    case 6:
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => FAQPage()));
-                      break;
-                  }
-                },
-              ),
-              const SizedBox(height: 50),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
+
+
+Future<void> clearToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance() ;
+    prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+  }
+  
+// =========================================================
+// ✅ ส่วน Header ที่แก้ไขตามโจทย์
+// =========================================================
+class _HeaderSection extends StatelessWidget {
+  final user; // รับ User เข้ามา
+  const _HeaderSection({this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    // 1. เช็ครูปโปรไฟล์ (ดึง Dynamic)
+    final hasAvatar = user?.avatar != null && user!.avatar!.isNotEmpty;
+
+    // 2. เช็คชื่อ (ดึง Dynamic)
+    final displayName = user?.fullName ?? 'Guest';
+
+    return Column(
+      children: [
+        // --- ส่วนรูปโปรไฟล์ ---
+        Container(
+          width: 125,
+          height: 125,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white24, // ใส่สีรองพื้นเผื่อรูปโหลดไม่ทัน
+            image: DecorationImage(
+              image:
+                  user?.avatar != null
+                      ? NetworkImage('$baseUrl/public/${user?.avatar!}')
+                      : AssetImage('assets/images/userpic.png'),
+              fit: BoxFit.cover,
+              onError:
+                  (exception, stackTrace) =>
+                      Icon(Icons.image_not_supported, size: 50),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        // ✅ ชื่อแสดงตาม Server
+        Text(
+          displayName,
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w800,
+            fontSize: 22,
+          ),
+        ),
+        const SizedBox(height: 4),
+        // ✅ รหัสผู้แนะนำ (ใช้ค่าเดิม ไม่ดึงจาก Server)
+        const Text(
+          'รหัสผู้แนะนำ 1234',
+          style: TextStyle(
+            color: Color(0xFF5A5A5A),
+            fontWeight: FontWeight.w400,
+            fontSize: 16,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ... Widget อื่นๆ ด้านล่างเหมือนเดิมครับ (ผม Copy ของเดิมมาให้ครบถ้วน) ...
 
 class _MemorableStoryCard extends StatelessWidget {
   const _MemorableStoryCard();
@@ -175,7 +343,9 @@ class _MemorableStoryCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(4),
-                boxShadow: [const BoxShadow(color: Colors.black12, blurRadius: 4)],
+                boxShadow: [
+                  const BoxShadow(color: Colors.black12, blurRadius: 4),
+                ],
                 border: Border.all(color: Colors.white, width: 3),
               ),
             ),
@@ -189,7 +359,9 @@ class _MemorableStoryCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(4),
-                boxShadow: [const BoxShadow(color: Colors.black12, blurRadius: 4)],
+                boxShadow: [
+                  const BoxShadow(color: Colors.black12, blurRadius: 4),
+                ],
                 border: Border.all(color: Colors.white, width: 3),
               ),
             ),
@@ -217,7 +389,8 @@ class _MemorableStoryCard extends StatelessWidget {
                     child: Image.asset(
                       'assets/images/exProfile.png',
                       fit: BoxFit.cover,
-                      errorBuilder: (c, o, s) => Container(color: Colors.grey[200]),
+                      errorBuilder:
+                          (c, o, s) => Container(color: Colors.grey[200]),
                     ),
                   ),
                 ),
@@ -353,40 +526,6 @@ class _ProductStatusCard extends StatelessWidget {
   }
 }
 
-class _HeaderSection extends StatelessWidget {
-  const _HeaderSection();
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 50,
-          backgroundImage: const AssetImage('assets/images/userpic.png'),
-          backgroundColor: Colors.grey.shade200,
-        ),
-        const SizedBox(height: 12),
-        const Text(
-          'korakrit',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w800,
-            fontSize: 22,
-          ),
-        ),
-        const SizedBox(height: 4),
-        const Text(
-          'รหัสผู้แนะนำ 1234',
-          style: TextStyle(
-            color: Color(0xFF5A5A5A),
-            fontWeight: FontWeight.w400,
-            fontSize: 16,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _TicketCard extends StatelessWidget {
   const _TicketCard();
   @override
@@ -430,11 +569,12 @@ class _TicketCard extends StatelessWidget {
             children: [
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const MembershipPackagePage(),
-                    ),
-                  ),
+                  onPressed:
+                      () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const MembershipPackagePage(),
+                        ),
+                      ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE86A3E),
                     foregroundColor: Colors.white,
@@ -466,9 +606,10 @@ class _TicketCard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const MembershipHistoryPage(
-                          type: HistoryType.subscription,
-                        ),
+                        builder:
+                            (context) => const MembershipHistoryPage(
+                              type: HistoryType.subscription,
+                            ),
                       ),
                     );
                   },
@@ -582,9 +723,10 @@ class _PointCard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const MembershipHistoryPage(
-                          type: HistoryType.point,
-                        ),
+                        builder:
+                            (context) => const MembershipHistoryPage(
+                              type: HistoryType.point,
+                            ),
                       ),
                     );
                   },
