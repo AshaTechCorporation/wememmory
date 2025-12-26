@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wememmory/shop/paymentPage.dart';
+
 
 // ==============================================================================
 // 0. ENUM & CONFIG: กำหนดสถานะออเดอร์
@@ -61,7 +63,9 @@ class AlbumHistoryPage extends StatelessWidget {
             barCount: 1,
             mainColor: kOrangeColor,
             icon: const Icon(Icons.access_time_filled, color: Colors.white, size: 18), // นาฬิกา
-            onTap: () => _goToDetail(context, OrderStatus.waitingPayment),
+            onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const PaymentPage()),
+              )
           ),
 
           // 2. เตรียมจัดส่ง (Preparing)
@@ -70,7 +74,7 @@ class AlbumHistoryPage extends StatelessWidget {
             statusText: 'เตรียมจัดส่ง',
             barCount: 2,
             mainColor: kOrangeColor,
-            icon: Image.asset('assets/icons/cube.png', width: 18, color: Colors.white, errorBuilder: (c,e,s)=>const Icon(Icons.inventory_2, color: Colors.white, size: 18)), // กล่อง
+            icon: Image.asset('assets/icons/box-time.png', width: 18, color: Colors.white, errorBuilder: (c,e,s)=>const Icon(Icons.inventory_2, color: Colors.white, size: 18)), // กล่อง
             onTap: () => _goToDetail(context, OrderStatus.preparing),
           ),
 
@@ -133,7 +137,7 @@ class AlbumHistoryPage extends StatelessWidget {
             barCount: 2,
             isGift: true, // โชว์ Tag ของขวัญ
             mainColor: kOrangeColor,
-            icon: Image.asset('assets/icons/cube.png', width: 18, color: Colors.white, errorBuilder: (c,e,s)=>const Icon(Icons.print, color: Colors.white, size: 18)),
+            icon: Image.asset('assets/icons/box-time.png', width: 18, color: Colors.white, errorBuilder: (c,e,s)=>const Icon(Icons.print, color: Colors.white, size: 18)),
             onTap: () => _goToDetail(context, OrderStatus.printing),
           ),
 
@@ -165,7 +169,7 @@ class AlbumHistoryPage extends StatelessWidget {
             barCount: 4,
             mainColor: kPeachColor,
             overrideIconBgColor: kPeachIconColor,
-            icon: const Icon(Icons.cached, color: Colors.white, size: 18),
+            icon: Image.asset('assets/icons/cube.png', width: 18, color: Colors.white, errorBuilder: (c,e,s)=>const Icon(Icons.print, color: Colors.white, size: 18)),
             onTap: () => _goToDetail(context, OrderStatus.returned),
           ),
 

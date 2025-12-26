@@ -124,7 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Text(
                           'Beginner',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFFEE743B),
                           ),
@@ -706,7 +706,7 @@ class _PointCard extends StatelessWidget {
                     elevation: 0,
                   ),
                   icon: Image.asset(
-                    'assets/icons/wallet-3.png',
+                    'assets/icons/gift.png',
                     width: 25,
                     height: 25,
                     color: Colors.white,
@@ -945,7 +945,9 @@ class _UsageStatsSection extends StatelessWidget {
           children: [
             Expanded(
               child: _buildStatBlock(
-                icon: Icons.calendar_month,
+                icon: Image.asset(
+                    'assets/icons/calendar2.png',
+                  ),
                 title: 'เดือนที่ทำต่อเนื่อง',
                 value: '7',
                 isDigitalFont: true,
@@ -954,7 +956,9 @@ class _UsageStatsSection extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: _buildStatBlock(
-                icon: Icons.qr_code,
+                icon: Image.asset(
+                    'assets/icons/qricon.png',
+                  ),
                 title: 'จำนวนคนที่ใช้โค้ด',
                 value: '10',
                 isDigitalFont: true,
@@ -969,21 +973,23 @@ class _UsageStatsSection extends StatelessWidget {
           children: [
             Expanded(
               child: _buildStatBlock(
-                icon: Icons.share,
+                icon: Image.asset(
+                    'assets/icons/share2.png',
+                ),
                 title: 'แชร์อัลบั้มทั้งหมด',
                 value: '20',
                 isDigitalFont: true,
-                iconSize: 24, // ลดขนาดไอคอน
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: _buildStatBlock(
-                icon: Icons.speed,
+                icon: Image.asset(
+                    'assets/icons/Timer.png',
+                ),
                 title: 'เวลาเลือกรูป(นาที)',
                 value: '300.45',
                 isDigitalFont: true,
-                valueFontSize: 24, // ลดขนาดฟอนต์ของเลขยาวๆ
               ),
             ),
           ],
@@ -1039,7 +1045,9 @@ class _UsageStatsSection extends StatelessWidget {
           children: [
             Expanded(
               child: _buildStatBlock(
-                icon: Icons.calendar_today,
+                icon: Image.asset(
+                    'assets/icons/carendar.png',
+                  ),
                 title: 'เดือนที่ทำทั้งหมด',
                 value: '8',
                 isDigitalFont: true,
@@ -1048,7 +1056,9 @@ class _UsageStatsSection extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: _buildStatBlock(
-                icon: Icons.image,
+                icon: Image.asset(
+                    'assets/icons/picture.png',
+                ),
                 title: 'วันที่สร้างมากที่สุด',
                 value: 'อาทิตย์',
                 isDigitalFont: false,
@@ -1061,17 +1071,33 @@ class _UsageStatsSection extends StatelessWidget {
     );
   }
 
-  // ✅ แก้ไข Widget ย่อยเพื่อป้องกัน Overflow
-  Widget _buildStatBlock({
-    required IconData icon,
+ Widget _buildStatBlock({
+    required dynamic icon, // 1. เปลี่ยนจาก IconData เป็น dynamic
     required String title,
     required String value,
     bool isDigitalFont = false,
-    double iconSize = 28, // ปรับ Default ลง
-    double valueFontSize = 32, // ปรับ Default ลง
+    double iconSize = 40,
+    double valueFontSize = 32,
   }) {
+    
+    // 2. สร้างตัวแปรมารองรับ Logic การแสดงผล
+    Widget iconWidget;
+    if (icon is IconData) {
+      // กรณีส่งมาเป็น Icons.abc (แบบเดิม) ให้สร้าง Icon ปกติ
+      iconWidget = Icon(icon, color: Colors.white, size: iconSize);
+    } else if (icon is Widget) {
+      // กรณีส่งมาเป็น Image.asset (แบบใหม่) ให้ใช้รูปนั้นเลย
+      iconWidget = SizedBox(
+        width: iconSize, 
+        height: iconSize, 
+        child: icon
+      );
+    } else {
+      iconWidget = const SizedBox();
+    }
+
     return Container(
-      height: 100, // Fixed height
+      height: 100, 
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: const Color(0xFF58A3B6),
@@ -1079,14 +1105,13 @@ class _UsageStatsSection extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white, size: iconSize),
+          iconWidget, // 3. นำ Widget ที่เช็คแล้วมาแสดงผลตรงนี้
           const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Title (ให้ย่อขนาดถ้ายาวเกิน)
                 Text(
                   title,
                   style: const TextStyle(color: Colors.white70, fontSize: 11),
@@ -1095,7 +1120,6 @@ class _UsageStatsSection extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                // Value (ใช้ FittedBox ให้ตัวเลข/ตัวหนังสือย่อลงอัตโนมัติ ไม่ล้น)
                 Flexible(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
