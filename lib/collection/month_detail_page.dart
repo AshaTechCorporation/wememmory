@@ -878,16 +878,17 @@ class _StaticPhotoSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ดึง URL
+    // ดึง URL รูป (สมมติว่าเป็น field 'image' ที่เป็น String)
     final String imageUrl = (item.image is String) ? item.image : "";
 
     return GestureDetector(
       onTap: () {
+        // ✅ กดแล้วไปหน้า AlbumPhotoViewPage พร้อมส่ง item ไป
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => AlbumPhotoViewPage(
-              item: item, // ต้องแก้ AlbumPhotoViewPage ให้รับ dynamic ด้วย
+              item: item, // ส่ง dynamic item (PhotoModel)
               monthName: monthName,
             ),
           ),
@@ -903,6 +904,7 @@ class _StaticPhotoSlot extends StatelessWidget {
             child: CachedNetworkImage(
               imageUrl: imageUrl,
               fit: BoxFit.cover,
+              // ใช้ Placeholder เล็กๆ เพื่อ performance
               placeholder: (context, url) => Container(color: Colors.grey[200]),
               errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
             )

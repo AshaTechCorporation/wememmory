@@ -1,11 +1,52 @@
-import 'dart:typed_data';
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/Album/createAlbumModal.dart';
 import 'package:wememmory/Album/upload_photo_page.dart';
 import 'package:wememmory/models/media_item.dart';
 
+// --- ENUM & MODEL CLASS ---
+
+enum CardType { standard, ticket, backgroundImage }
+
+class MemoryCardData {
+  final CardType type;
+  final String topTitle;
+  final String mainTitle;
+  final String subTitle;
+  final String footerText;
+  final List<Color> gradientColors;
+  final Color accentColor;
+  final Color? backgroundColor;
+  final List<MediaItem>? imageItems;
+  final List<String>? assetImages;
+  final String? backgroundImage;
+  final MediaItem? backgroundMediaItem;
+  final bool showTextOverlay;
+  final int currentProgress;
+  final int maxProgress;
+
+  MemoryCardData({
+    this.type = CardType.standard,
+    required this.topTitle,
+    required this.mainTitle,
+    required this.subTitle,
+    required this.footerText,
+    required this.gradientColors,
+    required this.accentColor,
+    this.backgroundColor,
+    this.imageItems,
+    this.assetImages,
+    this.backgroundImage,
+    this.backgroundMediaItem,
+    this.showTextOverlay = false,
+    this.currentProgress = 0,
+    this.maxProgress = 10,
+  });
+}
+
+// --- MAIN WIDGET ---
 
 class Recommended extends StatefulWidget {
   final List<MediaItem>? albumItems;
@@ -42,54 +83,42 @@ class _RecommendedState extends State<Recommended> {
   @override
   void didUpdateWidget(covariant Recommended oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // ตรวจสอบว่าข้อมูลเปลี่ยนไปหรือไม่ ถ้าเปลี่ยนให้คำนวณใหม่
     if (widget.albumItems != oldWidget.albumItems ||
         widget.albumMonth != oldWidget.albumMonth) {
       _initData();
     }
   }
 
-  // ✅ 1. Logic ใหม่: หาวันที่จาก 'uploadedAt' (วันที่อัปโหลด) + 7 วัน
   void _calculateTargetAndInitialString() {
-    // เช็คว่ามีรูปหรือไม่
     if (widget.albumItems != null && widget.albumItems!.isNotEmpty) {
-      
-      // ✅ แก้ไข: เปลี่ยนจาก item.asset.createDateTime เป็น item.uploadedAt
-      // (ต้องมั่นใจว่าแก้ไฟล์ MediaItem ตามขั้นตอนที่ 1 แล้ว)
+      // (สมมติว่า MediaItem มี uploadedAt)
       DateTime latestDate = widget.albumItems!
-          .map((item) => item.uploadedAt) // <--- ใช้เวลาอัปโหลด
-          .reduce((a, b) => a.isAfter(b) ? a : b); // หาเวลาที่ล่าสุดที่สุด
+          .map((item) => item.uploadedAt) 
+          .reduce((a, b) => a.isAfter(b) ? a : b); 
 
-      // กำหนดเป้าหมายคือ 7 วันหลังจากวันที่อัปโหลดล่าสุด
       _targetDate = latestDate.add(const Duration(days: 7));
-      
-      // คำนวณเวลาครั้งแรกทันที
       _updateTimeStringInternal();
     } else {
-      // กรณีไม่มีรูป: ไม่นับเวลา
       _targetDate = null;
-      _timeRemainingString = "7 วัน 00 ชม. 00 นาที 00 วิ"; 
+      _timeRemainingString = "7 วัน 00 ชม. 00 นาที 00 วิ";
     }
   }
 
   void _continueSelection() {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // จำเป็นต้องใส่เพื่อให้กำหนดความสูงได้
-      backgroundColor: Colors.transparent, // พื้นหลังใสเพื่อให้เห็นมุมโค้ง
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        // 🔹 กำหนดความสูงที่นี่ (0.9 คือ 90% ของหน้าจอ = ไม่เต็มจอ)
-        height: MediaQuery.of(context).size.height * 0.9, 
+        height: MediaQuery.of(context).size.height * 0.9,
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // มุมโค้งมนด้านบน
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        // 🔹 ClipRRect เพื่อให้เนื้อหาข้างในไม่ล้นมุมโค้ง
         child: ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           child: UploadPhotoPage(
-            // แก้คำว่า Unknown Month เป็นค่าว่าง หรือชื่อเดือนที่ถูกต้อง
-            selectedMonth: widget.albumMonth ?? "", 
+            selectedMonth: widget.albumMonth ?? "",
             initialSelectedItems: widget.albumItems,
           ),
         ),
@@ -97,11 +126,10 @@ class _RecommendedState extends State<Recommended> {
     );
   }
 
-  // ✅ 2. ฟังก์ชันคำนวณเวลา (คงเดิม)
   void _updateTimeStringInternal() {
     if (_targetDate == null) {
-       _timeRemainingString = "7 วัน 00 ชม. 00 นาที 00 วิ";
-       return;
+      _timeRemainingString = "7 วัน 00 ชม. 00 นาที 00 วิ";
+      return;
     }
 
     final now = DateTime.now();
@@ -118,13 +146,11 @@ class _RecommendedState extends State<Recommended> {
     }
   }
 
-  // ✅ 3. Timer Loop (คงเดิม)
   void _onTimerTick() {
     if (_targetDate == null) return;
 
-    _updateTimeStringInternal(); // คำนวณค่าใหม่
+    _updateTimeStringInternal();
     
-    // อัปเดต UI เฉพาะส่วน Card 2
     if (mounted && _items.length > 1) {
       setState(() {
          if (_items[1].type == CardType.ticket) {
@@ -137,7 +163,6 @@ class _RecommendedState extends State<Recommended> {
   void _updateCardTwoTitle() {
     try {
       final oldCard = _items[1];
-      // เช็คว่าค่า String เปลี่ยนไปจริงไหมค่อยสร้าง Object ใหม่ (Performance Optimization)
       if (oldCard.mainTitle != _timeRemainingString) {
         _items[1] = MemoryCardData(
           type: oldCard.type,
@@ -157,19 +182,16 @@ class _RecommendedState extends State<Recommended> {
     }
   }
 
-  
-
   void _initData() {
-    // STEP 1: คำนวณเวลาก่อน
     _calculateTargetAndInitialString();
     
     String displayMonth = widget.albumMonth ?? 'พฤษภาคม';
     int currentCount = widget.albumItems?.length ?? 0;
     int targetCount = 11;
 
-    // STEP 2: สร้าง List ข้อมูลการ์ด
+    // STEP 2: สร้าง List ข้อมูลการ์ด 12 ใบ
     _items = [
-      // Card 1: Standard
+      // Card 1: Standard (ยังไม่เริ่ม)
       MemoryCardData(
         type: CardType.standard,
         topTitle: '$displayMonth\nของฉัน',
@@ -185,11 +207,11 @@ class _RecommendedState extends State<Recommended> {
         ],
       ),
 
-      // Card 2: Ticket Layout (ตัวที่แสดงเวลานับถอยหลัง)
+      // Card 2: Ticket (กำลังทำ)
       MemoryCardData(
         type: CardType.ticket,
         topTitle: '$displayMonth\nของฉัน',
-        mainTitle: _timeRemainingString, // ใช้ค่าที่คำนวณแล้ว
+        mainTitle: _timeRemainingString, 
         subTitle: 'เหลือเวลาเก็บความทรงจำอีก 7 วัน',
         footerText: 'Ticket 10',
         currentProgress: currentCount,
@@ -199,11 +221,121 @@ class _RecommendedState extends State<Recommended> {
         backgroundColor: const Color(0xFF111111),
       ),
 
-      // Card 3: Background Image
+      // Card 3: เมษายน (แบบมีรูปพื้นหลัง - เสร็จแล้ว)
       MemoryCardData(
         type: CardType.backgroundImage,
         topTitle: 'เมษายน',
         mainTitle: 'ความทรงจำที่\nน่าจดจำ',
+        subTitle: '',
+        footerText: '',
+        gradientColors: [],
+        accentColor: Colors.transparent,
+        backgroundImage: 'assets/images/Hobby1.png',
+        showTextOverlay: true,
+      ),
+
+      // Card 4: มีนาคม (แบบมีรูปพื้นหลัง)
+      MemoryCardData(
+        type: CardType.backgroundImage,
+        topTitle: 'มีนาคม',
+        mainTitle: 'ช่วงเวลา\nแสนพิเศษ',
+        subTitle: '',
+        footerText: '',
+        gradientColors: [],
+        accentColor: Colors.transparent,
+        backgroundImage: 'assets/images/Hobby2.png',
+        showTextOverlay: true,
+      ),
+
+      // Card 5: กุมภาพันธ์ (แบบมีรูปพื้นหลัง)
+      MemoryCardData(
+        type: CardType.backgroundImage,
+        topTitle: 'กุมภาพันธ์',
+        mainTitle: 'เดือนแห่ง\nความรัก',
+        subTitle: '',
+        footerText: '',
+        gradientColors: [],
+        accentColor: Colors.transparent,
+        backgroundImage: 'assets/images/Hobby3.png',
+        showTextOverlay: true,
+      ),
+       // Card 6: มกราคม
+      MemoryCardData(
+        type: CardType.backgroundImage,
+        topTitle: 'มกราคม',
+        mainTitle: 'เริ่มต้น\nปีใหม่',
+        subTitle: '',
+        footerText: '',
+        gradientColors: [],
+        accentColor: Colors.transparent,
+        backgroundImage: 'assets/images/Hobby1.png',
+        showTextOverlay: true,
+      ),
+       // Card 7: ธันวาคม
+      MemoryCardData(
+        type: CardType.backgroundImage,
+        topTitle: 'ธันวาคม',
+        mainTitle: 'ส่งท้าย\nปีเก่า',
+        subTitle: '',
+        footerText: '',
+        gradientColors: [],
+        accentColor: Colors.transparent,
+        backgroundImage: 'assets/images/Hobby2.png',
+        showTextOverlay: true,
+      ),
+       // Card 8: พฤศจิกายน
+      MemoryCardData(
+        type: CardType.backgroundImage,
+        topTitle: 'พฤศจิกายน',
+        mainTitle: 'ลอยกระทง\nแสนสุข',
+        subTitle: '',
+        footerText: '',
+        gradientColors: [],
+        accentColor: Colors.transparent,
+        backgroundImage: 'assets/images/Hobby3.png',
+        showTextOverlay: true,
+      ),
+       // Card 9: ตุลาคม
+      MemoryCardData(
+        type: CardType.backgroundImage,
+        topTitle: 'ตุลาคม',
+        mainTitle: 'ปลายฝน\nต้นหนาว',
+        subTitle: '',
+        footerText: '',
+        gradientColors: [],
+        accentColor: Colors.transparent,
+        backgroundImage: 'assets/images/Hobby1.png',
+        showTextOverlay: true,
+      ),
+       // Card 10: กันยายน
+      MemoryCardData(
+        type: CardType.backgroundImage,
+        topTitle: 'กันยายน',
+        mainTitle: 'ความทรงจำ\nสีจาง',
+        subTitle: '',
+        footerText: '',
+        gradientColors: [],
+        accentColor: Colors.transparent,
+        backgroundImage: 'assets/images/Hobby2.png',
+        showTextOverlay: true,
+      ),
+       // Card 11: สิงหาคม
+      MemoryCardData(
+        type: CardType.backgroundImage,
+        topTitle: 'สิงหาคม',
+        mainTitle: 'วันแม่\nแห่งชาติ',
+        subTitle: '',
+        footerText: '',
+        gradientColors: [],
+        accentColor: Colors.transparent,
+        backgroundImage: 'assets/images/Hobby3.png',
+        showTextOverlay: true,
+      ),
+       // Card 12: กรกฎาคม
+      MemoryCardData(
+        type: CardType.backgroundImage,
+        topTitle: 'กรกฎาคม',
+        mainTitle: 'กลางปี\nที่สดใส',
         subTitle: '',
         footerText: '',
         gradientColors: [],
@@ -259,7 +391,6 @@ class _RecommendedState extends State<Recommended> {
       }
     }
     
-    // STEP 3: เริ่ม Timer ถ้ายังไม่ได้เริ่ม
     if (_timer == null) {
        _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
          _onTimerTick();
@@ -269,8 +400,6 @@ class _RecommendedState extends State<Recommended> {
     if (mounted) setState(() {});
   }
 
-  // ... (ส่วนอื่นๆ ของ Class เหมือนเดิม) ...
-  
   void _nextCard() {
     if (_currentIndex < _items.length - 1) {
       setState(() => _currentIndex++);
@@ -313,7 +442,6 @@ class _RecommendedState extends State<Recommended> {
   }
 
   Widget _buildCardItem(int index, MemoryCardData item) {
-    // Copy โค้ดส่วนนี้จากอันเดิมได้เลยครับ ไม่มีการเปลี่ยนแปลง Logic
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = 330.0;
     final cardHeight = 330.0;
@@ -357,7 +485,6 @@ class _RecommendedState extends State<Recommended> {
       if (index == 0) {
         onTapButton = _openCreateAlbumModal;
       } else if (item.type == CardType.ticket) {
-        // ถ้าเป็นการ์ด Ticket (นับรูป) ให้เรียกฟังก์ชันไปเลือกรูปต่อ
         onTapButton = _continueSelection;
       }
     }
@@ -393,187 +520,9 @@ class _RecommendedState extends State<Recommended> {
   }
 }
 
-// ... (Classes ที่เหลือ MemoryCardData, TicketMemoryCard, MemoryCard, AsyncImageLoader, _PhotoStack เหมือนเดิม) ...
-enum CardType { standard, ticket, backgroundImage }
-
-class MemoryCardData {
-  final CardType type;
-  final String topTitle;
-  final String mainTitle;
-  final String subTitle;
-  final String footerText;
-  final List<Color> gradientColors;
-  final Color accentColor;
-  final Color? backgroundColor;
-  final List<MediaItem>? imageItems;
-  final List<String>? assetImages;
-  final String? backgroundImage;
-  final MediaItem? backgroundMediaItem;
-  final bool showTextOverlay;
-  final int currentProgress;
-  final int maxProgress;
-
-  MemoryCardData({
-    this.type = CardType.standard,
-    required this.topTitle,
-    required this.mainTitle,
-    required this.subTitle,
-    required this.footerText,
-    required this.gradientColors,
-    required this.accentColor,
-    this.backgroundColor,
-    this.imageItems,
-    this.assetImages,
-    this.backgroundImage,
-    this.backgroundMediaItem,
-    this.showTextOverlay = false,
-    this.currentProgress = 0,
-    this.maxProgress = 10,
-  });
-}
-
-// Card 2 นับเวลานับรูปภาพ
-class TicketMemoryCard extends StatelessWidget {
-  final MemoryCardData data;
-  final VoidCallback? onButtonTap;
-
-  const TicketMemoryCard({Key? key, required this.data, this.onButtonTap})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final double progressPercent = data.maxProgress > 0 
-        ? (data.currentProgress / data.maxProgress).clamp(0.0, 1.0) 
-        : 0.0;
-
-    return Container(
-      padding: const EdgeInsets.all(26),
-      decoration: BoxDecoration(
-        color: data.backgroundColor ?? const Color(0xFF111111),
-        borderRadius: BorderRadius.circular(0),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                data.topTitle,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 28, 
-                  fontWeight: FontWeight.bold,
-                  height: 1.1,
-                ),
-              ),
-              Text(
-                data.footerText,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            data.subTitle,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
-              fontSize: 12,
-            ),
-          ),
-          const Spacer(),
-          Center(
-            child: Text(
-              data.mainTitle,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 21, 
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                "ความคืบหน้า",
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-              Text(
-                "${data.currentProgress}/${data.maxProgress}",
-                style: const TextStyle(
-                  color: Colors.white, 
-                  fontSize: 14, 
-                  fontWeight: FontWeight.bold
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Container(
-            height: 31,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xFF333333),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Stack(
-              children: [
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Container(
-                      width: constraints.maxWidth * progressPercent, 
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF6797A9),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 35),
-          GestureDetector(
-            onTap: onButtonTap,
-            child: Container(
-              width: double.infinity,
-              height: 39,
-              decoration: BoxDecoration(
-                color: data.accentColor,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                "คัดสรรรูปภาพของคุณ",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+// ---------------------------------------------------------------------------
+// Widget แสดงผลการ์ด
+// ---------------------------------------------------------------------------
 
 class MemoryCard extends StatelessWidget {
   final MemoryCardData data;
@@ -775,6 +724,150 @@ class MemoryCard extends StatelessWidget {
   }
 }
 
+// Card 2 นับเวลานับรูปภาพ (คงเดิม)
+class TicketMemoryCard extends StatelessWidget {
+  final MemoryCardData data;
+  final VoidCallback? onButtonTap;
+
+  const TicketMemoryCard({Key? key, required this.data, this.onButtonTap})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final double progressPercent = data.maxProgress > 0 
+        ? (data.currentProgress / data.maxProgress).clamp(0.0, 1.0) 
+        : 0.0;
+
+    return Container(
+      padding: const EdgeInsets.all(26),
+      decoration: BoxDecoration(
+        color: data.backgroundColor ?? const Color(0xFF111111),
+        borderRadius: BorderRadius.circular(0),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                data.topTitle,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 28, 
+                  fontWeight: FontWeight.bold,
+                  height: 1.1,
+                ),
+              ),
+              Text(
+                data.footerText,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            data.subTitle,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 12,
+            ),
+          ),
+          const Spacer(),
+          Center(
+            child: Text(
+              data.mainTitle,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 21, 
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "ความคืบหน้า",
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+              Text(
+                "${data.currentProgress}/${data.maxProgress}",
+                style: const TextStyle(
+                  color: Colors.white, 
+                  fontSize: 14, 
+                  fontWeight: FontWeight.bold
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 31,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xFF333333),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Stack(
+              children: [
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Container(
+                      width: constraints.maxWidth * progressPercent, 
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF6797A9),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 35),
+          GestureDetector(
+            onTap: onButtonTap,
+            child: Container(
+              width: double.infinity,
+              height: 39,
+              decoration: BoxDecoration(
+                color: data.accentColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              alignment: Alignment.center,
+              child: const Text(
+                "คัดสรรรูปภาพของคุณ",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Widget สำหรับโหลดรูป (Local)
 class AsyncImageLoader extends StatefulWidget {
   final MediaItem item;
   final BoxFit fit;
@@ -835,6 +928,7 @@ class _AsyncImageLoaderState extends State<AsyncImageLoader> {
   }
 }
 
+// Widget แสดงรูปซ้อนกัน (Photo Stack)
 class _PhotoStack extends StatelessWidget {
   final List<MediaItem>? items;
   final List<String>? assetImages;
