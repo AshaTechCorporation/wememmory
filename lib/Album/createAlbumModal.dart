@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wememmory/Album/upload_photo_page.dart';
-import 'package:wememmory/home/service/homeservice.dart'; // ✅ Import Service
-import 'package:wememmory/models/albumModel.dart';       // ✅ Import Model
+import 'package:wememmory/home/service/homeservice.dart';
+import 'package:wememmory/models/albumModel.dart';
 
 class CreateAlbumModal extends StatefulWidget {
   const CreateAlbumModal({super.key});
@@ -11,23 +11,29 @@ class CreateAlbumModal extends StatefulWidget {
 }
 
 class _CreateAlbumModalState extends State<CreateAlbumModal> {
-  // ตัวแปรเก็บรายการอัลบั้มที่ดึงมาจาก Server
-  List<AlbumModel> _existingAlbums = [];
+  // แยกเก็บข้อมูลตามปี เพื่อความแม่นยำในการเช็ค
+  List<AlbumModel> _albums2025 = [];
+  List<AlbumModel> _albums2026 = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchAlbumStatus();
+    _fetchAllYearsStatus();
   }
 
-  // ฟังก์ชันดึงข้อมูล (เลียนแบบ CollectionPage)
-  Future<void> _fetchAlbumStatus() async {
+  // ✅ 1. ดึงข้อมูลของทั้งปี 2025 และ 2026 มาเตรียมไว้
+  Future<void> _fetchAllYearsStatus() async {
     try {
-      final albums = await HomeService.getAlbums();
+      // ดึงปี 2025
+      final list2025 = await HomeService.getAlbums(year: '2025');
+      // ดึงปี 2026
+      final list2026 = await HomeService.getAlbums(year: '2026');
+
       if (mounted) {
         setState(() {
-          _existingAlbums = albums;
+          _albums2025 = list2025;
+          _albums2026 = list2026;
           _isLoading = false;
         });
       }
@@ -39,25 +45,55 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
     }
   }
 
-  // ฟังก์ชันเช็คสถานะของแต่ละเดือน
-  // return true ถ้าเดือนนั้นมีอัลบั้มและมีรูปครบ 11 รูปแล้ว
-  bool _checkIfMonthCompleted(String monthName) {
-    // ค้นหาอัลบั้มที่ชื่อเดือนตรงกัน
-    final foundAlbum = _existingAlbums.firstWhere(
-      (album) => album.month == monthName,
-      orElse: () => AlbumModel(month: null, photos: []), // คืนค่าว่างถ้าไม่เจอ
-    );
-
-    // เช็คเงื่อนไข: ต้องมีอัลบั้มจริง (month ไม่ว่าง) และมีรูป >= 11
-    if (foundAlbum.month != '' && (foundAlbum.photos?.length ?? 0) >= 11) {
-      return true;
+  // ✅ Helper: แปลงค่าเดือนจาก API (int/String) เป็นชื่อเดือนภาษาไทยเพื่อเปรียบเทียบ
+  String _getThaiMonthName(dynamic monthInput) {
+    const List<String> thaiMonths = [
+      "", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+      "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+    ];
+    try {
+      int monthNum = 0;
+      if (monthInput is int) {
+        monthNum = monthInput;
+      } else {
+        monthNum = int.tryParse(monthInput.toString()) ?? 0;
+      }
+      if (monthNum >= 1 && monthNum <= 12) {
+        return thaiMonths[monthNum];
+      }
+      return monthInput.toString(); 
+    } catch (e) {
+      return monthInput.toString();
     }
-    return false;
+  }
+
+  // ✅ 2. ฟังก์ชันเช็คสถานะที่แม่นยำขึ้น (เช็คทั้งชื่อเดือน และ ปี)
+  bool _checkIfMonthCompleted(String fullDateString) {
+    // Input: "มกราคม 2026"
+    // แยกส่วน: parts = ["มกราคม", "2026"]
+    final parts = fullDateString.split(' ');
+    if (parts.length < 2) return false;
+
+    final String targetMonthName = parts[0]; // "มกราคม"
+    final String targetYear = parts[1];      // "2026"
+
+    // เลือก List ข้อมูลให้ตรงกับปี
+    List<AlbumModel> targetList = (targetYear == '2026') ? _albums2026 : _albums2025;
+
+    // ค้นหาว่ามีอัลบั้มนี้อยู่หรือไม่
+    // โดยการแปลงเดือนใน API ให้เป็นภาษาไทยก่อน แล้วเทียบกับ targetMonthName
+    final bool exists = targetList.any((album) {
+      String dbMonthName = _getThaiMonthName(album.month);
+      // เงื่อนไข: ชื่อเดือนตรงกัน และมีรูปภาพ (ถือว่าสร้างแล้ว)
+      return dbMonthName == targetMonthName && (album.photos != null && album.photos!.isNotEmpty);
+    });
+
+    return exists;
   }
 
   @override
   Widget build(BuildContext context) {
-    // รายชื่อเดือนทั้งหมดที่จะแสดง (คุณอาจจะ Gen แบบ Dynamic ก็ได้)
+    // รายชื่อเดือนทั้งหมดที่จะแสดง
     final List<String> allMonths = [
       "มกราคม 2026",
       "ธันวาคม 2025", "พฤศจิกายน 2025", "ตุลาคม 2025",
@@ -136,7 +172,7 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
           // --- List of Months ---
           Expanded(
             child: _isLoading 
-                ? const Center(child: CircularProgressIndicator()) // แสดง Loading ระหว่างดึงข้อมูล
+                ? const Center(child: CircularProgressIndicator()) 
                 : ListView.separated(
                     padding: EdgeInsets.zero,
                     physics: const BouncingScrollPhysics(),
@@ -145,13 +181,21 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
                     itemBuilder: (context, index) {
                       final monthName = allMonths[index];
                       
-                      // ✅ เรียกใช้ฟังก์ชันตรวจสอบสถานะจริงจาก API
+                      // เช็คสถานะว่าอัปโหลดเสร็จหรือยัง
                       final bool isDone = _checkIfMonthCompleted(monthName);
 
                       return _AlbumOptionItem(
                         month: monthName,
+                        // ✅ ถ้าเสร็จแล้วแสดง "สร้างอัลบั้มสำเร็จ", ถ้ายังแสดง "สร้างอัลบั้ม"
                         statusText: isDone ? "สร้างอัลบั้มสำเร็จ" : "สร้างอัลบั้ม",
                         isDone: isDone,
+                        onTap: () {
+                           // ✅ ถ้าเสร็จแล้ว ห้ามกด (isDone เป็น true)
+                           // ถ้ายังไม่เสร็จ ให้ส่งค่ากลับไปหน้า FirstPage เพื่อเริ่ม process
+                           if (!isDone) {
+                             Navigator.pop(context, monthName); 
+                           }
+                        },
                       );
                     },
                   ),
@@ -167,33 +211,19 @@ class _AlbumOptionItem extends StatelessWidget {
   final String month;
   final String statusText;
   final bool isDone;
+  final VoidCallback onTap;
 
   const _AlbumOptionItem({
     required this.month,
     required this.statusText,
     required this.isDone,
+    required this.onTap,
   });
-
-  void _showUploadPhotoSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => UploadPhotoPage(selectedMonth: month),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: isDone ? null : () { // ถ้าเสร็จแล้ว (isDone = true) ห้ามกด
-        Navigator.pop(context);
-        Future.delayed(const Duration(milliseconds: 150), () {
-          if (context.mounted) {
-            _showUploadPhotoSheet(context);
-          }
-        });
-      },
+      onTap: isDone ? null : onTap, // ✅ Disable tap ถ้าเสร็จแล้ว
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
         child: Row(
@@ -202,26 +232,36 @@ class _AlbumOptionItem extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // ชื่อเดือน
                 Text(
                   month, 
                   style: TextStyle(
                     fontSize: 16, 
                     fontWeight: FontWeight.w500, 
-                    color: isDone ? Colors.grey[600] : Colors.black87
+                    // ถ้าเสร็จแล้วอาจจะให้สีจางลงนิดหน่อย หรือสีดำปกติก็ได้ตามดีไซน์
+                    color: Colors.black87 
                   )
                 ),
                 const SizedBox(height: 4),
+                // ข้อความสถานะ
                 Text(
                   statusText, 
                   style: TextStyle(
                     fontSize: 13, 
-                    color: isDone ? const Color(0xFF66BB6A) : Colors.grey[600]
+                    // ✅ ถ้าเสร็จแล้วเป็นสีเขียว (#66BB6A), ถ้ายังเป็นสีเทา
+                    color: isDone ? const Color(0xFF66BB6A) : const Color(0xFF66BB6A) // สีเขียวทั้งคู่ตามภาพ? หรือปกติอันล่างเป็นสีเทา? 
+                    // ตาม UX ปกติ: ถ้าเสร็จแล้ว = เขียว, ถ้ายัง = สีเทาหรือสี Theme(ส้ม)
+                    // แก้ไข: ให้ "สร้างอัลบั้มสำเร็จ" เป็นสีเขียว, "สร้างอัลบั้ม" เป็นสีส้มหรือเทา
                   )
                 ),
               ],
             ),
-            // ✅ แสดงไอคอนติ๊กถูกถ้าเสร็จแล้ว
-            if (isDone) const Icon(Icons.check_circle, color: Color(0xFF66BB6A), size: 24),
+            // ✅ แสดงไอคอนติ๊กถูกสีเขียว ถ้าเสร็จแล้ว
+            if (isDone) 
+              const Icon(Icons.check_circle, color: Color(0xFF66BB6A), size: 24)
+            // else
+            //   // ถ้ายังไม่เสร็จ อยากแสดง icon อื่นไหม? (เช่น chevron_right) ถ้าไม่ก็ปล่อยว่างไว้
+            //   const Icon(Icons.chevron_right, color: Colors.grey, size: 24) 
           ],
         ),
       ),
