@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
     // ขออนุญาต (ถ้ายังไม่เคยขอ)
     await NotificationHelper.checkPermission();
 
-    // ตั้งเวลา
+    // ตั้งเวลา 
     await NotificationHelper.scheduleHourly();
   }
 

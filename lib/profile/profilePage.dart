@@ -280,8 +280,8 @@ class _HeaderSection extends StatelessWidget {
       children: [
         // --- ส่วนรูปโปรไฟล์ ---
         Container(
-          width: 125,
-          height: 125,
+          width: 110,
+          height: 110,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.white24, // ใส่สีรองพื้นเผื่อรูปโหลดไม่ทัน
