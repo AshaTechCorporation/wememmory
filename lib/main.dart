@@ -52,8 +52,8 @@ class _MyAppState extends State<MyApp> {
     // ขออนุญาต (ถ้ายังไม่เคยขอ)
     await NotificationHelper.checkPermission();
 
-    // ตั้งเวลา 8 โมงเช้า (ทำงานเบื้องหลัง)
-    await NotificationHelper.scheduleDaily10AM();
+    // ตั้งเวลา
+    await NotificationHelper.scheduleHourly();
   }
 
   @override
