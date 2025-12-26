@@ -10,10 +10,7 @@ class ShopPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      body: _ShopBody(),
-    );
+    return const Scaffold(backgroundColor: Colors.white, body: _ShopBody());
   }
 }
 
@@ -37,12 +34,12 @@ class _ShopBody extends StatelessWidget {
           elevation: 0,
           scrolledUnderElevation: 0, // ป้องกันสีเปลี่ยนเวลาเลื่อนผ่าน
           automaticallyImplyLeading: false,
-          
+
           // --- การตั้งค่าการเลื่อน ---
           floating: true,
           snap: true,
           pinned: false,
-          
+
           titleSpacing: 0,
           title: const Padding(
             padding: EdgeInsets.fromLTRB(16, 8, 8, 8),
@@ -58,9 +55,17 @@ class _ShopBody extends StatelessWidget {
           actions: [
             IconButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CartPage()),
+                );
               },
-              icon: const Icon(Icons.shopping_cart_outlined, color: Colors.black),
+              icon: Image.asset(
+                'assets/icons/trolley.png',
+                width: 25,
+                height: 25, 
+                fit: BoxFit.contain,
+              ),
             ),
             const SizedBox(width: 8),
           ],
@@ -97,7 +102,9 @@ class _ShopBody extends StatelessWidget {
 
         const SliverToBoxAdapter(child: _GiftCardBanner()),
         const SliverToBoxAdapter(child: SizedBox(height: 16)),
-        const SliverToBoxAdapter(child: _GiftCardBanner(type: GiftCardType.photoFrame)),
+        const SliverToBoxAdapter(
+          child: _GiftCardBanner(type: GiftCardType.photoFrame),
+        ),
         const SliverToBoxAdapter(child: SizedBox(height: 24)),
         const SliverToBoxAdapter(child: _SupportLinks()),
 
@@ -128,24 +135,23 @@ class _BannerCarouselState extends State<_BannerCarousel> {
     super.dispose();
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         const SizedBox(height: 20),
         AspectRatio(
-          aspectRatio: 200 / 70, 
+          aspectRatio: 200 / 70,
           child: PageView.builder(
             controller: _controller,
             itemCount: _banners.length,
             onPageChanged: (i) => setState(() => _idx = i),
-            itemBuilder: (_, i) => Image.asset(
-              _banners[i],
-              fit: BoxFit.cover, 
-              width: MediaQuery.of(context).size.width,
-            ),
+            itemBuilder:
+                (_, i) => Image.asset(
+                  _banners[i],
+                  fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width,
+                ),
           ),
         ),
         const SizedBox(height: 6),
@@ -158,9 +164,10 @@ class _BannerCarouselState extends State<_BannerCarousel> {
               height: 4,
               margin: const EdgeInsets.symmetric(horizontal: 3),
               decoration: BoxDecoration(
-                color: i == _idx
-                    ? const Color(0xFFFF8A3D)
-                    : const Color(0xFFFFC7A5),
+                color:
+                    i == _idx
+                        ? const Color(0xFFFF8A3D)
+                        : const Color(0xFFFFC7A5),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -190,8 +197,8 @@ class _SectionPadding extends StatelessWidget {
 
 class _PromoCard extends StatelessWidget {
   // 3.1 เพิ่มตัวแปรรับค่า
-  final String imagePath; 
-  
+  final String imagePath;
+
   // 3.2 แก้ Constructor ให้รับค่า required
   const _PromoCard({required this.imagePath});
 
@@ -269,7 +276,7 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
           const SizedBox(height: 4),
           const Text(
             'เลือกแพ็กเกจที่ใช่เพื่อเก็บช่วงเวลาให้มีความหมายยิ่งขึ้น',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 100, 100, 100)),
           ),
           const SizedBox(height: 16),
 
@@ -418,55 +425,61 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
                                                 ),
                                             ],
                                           ),
-                                          
+
                                           // แถวที่ 2: ราคาเดิม และ ป้ายประหยัด (วางคู่กัน)
-                                          if (originalPrice.isNotEmpty || monthPrice.isNotEmpty)
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                              top: 6,
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                // 1. ราคาเดิม (ขีดฆ่า) -> วางก่อน
-                                                if (originalPrice.isNotEmpty)
-                                                  Text(
-                                                    originalPrice,
-                                                    style: const TextStyle(
-                                                      color: Colors.white60,
-                                                      fontSize: 13,
-                                                      decoration:
-                                                          TextDecoration.lineThrough,
-                                                    ),
-                                                  ),
-                                                  
-                                                // เว้นระยะถ้ามีทั้งคู่
-                                                if (originalPrice.isNotEmpty && monthPrice.isNotEmpty)
-                                                  const SizedBox(width: 8),
-                                                  
-                                                // 2. ป้ายประหยัด / ราคาต่อเดือน -> วางทีหลัง
-                                                if (monthPrice.isNotEmpty)
-                                                  Container(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                          horizontal: 8,
-                                                          vertical: 4,
-                                                        ),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white24,
-                                                      borderRadius:
-                                                          BorderRadius.circular(6),
-                                                    ),
-                                                    child: Text(
-                                                      monthPrice,
+                                          if (originalPrice.isNotEmpty ||
+                                              monthPrice.isNotEmpty)
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 6,
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  // 1. ราคาเดิม (ขีดฆ่า) -> วางก่อน
+                                                  if (originalPrice.isNotEmpty)
+                                                    Text(
+                                                      originalPrice,
                                                       style: const TextStyle(
-                                                        fontSize: 11,
-                                                        color: Colors.white,
+                                                        color: Colors.white60,
+                                                        fontSize: 13,
+                                                        decoration:
+                                                            TextDecoration
+                                                                .lineThrough,
                                                       ),
                                                     ),
-                                                  ),
-                                              ],
+
+                                                  // เว้นระยะถ้ามีทั้งคู่
+                                                  if (originalPrice
+                                                          .isNotEmpty &&
+                                                      monthPrice.isNotEmpty)
+                                                    const SizedBox(width: 8),
+
+                                                  // 2. ป้ายประหยัด / ราคาต่อเดือน -> วางทีหลัง
+                                                  if (monthPrice.isNotEmpty)
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 8,
+                                                            vertical: 4,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white24,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              6,
+                                                            ),
+                                                      ),
+                                                      child: Text(
+                                                        monthPrice,
+                                                        style: const TextStyle(
+                                                          fontSize: 11,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
                                         ],
                                       ),
 
@@ -475,14 +488,13 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          // เอา originalPrice ออกจากตรงนี้
                                           Text(
                                             desc,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
                                               color: Colors.white,
-                                              fontSize: 13,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ],
@@ -567,6 +579,7 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
     );
   }
 }
+
 /* ========================= SPECIAL GIFT HEADER ======================== */
 class _SpecialGiftHeader extends StatelessWidget {
   const _SpecialGiftHeader();
@@ -589,7 +602,7 @@ class _SpecialGiftHeader extends StatelessWidget {
           SizedBox(height: 4),
           Text(
             'แทนใจด้วยของขวัญที่บันทึกเรื่องราวที่อยากเก็บไว้ร่วมกัน',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            style: TextStyle(fontSize: 15, color: Color.fromARGB(255, 100, 100, 100)),
           ),
         ],
       ),
@@ -619,13 +632,13 @@ class _GiftCardBanner extends StatelessWidget {
       // รูปซ้อน: Rectangle1 (หน้า), Rectangle3 (หลัง)
       imageSection = _buildStackedImageContainer(
         frontImage: 'assets/images/front1.png',
-        backImage: 'assets/images/back1.png', 
+        backImage: 'assets/images/back1.png',
       );
 
       // ข้อความอยู่ขวา -> ชิดขวา
       textAlignment = CrossAxisAlignment.end;
       textAlign = TextAlign.right;
-      
+
       textSection = _buildTextBlock(
         context,
         'เก็บช่วงเวลาที่รักไว้\nติดตัวไปทุกที่',
@@ -637,13 +650,13 @@ class _GiftCardBanner extends StatelessWidget {
       // รูปซ้อน: Rectangle4 (หน้า), Rectangle0 (หลัง - ใช้รูปที่มีในโปรเจกต์เดิม)
       imageSection = _buildStackedImageContainer(
         frontImage: 'assets/images/front2.png',
-        backImage: 'assets/images/back2.png', 
+        backImage: 'assets/images/back2.png',
       );
 
       // ข้อความอยู่ซ้าย -> ชิดซ้าย
       textAlignment = CrossAxisAlignment.start;
       textAlign = TextAlign.left;
-      
+
       textSection = _buildTextBlock(
         context,
         'ให้ภาพของคุณเล่าเรื่อง\nอีกครั้ง',
@@ -669,46 +682,50 @@ class _GiftCardBanner extends StatelessWidget {
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: type == GiftCardType.charm
-              // การ์ดบน: รูปซ้าย | ข้อความขวา
-              ? [
-                  imageSection,
-                  const SizedBox(width: 20),
-                  Expanded(child: textSection),
-                ]
-              // การ์ดล่าง: ข้อความซ้าย | รูปขวา
-              : [
-                  Expanded(child: textSection),
-                  const SizedBox(width: 20),
-                  imageSection,
-                ],
+          children:
+              type == GiftCardType.charm
+                  // การ์ดบน: รูปซ้าย | ข้อความขวา
+                  ? [
+                    imageSection,
+                    const SizedBox(width: 20),
+                    Expanded(child: textSection),
+                  ]
+                  // การ์ดล่าง: ข้อความซ้าย | รูปขวา
+                  : [
+                    Expanded(child: textSection),
+                    const SizedBox(width: 20),
+                    imageSection,
+                  ],
         ),
       ),
     );
   }
 
   // --- Widget สร้างรูปซ้อนกัน 2 ชั้น (ใช้สำหรับทั้ง 2 การ์ด) ---
-  Widget _buildStackedImageContainer({required String frontImage, required String backImage}) {
-  const double size = 160;
-  // ----- แก้ไขตรงนี้ครับ -----
-  // เปลี่ยนจาก 4 เป็นตัวเลขที่มากขึ้น เช่น 12, 16, 20 ยิ่งเยอะยิ่งมน
-  const double borderRadius = 16;
-  // ------------------------
+  Widget _buildStackedImageContainer({
+    required String frontImage,
+    required String backImage,
+  }) {
+    const double size = 160;
+    // ----- แก้ไขตรงนี้ครับ -----
+    // เปลี่ยนจาก 4 เป็นตัวเลขที่มากขึ้น เช่น 12, 16, 20 ยิ่งเยอะยิ่งมน
+    const double borderRadius = 16;
+    // ------------------------
 
-  return SizedBox(
-    width: size,
-    height: size,
-    child: Stack(
-      clipBehavior: Clip.none,
-      alignment: Alignment.center,
-      children: [
-        // 1. รูปด้านหลัง (เอียงซ้าย)
-        Transform.rotate(
-          angle: 0.1,
-          child: Container(
-            width: size * 1,
-            height: size * 0.9,
-            /*decoration: BoxDecoration(
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          // 1. รูปด้านหลัง (เอียงซ้าย)
+          Transform.rotate(
+            angle: 0.1,
+            child: Container(
+              width: size * 1,
+              height: size * 0.9,
+              /*decoration: BoxDecoration(
               color: Colors.white,
               // ตรงนี้จะใช้ค่า borderRadius ที่เรากำหนดด้านบน
               borderRadius: BorderRadius.circular(borderRadius),
@@ -716,21 +733,21 @@ class _GiftCardBanner extends StatelessWidget {
                 BoxShadow(color: Color(0x15000000), blurRadius: 6, offset: Offset(-4, 4)),
               ],
             ),*/
-            child: ClipRRect(
-              // ตรงนี้ก็ใช้ค่าเดียวกัน
-              borderRadius: BorderRadius.circular(borderRadius),
-              child: Image.asset(backImage, fit: BoxFit.cover),
+              child: ClipRRect(
+                // ตรงนี้ก็ใช้ค่าเดียวกัน
+                borderRadius: BorderRadius.circular(borderRadius),
+                child: Image.asset(backImage, fit: BoxFit.cover),
+              ),
             ),
           ),
-        ),
 
-        // 2. รูปด้านหน้า (เอียงขวานิดๆ)
-        Transform.rotate(
-          angle: -0.1,
-          child: Container(
-            width: size * 1,
-            height: size * 0.9,
-            /*decoration: BoxDecoration(
+          // 2. รูปด้านหน้า (เอียงขวานิดๆ)
+          Transform.rotate(
+            angle: -0.1,
+            child: Container(
+              width: size * 1,
+              height: size * 0.9,
+              /*decoration: BoxDecoration(
               color: Colors.white,
               // ตรงนี้ใช้ค่า borderRadius
               borderRadius: BorderRadius.circular(borderRadius),
@@ -739,22 +756,26 @@ class _GiftCardBanner extends StatelessWidget {
                 BoxShadow(color: Color(0x25000000), blurRadius: 10, offset: Offset(2, 6)),
               ],
             ),*/
-            child: ClipRRect(
-              // ตรงนี้มีการลบออก 1 เพื่อชดเชยขอบขาว (Border)
-              // ถ้า borderRadius = 16 ตรงนี้จะเป็น 15 ซึ่งถูกต้องแล้วครับ
-              borderRadius: BorderRadius.circular(borderRadius - 1),
-              child: Image.asset(frontImage, fit: BoxFit.cover),
+              child: ClipRRect(
+                // ตรงนี้มีการลบออก 1 เพื่อชดเชยขอบขาว (Border)
+                // ถ้า borderRadius = 16 ตรงนี้จะเป็น 15 ซึ่งถูกต้องแล้วครับ
+                borderRadius: BorderRadius.circular(borderRadius - 1),
+                child: Image.asset(frontImage, fit: BoxFit.cover),
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   // Widget ส่วนข้อความและปุ่ม
   Widget _buildTextBlock(
-      BuildContext context, String text, CrossAxisAlignment alignment, TextAlign textAlign) {
+    BuildContext context,
+    String text,
+    CrossAxisAlignment alignment,
+    TextAlign textAlign,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: alignment,
@@ -774,14 +795,16 @@ class _GiftCardBanner extends StatelessWidget {
           height: 42,
           child: ElevatedButton(
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AlbumGiftPage()));
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const AlbumGiftPage()));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF6BB0C5),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(5),
               ),
               elevation: 0,
             ),
