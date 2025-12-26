@@ -9,6 +9,7 @@ import 'package:wememmory/home/widgets/AchievementLayout.dart';
 import 'package:wememmory/home/widgets/Recommended.dart';
 import 'package:wememmory/home/widgets/summary_strip.dart';
 import 'package:wememmory/models/media_item.dart';
+import 'package:wememmory/home/notifyPage.dart';
 
 class HomePage extends StatefulWidget {
   final List<MediaItem>? newAlbumItems;
@@ -118,7 +119,9 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 actions: [
-                  Stack(alignment: Alignment.center, children: [IconButton(onPressed: () {}, icon: const Icon(Icons.notifications, color: Colors.white, size: 25))]),
+                  Stack(alignment: Alignment.center, children: [IconButton(onPressed: () {Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationPage(),));}, icon: const Icon(Icons.notifications, color: Colors.white, size: 25))]),
                   const SizedBox(width: 12),
                 ],
               ),
