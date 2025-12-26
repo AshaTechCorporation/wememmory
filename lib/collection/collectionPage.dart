@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -14,16 +16,22 @@ import 'package:wememmory/shop/chooseMediaItem.dart';
 import 'package:wememmory/widgets/ApiExeption.dart';
 import 'package:wememmory/widgets/dialog.dart';
 
-// หน้า สมุดภาพ
+// ✅ 1. เปลี่ยนชื่อ State Class เป็น Public (ลบ _ ออก)
 class CollectionPage extends StatefulWidget {
+  // รับ Key จาก FirstPage ได้ (FirstPage จะส่ง GlobalKey มาที่นี่)
   const CollectionPage({super.key});
 
   @override
-  State<CollectionPage> createState() => _CollectionPageState();
+  // เปลี่ยน _CollectionPageState เป็น CollectionPageState (ลบ _ ข้างหน้า)
+  State<CollectionPage> createState() => CollectionPageState(); 
 }
 
-class _CollectionPageState extends State<CollectionPage> {
+// ✅ 2. เปลี่ยนชื่อ Class นี้ด้วย (ลบ _ ออก)
+class CollectionPageState extends State<CollectionPage> {
   List<AlbumModel> albums = [];
+  
+  // ✅ ตัวแปรเก็บปีที่เลือก (เริ่มที่ปีปัจจุบัน)
+  String selectedYear = DateTime.now().year.toString();
 
   @override
   void initState() {
@@ -33,12 +41,14 @@ class _CollectionPageState extends State<CollectionPage> {
     });
   }
 
+  // ✅ ฟังก์ชันเรียก API โดยใช้ selectedYear
   getAlbums() async {
     try {
-      final album1 = await HomeService.getAlbums();
+      // เรียก Service โดยส่งปีที่เลือกไป
+      final albumData = await HomeService.getAlbums(year: selectedYear);
       if (mounted) {
         setState(() {
-          albums = album1;
+          albums = albumData;
         });
       }
     } on ClientException catch (e) {
@@ -47,10 +57,28 @@ class _CollectionPageState extends State<CollectionPage> {
     } on ApiException catch (e) {
       if (!mounted) return;
       _showErrorDialog('$e');
+    } on SocketException {
+       if (!mounted) return;
+      _showErrorDialog('ไม่สามารถเชื่อมต่ออินเทอร์เน็ตได้');
+    } on TimeoutException {
+       if (!mounted) return;
+      _showErrorDialog('คำขอหมดเวลา โปรดลองอีกครั้ง');
     } on Exception catch (e) {
       if (!mounted) return;
-      _showErrorDialog('$e');
+      _showErrorDialog('เกิดข้อผิดพลาด: $e');
     }
+  }
+
+  // ✅✅ 3. ฟังก์ชันสำคัญ: ให้ FirstPage เรียกใช้ผ่าน GlobalKey เพื่อเปลี่ยนปีและรีเฟรช
+  void updateYearAndRefresh(String year) {
+    // ถ้าปีเปลี่ยนให้เซ็ตค่าใหม่
+    if (selectedYear != year) {
+      setState(() {
+        selectedYear = year;
+      });
+    }
+    // สั่งโหลดข้อมูลใหม่ทันที (ไม่ว่าปีจะเปลี่ยนหรือไม่ เพื่อความชัวร์ว่าได้ข้อมูลล่าสุด)
+    getAlbums(); 
   }
 
   void _showErrorDialog(String message) {
@@ -104,14 +132,54 @@ class _CollectionPageState extends State<CollectionPage> {
                 child: Column(children: [
                   _SearchBar(),
                   const SizedBox(height: 24),
-                  const _TabSelector(),
+                  
+                  // ✅ แสดงปีที่เลือกใน TabSelector (ปรับแก้เล็กน้อยให้แสดงปีด้วย)
+                  Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2))
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            margin: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                                color: Colors.orange, borderRadius: BorderRadius.circular(8)),
+                            alignment: Alignment.center,
+                            // ✅ แสดงปีที่เลือกตรงนี้
+                            child: Text("ปี $selectedYear",
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16)),
+                          ),
+                        ),
+                        Expanded(
+                            child: Container(
+                                alignment: Alignment.center,
+                                child: Text("เดือน",
+                                    style: TextStyle(
+                                        color: Colors.grey.shade700, fontSize: 16)))),
+                      ],
+                    ),
+                  ),
+                  
                   const SizedBox(height: 20)
                 ])),
             Expanded(
               child: albums.isEmpty
-                  ? const Center(
-                      child: Text("ยังไม่มีคอลเลกชัน",
-                          style: TextStyle(color: Colors.grey)))
+                  ? Center(
+                      child: Text("ยังไม่มีคอลเลกชัน ปี $selectedYear",
+                          style: const TextStyle(color: Colors.grey)))
                   : ListView.builder(
                       padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
                       itemCount: albums.length,
@@ -119,23 +187,24 @@ class _CollectionPageState extends State<CollectionPage> {
                       itemBuilder: (context, index) {
                         final album = albums[index];
                         
-                        // ✅ แปลงค่าเดือนเป็นภาษาไทยเก็บไว้ในตัวแปร
                         final String thaiMonthName = _getThaiMonth(album.month);
+                        
+                        // ✅ แสดงชื่อเดือนคู่กับปีที่เลือก
+                        final String titleWithYear = "$thaiMonthName $selectedYear";
 
                         return Column(
                           children: [
-                            // ✅ ใช้ตัวแปรภาษาไทยที่แปลงแล้ว
                             _MonthSectionHeader(
-                                title: thaiMonthName, items: album),
+                                title: titleWithYear, items: album),
                             const SizedBox(height: 12),
                             GestureDetector(
-                              onTap: () {
-                                // Navigator.push(context, MaterialPageRoute(builder: (context) => MonthDetailPage(monthName: album.month, items: album.items)));
-                              },
-                              // ✅ ใช้ตัวแปรภาษาไทยที่แปลงแล้ว
+                              // onTap: () {
+                              //   // กดแล้วไปหน้ารายละเอียด ส่งชื่อพร้อมปีไปด้วย
+                              //   Navigator.push(context, MaterialPageRoute(builder: (context) => MonthDetailPage(monthName: titleWithYear, items: album.photos ?? [])));
+                              // },
                               child: _AlbumPreviewSection(
                                   items: album,
-                                  monthTitle: thaiMonthName),
+                                  monthTitle: titleWithYear), // แสดงที่หน้าปก
                             ),
                             const SizedBox(height: 30),
                           ],
@@ -149,6 +218,10 @@ class _CollectionPageState extends State<CollectionPage> {
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// Widget ส่วนประกอบย่อย (คงเดิม)
+// ---------------------------------------------------------------------------
 
 class _MonthSectionHeader extends StatelessWidget {
   final String title;
@@ -218,13 +291,15 @@ class _AlbumPreviewSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ป้องกัน null safety
+    final photos = items.photos ?? [];
+
     return Center(
       child: FittedBox(
         fit: BoxFit.scaleDown,
         child: Container(
           padding: const EdgeInsets.all(10),
           decoration: const BoxDecoration(color: Color(0xFF555555)),
-          // 🚀 Optimization: ลบ IntrinsicWidth ออก เพราะ Container ลูกมีขนาดตายตัวอยู่แล้ว (ช่วยลดการคำนวณ Layout)
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,13 +316,13 @@ class _AlbumPreviewSection extends StatelessWidget {
                     Container(
                         decoration: const BoxDecoration(color: Colors.white),
                         child: Center(
-                            child: Text(monthTitle,
+                            child: Text(monthTitle.split(' ')[0], // แสดงแค่ชื่อเดือนในกล่องเล็ก
                                 style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold)))),
                     for (int i = 0; i < 5; i++)
-                      if (i < items.photos!.length)
-                        _StaticPhotoSlot(item: items.photos![i].image!)
+                      if (i < photos.length)
+                        _StaticPhotoSlot(item: photos[i].image!)
                       else
                         const SizedBox(),
                   ],
@@ -264,8 +339,8 @@ class _AlbumPreviewSection extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     for (int i = 0; i < 6; i++)
-                      if ((i + 5) < items.photos!.length)
-                        _StaticPhotoSlot(item: items.photos![i + 5].image!)
+                      if ((i + 5) < photos.length)
+                        _StaticPhotoSlot(item: photos[i + 5].image!)
                       else
                         const SizedBox(),
                   ],
@@ -283,7 +358,6 @@ class _AlbumPreviewSection extends StatelessWidget {
   }
 }
 
-// ✅ ปรับจูนให้เร็วสุดๆ
 class _StaticPhotoSlot extends StatelessWidget {
   final String item;
   const _StaticPhotoSlot({super.key, required this.item});
@@ -300,21 +374,11 @@ class _StaticPhotoSlot extends StatelessWidget {
           child: CachedNetworkImage(
             imageUrl: item,
             fit: BoxFit.cover,
-            
-            // 🚀 เทคนิค 1: ลดขนาด Cache ทั้งใน RAM และ Disk
-            // ช่วยให้เปิดแอปครั้งถัดไปเร็วขึ้นมากๆ เพราะไฟล์ที่บันทึกไว้เล็กนิดเดียว
-            memCacheWidth: 250, 
-            maxWidthDiskCache: 250, 
-            
-            // 🚀 เทคนิค 2: ปิด Animation Fade-in
-            // ทำให้รูปรู้สึก "เด้ง" มาทันทีที่โหลดเสร็จ ไม่ต้องรอค่อยๆ ชัด
+            memCacheWidth: 250,
+            maxWidthDiskCache: 250,
             fadeInDuration: Duration.zero,
             fadeOutDuration: Duration.zero,
-
-            // 🚀 เทคนิค 3: Placeholder แบบธรรมดา (สีเทา)
-            // การไม่ใส่ Loading หมุนๆ ในรูปเล็กๆ ช่วยลดการใช้ CPU ได้ถ้ามีรูปเยอะมากๆ
             placeholder: (context, url) => const ColoredBox(color: Color(0xFFEEEEEE)),
-            
             errorWidget: (context, url, error) => const Center(
               child: Icon(Icons.image_not_supported, size: 20, color: Colors.grey),
             ),
@@ -349,50 +413,6 @@ class _SearchBar extends StatelessWidget {
                   border: InputBorder.none),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TabSelector extends StatelessWidget {
-  const _TabSelector();
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2))
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                  color: Colors.orange, borderRadius: BorderRadius.circular(8)),
-              alignment: Alignment.center,
-              child: const Text("ปี",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16)),
-            ),
-          ),
-          Expanded(
-              child: Container(
-                  alignment: Alignment.center,
-                  child: Text("เดือน",
-                      style: TextStyle(
-                          color: Colors.grey.shade700, fontSize: 16)))),
         ],
       ),
     );

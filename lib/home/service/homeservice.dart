@@ -41,11 +41,13 @@ class HomeService {
     }
   }
 
-  static Future<List<AlbumModel>> getAlbums() async {
+  static Future<List<AlbumModel>> getAlbums({String? year}) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final url = Uri.https(publicUrl, 'public/api/get_album_months', {"year": '2025'});
+      String queryYear = year ?? DateTime.now().year.toString();
+      // ✅ 3. ส่ง queryYear ไปที่ API
+      final url = Uri.https(publicUrl, 'public/api/get_album_months', {"year": queryYear});
       var headers = {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'};
       final response = await http.get(url, headers: headers).timeout(const Duration(minutes: 1));
 
