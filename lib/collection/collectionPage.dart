@@ -16,21 +16,17 @@ import 'package:wememmory/shop/chooseMediaItem.dart';
 import 'package:wememmory/widgets/ApiExeption.dart';
 import 'package:wememmory/widgets/dialog.dart';
 
-// ✅ 1. เปลี่ยนชื่อ State Class เป็น Public (ลบ _ ออก)
 class CollectionPage extends StatefulWidget {
-  // รับ Key จาก FirstPage ได้ (FirstPage จะส่ง GlobalKey มาที่นี่)
   const CollectionPage({super.key});
 
   @override
-  // เปลี่ยน _CollectionPageState เป็น CollectionPageState (ลบ _ ข้างหน้า)
   State<CollectionPage> createState() => CollectionPageState(); 
 }
 
-// ✅ 2. เปลี่ยนชื่อ Class นี้ด้วย (ลบ _ ออก)
 class CollectionPageState extends State<CollectionPage> {
   List<AlbumModel> albums = [];
   
-  // ✅ ตัวแปรเก็บปีที่เลือก (เริ่มที่ปีปัจจุบัน)
+  // เก็บเป็น ค.ศ. เพื่อส่ง API (เช่น "2025")
   String selectedYear = DateTime.now().year.toString();
 
   @override
@@ -41,10 +37,9 @@ class CollectionPageState extends State<CollectionPage> {
     });
   }
 
-  // ✅ ฟังก์ชันเรียก API โดยใช้ selectedYear
+  // ฟังก์ชันเรียก API (ส่ง ค.ศ. ไป)
   getAlbums() async {
     try {
-      // เรียก Service โดยส่งปีที่เลือกไป
       final albumData = await HomeService.getAlbums(year: selectedYear);
       if (mounted) {
         setState(() {
@@ -69,15 +64,12 @@ class CollectionPageState extends State<CollectionPage> {
     }
   }
 
-  // ✅✅ 3. ฟังก์ชันสำคัญ: ให้ FirstPage เรียกใช้ผ่าน GlobalKey เพื่อเปลี่ยนปีและรีเฟรช
   void updateYearAndRefresh(String year) {
-    // ถ้าปีเปลี่ยนให้เซ็ตค่าใหม่
     if (selectedYear != year) {
       setState(() {
         selectedYear = year;
       });
     }
-    // สั่งโหลดข้อมูลใหม่ทันที (ไม่ว่าปีจะเปลี่ยนหรือไม่ เพื่อความชัวร์ว่าได้ข้อมูลล่าสุด)
     getAlbums(); 
   }
 
@@ -93,35 +85,41 @@ class CollectionPageState extends State<CollectionPage> {
     );
   }
 
-  // เพิ่มฟังก์ชันแปลงเดือนเป็นภาษาไทย
   String _getThaiMonth(dynamic monthInput) {
-    // รายชื่อเดือนภาษาไทย (index 0 เว้นว่างไว้ เพื่อให้ index 1 ตรงกับมกราคม)
     const List<String> thaiMonths = [
       "", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
       "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
     ];
-
     try {
       int monthNum;
-      // แปลง input ให้เป็นตัวเลข (ไม่ว่าจะมาเป็น int หรือ String)
       if (monthInput is int) {
         monthNum = monthInput;
       } else {
         monthNum = int.tryParse(monthInput.toString()) ?? 0;
       }
-
-      // เช็คว่าตัวเลขอยู่ในช่วง 1-12 หรือไม่
       if (monthNum >= 1 && monthNum <= 12) {
         return thaiMonths[monthNum];
       }
-      return monthInput.toString(); // ถ้าไม่ใช่ 1-12 ให้คืนค่าเดิมกลับไป
+      return monthInput.toString(); 
     } catch (e) {
       return monthInput.toString();
     }
   }
 
+  // ✅ Helper Function: แปลง ค.ศ. -> พ.ศ.
+  String _convertToBuddhistYear(String yearAD) {
+    int? year = int.tryParse(yearAD);
+    if (year != null) {
+      return (year + 543).toString();
+    }
+    return yearAD;
+  }
+
   @override
   Widget build(BuildContext context) {
+    // ✅ แปลงปีที่เลือกเป็น พ.ศ. เพื่อแสดงผล
+    String displayYearBE = _convertToBuddhistYear(selectedYear);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -133,52 +131,15 @@ class CollectionPageState extends State<CollectionPage> {
                   _SearchBar(),
                   const SizedBox(height: 24),
                   
-                  // ✅ แสดงปีที่เลือกใน TabSelector (ปรับแก้เล็กน้อยให้แสดงปีด้วย)
-                  Container(
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2))
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            margin: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                                color: Colors.orange, borderRadius: BorderRadius.circular(8)),
-                            alignment: Alignment.center,
-                            // ✅ แสดงปีที่เลือกตรงนี้
-                            child: Text("ปี $selectedYear",
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16)),
-                          ),
-                        ),
-                        Expanded(
-                            child: Container(
-                                alignment: Alignment.center,
-                                child: Text("เดือน",
-                                    style: TextStyle(
-                                        color: Colors.grey.shade700, fontSize: 16)))),
-                      ],
-                    ),
-                  ),
+                  // ✅ ส่งปี พ.ศ. ไปแสดงในปุ่ม
+                  _DynamicTabSelector(year: displayYearBE), 
                   
                   const SizedBox(height: 20)
                 ])),
             Expanded(
               child: albums.isEmpty
                   ? Center(
-                      child: Text("ยังไม่มีคอลเลกชัน ปี $selectedYear",
+                      child: Text("ยังไม่มีคอลเลกชัน ปี $displayYearBE", // แสดง พ.ศ.
                           style: const TextStyle(color: Colors.grey)))
                   : ListView.builder(
                       padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
@@ -189,8 +150,8 @@ class CollectionPageState extends State<CollectionPage> {
                         
                         final String thaiMonthName = _getThaiMonth(album.month);
                         
-                        // ✅ แสดงชื่อเดือนคู่กับปีที่เลือก
-                        final String titleWithYear = "$thaiMonthName $selectedYear";
+                        // ✅ สร้างชื่อ "เดือน พ.ศ." (เช่น มกราคม 2568)
+                        final String titleWithYear = "$thaiMonthName $displayYearBE";
 
                         return Column(
                           children: [
@@ -198,13 +159,12 @@ class CollectionPageState extends State<CollectionPage> {
                                 title: titleWithYear, items: album),
                             const SizedBox(height: 12),
                             GestureDetector(
-                              // onTap: () {
-                              //   // กดแล้วไปหน้ารายละเอียด ส่งชื่อพร้อมปีไปด้วย
-                              //   Navigator.push(context, MaterialPageRoute(builder: (context) => MonthDetailPage(monthName: titleWithYear, items: album.photos ?? [])));
-                              // },
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => MonthDetailPage(monthName: titleWithYear, items: album.photos ?? [])));
+                              },
                               child: _AlbumPreviewSection(
                                   items: album,
-                                  monthTitle: titleWithYear), // แสดงที่หน้าปก
+                                  monthTitle: titleWithYear), 
                             ),
                             const SizedBox(height: 30),
                           ],
@@ -220,9 +180,58 @@ class CollectionPageState extends State<CollectionPage> {
 }
 
 // ---------------------------------------------------------------------------
-// Widget ส่วนประกอบย่อย (คงเดิม)
+// Widget ส่วนประกอบย่อย
 // ---------------------------------------------------------------------------
 
+class _DynamicTabSelector extends StatelessWidget {
+  final String year; // รับค่าปี พ.ศ. มาแสดง
+  const _DynamicTabSelector({required this.year});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2))
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                  color: Colors.orange, borderRadius: BorderRadius.circular(8)),
+              alignment: Alignment.center,
+              // ✅ แสดง "ปี 2568"
+              child: Text("ปี $year", 
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16)),
+            ),
+          ),
+          Expanded(
+              child: Container(
+                  alignment: Alignment.center,
+                  child: Text("เดือน",
+                      style: TextStyle(
+                          color: Colors.grey.shade700, fontSize: 16)))),
+        ],
+      ),
+    );
+  }
+}
+
+// ... (Widget อื่นๆ เหมือนเดิม: _MonthSectionHeader, _AlbumPreviewSection, _StaticPhotoSlot, _SearchBar) ...
+// คุณสามารถก็อปปี้ส่วนที่เหลือจากไฟล์เดิมมาต่อท้ายได้เลยครับ เพราะไม่ได้มีการเปลี่ยนแปลง
 class _MonthSectionHeader extends StatelessWidget {
   final String title;
   final AlbumModel? items;
@@ -291,7 +300,6 @@ class _AlbumPreviewSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ป้องกัน null safety
     final photos = items.photos ?? [];
 
     return Center(
@@ -316,7 +324,7 @@ class _AlbumPreviewSection extends StatelessWidget {
                     Container(
                         decoration: const BoxDecoration(color: Colors.white),
                         child: Center(
-                            child: Text(monthTitle.split(' ')[0], // แสดงแค่ชื่อเดือนในกล่องเล็ก
+                            child: Text(monthTitle.split(' ')[0], 
                                 style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold)))),
