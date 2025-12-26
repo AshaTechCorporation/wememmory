@@ -1,12 +1,10 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:photo_manager/photo_manager.dart';
-import 'package:wememmory/models/media_item.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
-// หน้า รูปภาพจากแท็คสามารถเลือน slide ได้
 class MemorySlidePage extends StatelessWidget {
   final String monthName;
-  final List<MediaItem> items;
+  // ✅ เปลี่ยนเป็น dynamic
+  final List<dynamic> items;
 
   const MemorySlidePage({
     super.key,
@@ -18,8 +16,8 @@ class MemorySlidePage extends StatelessWidget {
   Widget build(BuildContext context) {
     // แบ่งข้อมูลออกเป็น 2 ชุดสำหรับ 2 แถว
     final int halfLength = (items.length / 2).ceil();
-    final List<MediaItem> firstRowItems = items.take(halfLength).toList();
-    final List<MediaItem> secondRowItems = items.skip(halfLength).toList();
+    final List<dynamic> firstRowItems = items.take(halfLength).toList();
+    final List<dynamic> secondRowItems = items.skip(halfLength).toList();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -33,20 +31,19 @@ class MemorySlidePage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // ให้หัวข้อชิดซ้าย
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- ส่วนหัวข้อ (ย้ายจาก AppBar มาไว้ตรงนี้) ---
+            // --- ส่วนหัวข้อ ---
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Center(
-                // ใช้ Center เพื่อให้ข้อความอยู่กลางหน้าจอตามภาพต้นฉบับ
                 child: Column(
                   children: [
                     Text(
                       "ความทรงจำใน$monthName",
                       style: const TextStyle(
                         color: Colors.black,
-                        fontSize: 22, // ปรับขนาดให้ใหญ่ขึ้นเล็กน้อย
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -65,7 +62,8 @@ class MemorySlidePage extends StatelessWidget {
             // --- แถวที่ 1 ---
             _buildMemoryRow(firstRowItems, "#ครอบครัว"),
 
-            const SizedBox(height: 40), // ระยะห่างระหว่างกลุ่มแถว
+            const SizedBox(height: 40),
+            
             // --- แถวที่ 2 ---
             _buildMemoryRow(secondRowItems, "#ความรัก"),
 
@@ -76,21 +74,19 @@ class MemorySlidePage extends StatelessWidget {
     );
   }
 
-  // ฟังก์ชันสร้างแถวที่มี Tag กำกับแค่คำเดียวด้านล่าง
-  Widget _buildMemoryRow(List<MediaItem> rowItems, String tagLabel) {
+  Widget _buildMemoryRow(List<dynamic> rowItems, String tagLabel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ส่วนของรายการรูปภาพที่เลื่อนได้
         SizedBox(
-          height: 300, // ปรับความสูงของการ์ด
+          height: 300,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: rowItems.length,
             itemBuilder: (context, index) {
               return Container(
-                width: 220, // ความกว้างของการ์ด
+                width: 220,
                 margin: const EdgeInsets.only(right: 16, bottom: 10, top: 10),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -109,6 +105,7 @@ class MemorySlidePage extends StatelessWidget {
                       flex: 5,
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
+                        // ✅ เรียกใช้ Widget ที่แสดงรูป URL
                         child: _StaticPhotoSlot(item: rowItems[index]),
                       ),
                     ),
@@ -129,7 +126,6 @@ class MemorySlidePage extends StatelessWidget {
           ),
         ),
 
-        // --- ส่วนของ Tag (แสดงแค่คำเดียวชิดซ้ายใต้แถว) ---
         Padding(
           padding: const EdgeInsets.only(left: 20.0, top: 8),
           child: Text(
@@ -146,34 +142,26 @@ class MemorySlidePage extends StatelessWidget {
   }
 }
 
-// _StaticPhotoSlot คงเดิมตามที่คุณมี...
+// ✅ ปรับ _StaticPhotoSlot ให้แสดงรูปจาก URL
 class _StaticPhotoSlot extends StatelessWidget {
-  final MediaItem item;
-  const _StaticPhotoSlot({required this.item});
+  final dynamic item;
+  const _StaticPhotoSlot({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
+    // ดึง URL
+    final imageUrl = (item.image is String) ? item.image : "";
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(2),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          if (item.capturedImage != null)
-            Image.memory(item.capturedImage!, fit: BoxFit.cover)
-          else
-            FutureBuilder<Uint8List?>(
-              future: item.asset.thumbnailDataWithSize(
-                const ThumbnailSize(400, 400),
-              ),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.data != null) {
-                  return Image.memory(snapshot.data!, fit: BoxFit.cover);
-                }
-                return Container(color: Colors.grey[100]);
-              },
-            ),
-        ],
+      child: Container(
+        color: Colors.grey[200],
+        child: CachedNetworkImage(
+          imageUrl: imageUrl,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          errorWidget: (context, url, error) => const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
+        ),
       ),
     );
   }
