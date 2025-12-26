@@ -1,12 +1,11 @@
-import 'dart:typed_data';
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:photo_manager/photo_manager.dart';
-import 'package:wememmory/models/media_item.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
-// หน้า stack การ์ด 4 ใบ ในการแชร์ของเดือนนี้
 class FanStackDetailPage extends StatelessWidget {
   final String monthName;
-  final List<MediaItem> items;
+  // ✅ เปลี่ยนเป็น dynamic เพื่อรองรับข้อมูลจาก Server
+  final List<dynamic> items;
 
   const FanStackDetailPage({
     super.key,
@@ -60,9 +59,9 @@ class FanStackDetailPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               itemCount: 4, // จำลองข้อมูล 4 รายการ
               itemBuilder: (context, index) {
+                // คำนวณวันที่จำลอง (หรือดึงจากข้อมูลจริงถ้ามี)
                 int day = 4 - index; 
                 
-                // ✅ ตรวจสอบว่าเป็นแถวคู่หรือคี่ เพื่อสลับตำแหน่ง
                 bool isLeftAligned = index % 2 == 0; 
 
                 return Padding(
@@ -98,14 +97,15 @@ class FanStackDetailPage extends StatelessWidget {
     );
   }
 
-  // --- Helper Method: สร้าง Text Content ---
   Widget _buildTextContent(int day, CrossAxisAlignment alignment) {
+    // แยกปีออกจาก monthName เพื่อมาแสดง (ถ้ามี)
+    // หรือจะ Hardcode 2025 ไปก่อนตามดีไซน์ก็ได้
     return Column(
-      crossAxisAlignment: alignment, // จัดชิดซ้ายหรือขวาตามที่ส่งมา
+      crossAxisAlignment: alignment,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "$day $monthName 2025",
+          "$day $monthName",
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -124,8 +124,8 @@ class FanStackDetailPage extends StatelessWidget {
     );
   }
 
-  // --- Helper Methods: Fan Stack (คงเดิม) ---
   Widget _buildFanImageStack() {
+    // ดึงข้อมูลรูปภาพมาแสดง (ถ้ามีน้อยกว่า 4 ก็เอาเท่าที่มี)
     final displayItems = items.take(4).toList();
     return SizedBox(
       height: 120, 
@@ -140,7 +140,7 @@ class FanStackDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFanItem(MediaItem item, {required int index}) {
+  Widget _buildFanItem(dynamic item, {required int index}) {
     const double cardWidth = 104.0;
     const double cardHeight = 91.0;
 
@@ -171,6 +171,7 @@ class FanStackDetailPage extends StatelessWidget {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(7),
+            // ✅ ใช้ฟังก์ชันแสดงภาพจาก URL
             child: _buildImage(item),
           ),
         ),
@@ -178,19 +179,16 @@ class FanStackDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildImage(MediaItem item) {
-    if (item.capturedImage != null) {
-      return Image.memory(item.capturedImage!, fit: BoxFit.cover);
-    } else {
-      return FutureBuilder<Uint8List?>(
-        future: item.asset.thumbnailDataWithSize(const ThumbnailSize(200, 200)),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            return Image.memory(snapshot.data!, fit: BoxFit.cover);
-          }
-          return Container(color: Colors.grey[200]);
-        },
-      );
-    }
+  // ✅ Helper method แสดงรูปจาก URL
+  Widget _buildImage(dynamic item) {
+    // ดึง URL จาก property .image (ปรับตาม Model ของคุณ)
+    final imageUrl = (item.image is String) ? item.image : "";
+
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      fit: BoxFit.cover,
+      placeholder: (context, url) => Container(color: Colors.grey[200]),
+      errorWidget: (context, url, error) => Container(color: Colors.grey[300], child: const Icon(Icons.error)),
+    );
   }
 }

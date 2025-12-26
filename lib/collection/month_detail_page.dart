@@ -176,9 +176,8 @@ class MonthDetailPage extends StatelessWidget {
                               MaterialPageRoute(
                                 builder: (context) => MemorySlidePage(
                                   monthName: monthName,
-                                  // ⚠️ แก้ไขชั่วคราว: ส่ง [] ไปก่อน เพราะหน้า MemorySlidePage ยังรับ MediaItem อยู่
-                                  // คุณต้องไปแก้ MemorySlidePage ให้รับ List<dynamic> เหมือนหน้านี้
-                                  items: [], 
+                                  items: items,
+                                  
                                 ),
                               ),
                             );
@@ -198,8 +197,7 @@ class MonthDetailPage extends StatelessWidget {
                               MaterialPageRoute(
                                 builder: (context) => FanStackDetailPage(
                                   monthName: monthName,
-                                  // ⚠️ แก้ไขชั่วคราว: ส่ง [] ไปก่อน
-                                  items: [], 
+                                  items: items,
                                 ),
                               ),
                             );
@@ -224,7 +222,7 @@ class MonthDetailPage extends StatelessWidget {
                               MaterialPageRoute(
                                 builder: (context) => MemorySlidePage(
                                   monthName: monthName,
-                                  items: [], // ⚠️ แก้ไขชั่วคราว
+                                  items: [], 
                                 ),
                               ),
                             );
