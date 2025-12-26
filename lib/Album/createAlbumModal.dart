@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wememmory/Album/upload_photo_page.dart'; // Import หน้า Upload
 import 'package:wememmory/home/service/homeservice.dart';
 import 'package:wememmory/models/albumModel.dart';
 
@@ -10,9 +11,8 @@ class CreateAlbumModal extends StatefulWidget {
 }
 
 class _CreateAlbumModalState extends State<CreateAlbumModal> {
-  // แยกเก็บข้อมูลตามปี เพื่อความแม่นยำในการเช็ค
-  List<AlbumModel> _albumsCurrentYear = []; // ปีปัจจุบัน
-  List<AlbumModel> _albumsPreviousYear = []; // ปีก่อนหน้า (เผื่อช่วงต้นปี)
+  // ✅ เปลี่ยนมาใช้ Map เพื่อเก็บข้อมูลหลายๆ ปี (Key = ปี ค.ศ., Value = รายการอัลบั้ม)
+  final Map<int, List<AlbumModel>> _cachedAlbums = {};
   bool _isLoading = true;
 
   @override
@@ -21,32 +21,47 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
     _fetchAllYearsStatus();
   }
 
-  // ✅ 1. ดึงข้อมูลของปีปัจจุบันและปีก่อนหน้า (Dynamic)
+  // ✅ 1. ดึงข้อมูลย้อนหลัง 4 ปีปฏิทิน (เพื่อให้ครอบคลุม 36 เดือน)
   Future<void> _fetchAllYearsStatus() async {
     try {
-      final currentYearAD = DateTime.now().year; // ปี ค.ศ. ปัจจุบัน
+      final currentYearAD = DateTime.now().year;
       
-      // ดึงปีปัจจุบัน
-      final listCurrent = await HomeService.getAlbums(year: '$currentYearAD');
-      // ดึงปีก่อนหน้า (เผื่อ user เลือกดูย้อนหลัง)
-      final listPrev = await HomeService.getAlbums(year: '${currentYearAD - 1}');
+      // รายการปีที่ต้องดึง (ปีปัจจุบัน และย้อนหลังไป 3 ปี)
+      // เช่น ถ้าปี 2025 จะดึง: 2025, 2024, 2023, 2022
+      List<int> yearsToFetch = [
+        currentYearAD,
+        currentYearAD - 1,
+        currentYearAD - 2,
+        currentYearAD - 3
+      ];
+
+      // ดึงข้อมูลแบบ Parallel (พร้อมกัน) เพื่อความรวดเร็ว
+      await Future.wait(yearsToFetch.map((year) async {
+        try {
+          final albums = await HomeService.getAlbums(year: '$year');
+          if (mounted) {
+            setState(() {
+              _cachedAlbums[year] = albums;
+            });
+          }
+        } catch (e) {
+          debugPrint("Error fetching albums for year $year: $e");
+        }
+      }));
 
       if (mounted) {
         setState(() {
-          _albumsCurrentYear = listCurrent;
-          _albumsPreviousYear = listPrev;
           _isLoading = false;
         });
       }
     } catch (e) {
-      debugPrint("Error fetching albums: $e");
+      debugPrint("Global error fetching albums: $e");
       if (mounted) {
         setState(() => _isLoading = false);
       }
     }
   }
 
-  // ✅ Helper: แปลงค่าเดือนจาก API เป็นชื่อเดือนภาษาไทย
   String _getThaiMonthName(dynamic monthInput) {
     const List<String> thaiMonths = [
       "", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
@@ -68,39 +83,34 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
     }
   }
 
-  // ✅ 2. ฟังก์ชันเช็คสถานะ (รองรับปี พ.ศ.)
+  // ✅ 2. ฟังก์ชันเช็คสถานะ (รองรับการค้นหาจาก Map)
   bool _checkIfMonthCompleted(String fullDateString) {
     // Input: "มกราคม 2568"
     final parts = fullDateString.split(' ');
     if (parts.length < 2) return false;
 
-    final String targetMonthName = parts[0]; // "มกราคม"
-    final int targetYearBE = int.tryParse(parts[1]) ?? 0; // 2568
-    final int targetYearAD = targetYearBE - 543; // แปลงเป็น ค.ศ. (2025)
+    final String targetMonthName = parts[0]; 
+    final int targetYearBE = int.tryParse(parts[1]) ?? 0; 
+    final int targetYearAD = targetYearBE - 543; // แปลง พ.ศ. -> ค.ศ.
 
-    final currentYearAD = DateTime.now().year;
+    // ดึง List ข้อมูลจาก Map ตามปี ค.ศ.
+    List<AlbumModel>? targetList = _cachedAlbums[targetYearAD];
 
-    // เลือก List ข้อมูลให้ตรงกับปี
-    List<AlbumModel> targetList;
-    if (targetYearAD == currentYearAD) {
-      targetList = _albumsCurrentYear;
-    } else if (targetYearAD == currentYearAD - 1) {
-      targetList = _albumsPreviousYear;
-    } else {
-      return false; // ไม่ได้โหลดข้อมูลปีนี้ไว้
+    // ถ้ายังไม่มีข้อมูลปีนั้น หรือ List ว่าง ให้ return false
+    if (targetList == null || targetList.isEmpty) {
+      return false;
     }
 
-    // ค้นหาว่ามีอัลบั้มนี้อยู่หรือไม่
+    // ค้นหาอัลบั้ม
     final bool exists = targetList.any((album) {
       String dbMonthName = _getThaiMonthName(album.month);
-      // เงื่อนไข: ชื่อเดือนตรงกัน และมีรูปภาพ
       return dbMonthName == targetMonthName && (album.photos != null && album.photos!.isNotEmpty);
     });
 
     return exists;
   }
 
-  // ✅ ฟังก์ชันสร้างรายการเดือนย้อนหลัง (ตามที่คุณขอ)
+  // ✅ 3. สร้างรายการเดือนย้อนหลัง 36 เดือน
   List<String> _generateMonthList() {
     final now = DateTime.now();
     final List<String> thaiMonths = [
@@ -110,15 +120,11 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
 
     List<String> result = [];
     
-    // วนลูปย้อนหลัง 12 เดือน (หรือตามต้องการ)
-    // เริ่มจากเดือนปัจจุบัน ถอยหลังไปเรื่อยๆ
-    for (int i = 0; i < 12; i++) {
-      // คำนวณเดือนและปี โดยการลบเดือนออกจากวันปัจจุบัน
-      // DateTime(year, month - i) จะจัดการเรื่องข้ามปีให้อัตโนมัติ (เช่น เดือน 1 - 1 = เดือน 12 ปีก่อนหน้า)
+    // วนลูปย้อนหลัง 36 เดือน
+    for (int i = 0; i < 36; i++) {
       final targetDate = DateTime(now.year, now.month - i, 1);
-      
       final monthName = thaiMonths[targetDate.month - 1];
-      final yearBE = targetDate.year + 543; // แปลง ค.ศ. เป็น พ.ศ.
+      final yearBE = targetDate.year + 543; // พ.ศ.
 
       result.add("$monthName $yearBE");
     }
@@ -128,11 +134,10 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ เรียกใช้ฟังก์ชันสร้างรายการเดือน
     final List<String> allMonths = _generateMonthList();
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
+      height: MediaQuery.of(context).size.height * 0.85, // เพิ่มความสูงหน่อยเพราะรายการยาวขึ้น
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
@@ -200,8 +205,8 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
 
           // --- List of Months ---
           Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+            child: _isLoading 
+                ? const Center(child: CircularProgressIndicator()) 
                 : ListView.separated(
                     padding: EdgeInsets.zero,
                     physics: const BouncingScrollPhysics(),
@@ -209,8 +214,7 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
                     separatorBuilder: (context, index) => const Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
                     itemBuilder: (context, index) {
                       final monthName = allMonths[index];
-
-                      // เช็คสถานะ
+                      
                       final bool isDone = _checkIfMonthCompleted(monthName);
 
                       return _AlbumOptionItem(
@@ -219,7 +223,7 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
                         isDone: isDone,
                         onTap: () {
                            if (!isDone) {
-                             Navigator.pop(context, monthName);
+                             Navigator.pop(context, monthName); 
                            }
                         },
                       );
@@ -232,7 +236,6 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
   }
 }
 
-// Widget ย่อยสำหรับแต่ละแถว (Row Item)
 class _AlbumOptionItem extends StatelessWidget {
   final String month;
   final String statusText;
@@ -249,7 +252,7 @@ class _AlbumOptionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: isDone ? null : onTap, // ✅ Disable tap ถ้าเสร็จแล้ว
+      onTap: isDone ? null : onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
         child: Row(
@@ -258,30 +261,27 @@ class _AlbumOptionItem extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ชื่อเดือน
                 Text(
-                  month,
+                  month, 
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87
+                    fontSize: 16, 
+                    fontWeight: FontWeight.w500, 
+                    color: Colors.black87 
                   )
                 ),
                 const SizedBox(height: 4),
-                // ข้อความสถานะ
                 Text(
-                  statusText,
+                  statusText, 
                   style: TextStyle(
-                    fontSize: 13,
-                    color: isDone ? const Color(0xFF66BB6A) : Colors.black87,
+                    fontSize: 13, 
+                    color: isDone ? const Color(0xFF66BB6A) : Colors.black87, 
                   )
                 ),
               ],
             ),
-            // ✅ แสดงรูปภาพ Check.png ถ้าเสร็จแล้ว
-            if (isDone)
+            if (isDone) 
               Image.asset(
-                'assets/icons/createSuccess.png', // ตรวจสอบชื่อไฟล์ให้ตรง
+                'assets/icons/createSuccess.png', // เปลี่ยนเป็น Check.png ตามที่คุณใช้
                 width: 24,
                 height: 24,
                 fit: BoxFit.contain,
