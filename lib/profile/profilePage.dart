@@ -124,7 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Text(
                           'Beginner',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFFEE743B),
                           ),
@@ -872,60 +872,66 @@ class _UsageStatsSection extends StatelessWidget {
   const _UsageStatsSection();
 
   TextStyle get _digitalTextStyle => GoogleFonts.orbitron(
-    fontSize: 30,
-    fontWeight: FontWeight.w900,
-    color: Colors.white,
-    letterSpacing: 1.5,
-    height: 1.0,
-  );
+        fontSize: 30, // ปรับลด Default ลงเล็กน้อย
+        fontWeight: FontWeight.w900,
+        color: Colors.white,
+        letterSpacing: 1.0,
+        height: 1.0,
+      );
 
   TextStyle get _digitalDateStyle => GoogleFonts.orbitron(
-    fontSize: 37,
-    fontWeight: FontWeight.w900,
-    color: const Color(0xFF4A4A4A),
-    letterSpacing: 0.5,
-    height: 1.0,
-  );
+        fontSize: 32, // ปรับลดจาก 37 เป็น 32 หรือใช้ FittedBox ช่วย
+        fontWeight: FontWeight.w900,
+        color: const Color(0xFF4A4A4A),
+        letterSpacing: 0.5,
+        height: 1.0,
+      );
 
   TextStyle get _headerThaiStyle => const TextStyle(
-    fontSize: 40,
-    fontWeight: FontWeight.bold,
-    color: Colors.white,
-    height: 1.0,
-  );
+        fontSize: 32, // ปรับลดจาก 40 เป็น 32 เพื่อความปลอดภัย
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+        height: 1.2,
+      );
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // --- ส่วน Header สีส้ม (วันที่) ---
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           decoration: const BoxDecoration(color: Color(0xFFF9A675)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('บันทึก', style: _headerThaiStyle),
-                  const Text(
-                    'ความทรงจำแรก',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 25,
-                      fontWeight: FontWeight.w500,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('บันทึก', style: _headerThaiStyle),
+                    const Text(
+                      'ความทรงจำแรก',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22, // ปรับลดลงเล็กน้อย
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text('10 Jan', style: _digitalDateStyle),
-                  Text('2025', style: _digitalDateStyle),
-                ],
+              // ใช้ Flexible เพื่อป้องกันล้นขวา
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    FittedBox(child: Text('10 Jan', style: _digitalDateStyle)),
+                    FittedBox(child: Text('2025', style: _digitalDateStyle)),
+                  ],
+                ),
               ),
             ],
           ),
@@ -933,6 +939,7 @@ class _UsageStatsSection extends StatelessWidget {
 
         const SizedBox(height: 12),
 
+        // --- แถวที่ 1 ---
         Row(
           children: [
             Expanded(
@@ -956,6 +963,7 @@ class _UsageStatsSection extends StatelessWidget {
         ),
 
         const SizedBox(height: 12),
+        // --- แถวที่ 2 ---
         Row(
           children: [
             Expanded(
@@ -964,7 +972,7 @@ class _UsageStatsSection extends StatelessWidget {
                 title: 'แชร์อัลบั้มทั้งหมด',
                 value: '20',
                 isDigitalFont: true,
-                iconSize: 28,
+                iconSize: 24, // ลดขนาดไอคอน
               ),
             ),
             const SizedBox(width: 12),
@@ -974,7 +982,7 @@ class _UsageStatsSection extends StatelessWidget {
                 title: 'เวลาเลือกรูป(นาที)',
                 value: '300.45',
                 isDigitalFont: true,
-                valueFontSize: 20,
+                valueFontSize: 24, // ลดขนาดฟอนต์ของเลขยาวๆ
               ),
             ),
           ],
@@ -982,9 +990,10 @@ class _UsageStatsSection extends StatelessWidget {
 
         const SizedBox(height: 12),
 
+        // --- ส่วน Header เรื่องราว ---
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           decoration: const BoxDecoration(color: Color(0xFFF9A675)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -997,19 +1006,25 @@ class _UsageStatsSection extends StatelessWidget {
                     'เรื่องราว',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
-              Text(
-                '80',
-                style: GoogleFonts.orbitron(
-                  fontSize: 60,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                  letterSpacing: 2.0,
+              // ใช้ FittedBox ป้องกันเลข 80 ล้น
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    '80',
+                    style: GoogleFonts.orbitron(
+                      fontSize: 50, // ปรับลดจาก 60
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: 2.0,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -1018,6 +1033,7 @@ class _UsageStatsSection extends StatelessWidget {
 
         const SizedBox(height: 12),
 
+        // --- แถวสุดท้าย ---
         Row(
           children: [
             Expanded(
@@ -1035,7 +1051,7 @@ class _UsageStatsSection extends StatelessWidget {
                 title: 'วันที่สร้างมากที่สุด',
                 value: 'อาทิตย์',
                 isDigitalFont: false,
-                valueFontSize: 30,
+                valueFontSize: 24, // ลดจาก 30 เพื่อแก้ล้นล่าง
               ),
             ),
           ],
@@ -1044,17 +1060,18 @@ class _UsageStatsSection extends StatelessWidget {
     );
   }
 
+  // ✅ แก้ไข Widget ย่อยเพื่อป้องกัน Overflow
   Widget _buildStatBlock({
     required IconData icon,
     required String title,
     required String value,
     bool isDigitalFont = false,
-    double iconSize = 32,
-    double valueFontSize = 40,
+    double iconSize = 28, // ปรับ Default ลง
+    double valueFontSize = 32, // ปรับ Default ลง
   }) {
     return Container(
-      height: 100,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      height: 100, // Fixed height
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: const Color(0xFF58A3B6),
         borderRadius: BorderRadius.circular(4),
@@ -1062,31 +1079,37 @@ class _UsageStatsSection extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, color: Colors.white, size: iconSize),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Title (ให้ย่อขนาดถ้ายาวเกิน)
                 Text(
                   title,
-                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  style: const TextStyle(color: Colors.white70, fontSize: 11),
                   textAlign: TextAlign.right,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  value,
-                  style:
-                      isDigitalFont
+                // Value (ใช้ FittedBox ให้ตัวเลข/ตัวหนังสือย่อลงอัตโนมัติ ไม่ล้น)
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      value,
+                      style: isDigitalFont
                           ? _digitalTextStyle.copyWith(fontSize: valueFontSize)
                           : GoogleFonts.prompt(
-                            fontSize: valueFontSize,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                  textAlign: TextAlign.right,
+                              fontSize: valueFontSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                    ),
+                  ),
                 ),
               ],
             ),
