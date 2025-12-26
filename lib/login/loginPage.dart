@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wememmory/login/service/LoginService.dart';
 import 'package:wememmory/widgets/ApiExeption.dart';
@@ -19,11 +23,45 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController tel = TextEditingController();
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   bool _isChecked = false;
+  String device_no = '';
+  String notify_token = '';
 
   static const Color _bgCream = Color(0xFFF4F6F8);
   static const Color _primaryOrange = Color(0xFFE18253);
   static const Color _textGrey = Color(0xFF7A7A7A);
   static const double _radius = 14;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      getToken();
+      getdeviceId();
+    });
+  }
+
+  void getdeviceId() async {
+    final deviceInfo = DeviceInfoPlugin();
+
+    if (Platform.isAndroid) {
+      // ดึงข้อมูล Android ID
+      final androidInfo = await deviceInfo.androidInfo;
+      device_no = androidInfo.id;
+      print('Android ID: ${androidInfo.id}');
+    } else if (Platform.isIOS) {
+      // ดึงข้อมูล Identifier for Vendor (iOS)
+      final iosInfo = await deviceInfo.iosInfo;
+      device_no = iosInfo.identifierForVendor!;
+      print('iOS Identifier: ${iosInfo.identifierForVendor}');
+    }
+  }
+
+  void getToken() async {
+    var playerId = OneSignal.User.pushSubscription.id;
+    notify_token = playerId ?? 'notify_token_TEST';
+
+    print('notify_token: ${notify_token}');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: () async {
                             try {
                               LoadingDialog.open(context);
-                              final login = await LoginService.login(username: tel.text, password: tel.text, device_no: 'device_no', notify_token: 'notify_token');
+                              final login = await LoginService.login(username: tel.text, password: tel.text, device_no: device_no, notify_token: notify_token);
                               final SharedPreferences prefs = await _prefs;
                               await prefs.setString('token', login['token']);
                               await prefs.setInt('userId', login['userId']);
@@ -199,8 +237,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
 
-
-                      
                       const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -208,15 +244,9 @@ class _LoginPageState extends State<LoginPage> {
                           const Text('ยังไม่มีบัญชีใช่ไหม? ', style: TextStyle(color: _textGrey, fontSize: 14)),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const RegisterPage()),
-                              );
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterPage()));
                             },
-                            child: const Text(
-                              'สมัครสมาชิก',
-                              style: TextStyle(color: _primaryOrange, fontWeight: FontWeight.bold, fontSize: 14),
-                            ),
+                            child: const Text('สมัครสมาชิก', style: TextStyle(color: _primaryOrange, fontWeight: FontWeight.bold, fontSize: 14)),
                           ),
                         ],
                       ),

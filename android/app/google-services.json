@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "537731299036",
+    "project_id": "wemory-d4511",
+    "storage_bucket": "wemory-d4511.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:537731299036:android:c4cbd5d7af19a32ee16619",
+        "android_client_info": {
+          "package_name": "com.asha.wemory.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa-wkbK_icKGBQPCeCs_J4W2mcZd8DoMs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:537731299036:android:4085a14205ab4473e16619",
+        "android_client_info": {
+          "package_name": "com.example.wememmory"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa-wkbK_icKGBQPCeCs_J4W2mcZd8DoMs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

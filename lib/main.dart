@@ -1,7 +1,10 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wememmory/firebase_options.dart';
 import 'package:wememmory/home/firstPage.dart';
 import 'package:wememmory/home/service/homeController.dart';
 import 'package:wememmory/login/loginPage.dart';
@@ -12,6 +15,15 @@ String? token;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Remove this method to stop OneSignal Debugging
+  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+
+  OneSignal.initialize("a5f8fd9d-e0a9-4b00-8fbb-e5e6942119e4");
+
+  OneSignal.Notifications.requestPermission(true);
 
   // 1. เริ่มระบบ
   await NotificationHelper.init();
