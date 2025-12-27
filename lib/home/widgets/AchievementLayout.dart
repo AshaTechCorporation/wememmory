@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 // --- Palette สี ---
-const Color _sidebarOrange = Color(0xFFF8B887); 
-const Color _bgWhite = Colors.white; 
-const Color _cardTeal = Color(0xFF6DA5B8); 
+const Color _sidebarOrange = Color(0xFFF8B887);
+const Color _bgWhite = Colors.white;
+const Color _cardTeal = Color(0xFF6DA5B8);
 const Color _cardOrange = Color(0xFFEE743B);
 const Color _cardLightOrange = Color(0xFFF8B887);
 const Color _cardpurple = Color(0xFF6988AC);
@@ -21,10 +21,7 @@ class AchievementLayout extends StatelessWidget {
           Positioned.fill(
             child: Container(
               margin: const EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 0.0),
-              decoration: const BoxDecoration(
-                color: _bgWhite,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(8.0)),
-              ),
+              decoration: const BoxDecoration(color: _bgWhite, borderRadius: BorderRadius.vertical(top: Radius.circular(8.0))),
             ),
           ),
 
@@ -36,10 +33,7 @@ class AchievementLayout extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 50.0, right: 24.0),
-                    child: _HeaderSection(),
-                  ),
+                  const Padding(padding: EdgeInsets.only(top: 50.0, right: 24.0), child: _HeaderSection()),
                   const SizedBox(height: 30),
 
                   // ส่วน Cards
@@ -111,22 +105,11 @@ class _HeaderSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/icons/wemoryv2.png',
-              height: 103,
-              width: 154,
-            ),
+            Image.asset('assets/icons/wemoryv2.png', height: 103, width: 154),
             Padding(
               padding: const EdgeInsets.only(top: 70.0), // ปรับค่าตรงนี้เพื่อเลื่อน Text ลงมา
-              child: Text(
-                "Beginner",
-                style: const TextStyle(
-                  color: Color(0xFFEE743B),
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            )
+              child: Text("Beginner", style: const TextStyle(color: Color(0xFFEE743B), fontSize: 24, fontWeight: FontWeight.bold)),
+            ),
           ],
         ),
       ],
@@ -163,16 +146,7 @@ class TimelineItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
-      child: _DetailCard(
-        monthTitle: monthTitle,
-        mainText: mainText,
-        subText: subText,
-        imagePath: imagePath,
-        imgWidth: imgWidth,
-        imgHeight: imgHeight,
-        isFill: isFill,
-        cardColor: cardColor,
-      ),
+      child: _DetailCard(monthTitle: monthTitle, mainText: mainText, subText: subText, imagePath: imagePath, imgWidth: imgWidth, imgHeight: imgHeight, isFill: isFill, cardColor: cardColor),
     );
   }
 }
@@ -208,19 +182,8 @@ class _DetailCard extends StatelessWidget {
       height: 143,
       decoration: BoxDecoration(
         color: cardColor, // ใช้สีที่ส่งมา
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(0),
-          bottomLeft: Radius.circular(0),
-          topRight: Radius.circular(0),
-          bottomRight: Radius.circular(0),
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 4),
-          ),
-        ],
+        borderRadius: const BorderRadius.only(topLeft: Radius.circular(0), bottomLeft: Radius.circular(0), topRight: Radius.circular(0), bottomRight: Radius.circular(0)),
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 4))],
       ),
       child: Stack(
         children: [
@@ -238,24 +201,16 @@ class _DetailCard extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // 2. Main Content (ข้อความหลัก)
           Padding(
-            padding: const EdgeInsets.only(left: 20, right: 80,top: 20),
+            padding: const EdgeInsets.only(left: 20, right: 80, top: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 30), // เว้นที่ให้ Title ด้านบนนิดนึง
-                Text(
-                  mainText,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    height: 1.2,
-                  ),
-                ),
+                Text(mainText, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, height: 1.2)),
                 const SizedBox(height: 1),
                 Text(
                   subText,

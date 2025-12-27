@@ -14,14 +14,12 @@ class NotificationPage extends StatelessWidget {
         "isUnread": true, // สีส้ม
       },
       {
-        "text":
-            "โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น",
+        "text": "โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น โปรโมชั่น",
         "time": "2h ago",
         "isUnread": false, // สีเทา
       },
       {
-        "text":
-            "ข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสาร",
+        "text": "ข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสารข่าวสาร",
         "time": "3h ago",
         "isUnread": false, // สีเทา
       },
@@ -41,38 +39,23 @@ class NotificationPage extends StatelessWidget {
         ),
         title: Text(
           'การแจ้งเตือน',
-          style: GoogleFonts.prompt(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w500),
+          //  style: GoogleFonts.prompt(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w500),
         ),
       ),
       body: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         itemCount: notifications.length,
-        separatorBuilder: (context, index) => const Divider(
-          height: 30, 
-          color: Color(0xFFEEEEEE),
-          thickness: 1,
-        ),
+        separatorBuilder: (context, index) => const Divider(height: 30, color: Color(0xFFEEEEEE), thickness: 1),
         itemBuilder: (context, index) {
           final item = notifications[index];
-          return _buildNotificationItem(
-            text: item['text'],
-            time: item['time'],
-            isUnread: item['isUnread'],
-          );
+          return _buildNotificationItem(text: item['text'], time: item['time'], isUnread: item['isUnread']);
         },
       ),
     );
   }
 
-  Widget _buildNotificationItem({
-    required String text,
-    required String time,
-    required bool isUnread,
-  }) {
+  Widget _buildNotificationItem({required String text, required String time, required bool isUnread}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start, // ให้ text เริ่มบรรทัดบนสุด
       children: [
@@ -101,9 +84,10 @@ class NotificationPage extends StatelessWidget {
                 width: 14,
                 height: 14,
                 decoration: BoxDecoration(
-                  color: isUnread 
-                      ? const Color(0xFFEE743B) // สีส้ม (ยังไม่อ่าน)
-                      : const Color(0xFF9E9E9E), // สีเทา (อ่านแล้ว)
+                  color:
+                      isUnread
+                          ? const Color(0xFFEE743B) // สีส้ม (ยังไม่อ่าน)
+                          : const Color(0xFF9E9E9E), // สีเทา (อ่านแล้ว)
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2), // ขอบขาว
                 ),
@@ -111,9 +95,8 @@ class NotificationPage extends StatelessWidget {
             ),
           ],
         ),
-        
-        const SizedBox(width: 16), // ระยะห่างระหว่างไอคอนกับข้อความ
 
+        const SizedBox(width: 16), // ระยะห่างระหว่างไอคอนกับข้อความ
         // --- ส่วนข้อความ ---
         Expanded(
           child: Column(
@@ -121,22 +104,32 @@ class NotificationPage extends StatelessWidget {
             children: [
               Text(
                 text,
-                style: GoogleFonts.prompt(
+                style: TextStyle(
                   fontSize: 14,
                   color: Colors.black87,
-                  height: 1.5, // ระยะห่างระหว่างบรรทัด
+                  height: 1.5, // ระยะห่างระหว่างบรรทัด,
                 ),
+                // style: GoogleFonts.prompt(
+                //   fontSize: 14,
+                //   color: Colors.black87,
+                //   height: 1.5, // ระยะห่างระหว่างบรรทัด
+                // ),
                 maxLines: 3, // จำกัดบรรทัดเผื่อยาวเกิน
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 8),
               Text(
                 time,
-                style: GoogleFonts.prompt(
+                style: TextStyle(
                   fontSize: 12,
                   color: Colors.black, // ในภาพสีดำเข้มชัดเจน
                   fontWeight: FontWeight.bold,
                 ),
+                // style: GoogleFonts.prompt(
+                //   fontSize: 12,
+                //   color: Colors.black, // ในภาพสีดำเข้มชัดเจน
+                //   fontWeight: FontWeight.bold,
+                // ),
               ),
             ],
           ),

@@ -54,6 +54,7 @@ dependencies:
   change_app_package_name: ^1.5.0
   video_player: ^2.8.7
   photo_manager: ^3.8.2
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +72,14 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/LogoWemory.jpg"
+  remove_alpha_ios: true
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/icons/LogoWemory.jpg"
+
 # The following section is specific to Flutter packages.
 flutter:
   # The following line ensures that the Material Icons font is
@@ -87,6 +96,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/provice/
+    - assets/font/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -99,6 +109,19 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  fonts:
+    - family: Wemory # ชื่อที่เราจะเอาไปเรียกใช้ในโค้ด (ตั้งชื่ออะไรก็ได้)
+      fonts:
+        - asset: assets/font/WEMORY-Regular.ttf
+    - family: Kanit
+      fonts:
+        - asset: assets/font/Kanit/Kanit-Regular.ttf
+        - asset: assets/font/Kanit/Kanit-Bold.ttf
+          weight: 700
+    - family: Outfit
+      fonts:
+        - asset: assets/font/Outfit/Outfit-VariableFont_wght.ttf
+          weight: 700
   # fonts:
   #   - family: Schyler
   #     fonts:

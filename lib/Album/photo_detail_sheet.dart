@@ -22,12 +22,12 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
   final GlobalKey _cropKey = GlobalKey();
   final TransformationController _transformationController = TransformationController();
   BoxFit _currentFit = BoxFit.contain;
-  
+
   Color _selectedTextColor = Colors.black;
   Color? _dropdownValue;
 
   final List<String> _allTags = ["family", "kid", "home", "lover", "favor"];
-  
+
   Uint8List? _imageData;
   bool _isLoadingImage = true;
 
@@ -35,7 +35,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
   void initState() {
     super.initState();
     _captionController = TextEditingController(text: widget.item.caption);
-    
+
     // เพิ่ม Listener: อัปเดตหน้าจอทันทีเมื่อพิมพ์
     _captionController.addListener(() {
       setState(() {});
@@ -94,12 +94,12 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
     try {
       // จับภาพเฉพาะ RepaintBoundary (หุ้มแค่รูปภาพ ไม่รวมข้อความ Overlay)
       RenderRepaintBoundary boundary = _cropKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      ui.Image image = await boundary.toImage(pixelRatio: 3.0); 
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
       ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
 
       if (byteData != null) {
         widget.item.capturedImage = byteData.buffer.asUint8List();
-        
+
         // บันทึก Caption แยกต่างหาก
         widget.item.caption = _captionController.text;
         widget.item.tags = List.from(_selectedTags);
@@ -120,22 +120,12 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.92,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
+      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
       child: Column(
         children: [
           const SizedBox(height: 12),
-          Container(
-            width: 61,
-            height: 5,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2.5),
-            ),
-          ),
-          
+          Container(width: 61, height: 5, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2.5))),
+
           // 1. Header
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 13, 16, 0),
@@ -144,28 +134,12 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
               children: [
                 Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.black87),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      onPressed: () => Navigator.pop(context),
-                    ),
+                    IconButton(icon: const Icon(Icons.arrow_back, color: Colors.black87), padding: EdgeInsets.zero, constraints: const BoxConstraints(), onPressed: () => Navigator.pop(context)),
                     const SizedBox(width: 12),
-                    const Text(
-                      "รายละเอียดรูปภาพ",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
-                    ),
+                    const Text("รายละเอียดรูปภาพ", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
                   ],
                 ),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Image.asset(
-                    'assets/icons/cross.png',
-                    width: 25,
-                    height: 25,
-                    fit: BoxFit.contain,
-                  ),
-                ),
+                GestureDetector(onTap: () => Navigator.pop(context), child: Image.asset('assets/icons/cross.png', width: 25, height: 25, fit: BoxFit.contain)),
               ],
             ),
           ),
@@ -204,39 +178,33 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                         children: [
                           // 1. รูปภาพ (ถูกหุ้มด้วย RepaintBoundary เพื่อบันทึก)
                           RepaintBoundary(
-                            key: _cropKey, 
+                            key: _cropKey,
                             child: InteractiveViewer(
                               transformationController: _transformationController,
                               minScale: 1.0,
                               maxScale: 4.0,
-                              child: _isLoadingImage
-                                  ? const Center(child: CircularProgressIndicator())
-                                  : _imageData != null
-                                      ? Image.memory(
-                                          _imageData!,
-                                          fit: _currentFit,
-                                          width: double.infinity,
-                                          height: double.infinity,
-                                        )
+                              child:
+                                  _isLoadingImage
+                                      ? const Center(child: CircularProgressIndicator())
+                                      : _imageData != null
+                                      ? Image.memory(_imageData!, fit: _currentFit, width: double.infinity, height: double.infinity)
                                       : const Center(child: Text("ไม่สามารถโหลดรูปภาพได้")),
                             ),
                           ),
 
                           // ✅ 2. ข้อความ Overlay: แก้ไขให้แสดง Placeholder ถ้ายังไม่มีข้อความ
                           Positioned(
-                            bottom: 20, 
+                            bottom: 20,
                             left: 10,
                             right: 10,
                             child: IgnorePointer(
                               child: Text(
                                 // ✅ ถ้า text ว่าง ให้แสดง placeholder, ถ้ามีข้อความ ให้แสดงข้อความ
-                                _captionController.text.isEmpty 
-                                    ? "เขียนความรู้สึกหรือเรื่องราวเล็กๆ ที่ซ่อนอยู่หลังภาพนี้...." 
-                                    : _captionController.text, 
+                                _captionController.text.isEmpty ? "เขียนความรู้สึกหรือเรื่องราวเล็กๆ ที่ซ่อนอยู่หลังภาพนี้...." : _captionController.text,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   // ✅ ใช้สีที่เลือกจาก Dropdown (หรือจะปรับ Opacity ให้จางลงถ้าเป็น Placeholder ก็ทำได้ตรงนี้)
-                                  color: _selectedTextColor.withOpacity(_captionController.text.isEmpty ? 0.7 : 1.0), 
+                                  color: _selectedTextColor.withOpacity(_captionController.text.isEmpty ? 0.7 : 1.0),
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   shadows: [
@@ -250,7 +218,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                               ),
                             ),
                           ),
-                          
+
                           // 3. เส้นตาราง Grid (ไม่ถูกบันทึก)
                           IgnorePointer(
                             child: Stack(
@@ -278,7 +246,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                   ),
 
                   const SizedBox(height: 10),
-                  
+
                   // ปุ่มควบคุม Scale และ สี Font
                   Row(
                     children: [
@@ -288,19 +256,12 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                           height: 45,
                           child: ElevatedButton(
                             onPressed: _toggleImageScale,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF67A5BA),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              elevation: 0,
-                            ),
-                            child: Text(
-                              _currentFit == BoxFit.contain ? "ขยายภาพเต็มจอ" : "แสดงภาพทั้งหมด",
-                              style: const TextStyle(color: Colors.white, fontSize: 16),
-                            ),
+                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF67A5BA), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), elevation: 0),
+                            child: Text(_currentFit == BoxFit.contain ? "ขยายภาพเต็มจอ" : "แสดงภาพทั้งหมด", style: const TextStyle(color: Colors.white, fontSize: 16)),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10), 
+                      const SizedBox(width: 10),
                       Expanded(
                         flex: 2,
                         child: LayoutBuilder(
@@ -314,73 +275,57 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                               onSelected: (Color value) {
                                 setState(() {
                                   _dropdownValue = value;
-                                  _selectedTextColor = value; 
+                                  _selectedTextColor = value;
                                 });
                               },
-                              itemBuilder: (BuildContext context) => [
-                                PopupMenuItem<Color>(
-                                  value: Colors.black,
-                                  child: Row(
-                                    children: [
-                                      const Text("สีดำ", style: TextStyle(fontSize: 14)),
-                                      const Spacer(),
-                                      Container(
-                                        width: 21,
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: Colors.black,
-                                          borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(color: const Color(0xFF95989A), width: 1),
-                                        ),
+                              itemBuilder:
+                                  (BuildContext context) => [
+                                    PopupMenuItem<Color>(
+                                      value: Colors.black,
+                                      child: Row(
+                                        children: [
+                                          const Text("สีดำ", style: TextStyle(fontSize: 14)),
+                                          const Spacer(),
+                                          Container(
+                                            width: 21,
+                                            height: 20,
+                                            decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFF95989A), width: 1)),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ),
-                                PopupMenuItem<Color>(
-                                  value: Colors.white,
-                                  child: Row(
-                                    children: [
-                                      const Text("สีขาว", style: TextStyle(fontSize: 14)),
-                                      const Spacer(),
-                                      Container(
-                                        width: 21,
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(color: Colors.grey[300]!),
-                                        ),
+                                    ),
+                                    PopupMenuItem<Color>(
+                                      value: Colors.white,
+                                      child: Row(
+                                        children: [
+                                          const Text("สีขาว", style: TextStyle(fontSize: 14)),
+                                          const Spacer(),
+                                          Container(
+                                            width: 21,
+                                            height: 20,
+                                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey[300]!)),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                                    ),
+                                  ],
                               child: Container(
                                 height: 45,
                                 padding: const EdgeInsets.symmetric(horizontal: 14),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(color: Colors.grey[300]!),
-                                  color: Colors.white,
-                                ),
+                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), border: Border.all(color: Colors.grey[300]!), color: Colors.white),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      _dropdownValue == null
-                                          ? "เลือกสีฟอนต์"
-                                          : (_dropdownValue == Colors.black ? "สีดำ" : "สีขาว"),
-                                      style: TextStyle(
-                                        color: Colors.black87,
-                                        fontSize: _dropdownValue == null ? 16 : 14,
-                                      ),
+                                      _dropdownValue == null ? "เลือกสีฟอนต์" : (_dropdownValue == Colors.black ? "สีดำ" : "สีขาว"),
+                                      style: TextStyle(color: Colors.black87, fontSize: _dropdownValue == null ? 16 : 14),
                                     ),
                                     const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
                                   ],
                                 ),
                               ),
                             );
-                          }
+                          },
                         ),
                       ),
                     ],
@@ -390,30 +335,24 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
 
                   // ช่องพิมพ์ข้อความ
                   Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey[200]!),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
+                    decoration: BoxDecoration(border: Border.all(color: Colors.grey[200]!), borderRadius: BorderRadius.circular(4)),
                     child: TextField(
                       controller: _captionController,
                       maxLines: 4,
-                      style: const TextStyle(color: Colors.black), 
+                      style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         hintText: "เขียนความรู้สึกหรือเรื่องราวเล็กๆ ที่ซ่อนอยู่หลังภาพนี้....",
                         hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.all(12),
                       ),
+                      maxLength: 50,
                     ),
                   ),
 
                   const SizedBox(height: 16),
 
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _allTags.map((tag) => _buildTagChip(tag)).toList(),
-                  ),
+                  Wrap(spacing: 8, runSpacing: 8, children: _allTags.map((tag) => _buildTagChip(tag)).toList()),
 
                   const SizedBox(height: 20),
                 ],
@@ -424,23 +363,14 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
           // 4. Bottom Button (Save)
           Container(
             padding: const EdgeInsets.fromLTRB(20, 13, 20, 38),
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.transparent)),
-            ),
+            decoration: const BoxDecoration(border: Border(top: BorderSide(color: Colors.transparent))),
             child: SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
                 onPressed: _saveData,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFED7D31),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  "บันทึก",
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFED7D31), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)), elevation: 0),
+                child: const Text("บันทึก", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
           ),
@@ -461,14 +391,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
           borderRadius: BorderRadius.circular(20),
           color: isSelected ? const Color(0xFFED7D31) : Colors.white,
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey[600],
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
+        child: Text(label, style: TextStyle(color: isSelected ? Colors.white : Colors.grey[600], fontSize: 13, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
       ),
     );
   }
@@ -482,14 +405,7 @@ class _StepItem extends StatelessWidget {
   final bool isLast;
   final bool isCompleted;
 
-  const _StepItem({
-    super.key,
-    required this.label,
-    required this.isActive,
-    this.isFirst = false,
-    this.isLast = false,
-    this.isCompleted = false,
-  });
+  const _StepItem({super.key, required this.label, required this.isActive, this.isFirst = false, this.isLast = false, this.isCompleted = false});
 
   @override
   Widget build(BuildContext context) {
@@ -498,41 +414,18 @@ class _StepItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(
-                flex: 2,
-                child: Container(
-                  height: 2,
-                  color: isFirst ? Colors.transparent : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]),
-                ),
-              ),
+              Expanded(flex: 2, child: Container(height: 2, color: isFirst ? Colors.transparent : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]))),
               const SizedBox(width: 40),
-              Container(
-                width: 11,
-                height: 11,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300],
-                ),
-              ),
+              Container(width: 11, height: 11, decoration: BoxDecoration(shape: BoxShape.circle, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300])),
               const SizedBox(width: 40),
-              Expanded(
-                flex: 2,
-                child: Container(
-                  height: 2,
-                  color: isLast ? Colors.transparent : (isCompleted ? const Color(0xFF5AB6D8) : Colors.grey[300]),
-                ),
-              ),
+              Expanded(flex: 2, child: Container(height: 2, color: isLast ? Colors.transparent : (isCompleted ? const Color(0xFF5AB6D8) : Colors.grey[300]))),
             ],
           ),
           const SizedBox(height: 5),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400],
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-            ),
+            style: TextStyle(fontSize: 12, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400], fontWeight: isActive ? FontWeight.w600 : FontWeight.normal),
           ),
         ],
       ),

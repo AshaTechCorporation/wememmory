@@ -106,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                         shape: BoxShape.circle,
                         color: Colors.white24, // ใส่สีรองพื้นเผื่อรูปโหลดไม่ทัน
                         image: DecorationImage(
-                          image: user?.avatar != null ? NetworkImage('$baseUrl/public/${user?.avatar!}') : AssetImage('assets/images/userpic.png'),
+                          image: user?.avatar != null ? NetworkImage('$baseUrl/public/${user?.avatar!}') : AssetImage('assets/images/userpic.png') as ImageProvider,
                           fit: BoxFit.cover,
                           onError: (exception, stackTrace) => Icon(Icons.image_not_supported, size: 50),
                         ),
@@ -119,9 +119,15 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 actions: [
-                  Stack(alignment: Alignment.center, children: [IconButton(onPressed: () {Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const NotificationPage(),));}, icon: const Icon(Icons.notifications, color: Colors.white, size: 25))]),
+                  Stack(alignment: Alignment.center, children: [
+                    IconButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => const NotificationPage(),
+                          ));
+                        },
+                        icon: const Icon(Icons.notifications, color: Colors.white, size: 25))
+                  ]),
                   const SizedBox(width: 12),
                 ],
               ),

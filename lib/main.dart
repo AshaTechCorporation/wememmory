@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
     // ขออนุญาต (ถ้ายังไม่เคยขอ)
     await NotificationHelper.checkPermission();
 
-    // ตั้งเวลา 
+    // ตั้งเวลา
     await NotificationHelper.scheduleHourly();
   }
 
@@ -61,9 +61,13 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (context) => HomeController())],
       child: MaterialApp(
-        title: 'Wememory',
+        title: 'Wemory',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(textTheme: GoogleFonts.promptTextTheme(Theme.of(context).textTheme), colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
+        theme: ThemeData(
+          fontFamily: 'Kanit',
+          fontFamilyFallback: ['Outfit'],
+          // textTheme: GoogleFonts.promptTextTheme(Theme.of(context).textTheme), colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)
+        ),
         // ✅ กลับมาใช้หน้า Login ปกติ
         home: token != null ? FirstPage() : LoginPage(),
       ),
