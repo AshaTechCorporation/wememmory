@@ -82,29 +82,10 @@ class _LoginPageState extends State<LoginPage> {
               alignment: Alignment.topCenter,
               children: [
                 // 1. รูปภาพพื้นหลัง
-                SizedBox(
-                  height: bannerHeight,
-                  width: double.infinity,
-                  child: Image.asset(
-                    'assets/images/Hobby.png',
-                    fit: BoxFit.cover,
-                    alignment: Alignment.topCenter,
-                  ),
-                ),
+                SizedBox(height: bannerHeight, width: double.infinity, child: Image.asset('assets/images/Hobby.png', fit: BoxFit.cover, alignment: Alignment.topCenter)),
 
                 // 2. โลโก้
-                Positioned(
-                  top: padding.top + 20,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Image.asset(
-                      'assets/images/image2.png',
-                      height: 45,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
+                Positioned(top: padding.top + 20, left: 0, right: 0, child: Center(child: Image.asset('assets/images/image2.png', height: 45, fit: BoxFit.contain))),
 
                 // 3. การ์ดฟอร์ม
                 Container(
@@ -115,20 +96,11 @@ class _LoginPageState extends State<LoginPage> {
                     right: 24,
                     bottom: 30,
                   ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 30,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(_radius),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x1A000000),
-                        blurRadius: 20,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
+                    boxShadow: const [BoxShadow(color: Color(0x1A000000), blurRadius: 20, offset: Offset(0, 5))],
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -136,60 +108,30 @@ class _LoginPageState extends State<LoginPage> {
                       // ช่องกรอกเบอร์โทรศัพท์
                       Container(
                         height: 50,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFE0E0E0)),
-                          color: Colors.white,
-                        ),
+                        decoration: BoxDecoration(border: Border.all(color: const Color(0xFFE0E0E0)), color: Colors.white),
                         child: Row(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
                               child: Row(
                                 children: [
-                                  Image.asset(
-                                    'assets/icons/Flags.png',
-                                    height: 20,
-                                  ),
+                                  Image.asset('assets/icons/Flags.png', height: 20),
                                   const SizedBox(width: 8),
-                                  const Text(
-                                    '+66',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
+                                  const Text('+66', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.black87)),
                                 ],
                               ),
                             ),
-                            Container(
-                              width: 1,
-                              height: 24,
-                              color: const Color(0xFFE0E0E0),
-                            ),
+                            Container(width: 1, height: 24, color: const Color(0xFFE0E0E0)),
                             Expanded(
                               child: TextField(
                                 controller: tel,
                                 keyboardType: TextInputType.phone,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter
-                                      .digitsOnly,
-                                  LengthLimitingTextInputFormatter(
-                                    10,
-                                  ),
-                                ],
+                                inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(10)],
                                 decoration: const InputDecoration(
                                   hintText: 'หมายเลขโทรศัพท์',
-                                  hintStyle: TextStyle(
-                                    color: Color(0xFF9E9E9E),
-                                    fontSize: 16,
-                                  ),
+                                  hintStyle: TextStyle(color: Color(0xFF9E9E9E), fontSize: 16),
                                   border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
                                 ),
                               ),
                             ),
@@ -213,58 +155,28 @@ class _LoginPageState extends State<LoginPage> {
                               height: 22,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color:
-                                    _isChecked ? _primaryOrange : Colors.white,
-                                border: Border.all(
-                                  color:
-                                      _isChecked
-                                          ? _primaryOrange
-                                          : const Color(0xFFC4C4C4),
-                                  width: 1,
-                                ),
+                                color: _isChecked ? _primaryOrange : Colors.white,
+                                border: Border.all(color: _isChecked ? _primaryOrange : const Color(0xFFC4C4C4), width: 1),
                               ),
-                              child:
-                                  _isChecked
-                                      ? const Icon(
-                                        Icons.check,
-                                        size: 16,
-                                        color: Colors.white,
-                                      )
-                                      : null,
+                              child: _isChecked ? const Icon(Icons.check, size: 16, color: Colors.white) : null,
                             ),
                           ),
                           Expanded(
                             child: RichText(
                               text: TextSpan(
-                                style: const TextStyle(
-                                  color: Color(0xFF505050),
-                                  fontSize: 13,
-                                  height: 1.5,
-                                  fontFamily: 'Kanit',
-                                ),
+                                style: const TextStyle(color: Color(0xFF505050), fontSize: 13, height: 1.5, fontFamily: 'Kanit'),
                                 children: [
-                                  const TextSpan(
-                                    text:
-                                        'การสร้างหรือใช้งานบัญชีของท่านถือว่าท่านยอมรับ\nและตกลงปฏิบัติตาม',
-                                  ),
+                                  const TextSpan(text: 'การสร้างหรือใช้งานบัญชีของท่านถือว่าท่านยอมรับ\nและตกลงปฏิบัติตาม'),
                                   TextSpan(
                                     text: 'ข้อกำหนดการใช้งาน',
-                                    style: const TextStyle(
-                                      color: _primaryOrange,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                    recognizer:
-                                        TapGestureRecognizer()..onTap = () {},
+                                    style: const TextStyle(color: _primaryOrange, decoration: TextDecoration.underline),
+                                    recognizer: TapGestureRecognizer()..onTap = () {},
                                   ),
                                   const TextSpan(text: 'และ'),
                                   TextSpan(
                                     text: 'นโยบาย\nความเป็นส่วนตัว',
-                                    style: const TextStyle(
-                                      color: _primaryOrange,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                    recognizer:
-                                        TapGestureRecognizer()..onTap = () {},
+                                    style: const TextStyle(color: _primaryOrange, decoration: TextDecoration.underline),
+                                    recognizer: TapGestureRecognizer()..onTap = () {},
                                   ),
                                   const TextSpan(text: 'ของเรา'),
                                 ],
@@ -284,33 +196,18 @@ class _LoginPageState extends State<LoginPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _primaryOrange,
                             foregroundColor: Colors.white,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.zero,
-                            ),
+                            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                             elevation: 0,
                           ),
                           onPressed: () async {
                             try {
                               LoadingDialog.open(context);
-                              final login = await LoginService.login(
-                                username: tel.text,
-                                password: tel.text,
-                                device_no: device_no,
-                                notify_token: notify_token,
-                              );
+                              final login = await LoginService.login(username: tel.text, password: tel.text, device_no: device_no, notify_token: notify_token);
                               final SharedPreferences prefs = await _prefs;
                               await prefs.setString('token', login['token']);
                               await prefs.setInt('userId', login['userId']);
                               LoadingDialog.close(context);
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) =>
-                                          OtpPage(phoneNumber: tel.text),
-                                ),
-                                (route) => false,
-                              );
+                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => OtpPage(phoneNumber: tel.text)), (route) => false);
                             } on ApiException catch (e) {
                               if (!mounted) return;
                               LoadingDialog.close(context);
@@ -339,13 +236,7 @@ class _LoginPageState extends State<LoginPage> {
                               );
                             }
                           },
-                          child: const Text(
-                            'เข้าสู่ระบบ',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                          child: const Text('เข้าสู่ระบบ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                         ),
                       ),
 
@@ -353,68 +244,53 @@ class _LoginPageState extends State<LoginPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
-                            'ยังไม่มีบัญชีใช่ไหม? ',
-                            style: TextStyle(color: _textGrey, fontSize: 14),
-                          ),
+                          const Text('ยังไม่มีบัญชีใช่ไหม? ', style: TextStyle(color: _textGrey, fontSize: 14)),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const RegisterPage(),
-                                ),
-                              );
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterPage()));
                             },
-                            child: const Text(
-                              'สมัครสมาชิก',
-                              style: TextStyle(
-                                color: _primaryOrange,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
+                            child: const Text('สมัครสมาชิก', style: TextStyle(color: _primaryOrange, fontWeight: FontWeight.bold, fontSize: 14)),
                           ),
                         ],
                       ),
 
                       const SizedBox(height: 24),
-                      // เส้นคั่น "หรือ"
-                      Row(
-                        children: [
-                          const Expanded(
-                            child: Divider(color: Color(0xFFE0E0E0)),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              'หรือ',
-                              style: TextStyle(color: _textGrey, fontSize: 14),
-                            ),
-                          ),
-                          const Expanded(
-                            child: Divider(color: Color(0xFFE0E0E0)),
-                          ),
-                        ],
-                      ),
+                      // // เส้นคั่น "หรือ"
+                      // Row(
+                      //   children: [
+                      //     const Expanded(
+                      //       child: Divider(color: Color(0xFFE0E0E0)),
+                      //     ),
+                      //     Padding(
+                      //       padding: const EdgeInsets.symmetric(horizontal: 16),
+                      //       child: Text(
+                      //         'หรือ',
+                      //         style: TextStyle(color: _textGrey, fontSize: 14),
+                      //       ),
+                      //     ),
+                      //     const Expanded(
+                      //       child: Divider(color: Color(0xFFE0E0E0)),
+                      //     ),
+                      //   ],
+                      // ),
 
-                      const SizedBox(height: 24),
+                      // const SizedBox(height: 24),
 
-                      // ปุ่ม Social Media
-                      _SocialButton(
-                        iconPath: 'assets/icons/SocialIcons.png',
-                        label: 'เข้าสู่ระบบด้วย Facebook',
-                      ),
-                      const SizedBox(height: 12),
-                      _SocialButton(
-                        iconPath: 'assets/icons/google.png',
-                        label: 'เข้าสู่ระบบด้วย Google',
-                      ),
-                      const SizedBox(height: 12),
-                      _SocialButton(
-                        iconPath: 'assets/icons/Line.png',
-                        label: 'เข้าสู่ระบบด้วย Line',
-                      ),
+                      // // ปุ่ม Social Media
+                      // _SocialButton(
+                      //   iconPath: 'assets/icons/SocialIcons.png',
+                      //   label: 'เข้าสู่ระบบด้วย Facebook',
+                      // ),
+                      // const SizedBox(height: 12),
+                      // _SocialButton(
+                      //   iconPath: 'assets/icons/google.png',
+                      //   label: 'เข้าสู่ระบบด้วย Google',
+                      // ),
+                      // const SizedBox(height: 12),
+                      // _SocialButton(
+                      //   iconPath: 'assets/icons/Line.png',
+                      //   label: 'เข้าสู่ระบบด้วย Line',
+                      // ),
                     ],
                   ),
                 ),
@@ -454,16 +330,7 @@ class _SocialButton extends StatelessWidget {
           children: [
             Image.asset(iconPath, height: 24),
             const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF333333),
-                ),
-              ),
-            ),
+            Expanded(child: Text(label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Color(0xFF333333)))),
           ],
         ),
       ),

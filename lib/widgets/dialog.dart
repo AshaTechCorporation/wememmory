@@ -82,7 +82,7 @@ class DialogYesNo extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 24),
-            Image.asset('assets/icons/alert.png', width: 100, height: 100),
+            Image.asset('assets/icons/alert.png', width: 100, height: 100, color: kBackgroundColor),
             const SizedBox(height: 10),
             Text(title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: const Color(0xFFFAAE73))),
             const SizedBox(height: 5),

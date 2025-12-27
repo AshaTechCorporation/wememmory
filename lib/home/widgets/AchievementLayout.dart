@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wememmory/widgets/FormNum.dart';
 
 // --- Palette สี ---
 const Color _sidebarOrange = Color(0xFFF8B887);
@@ -210,8 +211,15 @@ class _DetailCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 30), // เว้นที่ให้ Title ด้านบนนิดนึง
-                Text(mainText, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, height: 1.2)),
+                NumberAwareText(
+                  mainText,
+                  numberFontSize: 25,
+                  numberOffset: -2,
+                  numberFontFamily: 'Wemory',
+                  style: const TextStyle(fontFamily: 'Kanit', color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, height: 1.2),
+                ),
                 const SizedBox(height: 1),
+
                 Text(
                   subText,
                   style: TextStyle(

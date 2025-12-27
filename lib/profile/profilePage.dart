@@ -16,6 +16,7 @@ import 'package:wememmory/profile/languagePage.dart';
 import 'package:wememmory/shop/termsAndServicesPage.dart';
 import 'package:wememmory/profile/benefitsPage.dart';
 import 'package:wememmory/shop/faqPage.dart';
+import 'package:wememmory/widgets/FormNum.dart';
 import 'package:wememmory/widgets/dialog.dart';
 import 'widgets/index.dart';
 import 'package:wememmory/home/service/homeController.dart';
@@ -148,16 +149,17 @@ class _ProfilePageState extends State<ProfilePage> {
                         case 7:
                           final out = await showDialog(
                             context: context,
-                            builder: (context) => DialogYesNo(
-                              title: 'แจ้งเตือน',
-                              description: 'ต้องการออกจากระบบใช่ไหม',
-                              pressYes: () {
-                                Navigator.pop(context, true);
-                              },
-                              pressNo: () {
-                                Navigator.pop(context, false);
-                              },
-                            ),
+                            builder:
+                                (context) => DialogYesNo(
+                                  title: 'แจ้งเตือน',
+                                  description: 'ต้องการลบบัญชีใช่ไหม?',
+                                  pressYes: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  pressNo: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                ),
                           );
                           if (out == true) {
                             clearToken();
@@ -167,16 +169,17 @@ class _ProfilePageState extends State<ProfilePage> {
                         case 8:
                           final out = await showDialog(
                             context: context,
-                            builder: (context) => DialogYesNo(
-                              title: 'แจ้งเตือน',
-                              description: 'ต้องการออกจากระบบใช่ไหม',
-                              pressYes: () {
-                                Navigator.pop(context, true);
-                              },
-                              pressNo: () {
-                                Navigator.pop(context, false);
-                              },
-                            ),
+                            builder:
+                                (context) => DialogYesNo(
+                                  title: 'แจ้งเตือน',
+                                  description: 'ต้องการออกจากระบบใช่ไหม?',
+                                  pressYes: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  pressNo: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                ),
                           );
                           if (out == true) {
                             clearToken();
@@ -240,7 +243,7 @@ class _HeaderSection extends StatelessWidget {
         Text(displayName, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w800, fontSize: 22)),
         const SizedBox(height: 4),
         // ✅ รหัสผู้แนะนำ (ใช้ค่าเดิม ไม่ดึงจาก Server)
-        const Text('รหัสผู้แนะนำ 1234', style: TextStyle(color: Color(0xFF5A5A5A), fontWeight: FontWeight.w400, fontSize: 16)),
+        const NumberAwareText('รหัสผู้แนะนำ 1234', numberFontFamily: 'wemory', style: TextStyle(fontFamily: 'Kanit', color: Color(0xFF5A5A5A), fontWeight: FontWeight.w400, fontSize: 16)),
       ],
     );
   }
@@ -390,7 +393,7 @@ class _TicketCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Ticket', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w400, color: const Color(0x404A4A4A), height: 1.0)),
-              Text('10', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w600, color: Colors.white, height: 1.0)),
+              NumberAwareText('10', numberFontFamily: 'Wemory', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w600, color: Colors.white, height: 1.0)),
             ],
           ),
           Row(
@@ -462,7 +465,7 @@ class _PointCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
               Text('Point', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w400, color: Color(0x40FFFFFF), height: 1.0)),
-              Text('27', style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white, height: 1.0)),
+              NumberAwareText('27', numberFontFamily: 'wemory', style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white, height: 1.0)),
             ],
           ),
           Row(
@@ -592,27 +595,27 @@ class _UsageStatsSection extends StatelessWidget {
   const _UsageStatsSection();
 
   TextStyle get _digitalTextStyle => GoogleFonts.orbitron(
-        fontSize: 30, // ปรับลด Default ลงเล็กน้อย
-        fontWeight: FontWeight.w900,
-        color: Colors.white,
-        letterSpacing: 1.0,
-        height: 1.0,
-      );
+    fontSize: 30, // ปรับลด Default ลงเล็กน้อย
+    fontWeight: FontWeight.w900,
+    color: Colors.white,
+    letterSpacing: 1.0,
+    height: 1.0,
+  );
 
   TextStyle get _digitalDateStyle => GoogleFonts.orbitron(
-        fontSize: 32, // ปรับลดจาก 37 เป็น 32 หรือใช้ FittedBox ช่วย
-        fontWeight: FontWeight.w900,
-        color: const Color(0xFF4A4A4A),
-        letterSpacing: 0.5,
-        height: 1.0,
-      );
+    fontSize: 32, // ปรับลดจาก 37 เป็น 32 หรือใช้ FittedBox ช่วย
+    fontWeight: FontWeight.w900,
+    color: const Color(0xFF4A4A4A),
+    letterSpacing: 0.5,
+    height: 1.0,
+  );
 
   TextStyle get _headerThaiStyle => const TextStyle(
-        fontSize: 32, // ปรับลดจาก 40 เป็น 32 เพื่อความปลอดภัย
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-        height: 1.2,
-      );
+    fontSize: 32, // ปรับลดจาก 40 เป็น 32 เพื่อความปลอดภัย
+    fontWeight: FontWeight.bold,
+    color: Colors.white,
+    height: 1.2,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -693,8 +696,10 @@ class _UsageStatsSection extends StatelessWidget {
               Flexible(
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: Text(
+                  child: NumberAwareText(
                     '80',
+                    numberFontFamily: 'wemory',
+                    numberFontSize: 60,
                     style: GoogleFonts.orbitron(
                       fontSize: 50, // ปรับลดจาก 60
                       fontWeight: FontWeight.w900,
@@ -769,11 +774,20 @@ class _UsageStatsSection extends StatelessWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerRight,
-                    child: Text(
+                    child: NumberAwareText(
                       value,
-                      style: isDigitalFont ? _digitalTextStyle.copyWith(fontSize: valueFontSize) : TextStyle(fontSize: valueFontSize, fontWeight: FontWeight.bold, color: Colors.white),
+                      numberFontFamily: 'wemory',
+                      style:
+                          isDigitalFont
+                              ? _digitalTextStyle.copyWith(fontSize: valueFontSize)
+                              : TextStyle(fontFamily: 'Kanit', fontSize: valueFontSize, fontWeight: FontWeight.bold, color: Colors.white),
                       //  GoogleFonts.prompt(fontSize: valueFontSize, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
+                    // child: Text(
+                    //   value,
+                    //   style: isDigitalFont ? _digitalTextStyle.copyWith(fontSize: valueFontSize) : TextStyle(fontSize: valueFontSize, fontWeight: FontWeight.bold, color: Colors.white),
+                    //   //  GoogleFonts.prompt(fontSize: valueFontSize, fontWeight: FontWeight.bold, color: Colors.white),
+                    // ),
                   ),
                 ),
               ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wememmory/Album/upload_photo_page.dart'; // Import หน้า Upload
 import 'package:wememmory/home/service/homeservice.dart';
 import 'package:wememmory/models/albumModel.dart';
+import 'package:wememmory/widgets/FormNum.dart';
 
 class CreateAlbumModal extends StatefulWidget {
   const CreateAlbumModal({super.key});
@@ -25,29 +26,26 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
   Future<void> _fetchAllYearsStatus() async {
     try {
       final currentYearAD = DateTime.now().year;
-      
+
       // รายการปีที่ต้องดึง (ปีปัจจุบัน และย้อนหลังไป 3 ปี)
       // เช่น ถ้าปี 2025 จะดึง: 2025, 2024, 2023, 2022
-      List<int> yearsToFetch = [
-        currentYearAD,
-        currentYearAD - 1,
-        currentYearAD - 2,
-        currentYearAD - 3
-      ];
+      List<int> yearsToFetch = [currentYearAD, currentYearAD - 1, currentYearAD - 2, currentYearAD - 3];
 
       // ดึงข้อมูลแบบ Parallel (พร้อมกัน) เพื่อความรวดเร็ว
-      await Future.wait(yearsToFetch.map((year) async {
-        try {
-          final albums = await HomeService.getAlbums(year: '$year');
-          if (mounted) {
-            setState(() {
-              _cachedAlbums[year] = albums;
-            });
+      await Future.wait(
+        yearsToFetch.map((year) async {
+          try {
+            final albums = await HomeService.getAlbums(year: '$year');
+            if (mounted) {
+              setState(() {
+                _cachedAlbums[year] = albums;
+              });
+            }
+          } catch (e) {
+            debugPrint("Error fetching albums for year $year: $e");
           }
-        } catch (e) {
-          debugPrint("Error fetching albums for year $year: $e");
-        }
-      }));
+        }),
+      );
 
       if (mounted) {
         setState(() {
@@ -63,10 +61,7 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
   }
 
   String _getThaiMonthName(dynamic monthInput) {
-    const List<String> thaiMonths = [
-      "", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-      "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-    ];
+    const List<String> thaiMonths = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
     try {
       int monthNum = 0;
       if (monthInput is int) {
@@ -89,8 +84,8 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
     final parts = fullDateString.split(' ');
     if (parts.length < 2) return false;
 
-    final String targetMonthName = parts[0]; 
-    final int targetYearBE = int.tryParse(parts[1]) ?? 0; 
+    final String targetMonthName = parts[0];
+    final int targetYearBE = int.tryParse(parts[1]) ?? 0;
     final int targetYearAD = targetYearBE - 543; // แปลง พ.ศ. -> ค.ศ.
 
     // ดึง List ข้อมูลจาก Map ตามปี ค.ศ.
@@ -113,13 +108,10 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
   // ✅ 3. สร้างรายการเดือนย้อนหลัง 36 เดือน
   List<String> _generateMonthList() {
     final now = DateTime.now();
-    final List<String> thaiMonths = [
-      'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-    ];
+    final List<String> thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
 
     List<String> result = [];
-    
+
     // วนลูปย้อนหลัง 36 เดือน
     for (int i = 0; i < 36; i++) {
       final targetDate = DateTime(now.year, now.month - i, 1);
@@ -138,22 +130,12 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.85, // เพิ่มความสูงหน่อยเพราะรายการยาวขึ้น
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-      ),
+      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(12))),
       child: Column(
         children: [
           // --- Slide Indicator ---
           const SizedBox(height: 12),
-          Container(
-            width: 61,
-            height: 5,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2.5),
-            ),
-          ),
+          Container(width: 61, height: 5, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2.5))),
 
           // --- Header ---
           Padding(
@@ -161,18 +143,8 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'สร้างอัลบั้มรูป',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, size: 28, color: Colors.grey),
-                ),
+                const Text('สร้างอัลบั้มรูป', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87)),
+                IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close, size: 28, color: Colors.grey)),
               ],
             ),
           ),
@@ -182,20 +154,9 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
             padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             child: Column(
               children: [
-                Text(
-                  'คุณมีอยู่ 10 เครดิต',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
+                NumberAwareText('คุณมีอยู่ 10 เครดิต', numberFontFamily: 'Wemory', style: TextStyle(fontFamily: "Kanit", fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
                 SizedBox(height: 4),
-                Text(
-                  'ให้แต่ละเดือนบอกเล่าเรื่องราวของคุณ ผ่านภาพแห่งความทรงจำ',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: Colors.grey),
-                ),
+                Text('ให้แต่ละเดือนบอกเล่าเรื่องราวของคุณ ผ่านภาพแห่งความทรงจำ', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: Colors.grey)),
               ],
             ),
           ),
@@ -205,30 +166,31 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
 
           // --- List of Months ---
           Expanded(
-            child: _isLoading 
-                ? const Center(child: CircularProgressIndicator()) 
-                : ListView.separated(
-                    padding: EdgeInsets.zero,
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: allMonths.length,
-                    separatorBuilder: (context, index) => const Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
-                    itemBuilder: (context, index) {
-                      final monthName = allMonths[index];
-                      
-                      final bool isDone = _checkIfMonthCompleted(monthName);
+            child:
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView.separated(
+                      padding: EdgeInsets.zero,
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: allMonths.length,
+                      separatorBuilder: (context, index) => const Divider(height: 1, indent: 24, endIndent: 24, color: Colors.black12),
+                      itemBuilder: (context, index) {
+                        final monthName = allMonths[index];
 
-                      return _AlbumOptionItem(
-                        month: monthName,
-                        statusText: isDone ? "สร้างอัลบั้มสำเร็จ" : "สร้างอัลบั้ม",
-                        isDone: isDone,
-                        onTap: () {
-                           if (!isDone) {
-                             Navigator.pop(context, monthName); 
-                           }
-                        },
-                      );
-                    },
-                  ),
+                        final bool isDone = _checkIfMonthCompleted(monthName);
+
+                        return _AlbumOptionItem(
+                          month: monthName,
+                          statusText: isDone ? "สร้างอัลบั้มสำเร็จ" : "สร้างอัลบั้ม",
+                          isDone: isDone,
+                          onTap: () {
+                            if (!isDone) {
+                              Navigator.pop(context, monthName);
+                            }
+                          },
+                        );
+                      },
+                    ),
           ),
         ],
       ),
@@ -242,12 +204,7 @@ class _AlbumOptionItem extends StatelessWidget {
   final bool isDone;
   final VoidCallback onTap;
 
-  const _AlbumOptionItem({
-    required this.month,
-    required this.statusText,
-    required this.isDone,
-    required this.onTap,
-  });
+  const _AlbumOptionItem({required this.month, required this.statusText, required this.isDone, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -261,31 +218,18 @@ class _AlbumOptionItem extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  month, 
-                  style: const TextStyle(
-                    fontSize: 16, 
-                    fontWeight: FontWeight.w500, 
-                    color: Colors.black87 
-                  )
-                ),
+                NumberAwareText(month, numberFontFamily: 'Wemory', style: const TextStyle(fontSize: 16, fontFamily: 'Kanit', fontWeight: FontWeight.w500, color: Colors.black87)),
                 const SizedBox(height: 4),
-                Text(
-                  statusText, 
-                  style: TextStyle(
-                    fontSize: 13, 
-                    color: isDone ? const Color(0xFF66BB6A) : Colors.black87, 
-                  )
-                ),
+                Text(statusText, style: TextStyle(fontSize: 13, color: isDone ? const Color(0xFF66BB6A) : Colors.black87)),
               ],
             ),
-            if (isDone) 
+            if (isDone)
               Image.asset(
                 'assets/icons/createSuccess.png', // เปลี่ยนเป็น Check.png ตามที่คุณใช้
                 width: 24,
                 height: 24,
                 fit: BoxFit.contain,
-              )
+              ),
           ],
         ),
       ),
