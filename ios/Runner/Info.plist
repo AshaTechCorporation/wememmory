@@ -49,5 +49,7 @@
 	<string>แอพต้องการเข้าถึงคลังภาพเพื่อเลือกรูปภาพและวิดีโอสำหรับสร้างอัลบั้ม</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>แอพต้องการบันทึกรูปภาพลงในอุปกรณ์ของคุณ</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>อนุญาตเข้าถึงตำแหน่ง เพื่อกำหนดที่ตั้งร้านของคุณ</string>
 </dict>
 </plist>
