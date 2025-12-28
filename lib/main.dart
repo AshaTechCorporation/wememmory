@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
     await NotificationHelper.checkPermission();
 
     // ตั้งเวลา
-    await NotificationHelper.scheduleHourly();
+    await NotificationHelper.scheduleMonthly();
   }
 
   @override

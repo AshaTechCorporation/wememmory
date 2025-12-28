@@ -12,7 +12,7 @@ class NotificationHelper {
         NotificationChannel(
           channelKey: 'daily_channel',
           channelName: 'Daily Notifications',
-          channelDescription: 'แจ้งเตือนประจำวัน',
+          channelDescription: 'แจ้งเตือนประจำเดือน',
           defaultColor: Colors.deepPurple,
           ledColor: Colors.white,
           importance: NotificationImportance.High,
@@ -67,7 +67,8 @@ class NotificationHelper {
   }
   */
 
-  static Future<void> scheduleHourly() async {
+  // เปลี่ยนชื่อฟังก์ชันให้สื่อความหมาย (เช่น scheduleMonthly)
+  static Future<void> scheduleMonthly() async {
     // ลบตารางเวลาเก่าทิ้งก่อนเสมอ
     await AwesomeNotifications().cancelAllSchedules();
 
@@ -75,7 +76,7 @@ class NotificationHelper {
     
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
-        id: 2000, // เปลี่ยน ID ใหม่
+        id: 3000, 
         channelKey: 'daily_channel', 
         title: 'Wememory',
         body: 'อย่าลืมเข้ามาบันทึกความทรงจำนะ', 
@@ -85,16 +86,18 @@ class NotificationHelper {
         criticalAlert: Platform.isAndroid ? true : false, 
       ),
       schedule: NotificationCalendar(
-        minute: 0,  
+        day: 1,
+        hour: 10,
+        minute: 0,   
         second: 0,
         millisecond: 0,
         
         timeZone: localTimeZone, 
-        repeats: true,        
+        repeats: true,
         allowWhileIdle: true, 
         preciseAlarm: true,  
       ),
     );
-    debugPrint("✅ ตั้งเวลาแจ้งเตือนทุกชั่วโมง (ที่นาที 00) เรียบร้อย");
+    debugPrint("✅ ตั้งเวลาแจ้งเตือนทุกวันที่ 1 ของเดือน เวลา 10:00 เรียบร้อย");
   }
 }
