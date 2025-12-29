@@ -47,8 +47,8 @@ class _ShopBody extends StatelessWidget {
               'ร้านความทรงจำ',
               style: TextStyle(
                 color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
+                fontWeight: FontWeight.w300,
+                fontSize: 18,
               ),
             ),
           ),
@@ -62,8 +62,8 @@ class _ShopBody extends StatelessWidget {
               },
               icon: Image.asset(
                 'assets/icons/trolley.png',
-                width: 25,
-                height: 25, 
+                width: 20,
+                height: 20, 
                 fit: BoxFit.contain,
               ),
             ),
@@ -269,16 +269,16 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
             'แพ็กเกจสมาชิก',
             style: TextStyle(
               fontSize: 22,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
               color: Colors.black,
             ),
           ),
           const SizedBox(height: 4),
           const Text(
             'เลือกแพ็กเกจที่ใช่เพื่อเก็บช่วงเวลาให้มีความหมายยิ่งขึ้น',
-            style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 100, 100, 100)),
+            style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 100, 100, 100)),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 30),
 
           // 2. การ์ดใหญ่
           Container(
@@ -531,7 +531,7 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFF8A3D),
+                              backgroundColor: const Color(0xFFEE743B),
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -587,15 +587,15 @@ class _SpecialGiftHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
           Text(
             'ของขวัญสำหรับคนพิเศษ',
             style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
               color: Colors.black,
             ),
           ),
@@ -644,6 +644,7 @@ class _GiftCardBanner extends StatelessWidget {
         'เก็บช่วงเวลาที่รักไว้\nติดตัวไปทุกที่',
         textAlignment,
         textAlign,
+        
       );
     } else {
       // --- การ์ดล่าง (PhotoFrame) ---
@@ -784,7 +785,7 @@ class _GiftCardBanner extends StatelessWidget {
           text,
           textAlign: textAlign,
           style: const TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w400,
             fontSize: 16,
             height: 1.4,
             color: Colors.black87,
@@ -810,7 +811,7 @@ class _GiftCardBanner extends StatelessWidget {
             ),
             child: const Text(
               'ส่งของขวัญ',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16),
             ),
           ),
         ),

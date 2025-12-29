@@ -22,8 +22,8 @@ class SummaryStrip extends StatelessWidget {
                   title: 'เรื่องราวที่น่าจดจำ',
                   count: '88',
                   countColor: Color(0xFF5AB6D8),
-                  imagePaths: ['assets/images/Hobby1.png'],
-                  topCaptionTitle: 'ช่วงเวลาดีดี',
+                  imagePaths: ['assets/images/exProfile.png'],
+                  topCaptionTitle: 'อากาศดี วิวสวย',
                   topCaptionSub: '#ครอบครัว #ความรัก',
                 ),
               ),
@@ -83,23 +83,25 @@ class SubscriptionCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center, // จัดกึ่งกลางแนวตั้งของ Column
               children: [
                 // ข้อความบน: สร้างอัลบั้มต่อเนื่อง
-                Text('สร้างอัลบั้มต่อเนื่อง', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[400])),
+                Text('สร้างอัลบั้มต่อเนื่อง', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF5AB6D8))),
                 const SizedBox(height: 5),
 
                 // แถวล่าง: เลข 4 และ คำว่าเดือน
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // เลข 4 สีฟ้าตัวใหญ่
-                    const Text(
+                    // --- แก้ไขตรงนี้: ใช้ NumberAwareText และกำหนด font wemory ---
+                    NumberAwareText(
                       '4',
-                      style: TextStyle(
+                      numberFontFamily: 'wemory', // ✅ ใช้ฟอนต์ wemory
+                      style: const TextStyle(
                         fontSize: 60,
                         fontWeight: FontWeight.w900,
                         color: Color(0xFF5AB6D8), // สีฟ้า
                         height: 1.0,
                       ),
                     ),
+                    
                     const SizedBox(width: 9), // ระยะห่าง
                     // แคปซูลคำว่า "เดือน"
                     Container(
@@ -113,7 +115,7 @@ class SubscriptionCard extends StatelessWidget {
                         'เดือน',
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w400,
                           color: Color(0xFF5AB6D8), // สีตัวหนังสือสีฟ้า
                         ),
                       ),
@@ -160,7 +162,7 @@ class BackgroundCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------
-// InfoCard (คงเดิม)
+// InfoCard (คงเดิม แต่เช็ค Font ให้แล้ว)
 // ---------------------------------------------------------
 class InfoCard extends StatelessWidget {
   final String title;
@@ -192,14 +194,14 @@ class InfoCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[400])),
+                Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF5AB6D8))),
                 const SizedBox(height: 5),
+                // --- ตรงนี้ใช้ NumberAwareText อยู่แล้ว เพิ่มความชัวร์เรื่องชื่อ Font ---
                 NumberAwareText(
                   count,
-                  numberFontFamily: 'Wemory', // ใส่ชื่อฟอนต์ตัวเลขตรงนี้
-                  style: TextStyle(fontSize: 60, fontWeight: FontWeight.w900, color: countColor, height: 1.0),
+                  numberFontFamily: 'wemory', // ✅ ใช้ฟอนต์ wemory
+                  style: TextStyle(fontSize: 70, fontWeight: FontWeight.w400, color: countColor, height: 1.0),
                 ),
-                // Text(count, style: TextStyle(fontSize: 60, fontWeight: FontWeight.w900, color: countColor, height: 1.0)),
               ],
             ),
           ],
@@ -291,7 +293,7 @@ class _PhotoCard extends StatelessWidget {
                 children: [
                   Text(
                     captionTitle,
-                    style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Colors.black87),
+                    style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Color.fromARGB(153, 0, 0, 0)),
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -299,7 +301,7 @@ class _PhotoCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     captionSub,
-                    style: const TextStyle(fontSize: 7, color: Color(0xFF5AB6D8), fontWeight: FontWeight.w500),
+                    style: const TextStyle(fontSize: 7, color: Color(0xFF5AB6D8), fontWeight: FontWeight.w400),
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wememmory/widgets/FormNum.dart';
+// import 'package:wememmory/widgets/FormNum.dart'; // ไม่ต้องใช้ NumberAwareText ตรงจุดนี้แล้วเพราะเราเขียน Custom RichText เอง
 
 // --- Palette สี ---
 const Color _sidebarOrange = Color(0xFFF8B887);
@@ -40,30 +40,33 @@ class AchievementLayout extends StatelessWidget {
                   // ส่วน Cards
                   const Column(
                     children: [
-                      // เดือนเมษายน (สี Teal เดิม)
+                      // เดือนเมษายน
                       TimelineItem(
-                        monthTitle: 'Apr', // ชื่อเดือนภาษาอังกฤษ
-                        mainText: 'แชร์รูปภาพ 20 ครั้ง',
+                        monthTitle: 'Apr',
+                        mainText: 'แชร์รูปภาพ 20',
+                        highlightWord: '20', 
                         subText: 'แชร์รูปภาพมากที่สุดในปีนี้',
                         imagePath: 'assets/icons/shareLogo.png',
                         imgWidth: 67,
                         imgHeight: 57,
-                        cardColor: _cardTeal, // กำหนดสีการ์ด
+                        cardColor: _cardTeal,
                       ),
-                      // เดือนมีนาคม (สีส้ม)
+                      // เดือนมีนาคม
                       TimelineItem(
                         monthTitle: 'Mar',
-                        mainText: 'ใช้เวลา 5.47นาที',
+                        mainText: 'ใช้เวลา 5.47 นาที',
+                        highlightWord: '5.47', 
                         subText: 'ในการสร้างอัลบั้มเดือนนี้เร็วที่สุด',
                         imagePath: 'assets/icons/limiter.png',
                         imgWidth: 82,
                         imgHeight: 76,
-                        cardColor: _cardOrange, // เปลี่ยนเป็นสีส้ม
+                        cardColor: _cardOrange,
                       ),
                       // เดือนกุมภาพันธ์
                       TimelineItem(
                         monthTitle: 'Feb',
                         mainText: 'อธิบายภาพในเดือนนี้',
+                        highlightWord: 'อธิบายภาพ', 
                         subText: 'บันทึกเรื่องราวของเดือนนี้มากที่สุด',
                         imagePath: 'assets/icons/76p.png',
                         imgWidth: 92,
@@ -75,6 +78,7 @@ class AchievementLayout extends StatelessWidget {
                       TimelineItem(
                         monthTitle: 'Jan',
                         mainText: 'ความทรงจำครั้งแรก',
+                        highlightWord: 'ครั้งแรก', 
                         subText: 'สร้างความทรงจำครั้งแรก',
                         imagePath: 'assets/icons/bookp.png',
                         imgWidth: 76,
@@ -108,8 +112,15 @@ class _HeaderSection extends StatelessWidget {
           children: [
             Image.asset('assets/icons/wemoryv2.png', height: 103, width: 154),
             Padding(
-              padding: const EdgeInsets.only(top: 70.0), // ปรับค่าตรงนี้เพื่อเลื่อน Text ลงมา
-              child: Text("Beginner", style: const TextStyle(color: Color(0xFFEE743B), fontSize: 24, fontWeight: FontWeight.bold)),
+              padding: const EdgeInsets.only(top: 70.0),
+              child: Text(
+                "Beginner",
+                style: const TextStyle(
+                  color: Color(0xFFEE743B),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),
@@ -119,45 +130,58 @@ class _HeaderSection extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------
-// 📌 2. Timeline Item Structure (Updated)
+// 📌 2. Timeline Item Structure
 // -----------------------------------------------------------------
 class TimelineItem extends StatelessWidget {
-  final String monthTitle; // ชื่อเดือนตัวใหญ่ (Ex: Mar)
+  final String monthTitle;
   final String mainText;
+  final String? highlightWord; // เพิ่มตัวแปรรับคำที่ต้องการเน้น
   final String subText;
   final String imagePath;
   final double imgWidth;
   final double imgHeight;
   final bool isFill;
-  final Color cardColor; // สีพื้นหลังการ์ด
+  final Color cardColor;
 
   const TimelineItem({
     super.key,
     required this.monthTitle,
     required this.mainText,
+    this.highlightWord, // รับค่าตรงนี้
     required this.subText,
     required this.imagePath,
     required this.imgWidth,
     required this.imgHeight,
     this.isFill = false,
-    this.cardColor = _cardTeal, // Default color
+    this.cardColor = _cardTeal,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
-      child: _DetailCard(monthTitle: monthTitle, mainText: mainText, subText: subText, imagePath: imagePath, imgWidth: imgWidth, imgHeight: imgHeight, isFill: isFill, cardColor: cardColor),
+      child: _DetailCard(
+        monthTitle: monthTitle,
+        mainText: mainText,
+        highlightWord: highlightWord,
+        subText: subText,
+        imagePath: imagePath,
+        imgWidth: imgWidth,
+        imgHeight: imgHeight,
+        isFill: isFill,
+        cardColor: cardColor,
+      ),
     );
   }
 }
 
 // -----------------------------------------------------------------
-// 📌 3. Detail Card UI (Updated Layout)
+// 📌 3. Detail Card UI (Modified for custom highlighting)
 // -----------------------------------------------------------------
 class _DetailCard extends StatelessWidget {
   final String monthTitle;
   final String mainText;
+  final String? highlightWord;
   final String subText;
   final String imagePath;
   final double imgWidth;
@@ -168,6 +192,7 @@ class _DetailCard extends StatelessWidget {
   const _DetailCard({
     required this.monthTitle,
     required this.mainText,
+    this.highlightWord,
     required this.subText,
     required this.imagePath,
     required this.imgWidth,
@@ -182,20 +207,21 @@ class _DetailCard extends StatelessWidget {
       width: double.infinity,
       height: 143,
       decoration: BoxDecoration(
-        color: cardColor, // ใช้สีที่ส่งมา
-        borderRadius: const BorderRadius.only(topLeft: Radius.circular(0), bottomLeft: Radius.circular(0), topRight: Radius.circular(0), bottomRight: Radius.circular(0)),
+        color: cardColor,
+        borderRadius: const BorderRadius.all(Radius.circular(0)),
         boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 4))],
       ),
       child: Stack(
         children: [
-          // 1. Month Title (ตัวหนังสือจางๆ ด้านหลัง)
+          // 1. Month Title
           Positioned(
             top: 8,
             left: 20,
             child: Text(
               monthTitle,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.3), // สีจางๆ
+                fontFamily: 'wemory',
+                color: Colors.white.withOpacity(0.3),
                 fontSize: 60,
                 fontWeight: FontWeight.bold,
                 height: 1.0,
@@ -203,21 +229,18 @@ class _DetailCard extends StatelessWidget {
             ),
           ),
 
-          // 2. Main Content (ข้อความหลัก)
+          // 2. Main Content
           Padding(
             padding: const EdgeInsets.only(left: 20, right: 80, top: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 30), // เว้นที่ให้ Title ด้านบนนิดนึง
-                NumberAwareText(
-                  mainText,
-                  numberFontSize: 25,
-                  numberOffset: -2,
-                  numberFontFamily: 'Wemory',
-                  style: const TextStyle(fontFamily: 'Kanit', color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, height: 1.2),
-                ),
+                const SizedBox(height: 30),
+                
+                // ✅ ส่วนแสดงผลข้อความที่รองรับการขยายคำเฉพาะ
+                _buildRichText(),
+                
                 const SizedBox(height: 1),
 
                 Text(
@@ -225,14 +248,14 @@ class _DetailCard extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.9),
                     fontSize: 14,
-                    fontWeight: FontWeight.w300, // ปรับน้ำหนักให้บางลงนิดหน่อยตามภาพ
+                    fontWeight: FontWeight.w300,
                   ),
                 ),
               ],
             ),
           ),
 
-          // 3. Icon ด้านขวา
+          // 3. Icon
           Positioned(
             right: 18,
             top: 0,
@@ -251,6 +274,57 @@ class _DetailCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  // ฟังก์ชันสร้าง TextSpan เพื่อขยายคำที่ตรงกับ highlightWord
+  Widget _buildRichText() {
+    if (highlightWord == null || highlightWord!.isEmpty) {
+      return Text(
+        mainText,
+        style: const TextStyle(fontFamily: 'Kanit', color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, height: 1.2),
+      );
+    }
+
+    // แยกประโยคออกเป็นส่วนๆ โดยใช้คำที่ highlight เป็นตัวตัด
+    final parts = mainText.split(highlightWord!);
+    List<TextSpan> spans = [];
+
+    for (int i = 0; i < parts.length; i++) {
+      // 1. ใส่ข้อความปกติ
+      if (parts[i].isNotEmpty) {
+        spans.add(TextSpan(
+          text: parts[i],
+          style: const TextStyle(
+            fontFamily: 'Kanit',
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ));
+      }
+
+      // 2. ใส่คำ Highlight (ถ้าไม่ใช่ส่วนสุดท้าย)
+      if (i < parts.length - 1) {
+        // ตรวจสอบว่าเป็นตัวเลขหรือไม่ เพื่อเลือก Font
+        bool isNumeric = double.tryParse(highlightWord!) != null;
+        
+        spans.add(TextSpan(
+          text: highlightWord,
+          style: TextStyle(
+            // ถ้าเป็นตัวเลขใช้ wemory ถ้าไม่ใช่ใช้ Kanit (หรือฟอนต์ปกติ)
+            fontFamily: isNumeric ? 'wemory' : 'Kanit', 
+            color: Colors.white,
+            fontSize: 34, // ✅ ขนาดใหญ่พิเศษสำหรับคำที่เลือก
+            fontWeight: FontWeight.bold,
+            height: isNumeric ? 0.8 : 1.2, // ปรับความสูงบรรทัดถ้าเป็นตัวเลข Wemory เพื่อให้ไม่ลอย
+          ),
+        ));
+      }
+    }
+
+    return RichText(
+      text: TextSpan(children: spans),
     );
   }
 }

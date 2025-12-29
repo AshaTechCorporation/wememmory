@@ -21,7 +21,7 @@ class CartPage extends StatelessWidget {
           'ตะกร้าสินค้า',
           style: TextStyle(
             color: Colors.black,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w400,
           ),
         ),
         leading: IconButton(
@@ -38,7 +38,6 @@ class CartPage extends StatelessWidget {
           children: [
             _buildSelectAllSection(),
             
-            const Divider(height: 1, color: Colors.grey),
             
             // รายการสินค้า
             _buildCartItem(
