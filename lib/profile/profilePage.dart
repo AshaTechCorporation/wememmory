@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart';
 import 'package:wememmory/constants.dart';
 import 'package:wememmory/login/loginPage.dart';
 import 'package:wememmory/profile/albumDetailPage.dart';
@@ -303,8 +303,22 @@ class _MemorableStoryCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text('อากาศดี วิวสวย', style: GoogleFonts.chakraPetch(fontSize: 10, fontWeight: FontWeight.bold)),
-                Text('#ครอบครัว #ความรัก', style: GoogleFonts.chakraPetch(fontSize: 8, color: const Color(0xFF58A3B6))),
+                Text(
+                  'อากาศดี วิวสวย',
+                  style: TextStyle(
+                    // GoogleFonts.chakraPetch(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '#ครอบครัว #ความรัก',
+                  style: TextStyle(
+                    // GoogleFonts.chakraPetch(
+                    fontSize: 8,
+                    color: const Color(0xFF58A3B6),
+                  ),
+                ),
               ],
             ),
           ),
@@ -331,9 +345,26 @@ class _MemorableStoryCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('เรื่องราวที่น่าจดจำ', style: GoogleFonts.chakraPetch(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF58A3B6))),
+                Text(
+                  'เรื่องราวที่น่าจดจำ',
+                  style: TextStyle(
+                    // GoogleFonts.chakraPetch(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF58A3B6),
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text('88', style: GoogleFonts.chakraPetch(fontSize: 60, fontWeight: FontWeight.bold, color: const Color(0xFF58A3B6), height: 1.0)),
+                Text(
+                  '88',
+                  style: TextStyle(
+                    //  GoogleFonts.chakraPetch(
+                    fontSize: 60,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF58A3B6),
+                    height: 1.0,
+                  ),
+                ),
               ],
             ),
           ),
@@ -594,7 +625,7 @@ class _MetricBarChart extends StatelessWidget {
 class _UsageStatsSection extends StatelessWidget {
   const _UsageStatsSection();
 
-  TextStyle get _digitalTextStyle => GoogleFonts.orbitron(
+  TextStyle get _digitalTextStyle => TextStyle(
     fontSize: 30, // ปรับลด Default ลงเล็กน้อย
     fontWeight: FontWeight.w900,
     color: Colors.white,
@@ -602,7 +633,16 @@ class _UsageStatsSection extends StatelessWidget {
     height: 1.0,
   );
 
-  TextStyle get _digitalDateStyle => GoogleFonts.orbitron(
+  //  GoogleFonts.orbitron(
+  //   fontSize: 30, // ปรับลด Default ลงเล็กน้อย
+  //   fontWeight: FontWeight.w900,
+  //   color: Colors.white,
+  //   letterSpacing: 1.0,
+  //   height: 1.0,
+  // );
+
+  TextStyle get _digitalDateStyle => TextStyle(
+    // GoogleFonts.orbitron(
     fontSize: 32, // ปรับลดจาก 37 เป็น 32 หรือใช้ FittedBox ช่วย
     fontWeight: FontWeight.w900,
     color: const Color(0xFF4A4A4A),
@@ -700,12 +740,18 @@ class _UsageStatsSection extends StatelessWidget {
                     '80',
                     numberFontFamily: 'wemory',
                     numberFontSize: 60,
-                    style: GoogleFonts.orbitron(
+                    style: TextStyle(
                       fontSize: 50, // ปรับลดจาก 60
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
                       letterSpacing: 2.0,
                     ),
+                    //  style: GoogleFonts.orbitron(
+                    //   fontSize: 50, // ปรับลดจาก 60
+                    //   fontWeight: FontWeight.w900,
+                    //   color: Colors.white,
+                    //   letterSpacing: 2.0,
+                    // ),
                   ),
                 ),
               ),
