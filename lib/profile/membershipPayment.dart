@@ -49,7 +49,7 @@ class _PaymentPageState extends State<PaymentPage> {
         ),
         title: const Text(
           'ชำระเงิน',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
         ),
       ),
       body: SafeArea(
@@ -64,7 +64,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     // --- ส่วนรายละเอียดแพ็กเกจ ---
                     const Text(
                       'รายละเอียด',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -85,7 +85,6 @@ class _PaymentPageState extends State<PaymentPage> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Divider(thickness: 1),
                     const SizedBox(height: 16),
 
                     // --- ส่วนช่องทางชำระเงิน ---
@@ -109,7 +108,6 @@ class _PaymentPageState extends State<PaymentPage> {
                     _buildCreditCardSection(),
 
                     const SizedBox(height: 16),
-                    const Divider(thickness: 1),
                     const SizedBox(height: 16),
 
                     // --- ส่วนลด ---
@@ -124,10 +122,9 @@ class _PaymentPageState extends State<PaymentPage> {
                         ElevatedButton(
                           onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CouponSelectionPage())),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFEF703F),
+                            backgroundColor: const Color(0xFFEE743B),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           ),
@@ -163,9 +160,8 @@ class _PaymentPageState extends State<PaymentPage> {
                 child: ElevatedButton(
                   onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaymentSuccessPage())),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFEF703F),
+                    backgroundColor: const Color(0xFFEE743B),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   child: const Text(

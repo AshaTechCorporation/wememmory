@@ -41,7 +41,7 @@ class PaymentSuccessPage extends StatelessWidget {
                               'การชำระเงินของคุณเสร็จสมบูรณ์',
                               style: TextStyle(
                                 fontSize: 18, 
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w300,
                                 color: Colors.black87,
                               ),
                             ),
@@ -84,14 +84,13 @@ class PaymentSuccessPage extends StatelessWidget {
                     backgroundColor: const Color(0xFFFF7043),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   child: const Text(
                     'ยืนยัน',
                     style: TextStyle(
                       color: Colors.white, 
-                      fontWeight: FontWeight.bold, 
+                      fontWeight: FontWeight.w300, 
                       fontSize: 16
                     ),
                   ),
