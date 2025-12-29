@@ -7,16 +7,16 @@ class BankInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const orange = Color(0xFFF29C64);
+    const orange = Color(0xFFEE743B);
     const divider = Color(0xFFEFEFEF);
-    const textGray = Color(0xFF5F5F5F);
+    
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255), // พื้นหลังส้มด้านบน
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255), // พื้นหลังขาว
       appBar: AppBar(
         backgroundColor: const Color(0xFFF8B887),
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white), onPressed: () => Navigator.pop(context)),
-        title: const Text('ข้อมูลบัญชีธนาคาร/บัตรเครดิต', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+        title: const Text('ข้อมูลบัญชีธนาคาร/บัตรเครดิต', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w300,fontSize: 16)),
       ),
 
       // ตัวเนื้อหาพื้นขาว
@@ -31,7 +31,7 @@ class BankInfoPage extends StatelessWidget {
                 icon: 'assets/icons/iconb123.png',
                 title: 'Mobile Banking',
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => MobileBankingPage()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const MobileBankingPage()));
                 },
               ),
               const Divider(height: 1, color: divider),
@@ -52,9 +52,9 @@ class BankInfoPage extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: orange,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+              shape: RoundedRectangleBorder(),
             ),
-            child: const Text('ยืนยัน', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+            child: const Text('ยืนยัน', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 15)),
           ),
         ),
       ),
@@ -80,7 +80,7 @@ class _ListTile extends StatelessWidget {
           children: [
             Image.asset(icon, width: 28, height: 28),
             const SizedBox(width: 14),
-            Expanded(child: Text(title, style: const TextStyle(fontSize: 15, color: textGray, fontWeight: FontWeight.w700))),
+            Expanded(child: Text(title, style: const TextStyle(fontSize: 15, color: textGray, fontWeight: FontWeight.w300))),
             const Icon(Icons.chevron_right, color: Color(0xFFB7B7B7)),
           ],
         ),

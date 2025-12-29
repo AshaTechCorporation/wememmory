@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wememmory/home/firstPage.dart';
 
 class BenefitsPage extends StatelessWidget {
   const BenefitsPage({super.key});
@@ -14,25 +15,25 @@ class BenefitsPage extends StatelessWidget {
         'amount': '1',
       },
       {
-        'image': 'assets/images/order1.png', 
+        'image': 'assets/images/exGife.png', 
         'title': 'สินค้า',
         'subtitle': 'ให้ภาพของคุณเล่าเรื่องอีกครั้ง',
         'amount': '1',
       },
       {
-        'image': 'assets/images/order2.png',
+        'image': 'assets/images/exGife.png', 
         'title': 'สินค้า',
         'subtitle': 'ให้ภาพของคุณเล่าเรื่องอีกครั้ง',
         'amount': '1',
       },
       {
-        'image': 'assets/images/album.png',
+        'image': 'assets/images/exGife.png', 
         'title': 'สินค้า',
         'subtitle': 'ให้ภาพของคุณเล่าเรื่องอีกครั้ง',
         'amount': '1',
       },
       {
-        'image': 'assets/images/order1.png',
+        'image': 'assets/images/exGife.png', 
         'title': 'สินค้า',
         'subtitle': 'ให้ภาพของคุณเล่าเรื่องอีกครั้ง',
         'amount': '1',
@@ -96,7 +97,7 @@ class BenefitsPage extends StatelessWidget {
                   const SizedBox(width: 16),
                   const Text(
                     'สิทธิประโยชน์',
-                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w300),
                   ),
                 ],
               ),
@@ -121,7 +122,7 @@ class BenefitsPage extends StatelessWidget {
                           // หัวข้อของขวัญ
                           const Text(
                             'ของขวัญที่สามารถแลกเปลี่ยนได้',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
+                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w300, color: Color(0xFF333333)),
                           ),
                           const SizedBox(height: 16),
 
@@ -136,7 +137,7 @@ class BenefitsPage extends StatelessWidget {
                             children: const [
                               Text(
                                 'เงื่อนไขการสะสม Point',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Color(0xFF333333)),
                               ),
                               Icon(Icons.keyboard_arrow_up, color: Colors.grey), // ไอคอนลูกศร
                             ],
@@ -152,7 +153,7 @@ class BenefitsPage extends StatelessWidget {
                           // หัวข้อกิจกรรม
                           const Text(
                             'กิจกรรม (Activity)',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Color(0xFF333333)),
                           ),
                           const SizedBox(height: 16),
 
@@ -173,17 +174,19 @@ class BenefitsPage extends StatelessWidget {
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
-                            onPressed: () {
-                              // Action แลกเปลี่ยนของรางวัล
+                            onPressed: () {Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const FirstPage()),
+                      (route) => false,
+                    );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFEE743B), // สีส้มปุ่ม
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              shape: RoundedRectangleBorder(),
                               elevation: 0,
                             ),
                             child: const Text(
                               'แลกเปลี่ยนของรางวัล',
-                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400),
                             ),
                           ),
                         ),
@@ -228,7 +231,7 @@ class BenefitsPage extends StatelessWidget {
               children: [
                 Text(
                   item['title'],
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Colors.black87),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -245,7 +248,7 @@ class BenefitsPage extends StatelessWidget {
             padding: const EdgeInsets.only(left: 8, top: 4),
             child: Text(
               item['amount'],
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
             ),
           ),
         ],
@@ -268,7 +271,7 @@ class BenefitsPage extends StatelessWidget {
               children: [
                 Text(
                   item['title'],
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w300, color: Colors.black87),
                 ),
                 const SizedBox(height: 4),
                 Text(
