@@ -73,7 +73,7 @@ class _MembershipHistoryPageState extends State<MembershipHistoryPage> {
                   const SizedBox(width: 16),
                   const Text(
                     'ประวัติรายการ',
-                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w300),
                   ),
                 ],
               ),
@@ -119,7 +119,7 @@ class _MembershipHistoryPageState extends State<MembershipHistoryPage> {
                             children: [
                               Text(
                                 _selectedFilter,
-                                style: const TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.w500),
+                                style: const TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.w300),
                               ),
                               const SizedBox(width: 8),
                               const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 20),
@@ -155,7 +155,7 @@ class _MembershipHistoryPageState extends State<MembershipHistoryPage> {
                                       item['name'],
                                       style: TextStyle(
                                         fontSize: 16,
-                                        fontWeight: isSubscription ? FontWeight.w600 : FontWeight.w500, // ปรับน้ำหนัก font ตามแบบ
+                                        fontWeight: isSubscription ? FontWeight.w300 : FontWeight.w300, // ปรับน้ำหนัก font ตามแบบ
                                         color: const Color(0xFF333333),
                                       ),
                                     ),
@@ -176,7 +176,7 @@ class _MembershipHistoryPageState extends State<MembershipHistoryPage> {
                                     item['value'],
                                     style: const TextStyle(
                                       fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w300,
                                       color: Color(0xFF333333),
                                     ),
                                   ),

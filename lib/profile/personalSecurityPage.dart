@@ -25,7 +25,7 @@ class _PersonalSecurityPageState extends State<PersonalSecurityPage> {
         backgroundColor: const Color(0xFFF8B887),
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white), onPressed: () => Navigator.pop(context)),
-        title: const Text('ข้อมูลส่วนบุคคลและความปลอดภัย', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800,)),
+        title: const Text('ข้อมูลส่วนบุคคลและความปลอดภัย', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400,fontSize: 16)),
       ),
       body: SafeArea(
         child: Container(
@@ -44,7 +44,7 @@ class _PersonalSecurityPageState extends State<PersonalSecurityPage> {
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: Colors.grey.shade400, width: 1),
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        shape: RoundedRectangleBorder(),
                         backgroundColor: Colors.white,
                       ),
                       onPressed: () {},

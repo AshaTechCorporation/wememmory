@@ -111,14 +111,15 @@ class _MembershipPackagePageState extends State<MembershipPackagePage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF08336), // สีส้ม
+                            color: const Color(0xFFEE743B), // สีส้ม
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
                             'ประวัติ',
                             style: TextStyle(
                               color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w300,
+                              fontSize: 16,
                             ),
                           ),
                         ),
@@ -135,7 +136,7 @@ class _MembershipPackagePageState extends State<MembershipPackagePage> {
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -146,7 +147,7 @@ class _MembershipPackagePageState extends State<MembershipPackagePage> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white70,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                   ),
                 ),
@@ -292,9 +293,8 @@ class _MembershipPackagePageState extends State<MembershipPackagePage> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF08336), // สีส้ม
+                        backgroundColor: const Color(0xFFEE743B), // สีส้ม
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                       child: const Text(

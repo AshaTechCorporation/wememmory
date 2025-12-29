@@ -30,7 +30,7 @@ class _MobileBankingPageState extends State<MobileBankingPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.black87), onPressed: () => Navigator.pop(context)),
-        title: const Text('Mobile Banking', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w800)),
+        title: const Text('Mobile Banking', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w300)),
       ),
 
       body: SafeArea(
@@ -47,10 +47,10 @@ class _MobileBankingPageState extends State<MobileBankingPage> {
                   children: [
                     Image.asset(item['icon'], width: 32, height: 32),
                     const SizedBox(width: 12),
-                    Expanded(child: Text(item['name'], style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.black87))),
+                    Expanded(child: Text(item['name'], style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w300, color: Colors.black87))),
                     // ถ้ามีสถานะ (เช่น "ยืนยันสำเร็จ")
                     if (item['status'] != '')
-                      Text(item['status'], style: TextStyle(color: item['statusColor'], fontSize: 13, fontWeight: FontWeight.w700)),
+                      Text(item['status'], style: TextStyle(color: item['statusColor'], fontSize: 13, fontWeight: FontWeight.w300)),
                     const SizedBox(width: 10),
                     Radio<int>(value: i, groupValue: selectedIndex, onChanged: (v) => setState(() => selectedIndex = v), activeColor: orange),
                   ],
@@ -73,7 +73,7 @@ class _MobileBankingPageState extends State<MobileBankingPage> {
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
             ),
-            child: const Text('ยืนยัน', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+            child: const Text('ยืนยัน', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 15)),
           ),
         ),
       ),
