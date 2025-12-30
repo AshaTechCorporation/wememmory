@@ -39,7 +39,7 @@ class TermsAndServicesPage extends StatelessWidget {
       backgroundColor: orangeColor, // 1. เปลี่ยนพื้นหลังแอปเป็นสีส้ม
       appBar: AppBar(
         title: const Text(
-          'เงื่อนไขและการใช้บริการ',
+          'ข้อตกลงและเงื่อนไขการใช้บริการ',
           style: TextStyle(fontWeight: FontWeight.w300), // Title w300
         ),
         backgroundColor: orangeColor, // AppBar สีส้มกลืนไปกับพื้นหลัง
