@@ -49,7 +49,7 @@ class _AddressSelectionPageState extends State<AddressSelectionPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('ที่อยู่', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: const Text('ที่อยู่', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400)),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: const BackButton(color: Colors.black),
@@ -89,7 +89,7 @@ class _AddressSelectionPageState extends State<AddressSelectionPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('${item.name}  ${item.phone}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('${item.name}  ${item.phone}', style: const TextStyle(fontWeight: FontWeight.w700)),
                               const SizedBox(height: 4),
                               Text(
                                 '${item.detail} ${item.subDistrict} ${item.district} ${item.province}',

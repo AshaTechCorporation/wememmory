@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wememmory/shop/address_model.dart'; // ตรวจสอบ path ให้ถูก
+import 'package:wememmory/shop/address_model.dart';
 
 class AddressPickerPage extends StatefulWidget {
   const AddressPickerPage({super.key});
@@ -26,7 +26,7 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
   Subdistrict? selectedSubdistrict;
 
   bool isLoading = true;
-  String? errorMessage; // ตัวแปรเก็บข้อความ Error
+  String? errorMessage;
   final TextEditingController _detailController = TextEditingController();
 
   @override
@@ -37,12 +37,10 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
 
   Future<void> _loadAllAddressData() async {
     try {
-      // 1. อ่านไฟล์ (ต้องแน่ใจว่าไฟล์อยู่ใน assets จริงๆ)
       final pString = await rootBundle.loadString('assets/provice/provinces.json');
       final dString = await rootBundle.loadString('assets/provice/districts.json');
       final sString = await rootBundle.loadString('assets/provice/subdistricts.json');
 
-      // 2. แปลง JSON
       final List<dynamic> pJson = json.decode(pString);
       final List<dynamic> dJson = json.decode(dString);
       final List<dynamic> sJson = json.decode(sString);
@@ -53,7 +51,7 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
           _allDistricts = dJson.map((e) => District.fromJson(e)).toList();
           _allSubdistricts = sJson.map((e) => Subdistrict.fromJson(e)).toList();
           isLoading = false;
-          errorMessage = null; // เคลียร์ Error
+          errorMessage = null;
         });
       }
     } catch (e) {
@@ -61,7 +59,7 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
       if (mounted) {
         setState(() {
           isLoading = false;
-          errorMessage = "โหลดข้อมูลไม่สำเร็จ:\n$e"; // แสดง Error บนหน้าจอ
+          errorMessage = "โหลดข้อมูลไม่สำเร็จ:\n$e";
         });
       }
     }
@@ -72,7 +70,8 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('แก้ไขที่อยู่', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        // ปรับ Font Weight ตรง Title
+        title: const Text('แก้ไขที่อยู่', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400)),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -83,7 +82,7 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : errorMessage != null
-              ? Center(child: Text(errorMessage!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.red)))
+              ? Center(child: Text(errorMessage!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w400)))
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -96,7 +95,8 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
                         child: OutlinedButton.icon(
                           onPressed: () {},
                           icon: const Icon(Icons.map, color: Color(0xFF2D9CDB)),
-                          label: const Text('เลือกจากแผนที่', style: TextStyle(color: Color(0xFF2D9CDB), fontSize: 16)),
+                          // ปรับ Font Weight
+                          label: const Text('เลือกจากแผนที่', style: TextStyle(color: Color(0xFF2D9CDB), fontSize: 16, fontWeight: FontWeight.w400)),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: Color(0xFF2D9CDB)),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -116,12 +116,10 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
                         onChanged: (val) {
                           setState(() {
                             selectedProvince = val;
-                            // กรองอำเภอ
                             _shownDistricts = _allDistricts
                                 .where((d) => d.provinceCode == val!.provinceCode)
                                 .toList();
                             
-                            // รีเซ็ตค่าลูก
                             selectedDistrict = null;
                             selectedSubdistrict = null;
                             _shownSubdistricts = [];
@@ -140,12 +138,10 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
                         onChanged: (val) {
                           setState(() {
                             selectedDistrict = val;
-                            // กรองตำบล
                             _shownSubdistricts = _allSubdistricts
                                 .where((s) => s.districtCode == val!.districtCode)
                                 .toList();
                             
-                            // รีเซ็ตค่าลูก
                             selectedSubdistrict = null;
                           });
                         },
@@ -170,9 +166,11 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
                       _buildLabel('บ้านเลขที่, ซอย, หมู่, ถนน'),
                       TextField(
                         controller: _detailController,
+                        style: const TextStyle(fontWeight: FontWeight.w400), // Text ที่พิมพ์
                         decoration: const InputDecoration(
                           hintText: 'กรุณากรอกข้อมูล',
-                          hintStyle: TextStyle(color: Colors.grey),
+                          // ปรับ Font Weight Hint Text
+                          hintStyle: TextStyle(color: Colors.grey, fontWeight: FontWeight.w400),
                           border: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFEEEEEE))),
                           enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFEEEEEE))),
                           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -216,7 +214,8 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
                 backgroundColor: const Color(0xFFF36F45),
                 shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
               ),
-              child: const Text('ยืนยัน', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+              // ปรับ Font Weight ปุ่มยืนยัน
+              child: const Text('ยืนยัน', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.white)),
             ),
           ),
         ),
@@ -227,7 +226,8 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0, top: 16.0),
-      child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+      // ปรับ Font Weight ตรง Label หัวข้อ
+      child: Text(text, style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 16)),
     );
   }
 
@@ -249,13 +249,15 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<T>(
           value: value,
-          hint: Text(hint, style: const TextStyle(color: Colors.grey)),
+          // ปรับ Font Weight ตรง Hint ใน Dropdown
+          hint: Text(hint, style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w400)),
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black),
           items: items.map((item) {
             return DropdownMenuItem<T>(
               value: item,
-              child: Text(labelKey(item), style: const TextStyle(fontSize: 16)),
+              // ปรับ Font Weight รายการใน Dropdown
+              child: Text(labelKey(item), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
             );
           }).toList(),
           onChanged: enabled ? onChanged : null,

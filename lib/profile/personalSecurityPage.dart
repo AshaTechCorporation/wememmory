@@ -99,7 +99,7 @@ class _PersonalSecurityPageState extends State<PersonalSecurityPage> {
                     // กลุ่มรายการข้อมูลทั่วไป
                     _TitledListGroup(
                       children: [
-                        _NavRow(title: 'ชื่อผู้ใช้งาน', onTap: () {
+                        _NavRow(title: 'ข้อมูลผู้ใช้งาน', onTap: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => const UserFormScreen()),
@@ -246,7 +246,7 @@ class _StatusRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(5),
               border: Border.all(color: statusColor.withOpacity(0.35)),
             ),
-            child: Text(statusText, style: TextStyle(color: statusColor, fontSize: 12.5, fontWeight: FontWeight.w800)),
+            child: Text(statusText, style: TextStyle(color: statusColor, fontSize: 14, fontWeight: FontWeight.w400)),
           ),
         ],
       ),

@@ -268,8 +268,8 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
           const Text(
             'แพ็กเกจสมาชิก',
             style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
+              fontSize: 24,
+              fontWeight: FontWeight.w400,
               color: Colors.black,
             ),
           ),
@@ -595,7 +595,7 @@ class _SpecialGiftHeader extends StatelessWidget {
             'ของขวัญสำหรับคนพิเศษ',
             style: TextStyle(
               fontSize: 24,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w400,
               color: Colors.black,
             ),
           ),

@@ -150,7 +150,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
       appBar: AppBar(
         title: Text(isEditing ? 'แก้ไขที่อยู่' : 'เพิ่มที่อยู่',
             style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold)),
+                color: Colors.black, fontWeight: FontWeight.w400)),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -164,7 +164,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('ชื่อ - นามสกุล',
-                style: TextStyle(fontWeight: FontWeight.w600)),
+                style: TextStyle(fontWeight: FontWeight.w400,fontSize: 16)),
             const SizedBox(height: 8),
             TextField(
               controller: _nameController,
@@ -187,7 +187,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
             ),
             const SizedBox(height: 16),
             const Text('หมายเลขโทรศัพท์',
-                style: TextStyle(fontWeight: FontWeight.w600)),
+                style: TextStyle(fontWeight: FontWeight.w400,fontSize: 16)),
             const SizedBox(height: 8),
 
             // ✅ TextField เบอร์โทรศัพท์ พร้อม Formatter
@@ -212,7 +212,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
             const SizedBox(height: 20),
 
             const Text('จังหวัด, เขต/อำเภอ, แขวง/ตำบล',
-                style: TextStyle(fontWeight: FontWeight.w700)),
+                style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16)),
             const SizedBox(height: 12),
             InkWell(
               onTap: () async {
