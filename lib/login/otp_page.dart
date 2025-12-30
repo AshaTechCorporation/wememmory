@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wememmory/home/firstPage.dart';
 import 'package:wememmory/home/service/homeController.dart';
 import 'package:wememmory/login/memeship_login.dart';
 import 'package:wememmory/main.dart';
@@ -195,7 +196,7 @@ class _OtpPageState extends State<OtpPage> {
                                       if (controller.user?.fullName == null) {
                                         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const UsernamePage()));
                                       } else {
-                                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MembershipPage()));
+                                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const FirstPage()));
                                       }
                                     } else {
                                       // ✅ 1. แสดง Error Text
