@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wememmory/firebase_options.dart';
 import 'package:wememmory/home/firstPage.dart';
 import 'package:wememmory/home/service/homeController.dart';
-import 'package:wememmory/login/loginPage.dart';
 import 'package:wememmory/login/openscreen.dart';
 import 'notification.dart';
 
