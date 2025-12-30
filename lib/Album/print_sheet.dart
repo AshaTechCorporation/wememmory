@@ -231,12 +231,17 @@ class _PrintSheetState extends State<PrintSheet> {
                         );
                         LoadingDialog.close(context);
                         
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OrderSuccessPage(items: widget.items, monthName: widget.monthName),
-                          ),
-                        );
+                        if (mounted) { // เช็ค mounted เพื่อความชัวร์ก่อนใช้ context
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true, // สำคัญมาก! เพื่อให้ Sheet สูง 95% ตามที่เราเขียน
+                            backgroundColor: Colors.transparent, // สำคัญมาก! เพื่อให้เห็นขอบมน
+                            builder: (context) => OrderSuccessPage(
+                              items: widget.items, 
+                              monthName: widget.monthName
+                            ),
+                          );
+                        }
                       } catch (e) {
                         if (!mounted) return;
                         LoadingDialog.close(context);
