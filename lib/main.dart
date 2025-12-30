@@ -8,6 +8,7 @@ import 'package:wememmory/firebase_options.dart';
 import 'package:wememmory/home/firstPage.dart';
 import 'package:wememmory/home/service/homeController.dart';
 import 'package:wememmory/login/loginPage.dart';
+import 'package:wememmory/login/openscreen.dart';
 import 'notification.dart';
 
 late SharedPreferences prefs;
@@ -69,7 +70,7 @@ class _MyAppState extends State<MyApp> {
           // textTheme: GoogleFonts.promptTextTheme(Theme.of(context).textTheme), colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)
         ),
         // ✅ กลับมาใช้หน้า Login ปกติ
-        home: token != null ? FirstPage() : LoginPage(),
+        home: token != null ? FirstPage() : OpenScreen(),
       ),
     );
   }

@@ -138,7 +138,6 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      //เขียน API ก่อนที่จะเปลี่ยหน้า
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
@@ -248,7 +247,7 @@ class _AlbumPreviewSection extends StatelessWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         // Slot 0: ชื่อเดือน
-                        Container(decoration: const BoxDecoration(color: Colors.white), child: Center(child: Text(monthName, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)))),
+                        Container(decoration: const BoxDecoration(color: Colors.white), child: Center(child: Text(monthName.split(' ')[0], style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)))),
                         // Slot 1-5: รูปภาพ
                         for (int i = 0; i < 5; i++)
                           if (i < items.length) _StaticPhotoSlot(item: items[i]) else const SizedBox(),

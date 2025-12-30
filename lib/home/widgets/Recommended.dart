@@ -56,7 +56,6 @@ class MemoryCardData {
 // --- MAIN WIDGET ---
 
 class Recommended extends StatefulWidget {
-  // รับค่ารูปภาพที่เลือกมาจากหน้า Upload (กรณีเลือกไม่ครบ)
   final List<MediaItem>? albumItems;
   final String? albumMonth;
 
@@ -80,13 +79,14 @@ class _RecommendedState extends State<Recommended> {
   @override
   void initState() {
     super.initState();
+    // ตั้งเวลาเป้าหมาย 7 วันนับจากเปิดหน้านี้ (หรือจะ Fix วันที่ก็ได้)
+    _calculateTargetAndInitialString();
     _fetchRealAlbumData();
   }
 
   @override
   void didUpdateWidget(covariant Recommended oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // ถ้ารูปมีการเปลี่ยนแปลงจากหน้าอื่น ให้โหลดการ์ดใหม่
     if (widget.albumItems != oldWidget.albumItems || 
         widget.albumMonth != oldWidget.albumMonth) {
       _generateCards();
@@ -144,39 +144,32 @@ class _RecommendedState extends State<Recommended> {
     return "";
   }
 
-  // ✅ 2. สร้างการ์ด 1-12 (แก้ Logic ให้นับรวมรูปจาก Local ที่ส่งเข้ามา)
+  // ✅ 2. สร้างการ์ด (เดือน 12 -> 1)
   void _generateCards() {
     final now = DateTime.now();
     List<MemoryCardData> tempItems = [];
 
-    // วนลูปเดือน 1 ถึง 12
-    for (int i = 1; i <= 12; i++) {
+    // วนลูปถอยหลัง: เดือน 12 ลงไปถึง เดือน 1
+    for (int i = 12; i >= 1; i--) {
       final monthName = _getThaiMonthName(i);
       final yearBE = now.year + 543;
       final String key = "$monthName $yearBE";
 
-      // 2.1 ดึงจำนวนรูปจาก API
       final AlbumModel? album = _cachedAlbumMap[key];
       int photoCount = album?.photos?.length ?? 0;
 
-      // 2.2 ✅ ตรวจสอบข้อมูล Local (ที่ส่งกลับมาจากหน้า Upload)
-      // ถ้าเดือนตรงกัน ให้ใช้จำนวนรูปจาก Local แทน (เพราะถือว่าเป็นข้อมูลล่าสุดที่ user เลือก)
+      // ตรวจสอบข้อมูล Local (ถ้ามีการส่งค่ากลับมาจากหน้า Upload)
       if (widget.albumMonth != null && widget.albumItems != null) {
-        // ตัดช่องว่างหัวท้ายเปรียบเทียบ string
         if (widget.albumMonth!.trim() == key.trim()) {
-           // ใช้จำนวนรูปที่ user เพิ่งเลือกมา
            photoCount = widget.albumItems!.length;
         }
       }
       
       bool isCurrentMonth = (i == now.month);
-      // คำนวณเวลาถอยหลัง (ใช้สำหรับ Card 2)
-      String timeString = _calculateTimeRemaining(i, now.year);
 
       // --- CASE 3: ครบ 11 รูป (Background Card) ---
       if (photoCount >= 11) {
         String? coverImageUrl;
-        // พยายามเอารูปจาก API ก่อน
         if (album != null && album.photos != null && album.photos!.isNotEmpty) {
           coverImageUrl = album.photos![0].image;
         }
@@ -190,23 +183,20 @@ class _RecommendedState extends State<Recommended> {
           gradientColors: [],
           accentColor: Colors.transparent,
           backgroundUrl: coverImageUrl,
-          // ถ้าไม่มี URL ให้ใช้ Asset หรือถ้ามีรูป local ก็อาจจะ map มาใส่ backgroundMediaItem ได้
           backgroundImage: coverImageUrl == null ? 'assets/images/Hobby1.png' : null,
           showTextOverlay: true,
           monthIndex: i,
         ));
       } 
-      // --- CASE 2: ระหว่าง 1-10 รูป (Ticket Card) ---
-      // ✅ เงื่อนไขนี้จะทำงานถูกต้องแล้ว เพราะ photoCount ถูกอัปเดตจาก widget.albumItems แล้ว
+      // --- CASE 2: กำลังทำ / ไม่ครบ (Ticket Card) ---
       else if (photoCount > 0 && photoCount < 11) {
         tempItems.add(MemoryCardData(
           type: CardType.ticket,
           topTitle: '$monthName\n$yearBE',
-          // ถ้าเป็นเดือนปัจจุบัน โชว์เวลา / ถ้าเดือนอื่นโชว์ข้อความ
-          mainTitle: isCurrentMonth ? _timeRemainingString : "ดำเนินการต่อ", 
+          mainTitle: _timeRemainingString, // ✅ แสดงเวลาทุกใบที่เป็น Ticket
           subTitle: 'ขาดอีก ${11 - photoCount} ภาพ',
           footerText: 'Ticket 10',
-          currentProgress: photoCount, // ✅ แสดงจำนวนรูปที่ถูกต้อง
+          currentProgress: photoCount, // ✅ แสดง Progress Bar
           maxProgress: 11,
           gradientColors: [],
           accentColor: const Color(0xFFFF7043),
@@ -214,7 +204,7 @@ class _RecommendedState extends State<Recommended> {
           monthIndex: i,
         ));
       } 
-      // --- CASE 1: 0 รูป (Standard Card) ---
+      // --- CASE 1: ยังไม่เริ่ม (Standard Card) ---
       else {
         tempItems.add(MemoryCardData(
           type: CardType.standard,
@@ -236,86 +226,93 @@ class _RecommendedState extends State<Recommended> {
 
     setState(() {
       _items = tempItems;
+      // ตั้งค่าเริ่มต้นเป็น 0 (Card ใบแรกคือเดือน 12)
       if (_items.isNotEmpty) {
-         _currentIndex = (now.month - 1).clamp(0, 11);
+         _currentIndex = 0; 
       }
     });
     
-    // ตั้ง Timer
+    // เริ่ม Timer เพื่ออัปเดตเวลา
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _onTimerTick());
   }
 
-  String _calculateTimeRemaining(int month, int year) {
-    final now = DateTime.now();
-    if (month < now.month) return "หมดเวลา";
-    if (month > now.month) return "รอเริ่ม";
-
-    // นับถอยหลัง 7 วันจากตอนนี้ (หรือจะแก้เป็นสิ้นเดือนก็ได้)
-    // ใช้ logic ตามเดิมคือ 7 วันจากเวลาปัจจุบัน หรือ user อยากได้สิ้นเดือนก็แก้ตรงนี้
-    if (_targetDate == null) {
-       _targetDate = now.add(const Duration(days: 7));
-    }
-    
-    final diff = _targetDate!.difference(now);
-    if (diff.isNegative) return "หมดเวลา";
-    
-    final days = diff.inDays;
-    final hours = diff.inHours % 24;
-    final minutes = diff.inMinutes % 60;
-    final seconds = diff.inSeconds % 60;
-    
-    return "$days วัน $hours ชม. $minutes น. $seconds วิ";
+  void _calculateTargetAndInitialString() {
+      final now = DateTime.now();
+      if (_targetDate == null) {
+         // นับถอยหลัง 7 วันจากเวลาปัจจุบัน
+         _targetDate = now.add(const Duration(days: 7));
+      }
+      _updateTimeStringInternal();
   }
 
+  void _updateTimeStringInternal() {
+    if (_targetDate == null) return;
+    final now = DateTime.now();
+    
+    final diff = _targetDate!.difference(now);
+    if (diff.isNegative) {
+      _timeRemainingString = "หมดเวลา";
+    } else {
+      final days = diff.inDays;
+      final hours = diff.inHours % 24;
+      final minutes = diff.inMinutes % 60;
+      final seconds = diff.inSeconds % 60;
+      _timeRemainingString = "$days วัน $hours ชม. $minutes น. $seconds วิ";
+    }
+  }
+
+  // ✅ อัปเดตเวลา Realtime ให้กับทุก Card ที่เป็น Ticket
   void _onTimerTick() {
     if (_items.isEmpty) return;
     
-    final now = DateTime.now();
-    int currentMonthIndex = now.month - 1;
-    
-    // คำนวณเวลาใหม่
-    String newTime = _calculateTimeRemaining(now.month, now.year);
-    if (newTime != _timeRemainingString) {
-       _timeRemainingString = newTime;
+    _updateTimeStringInternal(); // คำนวณเวลาใหม่
+
+    if (!mounted) return;
+
+    bool needsUpdate = false;
+    List<MemoryCardData> updatedItems = List.from(_items);
+
+    // วนลูปเช็คทุกการ์ด ถ้าใบไหนเป็น Ticket ให้อัปเดตเวลา
+    for (int i = 0; i < updatedItems.length; i++) {
+      final item = updatedItems[i];
+      
+      if (item.type == CardType.ticket) {
+        if (item.mainTitle != _timeRemainingString) {
+           updatedItems[i] = MemoryCardData(
+              type: item.type,
+              topTitle: item.topTitle,
+              mainTitle: _timeRemainingString, // อัปเดตเวลาตรงนี้
+              subTitle: item.subTitle,
+              footerText: item.footerText,
+              gradientColors: item.gradientColors,
+              accentColor: item.accentColor,
+              backgroundColor: item.backgroundColor,
+              currentProgress: item.currentProgress,
+              maxProgress: item.maxProgress,
+              imageItems: item.imageItems,
+              assetImages: item.assetImages,
+              backgroundUrl: item.backgroundUrl,
+              backgroundImage: item.backgroundImage,
+              showTextOverlay: item.showTextOverlay,
+              monthIndex: item.monthIndex,
+           );
+           needsUpdate = true;
+        }
+      }
     }
 
-    // อัปเดตเฉพาะการ์ดเดือนปัจจุบันที่เป็น Ticket
-    if (mounted && 
-        currentMonthIndex < _items.length && 
-        _items[currentMonthIndex].type == CardType.ticket) {
-      
+    if (needsUpdate) {
       setState(() {
-         final old = _items[currentMonthIndex];
-         _items[currentMonthIndex] = MemoryCardData(
-            type: old.type, 
-            topTitle: old.topTitle, 
-            mainTitle: _timeRemainingString, // ✅ อัปเดตเวลา Realtime
-            subTitle: old.subTitle, 
-            footerText: old.footerText, 
-            gradientColors: old.gradientColors, 
-            accentColor: old.accentColor,
-            backgroundColor: old.backgroundColor, 
-            currentProgress: old.currentProgress,
-            maxProgress: old.maxProgress,
-            imageItems: old.imageItems,
-            assetImages: old.assetImages,
-            backgroundUrl: old.backgroundUrl,
-            backgroundImage: old.backgroundImage,
-            showTextOverlay: old.showTextOverlay,
-            monthIndex: old.monthIndex,
-         );
+        _items = updatedItems;
       });
     }
   }
 
-  // ✅ แก้ไขฟังก์ชันนี้ใน class _RecommendedState
-  Future<void> _continueSelection(String fullTitle) async {
-    // 1. เตรียมชื่อเดือนสำหรับส่งไป
+  void _continueSelection(String fullTitle) {
     String cleanTitle = fullTitle.replaceAll('\n', ' ').replaceAll('ของฉัน', '').trim();
-    String monthNameOnly = cleanTitle.split(' ')[0]; // เช่น "มกราคม"
+    String monthNameOnly = cleanTitle.split(' ')[0];
 
-    // 2. หาว่าการ์ดใบนี้มีรูปที่เคยเลือกไว้ไหม (เพื่อส่งไปแสดงในหน้า Upload)
     List<MediaItem>? currentItems;
     int targetIndex = _items.indexWhere((item) => item.topTitle.contains(monthNameOnly));
     
@@ -323,8 +320,7 @@ class _RecommendedState extends State<Recommended> {
       currentItems = _items[targetIndex].imageItems;
     }
 
-    // 3. เปิด Modal และรอรับค่ากลับ (await)
-    final result = await showModalBottomSheet(
+    showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -338,44 +334,15 @@ class _RecommendedState extends State<Recommended> {
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           child: UploadPhotoPage(
             selectedMonth: cleanTitle,
-            initialSelectedItems: currentItems, // ส่งรูปเดิมไป (ถ้ามี)
+            initialSelectedItems: currentItems,
           ),
         ),
       ),
-    );
-
-    // 4. ✅ ตรวจสอบค่าที่ส่งกลับมา
-    if (result is List<MediaItem> && result.isNotEmpty) {
-      // กรณี: ผู้ใช้กด "ถัดไป" (รูปไม่ครบ) -> อัปเดตการ์ดใบนั้นทันที
-      setState(() {
-        if (targetIndex != -1) {
-          // เลื่อนไปหาการ์ดใบนั้น
-          _currentIndex = targetIndex; 
-
-          // อัปเดตข้อมูลการ์ดใบนั้นให้เป็น Ticket (กำลังทำ)
-          final old = _items[targetIndex];
-          _items[targetIndex] = MemoryCardData(
-            type: CardType.ticket, // บังคับเป็น Ticket
-            topTitle: old.topTitle,
-            mainTitle: targetIndex == (DateTime.now().month - 1) ? _timeRemainingString : "ดำเนินการต่อ",
-            subTitle: 'ขาดอีก ${11 - result.length} ภาพ',
-            footerText: 'Ticket 10',
-            currentProgress: result.length, // จำนวนรูปที่เพิ่งเลือกมา
-            maxProgress: 11,
-            imageItems: result, // บันทึกรูปเก็บไว้ในตัวแปร Local
-            gradientColors: [],
-            accentColor: const Color(0xFFFF7043),
-            backgroundColor: const Color(0xFF111111),
-            monthIndex: old.monthIndex,
-          );
-        }
-      });
-    } else {
-      // กรณี: ผู้ใช้กดปิด หรือทำรายการเสร็จสิ้น (ไปหน้า Layout แล้ว)
-      // ให้โหลดข้อมูลจาก API ใหม่เพื่อความชัวร์
-      _fetchRealAlbumData();
-    }
+    ).then((_) {
+      _fetchRealAlbumData(); 
+    });
   }
+
   void _nextCard() {
     if (_currentIndex < _items.length - 1) setState(() => _currentIndex++);
   }
@@ -499,12 +466,10 @@ class MemoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ CASE 2: Ticket Card (กำลังทำ)
     if (data.type == CardType.ticket) {
       return TicketMemoryCard(data: data, onButtonTap: onButtonTap);
     }
 
-    // ✅ CASE 3: Background Card (เสร็จแล้ว)
     if (data.type == CardType.backgroundImage) {
       return Container(
         child: ClipRRect(
@@ -555,7 +520,7 @@ class MemoryCard extends StatelessWidget {
       );
     }
 
-    // ✅ CASE 1: Standard Card (ยังไม่เริ่ม)
+    // CASE 1: Standard Card
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(0),
@@ -663,7 +628,7 @@ class TicketMemoryCard extends StatelessWidget {
           const Spacer(),
           Center(
             child: Text(
-              data.mainTitle, // เวลาจะแสดงตรงนี้
+              data.mainTitle, 
               style: const TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.bold, letterSpacing: 0.5),
               textAlign: TextAlign.center,
             ),
@@ -713,7 +678,7 @@ class TicketMemoryCard extends StatelessWidget {
   }
 }
 
-// Widget สำหรับโหลดรูป Local (ไม่เปลี่ยนแปลง)
+// Widget สำหรับโหลดรูป Local
 class AsyncImageLoader extends StatefulWidget {
   final MediaItem item;
   final BoxFit fit;
@@ -747,7 +712,7 @@ class _AsyncImageLoaderState extends State<AsyncImageLoader> {
   }
 }
 
-// Widget PhotoStack (ไม่เปลี่ยนแปลง)
+// Widget PhotoStack
 class _PhotoStack extends StatelessWidget {
   final List<MediaItem>? items;
   final List<String>? assetImages;

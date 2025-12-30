@@ -99,7 +99,7 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '$monthTitle : อัลบั้ม (0 แก้ไข)',
+                  '$monthTitle : เลือก 11 ของคุณ',
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
                 ),
                 GestureDetector(
@@ -177,7 +177,7 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                                         child: Center(
                                           child: Text(
                                             monthTitle,
-                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87),
+                                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
                                           ),
                                         ),
                                       ),
@@ -275,7 +275,7 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                         backgroundColor: Colors.transparent,
                         builder: (context) => FinalPreviewSheet(
                           items: _items,
-                          monthName: monthTitle,
+                          monthName: widget.monthName,
                         ),
                       );
                     },

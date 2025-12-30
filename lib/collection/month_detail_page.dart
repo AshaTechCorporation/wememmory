@@ -88,21 +88,22 @@ class MonthDetailPage extends StatelessWidget {
                         monthName,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                              blurRadius: 4,
-                              color: Colors.black45,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
+                          fontSize: 48,
+                          fontWeight: FontWeight.w300,
+                          fontFamily: 'kanit',
+                          // shadows: [
+                          //   Shadow(
+                          //     blurRadius: 4,
+                          //     color: Colors.black45,
+                          //     offset: Offset(0, 2),
+                          //   ),
+                          // ],
                         ),
                       ),
                       const SizedBox(height: 8),
                       const Text(
                         "เก็บเรื่องราวกับครอบครัว",
-                        style: TextStyle(color: Colors.white70, fontSize: 16),
+                        style: TextStyle(color: Colors.white, fontSize: 18,fontWeight: FontWeight.w400,fontFamily: 'kanit'),
                       ),
                     ],
                   ),

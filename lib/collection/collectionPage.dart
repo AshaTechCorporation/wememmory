@@ -41,6 +41,7 @@ class CollectionPageState extends State<CollectionPage> {
   // ฟังก์ชันเรียก API
   getAlbums() async {
     try {
+      print("--- DEBUG: CollectionPage ---");
       print("Fetching albums for year: $selectedYear");
       final albumData = await HomeService.getAlbums(year: selectedYear);
       if (mounted) {
@@ -290,7 +291,7 @@ class _MonthSectionHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        NumberAwareText(title, numberFontFamily: 'Wemory', style: const TextStyle(fontFamily: 'Kanit', fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)),
+        Text(title, style: const TextStyle(fontFamily: 'Kanit', fontSize: 20, fontWeight: FontWeight.w500, color: Colors.black87)),
         Row(
           children: [
             GestureDetector(onTap: () {}, child: _buildIconButton('assets/icons/print.png')),
@@ -331,49 +332,65 @@ class _AlbumPreviewSection extends StatelessWidget {
     return Center(
       child: Container(
         padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(color: const Color(0xFF555555), borderRadius: BorderRadius.circular(4)),
-        child: IntrinsicWidth(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildPageContainer(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 3,
-                  mainAxisSpacing: 3,
-                  childAspectRatio: 1.0,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  children: [
-                    Container(
-                      decoration: const BoxDecoration(color: Colors.white),
-                      child: Center(child: Text(monthTitle.split(' ')[0], style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold))),
-                    ),
-                    for (int i = 0; i < 5; i++)
-                      if (i < photos.length) _StaticPhotoSlot(item: photos[i].image!) else const SizedBox(),
-                  ],
+        decoration: BoxDecoration(
+            color: const Color(0xFF555555),
+            borderRadius: BorderRadius.circular(4)),
+        // ✅ ใช้ FittedBox เพื่อให้ย่อขนาดลงอัตโนมัติถ้าหน้าจอเล็ก
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: IntrinsicWidth(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildPageContainer(
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 3,
+                    mainAxisSpacing: 3,
+                    childAspectRatio: 1.0,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    children: [
+                      Container(
+                        decoration: const BoxDecoration(color: Colors.white),
+                        child: Center(
+                            child: Text(monthTitle.split(' ')[0],
+                                style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold))),
+                      ),
+                      for (int i = 0; i < 5; i++)
+                        if (i < photos.length)
+                          _StaticPhotoSlot(item: photos[i].image!)
+                        else
+                          const SizedBox(),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 20),
-              _buildPageContainer(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 3,
-                  mainAxisSpacing: 3,
-                  childAspectRatio: 1.0,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  children: [
-                    for (int i = 0; i < 6; i++)
-                      if ((i + 5) < photos.length) _StaticPhotoSlot(item: photos[i + 5].image!) else const SizedBox(),
-                  ],
+                const SizedBox(width: 20),
+                _buildPageContainer(
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 3,
+                    mainAxisSpacing: 3,
+                    childAspectRatio: 1.0,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    children: [
+                      for (int i = 0; i < 6; i++)
+                        if ((i + 5) < photos.length)
+                          _StaticPhotoSlot(item: photos[i + 5].image!)
+                        else
+                          const SizedBox(),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -381,6 +398,7 @@ class _AlbumPreviewSection extends StatelessWidget {
   }
 
   Widget _buildPageContainer({required Widget child}) {
+    
     return SizedBox(width: 160, height: 245, child: child);
   }
 }

@@ -154,7 +154,7 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
             padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             child: Column(
               children: [
-                NumberAwareText('คุณมีอยู่ 10 เครดิต', numberFontFamily: 'Wemory', style: TextStyle(fontFamily: "Kanit", fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
+                Text('คุณมีอยู่ 10 เครดิต', style: TextStyle(fontFamily: "Kanit", fontSize: 18, fontWeight: FontWeight.w400, color: Colors.black87)),
                 SizedBox(height: 4),
                 Text('ให้แต่ละเดือนบอกเล่าเรื่องราวของคุณ ผ่านภาพแห่งความทรงจำ', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: Colors.grey)),
               ],
@@ -218,7 +218,7 @@ class _AlbumOptionItem extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                NumberAwareText(month, numberFontFamily: 'Wemory', style: const TextStyle(fontSize: 16, fontFamily: 'Kanit', fontWeight: FontWeight.w500, color: Colors.black87)),
+                Text(month, style: const TextStyle(fontSize: 16, fontFamily: 'Kanit', fontWeight: FontWeight.w500, color: Colors.black87)),
                 const SizedBox(height: 4),
                 Text(statusText, style: TextStyle(fontSize: 13, color: isDone ? const Color(0xFF66BB6A) : Colors.black87)),
               ],
