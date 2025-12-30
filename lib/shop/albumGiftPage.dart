@@ -17,6 +17,7 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
   int _quantity = 1;
   int _selectedColorIndex = 0;
   File? _selectedCoverImage;
+  bool _isExpanded = false; // ตัวแปรสำหรับตรวจสอบสถานะ การย่อ/ขยาย
 
   final List<Map<String, dynamic>> _colorOptions = [
     {'name': 'เทา', 'color': const Color(0xFF424242)},
@@ -92,7 +93,7 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
         ),
         title: const Text(
           'อัลบั้ม',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
         ),
         centerTitle: false,
       ),
@@ -176,11 +177,11 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
                     children: [
                       Text(
                         'อัลบั้มสำหรับคนสำคัญ',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFFFF8A3D)),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Color.fromARGB(255, 0, 0, 0)),
                       ),
                       Text(
                         '฿ 599',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFFF8A3D)),
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, color: Color.fromARGB(255, 0, 0, 0)),
                       ),
                     ],
                   ),
@@ -233,7 +234,7 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('รูปภาพหน้าปกอัลบั้ม', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            const Text('รูปภาพหน้าปกอัลบั้ม', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16)),
                             const SizedBox(height: 12),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -331,47 +332,120 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
     );
   }
 
+  // --- ส่วนแสดงเนื้อหา เรื่องราว ---
   Widget _buildStorySection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('เก็บทุกช่วงเวลาที่คุณรัก...ไว้ในเล่มเดียว', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
+        // 1. ส่วนหัวข้อความ (แสดงตลอด)
+        const Text('เก็บทุกช่วงเวลาที่คุณรัก...ไว้ในเล่มเดียว', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Colors.black87)),
         const SizedBox(height: 8),
         Text('รวมทุกภาพที่มีความหมายที่สุดของคุณไว้ในอัลบั้มสุดอบอุ่น...', style: TextStyle(fontSize: 14, color: Colors.grey.shade600, height: 1.5)),
+        
         const SizedBox(height: 24),
-        Column(
-          children: _storyImagesVertical.map((imagePath) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Image.asset(imagePath, fit: BoxFit.cover, errorBuilder: (c, e, s) => Container(height: 200, color: Colors.grey[300])),
+
+        // 2. เช็คสถานะ: ถ้ายังไม่ขยาย ให้โชว์ปุ่ม "แสดงเพิ่มเติม" ตรงกลาง (สีเทา)
+        if (!_isExpanded)
+          Center(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _isExpanded = true;
+                });
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Text(
+                    'แสดงเพิ่มเติม',
+                    style: TextStyle(
+                      color: Colors.grey, // ✅ เปลี่ยนเป็นสีเทา
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Icon(Icons.keyboard_arrow_down, color: Colors.grey), // ✅ เปลี่ยนเป็นสีเทา
+                ],
               ),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 30),
-        const Text('เลือกภาพที่คุณรัก มาเป็นหน้าปกอัลบั้ม', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 350,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: _storyImages.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 16),
-            itemBuilder: (context, index) {
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Image.asset(_storyImages[index], fit: BoxFit.cover, errorBuilder: (c, e, s) => Container(width: 350, color: Colors.grey[300])),
-              );
-            },
+            ),
+          )
+        
+        // 3. ถ้าขยายแล้ว ให้โชว์เนื้อหาทั้งหมด + ปุ่ม "แสดงน้อยลง" ด้านล่างสุด (สีเทา)
+        else
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // --- เนื้อหาที่ซ่อนอยู่ ---
+              Column(
+                children: _storyImagesVertical.map((imagePath) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Image.asset(imagePath, fit: BoxFit.cover, errorBuilder: (c, e, s) => Container(height: 200, color: Colors.grey[300])),
+                    ),
+                  );
+                }).toList(),
+              ),
+              Text('อัลบัมภาพคือของขวัญที่เก็บได้ทั้งรอยยิ้มและเวลาเหมาะจะมอบให้กับคนที่คุณรักไม่ว่าจะเป็นวันเกิดหรือวันสำคัญอื่น ๆ', style: TextStyle(fontSize: 14, color: Colors.grey.shade600, height: 1.5)),
+              const SizedBox(height: 30),
+              const Text('เลือกภาพที่คุณรัก มาเป็นหน้าปกอัลบั้ม', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16)),
+              const SizedBox(height: 12),
+              Text('ภาพหน้าปกที่สะท้อนความทรงจำของคุณและเก็บทุกช่วงเวลาสำคัญไว้ในอัลบั้มเล่มเดียว', style: TextStyle(fontSize: 14, color: Colors.grey.shade600, height: 1.5)),
+              const SizedBox(height: 24),
+              SizedBox(
+                height: 350,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _storyImages.length,
+                  separatorBuilder: (context, index) => const SizedBox(width: 16),
+                  itemBuilder: (context, index) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Image.asset(_storyImages[index], fit: BoxFit.cover, errorBuilder: (c, e, s) => Container(width: 350, color: Colors.grey[300])),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text('เพื่อให้ทุกความทรงจำเริ่มต้นอย่างมีความหมายทุกครั้ง ที่เปิดคือการย้อนกลับไปสู่ช่วงเวลาดี ๆ ของคุณ', style: TextStyle(fontSize: 14, color: Colors.grey.shade600, height: 1.5)),
+              
+              const SizedBox(height: 30),
+
+              // --- ปุ่มแสดงน้อยลง (อยู่ล่างสุด - สีเทา) ---
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isExpanded = false;
+                    });
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Text(
+                        'แสดงน้อยลง',
+                        style: TextStyle(
+                          color: Colors.grey, // ✅ เปลี่ยนเป็นสีเทา
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Icon(Icons.keyboard_arrow_up, color: Colors.grey), // ✅ เปลี่ยนเป็นสีเทา
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
       ],
     );
   }
 }
 
+// -------------------------------------------------------------
+// คลาสหน้าเลือกรูป (Helper Class)
+// -------------------------------------------------------------
 class AlbumCoverSelectionPage extends StatefulWidget {
   final List<MediaItem> items;
 

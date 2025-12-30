@@ -8,10 +8,8 @@ class CouponSelectionPage extends StatefulWidget {
 }
 
 class _CouponSelectionPageState extends State<CouponSelectionPage> {
-  // ตัวแปรเก็บ index ของคูปองที่ถูกเลือก (-1 คือยังไม่เลือก)
   int _selectedIndex = -1;
 
-  // ข้อมูลจำลองของคูปอง (Mock Data)
   final List<Map<String, dynamic>> coupons = [
     {
       "title": "ส่วนลดเมื่อซื้ออัลบั้มรูปแรก",
@@ -20,28 +18,21 @@ class _CouponSelectionPageState extends State<CouponSelectionPage> {
       "enabled": true,
     },
     {
-      "title": "ส่วนลดเมื่อซื้ออัลบั้มรูปแรก",
-      "condition": "เมื่อซื้อขั้นต่ำ 990฿",
-      "date": "10 มกราคม 2569",
+      "title": "ลด 50 บาท ทันที",
+      "condition": "ไม่มีขั้นต่ำ",
+      "date": "15 มกราคม 2569",
       "enabled": true,
     },
     {
-      "title": "ส่วนลดเมื่อซื้ออัลบั้มรูปแรก",
-      "condition": "เมื่อซื้อขั้นต่ำ 990฿",
-      "date": "10 มกราคม 2569",
+      "title": "ส่งฟรีทั่วไทย",
+      "condition": "เมื่อซื้อครบ 1,500 บาท",
+      "date": "20 มกราคม 2569",
       "enabled": true,
     },
     {
-      // ตัวอย่างสถานะ Disabled (สีเทาตามรูปด้านล่าง)
-      "title": "ส่วนลดเมื่อซื้ออัลบั้มรูปแรก",
-      "condition": "เมื่อซื้อขั้นต่ำ 990฿",
-      "date": "10 มกราคม 2569",
-      "enabled": false,
-    },
-    {
-      "title": "ส่วนลดเมื่อซื้ออัลบั้มรูปแรก",
-      "condition": "เมื่อซื้อขั้นต่ำ 990฿",
-      "date": "10 มกราคม 2569",
+      "title": "ส่วนลดสมาชิกใหม่",
+      "condition": "ใช้ได้ครั้งเดียว",
+      "date": "31 ธันวาคม 2568",
       "enabled": false,
     },
   ];
@@ -55,17 +46,17 @@ class _CouponSelectionPageState extends State<CouponSelectionPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context); 
           },
         ),
         title: const Text(
           'เลือกโค้ดส่วนลด',
-          style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+          // ปรับเป็น w400
+          style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w400),
         ),
       ),
       body: Column(
         children: [
-          // ส่วนรายการคูปอง (Scrollable)
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
@@ -95,7 +86,7 @@ class _CouponSelectionPageState extends State<CouponSelectionPage> {
             ),
           ),
           
-          // ปุ่มยืนยันด้านล่าง
+          // ปุ่มยืนยัน
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -104,19 +95,22 @@ class _CouponSelectionPageState extends State<CouponSelectionPage> {
                 height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF15F39), // สีส้มตามรูป
+                    backgroundColor: const Color(0xFFF15F39),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4), // มุมมนเล็กน้อย
+                      borderRadius: BorderRadius.circular(4),
                     ),
                   ),
                   onPressed: () {
-                    // Action เมื่อกดปุ่มยืนยัน
-                    print("Selected Coupon Index: $_selectedIndex");
-                    Navigator.pop(context, _selectedIndex);
+                    if (_selectedIndex != -1) {
+                      Navigator.pop(context, coupons[_selectedIndex]);
+                    } else {
+                      Navigator.pop(context);
+                    }
                   },
                   child: const Text(
                     'ยืนยัน',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                    // ปรับเป็น w400
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.white),
                   ),
                 ),
               ),
@@ -128,7 +122,6 @@ class _CouponSelectionPageState extends State<CouponSelectionPage> {
   }
 }
 
-// Widget การ์ดคูปองแยกออกมาเพื่อความสะอาดของโค้ด
 class CouponCard extends StatelessWidget {
   final String title;
   final String condition;
@@ -147,7 +140,6 @@ class CouponCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // สีของ Border และ Text
     final borderColor = const Color(0xFFF15F39).withOpacity(0.6);
     
     return Container(
@@ -160,7 +152,6 @@ class CouponCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ส่วนหัว: คำว่า โค้ดส่วนลด + วันที่
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Row(
@@ -168,7 +159,8 @@ class CouponCard extends StatelessWidget {
               children: [
                 const Text(
                   'โค้ดส่วนลด',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  // ปรับเป็น w400
+                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16),
                 ),
                 Text(
                   date,
@@ -177,27 +169,23 @@ class CouponCard extends StatelessWidget {
               ],
             ),
           ),
-
-          // เส้นประ (Dashed Line)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: DashedDivider(color: borderColor),
           ),
-
-          // ส่วนเนื้อหา: รายละเอียด + ปุ่มเลือก
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Text Description
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                        // ปรับเป็น w400
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -208,8 +196,6 @@ class CouponCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                
-                // วงกลมเลือก (Radio Circle)
                 Container(
                   width: 24,
                   height: 24,
@@ -217,7 +203,7 @@ class CouponCard extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: isEnabled 
                         ? (isSelected ? const Color(0xFFF15F39) : Colors.white)
-                        : Colors.grey[400], // สีเทาสำหรับตัวที่ Disabled
+                        : Colors.grey[400],
                     border: Border.all(
                       color: isEnabled 
                           ? (isSelected ? const Color(0xFFF15F39) : Colors.grey)
@@ -238,7 +224,6 @@ class CouponCard extends StatelessWidget {
   }
 }
 
-// Widget สร้างเส้นประ (Custom Dashed Line)
 class DashedDivider extends StatelessWidget {
   final double height;
   final Color color;

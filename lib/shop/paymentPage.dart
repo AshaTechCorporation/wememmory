@@ -1,6 +1,10 @@
+import 'dart:async';
+import 'dart:convert'; // ✅ 1. เพิ่มเพื่อใช้ jsonEncode/jsonDecode
 import 'package:flutter/material.dart';
-import 'package:wememmory/shop/paymentSuccessPage.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // ✅ 2. เพิ่ม import
+
 import 'package:wememmory/shop/addCardPage.dart';
+import 'package:wememmory/shop/paymentSuccessPage.dart';
 import 'package:wememmory/shop/addressSelectionPage.dart';
 import 'package:wememmory/shop/couponPage.dart';
 import 'package:wememmory/shop/address_model.dart';
@@ -13,10 +17,11 @@ class PaymentPage extends StatefulWidget {
 }
 
 class _PaymentPageState extends State<PaymentPage> {
-  // 2. ตัวแปรเก็บที่อยู่
-  AddressInfo? _deliveryAddress; 
+  AddressInfo? _deliveryAddress;
+  Map<String, dynamic>? _selectedCoupon;
+  Map<String, dynamic>? _savedCard; 
 
-  int _selectedMethod = 0; 
+  int _selectedMethod = 0;
   String? _expandedSection;
   int _selectedBankIndex = -1;
 
@@ -32,13 +37,40 @@ class _PaymentPageState extends State<PaymentPage> {
   void initState() {
     super.initState();
     _deliveryAddress = AddressInfo(
-       name: 'ชื่อ - นามสกุล',
-       phone: '098 - 765 - 4321',
-       province: 'กรุงเทพมหานคร',
-       district: 'ลาดกระบัง',
-       subDistrict: 'ลาดกระบัง',
-       detail: 'หมู่บ้าน สุวรรณภูมิทาวน์ซอย ลาดกระบัง 54/3'
-    );
+        name: 'ชื่อ - นามสกุล',
+        phone: '098 - 765 - 4321',
+        province: 'กรุงเทพมหานคร',
+        district: 'ลาดกระบัง',
+        subDistrict: 'ลาดกระบัง',
+        detail: 'หมู่บ้าน สุวรรณภูมิทาวน์ซอย ลาดกระบัง 54/3');
+    
+    // ✅ 3. เรียกฟังก์ชันโหลดข้อมูลบัตรทันทีที่เปิดหน้านี้
+    _loadSavedCard();
+  }
+
+  // ✅ 4. ฟังก์ชันโหลดข้อมูลจากเครื่อง
+  Future<void> _loadSavedCard() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? cardJson = prefs.getString('saved_card_data'); // คีย์สำหรับดึงข้อมูล
+    
+    if (cardJson != null) {
+      setState(() {
+        _savedCard = jsonDecode(cardJson); // แปลง JSON String กลับเป็น Map
+      });
+    }
+  }
+
+  // ✅ 5. ฟังก์ชันบันทึกข้อมูลลงเครื่อง
+  Future<void> _saveCardToStorage(Map<String, dynamic> cardData) async {
+    final prefs = await SharedPreferences.getInstance();
+    String cardJson = jsonEncode(cardData); // แปลง Map เป็น JSON String
+    await prefs.setString('saved_card_data', cardJson);
+  }
+
+  // ✅ 6. ฟังก์ชันลบข้อมูลออกจากเครื่อง
+  Future<void> _removeCardFromStorage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('saved_card_data');
   }
 
   Future<void> _selectAddress() async {
@@ -47,11 +79,35 @@ class _PaymentPageState extends State<PaymentPage> {
         builder: (_) => AddressSelectionPage(selected: _deliveryAddress),
       ),
     );
-
     if (result != null && result is AddressInfo) {
       setState(() {
         _deliveryAddress = result;
       });
+    }
+  }
+
+  Future<void> _selectCoupon() async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const CouponSelectionPage()),
+    );
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        _selectedCoupon = result;
+      });
+    }
+  }
+
+  Future<void> _addCard() async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const AddCardPage()),
+    );
+
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        _savedCard = result;
+      });
+      // ✅ 7. บันทึกทันทีเมื่อได้ข้อมูลกลับมา
+      _saveCardToStorage(result);
     }
   }
 
@@ -68,7 +124,8 @@ class _PaymentPageState extends State<PaymentPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('สั่งซื้อ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text('สั่งซื้อ',
+            style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(color: Colors.grey.shade200, height: 1),
@@ -80,7 +137,8 @@ class _PaymentPageState extends State<PaymentPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // --- 1. ที่อยู่ ---
-            const Text('ที่อยู่', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Text('ที่อยู่',
+                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16)),
             const SizedBox(height: 12),
             InkWell(
               onTap: _selectAddress,
@@ -97,18 +155,23 @@ class _PaymentPageState extends State<PaymentPage> {
                   children: [
                     Expanded(
                       child: _deliveryAddress == null
-                          ? const Text('กรุณาเลือกที่อยู่จัดส่ง', style: TextStyle(color: Colors.red))
+                          ? const Text('กรุณาเลือกที่อยู่จัดส่ง',
+                              style: TextStyle(color: Colors.red))
                           : Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   '${_deliveryAddress!.name} | ${_deliveryAddress!.phone}',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w400, fontSize: 14),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   '${_deliveryAddress!.detail} ${_deliveryAddress!.subDistrict} ${_deliveryAddress!.district} ${_deliveryAddress!.province} ',
-                                  style: TextStyle(color: Colors.grey.shade700, height: 1.5, fontSize: 13),
+                                  style: TextStyle(
+                                      color: Colors.grey.shade700,
+                                      height: 1.5,
+                                      fontSize: 13),
                                 ),
                               ],
                             ),
@@ -119,19 +182,21 @@ class _PaymentPageState extends State<PaymentPage> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
             const Divider(thickness: 1, height: 1, color: Color(0xFFEEEEEE)),
             const SizedBox(height: 24),
 
             // --- 2. รายละเอียดสินค้า ---
-            const Text('รายละเอียดสินค้า', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Text('รายละเอียดสินค้า',
+                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16)),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: const [
                 Text('อัลบั้มรูป', style: TextStyle(fontSize: 15)),
-                Text('฿ 599', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                Text('฿ 599',
+                    style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15)),
               ],
             ),
 
@@ -140,7 +205,8 @@ class _PaymentPageState extends State<PaymentPage> {
             const SizedBox(height: 24),
 
             // --- 3. ช่องทางชำระเงิน ---
-            const Text('ช่องทางชำระเงิน', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Text('ช่องทางชำระเงิน',
+                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16)),
             const SizedBox(height: 16),
 
             // QR พร้อมเพย์
@@ -153,7 +219,9 @@ class _PaymentPageState extends State<PaymentPage> {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
                   children: [
-                    Image.asset('assets/icons/qrPayment.png', width: 28, height: 28, errorBuilder: (_,__,___) => const Icon(Icons.qr_code_2, size: 28, color: Color(0xFF1A237E))),
+                    Image.asset('assets/icons/qrPayment.png',
+                        width: 28, height: 28,
+                        errorBuilder: (_, __, ___) => const Icon(Icons.qr_code_2, size: 28, color: Color(0xFF1A237E))),
                     const SizedBox(width: 12),
                     const Expanded(child: Text('QR พร้อมเพย์', style: TextStyle(fontSize: 15))),
                     _buildRadio(_selectedMethod == 0),
@@ -166,8 +234,7 @@ class _PaymentPageState extends State<PaymentPage> {
             // Mobile Banking
             _buildDropdownSection(
               title: 'Mobile Banking',
-              // ✅ แก้ไข: ส่ง path รูปภาพ (String)
-              iconAsset: 'assets/icons/bank.png', 
+              iconAsset: 'assets/icons/bank.png',
               isExpanded: _expandedSection == 'mobile',
               onTap: () => setState(() {
                 if (_expandedSection == 'mobile') {
@@ -192,15 +259,12 @@ class _PaymentPageState extends State<PaymentPage> {
                             borderRadius: BorderRadius.circular(8),
                             child: Image.asset(
                               _bankOptions[index]['icon'],
-                              width: 32,
-                              height: 32,
+                              width: 32, height: 32,
                               errorBuilder: (context, error, stackTrace) => Container(width: 32, height: 32, color: Colors.grey.shade300),
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(_bankOptions[index]['name'], style: const TextStyle(fontSize: 14)),
-                          ),
+                          Expanded(child: Text(_bankOptions[index]['name'], style: const TextStyle(fontSize: 14))),
                           _buildRadio(_selectedBankIndex == index && _selectedMethod == 1),
                         ],
                       ),
@@ -214,10 +278,7 @@ class _PaymentPageState extends State<PaymentPage> {
             // บัตรเครดิต
             _buildDropdownSection(
               title: 'บัตรเครดิต/บัตรเดบิต',
-              
-              // ✅ แก้ไข: เปลี่ยนจาก iconData เป็น iconAsset
-              iconAsset: 'assets/icons/card.png', 
-              
+              iconAsset: 'assets/icons/card.png',
               isExpanded: _expandedSection == 'card',
               onTap: () => setState(() {
                 if (_expandedSection == 'card') {
@@ -229,33 +290,82 @@ class _PaymentPageState extends State<PaymentPage> {
               }),
               content: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AddCardPage()));
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(4),
+                child: _savedCard == null
+                    // กรณีไม่มีบัตร
+                    ? InkWell(
+                        onTap: _addCard,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(4),
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(Icons.add, color: Colors.grey, size: 20),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Icon(Icons.add, color: Colors.grey, size: 20),
+                              ),
+                              const SizedBox(width: 12),
+                              const Text('เพิ่มบัตรใหม่', style: TextStyle(color: Colors.grey, fontSize: 14)),
+                            ],
+                          ),
                         ),
-                        const SizedBox(width: 12),
-                        const Text('เพิ่มบัตรใหม่', style: TextStyle(color: Colors.grey, fontSize: 14)),
-                      ],
-                    ),
-                  ),
-                ),
+                      )
+                    // กรณีมีบัตร (โหลดจากเครื่องหรือเพิ่มใหม่)
+                    : InkWell(
+                        onTap: () {},
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: const Color(0xFF4CAF50)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                'assets/icons/Visa.png',
+                                width: 40, height: 25, fit: BoxFit.contain,
+                                errorBuilder: (c,o,s) => const Icon(Icons.credit_card, color: Colors.blue),
+                              ),
+                              const SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '**** **** **** ${_savedCard!['last4']}',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                  ),
+                                  if (_savedCard!['holderName'] != null)
+                                    Text(
+                                      _savedCard!['holderName'],
+                                      style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                    ),
+                                ],
+                              ),
+                              const Spacer(),
+                              // ปุ่มลบ
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline, color: Colors.grey),
+                                onPressed: () {
+                                  setState(() {
+                                    _savedCard = null;
+                                  });
+                                  // ✅ 8. ลบจาก Storage ด้วย
+                                  _removeCardFromStorage();
+                                },
+                              ),
+                              _buildRadio(true),
+                            ],
+                          ),
+                        ),
+                      ),
               ),
             ),
 
@@ -271,24 +381,67 @@ class _PaymentPageState extends State<PaymentPage> {
                 SizedBox(
                   height: 36,
                   child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CouponSelectionPage())),
+                    onPressed: _selectCoupon,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF7043),
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                     ),
-                    child: const Text('ใช้ส่วนลด', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: Text(_selectedCoupon == null ? 'ใช้ส่วนลด' : 'เปลี่ยน',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400)),
                   ),
                 ),
               ],
             ),
-            
+
+            if (_selectedCoupon != null) ...[
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF3E0),
+                  border: Border.all(color: const Color(0xFFFF8A3D).withOpacity(0.5)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.local_offer, color: Color(0xFFFF7043)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _selectedCoupon!['title'],
+                            style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 14, color: Colors.black87),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _selectedCoupon!['condition'],
+                            style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 18, color: Colors.grey),
+                      onPressed: () {
+                        setState(() {
+                          _selectedCoupon = null;
+                        });
+                      },
+                    )
+                  ],
+                ),
+              ),
+            ],
+
             const SizedBox(height: 40),
           ],
         ),
       ),
-      
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.all(20),
         child: SizedBox(
@@ -296,19 +449,22 @@ class _PaymentPageState extends State<PaymentPage> {
           child: ElevatedButton(
             onPressed: () {
               if (_deliveryAddress == null) {
-                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('กรุณาเลือกที่อยู่จัดส่ง')));
-                 return;
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('กรุณาเลือกที่อยู่จัดส่ง')));
+                return;
               }
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaymentSuccessPage()));
+              if (_selectedMethod == 0) {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QRPaymentPage(amount: 599)));
+              } else {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaymentSuccessPage()));
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF7043),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
               elevation: 0,
             ),
-            child: const Text(
-              'ชำระเงิน',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+            child: const Text('ชำระเงิน',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Colors.white),
             ),
           ),
         ),
@@ -316,11 +472,11 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
-  // ✅ แก้ไข Helper Widget: ให้รองรับทั้ง IconData และ Image Asset
+  // ... (Helper Methods ส่วน UI เดิม)
   Widget _buildDropdownSection({
     required String title,
-    IconData? iconData, // ทำให้เป็น optional
-    String? iconAsset,  // เพิ่ม optional สำหรับ path รูปภาพ
+    IconData? iconData,
+    String? iconAsset,
     required bool isExpanded,
     required VoidCallback onTap,
     required Widget content,
@@ -333,14 +489,12 @@ class _PaymentPageState extends State<PaymentPage> {
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Row(
               children: [
-                // แสดงผลตามสิ่งที่ส่งมา
                 if (iconAsset != null)
-                   Image.asset(iconAsset, width: 26, height: 26)
+                  Image.asset(iconAsset, width: 26, height: 26)
                 else if (iconData != null)
-                   Icon(iconData, color: const Color(0xFF607D8B), size: 26)
+                  Icon(iconData, color: const Color(0xFF607D8B), size: 26)
                 else
-                   const SizedBox(width: 26), // กรณีไม่ส่งอะไรมาเลย
-                   
+                  const SizedBox(width: 26),
                 const SizedBox(width: 12),
                 Expanded(child: Text(title, style: const TextStyle(fontSize: 15))),
                 Icon(
@@ -368,8 +522,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Widget _buildRadio(bool isSelected) {
     return Container(
-      width: 24,
-      height: 24,
+      width: 24, height: 24,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
@@ -380,15 +533,155 @@ class _PaymentPageState extends State<PaymentPage> {
       child: isSelected
           ? Center(
               child: Container(
-                width: 12,
-                height: 12,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFF8A3D),
-                  shape: BoxShape.circle,
-                ),
+                width: 12, height: 12,
+                decoration: const BoxDecoration(color: Color(0xFFFF8A3D), shape: BoxShape.circle),
               ),
             )
           : null,
+    );
+  }
+}
+
+// ... (Sub-Class QRPaymentPage เก็บไว้ท้ายไฟล์เดิม)
+class QRPaymentPage extends StatefulWidget {
+  final double amount;
+  const QRPaymentPage({super.key, required this.amount});
+
+  @override
+  State<QRPaymentPage> createState() => _QRPaymentPageState();
+}
+
+class _QRPaymentPageState extends State<QRPaymentPage> {
+  // ... (Logic หน้า QR เหมือนเดิมทุกอย่าง)
+  Duration duration = const Duration(hours: 12, minutes: 34, seconds: 56);
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        if (duration.inSeconds > 0) {
+          setState(() {
+            duration = Duration(seconds: duration.inSeconds - 1);
+          });
+        } else {
+          timer?.cancel();
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  String _printDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // ... (ส่วน UI QR เหมือนเดิม)
+    return Scaffold(
+      // ... (โค้ด UI QR)
+       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text('ชำระเงิน',
+            style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w400)),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('กำลังรอการชำระเงิน', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+                Text('฿ ${widget.amount.toStringAsFixed(0)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const Text('หมดอายุใน ', style: TextStyle(fontSize: 14, color: Colors.deepOrange)),
+                Text(_printDuration(duration), style: const TextStyle(fontSize: 14, color: Colors.deepOrange, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Container(
+              width: double.infinity,
+              height: 350,
+              decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(40.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(16)),
+                        child: Center(child: Icon(Icons.qr_code_2, size: 100, color: Colors.grey.shade500)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('บันทึก QR Code เรียบร้อย')));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey.shade400,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                ),
+                child: const Text('ดาวน์โหลด', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400)),
+              ),
+            ),
+            const SizedBox(height: 32),
+            const Text('ขั้นตอนการชำระเงินด้วยรหัส QR', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            _buildStep(1, 'แตะ "บันทึกรหัส QR" หรือ จับภาพหน้าจอ เพื่อเก็บรหัส QR ไว้ในโทรศัพท์ของคุณ'),
+            _buildStep(2, 'เปิดแอปธนาคาร หรือ E-Wallet ที่คุณต้องการใช้ชำระเงิน'),
+            _buildStep(3, 'อัปโหลดภาพรหัส QR ที่บันทึกไว้ หรือ สแกนรหัส QR โดยตรงผ่านแอปธนาคารหรือ E-Wallet'),
+            _buildStep(4, 'ตรวจสอบรายละเอียดการชำระเงินและยืนยันรายการเพื่อทำธุรกรรมให้เสร็จสมบูรณ์'),
+          ],
+        ),
+      ),
+    );
+  }
+   Widget _buildStep(int number, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('$number. ', style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black87)),
+          Expanded(child: Text(text, style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black87))),
+        ],
+      ),
     );
   }
 }
