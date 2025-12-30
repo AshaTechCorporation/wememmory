@@ -36,23 +36,45 @@ class _AddCardPageState extends State<AddCardPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black87,
-        title: const Text('เพิ่มบัตร', style: TextStyle(fontWeight: FontWeight.w700)),
+        title: const Text('เพิ่มบัตร', style: TextStyle(fontWeight: FontWeight.w400)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  ..._cardBrands.map((brand) => Container(margin: const EdgeInsets.only(right: 16), child: brand.iconWidget)),
-                  Container(height: 24, width: 1, color: Colors.grey[300], margin: const EdgeInsets.symmetric(horizontal: 8)),
-                  const Padding(padding: EdgeInsets.only(left: 4.0), child: Icon(Icons.lock_outline, color: Color(0xFF9E9E9E))),
-                ],
-              ),
+            // --- ส่วนที่แก้ไข: จัด Layout ให้กล้องอยู่ขวา และรายการบัตรอยู่ซ้าย ---
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        ..._cardBrands.map((brand) => Container(margin: const EdgeInsets.only(right: 16), child: brand.iconWidget)),
+                        Container(height: 24, width: 1, color: Colors.grey[300], margin: const EdgeInsets.symmetric(horizontal: 8)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12), // เว้นระยะห่างระหว่างกลุ่มไอคอนกับกล้อง
+                // ไอคอนกล้อง (Scan)
+                InkWell(
+                  onTap: () {
+                    // ใส่ฟังก์ชันเปิดกล้องตรงนี้
+                    debugPrint("Open Camera");
+                  },
+                  child: Image.asset(
+                    'assets/icons/camera.png',
+                    width: 28, // ปรับขนาดตามต้องการ
+                    height: 28,
+                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.camera_alt_outlined, color: Colors.grey, size: 28), // กรณีไม่มีรูปจะโชว์ Icon แทน
+                  ),
+                ),
+              ],
             ),
+            // -----------------------------------------------------------
             const SizedBox(height: 24),
             TextField(
               controller: _cardNumberController,
@@ -121,7 +143,7 @@ class _AddCardPageState extends State<AddCardPage> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF8A3D),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+              shape: RoundedRectangleBorder(),
             ),
             child: const Text('ยืนยัน', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
           ),

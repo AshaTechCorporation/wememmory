@@ -20,7 +20,7 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
   bool _isExpanded = false; // ตัวแปรสำหรับตรวจสอบสถานะ การย่อ/ขยาย
 
   final List<Map<String, dynamic>> _colorOptions = [
-    {'name': 'เทา', 'color': const Color(0xFF424242)},
+    {'name': 'เทา', 'color': const Color.fromARGB(255, 87, 87, 87)},
     {'name': 'ส้ม', 'color': const Color(0xFFFF7043)},
     {'name': 'ดำ', 'color': const Color(0xFF000000)},
     {'name': 'น้ำเงิน', 'color': const Color(0xFF26C6DA)},
@@ -144,15 +144,17 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
                             ),
                             child: Row(
                               children: [
+                                // --- ส่วนที่แก้ไข: เปลี่ยนจากวงกลมเป็นสี่เหลี่ยมขอบมน ---
                                 Container(
                                   width: 24,
                                   height: 24,
                                   decoration: BoxDecoration(
                                     color: _colorOptions[index]['color'],
-                                    shape: BoxShape.circle,
+                                    borderRadius: BorderRadius.circular(6), // ปรับความมนของขอบตรงนี้ (4-8 กำลังสวย)
                                     border: Border.all(color: Colors.grey.shade200),
                                   ),
                                 ),
+                                // ---------------------------------------------------
                                 const SizedBox(width: 8),
                                 Text(
                                   _colorOptions[index]['name'],
@@ -359,12 +361,12 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
                   Text(
                     'แสดงเพิ่มเติม',
                     style: TextStyle(
-                      color: Colors.grey, // ✅ เปลี่ยนเป็นสีเทา
+                      color: Colors.grey,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Icon(Icons.keyboard_arrow_down, color: Colors.grey), // ✅ เปลี่ยนเป็นสีเทา
+                  Icon(Icons.keyboard_arrow_down, color: Colors.grey),
                 ],
               ),
             ),
@@ -426,12 +428,12 @@ class _AlbumGiftPageState extends State<AlbumGiftPage> {
                       Text(
                         'แสดงน้อยลง',
                         style: TextStyle(
-                          color: Colors.grey, // ✅ เปลี่ยนเป็นสีเทา
+                          color: Colors.grey,
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Icon(Icons.keyboard_arrow_up, color: Colors.grey), // ✅ เปลี่ยนเป็นสีเทา
+                      Icon(Icons.keyboard_arrow_up, color: Colors.grey),
                     ],
                   ),
                 ),
@@ -470,7 +472,7 @@ class _AlbumCoverSelectionPageState extends State<AlbumCoverSelectionPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black, size: 28),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('รูปภาพหน้าปกอัลบั้ม', style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold)),
+        title: const Text('รูปภาพหน้าปกอัลบั้ม', style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w400)),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -535,7 +537,7 @@ class _AlbumCoverSelectionPageState extends State<AlbumCoverSelectionPage> {
                 elevation: 0,
                 disabledBackgroundColor: Colors.grey[300],
               ),
-              child: const Text('ยืนยัน', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              child: const Text('ยืนยัน', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w400)),
             ),
           ),
         ),

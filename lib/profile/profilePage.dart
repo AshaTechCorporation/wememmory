@@ -20,6 +20,7 @@ import 'package:wememmory/widgets/FormNum.dart';
 import 'package:wememmory/widgets/dialog.dart';
 import 'widgets/index.dart';
 import 'package:wememmory/home/service/homeController.dart';
+import 'package:wememmory/profile/addressPage.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -185,7 +186,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AddressSelectionPage(),
+                              builder: (context) => AddressPage(),
                             ),
                           );
                           break;

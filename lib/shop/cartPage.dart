@@ -216,7 +216,6 @@ class CartPage extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: kPrimaryColor, 
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
               ),
               elevation: 0,
             ),
@@ -224,7 +223,7 @@ class CartPage extends StatelessWidget {
               'สั่งซื้อสินค้า',
               style: TextStyle(
                 fontSize: 18, 
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w400,
                 color: Colors.white,
               ),
             ),

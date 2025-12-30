@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wememmory/constants.dart';
 import 'package:wememmory/profile/mobileBankingPage.dart';
+import 'package:wememmory/profile/cardinfoPage.dart';
 
 class BankInfoPage extends StatelessWidget {
   const BankInfoPage({super.key});
@@ -16,7 +17,7 @@ class BankInfoPage extends StatelessWidget {
         backgroundColor: const Color(0xFFF8B887),
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white), onPressed: () => Navigator.pop(context)),
-        title: const Text('ข้อมูลบัญชีธนาคาร/บัตรเครดิต', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w300,fontSize: 16)),
+        title: const Text('ข้อมูลบัญชีธนาคาร/บัตรเครดิต', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w300,fontSize: 18)),
       ),
 
       // ตัวเนื้อหาพื้นขาว
@@ -35,7 +36,8 @@ class BankInfoPage extends StatelessWidget {
                 },
               ),
               const Divider(height: 1, color: divider),
-              _ListTile(icon: 'assets/icons/si_credit-card-fill.png', title: 'บัตรเครดิต/บัตรเดบิต', onTap: () {}),
+              _ListTile(icon: 'assets/icons/si_credit-card-fill.png', title: 'บัตรเครดิต/บัตรเดบิต', 
+              onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context) => const CardInfoPage()));}),
               const Divider(height: 1, color: divider),
             ],
           ),
@@ -48,7 +50,7 @@ class BankInfoPage extends StatelessWidget {
         child: SizedBox(
           height: 46,
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {Navigator.pop(context);},
             style: ElevatedButton.styleFrom(
               backgroundColor: orange,
               elevation: 0,
