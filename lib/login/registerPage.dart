@@ -45,11 +45,7 @@ class _RegisterPageState extends State<RegisterPage> {
   // ✅ 1. แก้ไขฟังก์ชันนี้ให้รับค่า source (Camera/Gallery)
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final XFile? pickedFile = await _picker.pickImage(
-        source: source, 
-        maxWidth: 800, 
-        maxHeight: 800,
-      );
+      final XFile? pickedFile = await _picker.pickImage(source: source, maxWidth: 800, maxHeight: 800);
 
       if (pickedFile != null) {
         setState(() {
@@ -66,9 +62,7 @@ class _RegisterPageState extends State<RegisterPage> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (BuildContext context) {
         return SafeArea(
           child: Wrap(
@@ -120,11 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
           labelText: label,
           labelStyle: const TextStyle(color: _textGrey),
           prefixIcon: Icon(icon, color: _primaryOrange),
-          suffixIcon: isPassword
-              ? IconButton(
-                  icon: Icon((obscureText ?? true) ? Icons.visibility_off : Icons.visibility, color: _textGrey),
-                  onPressed: onToggleVisibility)
-              : null,
+          suffixIcon: isPassword ? IconButton(icon: Icon((obscureText ?? true) ? Icons.visibility_off : Icons.visibility, color: _textGrey), onPressed: onToggleVisibility) : null,
           contentPadding: const EdgeInsets.symmetric(vertical: 12),
           enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade300)),
           focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: _primaryOrange, width: 2)),
@@ -256,19 +246,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                     // Logic เดิมของคุณ: อัพโหลดรูปก่อนแล้วค่อย Register
                                     if (_avatar != null) {
-                                      image = await LoginService.addImage(file: _avatar, path: 'images/asset/'); 
+                                      image = await LoginService.addImage(file: _avatar, path: 'images/asset/');
                                     }
-                                    
-                                    final register = await Registerservice.register(
-                                      fullname: _nameController.text,
-                                      username: _phoneController.text,
-                                      avatar: image,
-                                      language: 'th',
-                                    );
-                                    
+
+                                    final register = await Registerservice.register(fullname: _nameController.text, username: _phoneController.text, avatar: image, language: 'th');
+
                                     if (!mounted) return;
                                     LoadingDialog.close(context);
-                                    Navigator.pop(context, true);
+                                    Navigator.pop(context, _phoneController.text);
                                   } on ApiException catch (e) {
                                     if (!mounted) return;
                                     LoadingDialog.close(context);

@@ -246,8 +246,12 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           const Text('ยังไม่มีบัญชีใช่ไหม? ', style: TextStyle(color: _textGrey, fontSize: 14)),
                           GestureDetector(
-                            onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterPage()));
+                            onTap: () async {
+                              final telRegister = await Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterPage()));
+                              if (telRegister != null) {
+                                tel.text = telRegister;
+                                setState(() {});
+                              }
                             },
                             child: const Text('สมัครสมาชิก', style: TextStyle(color: _primaryOrange, fontWeight: FontWeight.bold, fontSize: 14)),
                           ),

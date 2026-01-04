@@ -59,8 +59,7 @@ class Recommended extends StatefulWidget {
   final List<MediaItem>? albumItems;
   final String? albumMonth;
 
-  const Recommended({Key? key, this.albumItems, this.albumMonth})
-      : super(key: key);
+  const Recommended({Key? key, this.albumItems, this.albumMonth}) : super(key: key);
 
   @override
   State<Recommended> createState() => _RecommendedState();
@@ -87,8 +86,7 @@ class _RecommendedState extends State<Recommended> {
   @override
   void didUpdateWidget(covariant Recommended oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.albumItems != oldWidget.albumItems || 
-        widget.albumMonth != oldWidget.albumMonth) {
+    if (widget.albumItems != oldWidget.albumItems || widget.albumMonth != oldWidget.albumMonth) {
       _generateCards();
     }
   }
@@ -106,19 +104,21 @@ class _RecommendedState extends State<Recommended> {
       final currentYearAD = DateTime.now().year;
       List<int> yearsToFetch = [currentYearAD];
 
-      await Future.wait(yearsToFetch.map((year) async {
-        try {
-          final albums = await HomeService.getAlbums(year: '$year');
-          for (var album in albums) {
-            String monthName = _getThaiMonthNameFromData(album.month);
-            int yearBE = int.parse(year.toString()) + 543;
-            String key = "$monthName $yearBE";
-            _cachedAlbumMap[key] = album;
+      await Future.wait(
+        yearsToFetch.map((year) async {
+          try {
+            final albums = await HomeService.getAlbums(year: '$year');
+            for (var album in albums) {
+              String monthName = _getThaiMonthNameFromData(album.month);
+              int yearBE = int.parse(year.toString()) + 543;
+              String key = "$monthName $yearBE";
+              _cachedAlbumMap[key] = album;
+            }
+          } catch (e) {
+            debugPrint("Error fetching year $year: $e");
           }
-        } catch (e) {
-          debugPrint("Error fetching year $year: $e");
-        }
-      }));
+        }),
+      );
 
       _generateCards();
     } catch (e) {
@@ -150,7 +150,7 @@ class _RecommendedState extends State<Recommended> {
     List<MemoryCardData> tempItems = [];
 
     // วนลูปถอยหลัง: เดือน 12 ลงไปถึง เดือน 1
-    for (int i = 12; i >= 1; i--) {
+    for (int i = DateTime.now().month; i >= 1; i--) {
       final monthName = _getThaiMonthName(i);
       final yearBE = now.year + 543;
       final String key = "$monthName $yearBE";
@@ -161,10 +161,10 @@ class _RecommendedState extends State<Recommended> {
       // ตรวจสอบข้อมูล Local (ถ้ามีการส่งค่ากลับมาจากหน้า Upload)
       if (widget.albumMonth != null && widget.albumItems != null) {
         if (widget.albumMonth!.trim() == key.trim()) {
-           photoCount = widget.albumItems!.length;
+          photoCount = widget.albumItems!.length;
         }
       }
-      
+
       bool isCurrentMonth = (i == now.month);
 
       // --- CASE 3: ครบ 11 รูป (Background Card) ---
@@ -174,53 +174,55 @@ class _RecommendedState extends State<Recommended> {
           coverImageUrl = album.photos![0].image;
         }
 
-        tempItems.add(MemoryCardData(
-          type: CardType.backgroundImage,
-          topTitle: monthName,
-          mainTitle: 'ความทรงจำ\nที่สมบูรณ์',
-          subTitle: 'บันทึกครบ $photoCount ภาพ',
-          footerText: 'ปี $yearBE',
-          gradientColors: [],
-          accentColor: Colors.transparent,
-          backgroundUrl: coverImageUrl,
-          backgroundImage: coverImageUrl == null ? 'assets/images/Hobby1.png' : null,
-          showTextOverlay: true,
-          monthIndex: i,
-        ));
-      } 
+        tempItems.add(
+          MemoryCardData(
+            type: CardType.backgroundImage,
+            topTitle: monthName,
+            mainTitle: 'ความทรงจำ\nที่สมบูรณ์',
+            subTitle: 'บันทึกครบ $photoCount ภาพ',
+            footerText: 'ปี $yearBE',
+            gradientColors: [],
+            accentColor: Colors.transparent,
+            backgroundUrl: coverImageUrl,
+            backgroundImage: coverImageUrl == null ? 'assets/images/Hobby1.png' : null,
+            showTextOverlay: true,
+            monthIndex: i,
+          ),
+        );
+      }
       // --- CASE 2: กำลังทำ / ไม่ครบ (Ticket Card) ---
       else if (photoCount > 0 && photoCount < 11) {
-        tempItems.add(MemoryCardData(
-          type: CardType.ticket,
-          topTitle: '$monthName\n$yearBE',
-          mainTitle: _timeRemainingString, // ✅ แสดงเวลาทุกใบที่เป็น Ticket
-          subTitle: 'ขาดอีก ${11 - photoCount} ภาพ',
-          footerText: 'Ticket 10',
-          currentProgress: photoCount, // ✅ แสดง Progress Bar
-          maxProgress: 11,
-          gradientColors: [],
-          accentColor: const Color(0xFFFF7043),
-          backgroundColor: const Color(0xFF111111),
-          monthIndex: i,
-        ));
-      } 
+        tempItems.add(
+          MemoryCardData(
+            type: CardType.ticket,
+            topTitle: '$monthName\n$yearBE',
+            mainTitle: _timeRemainingString, // ✅ แสดงเวลาทุกใบที่เป็น Ticket
+            subTitle: 'ขาดอีก ${11 - photoCount} ภาพ',
+            footerText: 'Ticket 10',
+            currentProgress: photoCount, // ✅ แสดง Progress Bar
+            maxProgress: 11,
+            gradientColors: [],
+            accentColor: const Color(0xFFFF7043),
+            backgroundColor: const Color(0xFF111111),
+            monthIndex: i,
+          ),
+        );
+      }
       // --- CASE 1: ยังไม่เริ่ม (Standard Card) ---
       else {
-        tempItems.add(MemoryCardData(
-          type: CardType.standard,
-          topTitle: '$monthName\n$yearBE',
-          mainTitle: '',
-          subTitle: isCurrentMonth ? 'เริ่มบันทึกความทรงจำเดือนนี้' : 'ยังไม่มีบันทึกความทรงจำ',
-          footerText: 'Start Now',
-          gradientColors: [const Color(0xFF424242), const Color(0xFF212121)],
-          accentColor: const Color(0xFFFF7043),
-          assetImages: [
-            'assets/images/Hobby2.png',
-            'assets/images/Hobby3.png',
-            'assets/images/Hobby1.png',
-          ],
-          monthIndex: i,
-        ));
+        tempItems.add(
+          MemoryCardData(
+            type: CardType.standard,
+            topTitle: '$monthName\n$yearBE',
+            mainTitle: '',
+            subTitle: isCurrentMonth ? 'เริ่มบันทึกความทรงจำเดือนนี้' : 'ยังไม่มีบันทึกความทรงจำ',
+            footerText: 'Start Now',
+            gradientColors: [const Color(0xFF424242), const Color(0xFF212121)],
+            accentColor: const Color(0xFFFF7043),
+            assetImages: ['assets/images/Hobby2.png', 'assets/images/Hobby3.png', 'assets/images/Hobby1.png'],
+            monthIndex: i,
+          ),
+        );
       }
     }
 
@@ -228,28 +230,28 @@ class _RecommendedState extends State<Recommended> {
       _items = tempItems;
       // ตั้งค่าเริ่มต้นเป็น 0 (Card ใบแรกคือเดือน 12)
       if (_items.isNotEmpty) {
-         _currentIndex = 0; 
+        _currentIndex = 0;
       }
     });
-    
+
     // เริ่ม Timer เพื่ออัปเดตเวลา
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _onTimerTick());
   }
 
   void _calculateTargetAndInitialString() {
-      final now = DateTime.now();
-      if (_targetDate == null) {
-         // นับถอยหลัง 7 วันจากเวลาปัจจุบัน
-         _targetDate = now.add(const Duration(days: 7));
-      }
-      _updateTimeStringInternal();
+    final now = DateTime.now();
+    if (_targetDate == null) {
+      // นับถอยหลัง 7 วันจากเวลาปัจจุบัน
+      _targetDate = now.add(const Duration(days: 7));
+    }
+    _updateTimeStringInternal();
   }
 
   void _updateTimeStringInternal() {
     if (_targetDate == null) return;
     final now = DateTime.now();
-    
+
     final diff = _targetDate!.difference(now);
     if (diff.isNegative) {
       _timeRemainingString = "หมดเวลา";
@@ -265,7 +267,7 @@ class _RecommendedState extends State<Recommended> {
   // ✅ อัปเดตเวลา Realtime ให้กับทุก Card ที่เป็น Ticket
   void _onTimerTick() {
     if (_items.isEmpty) return;
-    
+
     _updateTimeStringInternal(); // คำนวณเวลาใหม่
 
     if (!mounted) return;
@@ -276,28 +278,28 @@ class _RecommendedState extends State<Recommended> {
     // วนลูปเช็คทุกการ์ด ถ้าใบไหนเป็น Ticket ให้อัปเดตเวลา
     for (int i = 0; i < updatedItems.length; i++) {
       final item = updatedItems[i];
-      
+
       if (item.type == CardType.ticket) {
         if (item.mainTitle != _timeRemainingString) {
-           updatedItems[i] = MemoryCardData(
-              type: item.type,
-              topTitle: item.topTitle,
-              mainTitle: _timeRemainingString, // อัปเดตเวลาตรงนี้
-              subTitle: item.subTitle,
-              footerText: item.footerText,
-              gradientColors: item.gradientColors,
-              accentColor: item.accentColor,
-              backgroundColor: item.backgroundColor,
-              currentProgress: item.currentProgress,
-              maxProgress: item.maxProgress,
-              imageItems: item.imageItems,
-              assetImages: item.assetImages,
-              backgroundUrl: item.backgroundUrl,
-              backgroundImage: item.backgroundImage,
-              showTextOverlay: item.showTextOverlay,
-              monthIndex: item.monthIndex,
-           );
-           needsUpdate = true;
+          updatedItems[i] = MemoryCardData(
+            type: item.type,
+            topTitle: item.topTitle,
+            mainTitle: _timeRemainingString, // อัปเดตเวลาตรงนี้
+            subTitle: item.subTitle,
+            footerText: item.footerText,
+            gradientColors: item.gradientColors,
+            accentColor: item.accentColor,
+            backgroundColor: item.backgroundColor,
+            currentProgress: item.currentProgress,
+            maxProgress: item.maxProgress,
+            imageItems: item.imageItems,
+            assetImages: item.assetImages,
+            backgroundUrl: item.backgroundUrl,
+            backgroundImage: item.backgroundImage,
+            showTextOverlay: item.showTextOverlay,
+            monthIndex: item.monthIndex,
+          );
+          needsUpdate = true;
         }
       }
     }
@@ -315,7 +317,7 @@ class _RecommendedState extends State<Recommended> {
 
     List<MediaItem>? currentItems;
     int targetIndex = _items.indexWhere((item) => item.topTitle.contains(monthNameOnly));
-    
+
     if (targetIndex != -1) {
       currentItems = _items[targetIndex].imageItems;
     }
@@ -324,57 +326,48 @@ class _RecommendedState extends State<Recommended> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.9,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          child: UploadPhotoPage(
-            selectedMonth: cleanTitle,
-            initialSelectedItems: currentItems,
+      builder:
+          (context) => Container(
+            height: MediaQuery.of(context).size.height * 0.9,
+            decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+            child: ClipRRect(borderRadius: const BorderRadius.vertical(top: Radius.circular(20)), child: UploadPhotoPage(selectedMonth: cleanTitle, initialSelectedItems: currentItems)),
           ),
-        ),
-      ),
     ).then((_) {
-      _fetchRealAlbumData(); 
+      _fetchRealAlbumData();
     });
   }
 
   void _nextCard() {
     if (_currentIndex < _items.length - 1) setState(() => _currentIndex++);
   }
+
   void _previousCard() {
     if (_currentIndex > 0) setState(() => _currentIndex--);
   }
 
   @override
   Widget build(BuildContext context) {
-      if (_isLoading) {
-          return const SizedBox(
-              height: 416, 
-              child: Center(child: CircularProgressIndicator(color: Colors.orange))
-          );
-      }
+    if (_isLoading) {
+      return const SizedBox(height: 416, child: Center(child: CircularProgressIndicator(color: Colors.orange)));
+    }
 
-      if (_items.isEmpty) return const SizedBox(height: 416);
+    if (_items.isEmpty) return const SizedBox(height: 416);
 
-      return SizedBox(
+    return SizedBox(
       height: 416,
       width: double.infinity,
       child: Stack(
         alignment: Alignment.center,
-        children: _items
-            .asMap()
-            .entries
-            .map((entry) {
-              return _buildCardItem(entry.key, entry.value);
-            })
-            .toList()
-            .reversed 
-            .toList(),
+        children:
+            _items
+                .asMap()
+                .entries
+                .map((entry) {
+                  return _buildCardItem(entry.key, entry.value);
+                })
+                .toList()
+                .reversed
+                .toList(),
       ),
     );
   }
@@ -401,7 +394,7 @@ class _RecommendedState extends State<Recommended> {
       opacity = 0.0;
       isAbsorbing = true;
       onDragEnd = null;
-      onTapButton = null; 
+      onTapButton = null;
     } else {
       final int relativeIndex = index - _currentIndex;
       scale = 1.0 - (relativeIndex * 0.15);
@@ -429,23 +422,13 @@ class _RecommendedState extends State<Recommended> {
       top: top,
       left: left,
       child: GestureDetector(
-        onHorizontalDragEnd: onDragEnd, 
+        onHorizontalDragEnd: onDragEnd,
         child: Transform.scale(
           scale: scale,
           alignment: Alignment.centerLeft,
           child: Opacity(
             opacity: opacity,
-            child: SizedBox(
-              width: cardWidth,
-              height: cardHeight,
-              child: AbsorbPointer(
-                absorbing: isAbsorbing, 
-                child: MemoryCard(
-                  data: item,
-                  onButtonTap: onTapButton,
-                ),
-              ),
-            ),
+            child: SizedBox(width: cardWidth, height: cardHeight, child: AbsorbPointer(absorbing: isAbsorbing, child: MemoryCard(data: item, onButtonTap: onTapButton))),
           ),
         ),
       ),
@@ -461,8 +444,7 @@ class MemoryCard extends StatelessWidget {
   final MemoryCardData data;
   final VoidCallback? onButtonTap;
 
-  const MemoryCard({Key? key, required this.data, this.onButtonTap})
-      : super(key: key);
+  const MemoryCard({Key? key, required this.data, this.onButtonTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -486,19 +468,14 @@ class MemoryCard extends StatelessWidget {
                 )
               else if (data.backgroundImage != null)
                 Image.asset(data.backgroundImage!, fit: BoxFit.cover)
-              else 
+              else
                 Image.asset('assets/images/Hobby1.png', fit: BoxFit.cover),
-              
+
               if (data.showTextOverlay)
                 Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [
-                        Colors.black.withOpacity(0.6),
-                        Colors.transparent,
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.3),
-                      ],
+                      colors: [Colors.black.withOpacity(0.6), Colors.transparent, Colors.transparent, Colors.black.withOpacity(0.3)],
                       stops: const [0.0, 0.4, 0.7, 1.0],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
@@ -509,7 +486,7 @@ class MemoryCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(data.topTitle, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold, height: 1.1)),
-                      const SizedBox(height: 8), 
+                      const SizedBox(height: 8),
                       Text(data.mainTitle, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, height: 1.2)),
                     ],
                   ),
@@ -524,11 +501,7 @@ class MemoryCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(0),
-        gradient: LinearGradient(
-          colors: data.gradientColors,
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
+        gradient: LinearGradient(colors: data.gradientColors, begin: Alignment.topCenter, end: Alignment.bottomCenter),
         border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
       child: ClipRRect(
@@ -536,14 +509,9 @@ class MemoryCard extends StatelessWidget {
         child: Stack(
           children: [
             Positioned(
-              top: -100, right: -50,
-              child: Container(
-                width: 300, height: 300,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(colors: [Colors.white.withOpacity(0.1), Colors.transparent]),
-                ),
-              ),
+              top: -100,
+              right: -50,
+              child: Container(width: 300, height: 300, decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [Colors.white.withOpacity(0.1), Colors.transparent]))),
             ),
             Padding(
               padding: const EdgeInsets.all(24.0),
@@ -561,18 +529,14 @@ class MemoryCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(data.subTitle, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
                   const Spacer(),
-                  Center(
-                    child: SizedBox(
-                      height: 138, width: 280,
-                      child: _PhotoStack(items: data.imageItems, assetImages: data.assetImages),
-                    ),
-                  ),
+                  Center(child: SizedBox(height: 138, width: 280, child: _PhotoStack(items: data.imageItems, assetImages: data.assetImages))),
                   const Spacer(),
                   const SizedBox(height: 16),
                   GestureDetector(
                     onTap: onButtonTap,
                     child: Container(
-                      width: double.infinity, height: 39,
+                      width: double.infinity,
+                      height: 39,
                       decoration: BoxDecoration(
                         color: data.accentColor,
                         borderRadius: BorderRadius.circular(8),
@@ -601,17 +565,11 @@ class TicketMemoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double progressPercent = data.maxProgress > 0 
-        ? (data.currentProgress / data.maxProgress).clamp(0.0, 1.0) 
-        : 0.0;
+    final double progressPercent = data.maxProgress > 0 ? (data.currentProgress / data.maxProgress).clamp(0.0, 1.0) : 0.0;
 
     return Container(
       padding: const EdgeInsets.all(26),
-      decoration: BoxDecoration(
-        color: data.backgroundColor ?? const Color(0xFF111111),
-        borderRadius: BorderRadius.circular(0),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
-      ),
+      decoration: BoxDecoration(color: data.backgroundColor ?? const Color(0xFF111111), borderRadius: BorderRadius.circular(0), border: Border.all(color: Colors.white.withOpacity(0.1), width: 1)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -626,13 +584,7 @@ class TicketMemoryCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(data.subTitle, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
           const Spacer(),
-          Center(
-            child: Text(
-              data.mainTitle, 
-              style: const TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-              textAlign: TextAlign.center,
-            ),
-          ),
+          Center(child: Text(data.mainTitle, style: const TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.bold, letterSpacing: 0.5), textAlign: TextAlign.center)),
           const Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -643,16 +595,14 @@ class TicketMemoryCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Container(
-            height: 31, width: double.infinity,
+            height: 31,
+            width: double.infinity,
             decoration: BoxDecoration(color: const Color(0xFF333333), borderRadius: BorderRadius.circular(15)),
             child: Stack(
               children: [
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    return Container(
-                      width: constraints.maxWidth * progressPercent, 
-                      decoration: BoxDecoration(color: const Color(0xFF6797A9), borderRadius: BorderRadius.circular(15)),
-                    );
+                    return Container(width: constraints.maxWidth * progressPercent, decoration: BoxDecoration(color: const Color(0xFF6797A9), borderRadius: BorderRadius.circular(15)));
                   },
                 ),
               ],
@@ -662,7 +612,8 @@ class TicketMemoryCard extends StatelessWidget {
           GestureDetector(
             onTap: onButtonTap,
             child: Container(
-              width: double.infinity, height: 39,
+              width: double.infinity,
+              height: 39,
               decoration: BoxDecoration(
                 color: data.accentColor,
                 borderRadius: BorderRadius.circular(12),
@@ -691,12 +642,17 @@ class AsyncImageLoader extends StatefulWidget {
 class _AsyncImageLoaderState extends State<AsyncImageLoader> {
   Uint8List? _imageData;
   @override
-  void initState() { super.initState(); _load(); }
+  void initState() {
+    super.initState();
+    _load();
+  }
+
   @override
   void didUpdateWidget(covariant AsyncImageLoader oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.item.asset.id != oldWidget.item.asset.id) _load();
   }
+
   Future<void> _load() async {
     if (widget.item.capturedImage != null) {
       if (mounted) setState(() => _imageData = widget.item.capturedImage);
@@ -705,6 +661,7 @@ class _AsyncImageLoaderState extends State<AsyncImageLoader> {
     final data = await widget.item.asset.thumbnailDataWithSize(ThumbnailSize(widget.quality, widget.quality));
     if (mounted) setState(() => _imageData = data);
   }
+
   @override
   Widget build(BuildContext context) {
     if (_imageData != null) return Image.memory(_imageData!, fit: widget.fit, gaplessPlayback: true);
@@ -724,6 +681,7 @@ class _PhotoStack extends StatelessWidget {
       if (assetImages != null && index < assetImages!.length) return assetImages![index];
       return null;
     }
+
     return Stack(
       alignment: Alignment.center,
       clipBehavior: Clip.none,
@@ -734,19 +692,23 @@ class _PhotoStack extends StatelessWidget {
       ],
     );
   }
+
   Widget _buildPolaroid({required double angle, required Offset offset, bool isFront = false, dynamic item, Color? color}) {
     return Transform.translate(
       offset: offset,
       child: Transform.rotate(
         angle: angle,
         child: Container(
-          width: 90, height: 115, padding: const EdgeInsets.fromLTRB(2, 10, 2, 9),
+          width: 90,
+          height: 115,
+          padding: const EdgeInsets.fromLTRB(2, 10, 2, 9),
           decoration: BoxDecoration(color: color ?? Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 6, offset: const Offset(0, 3))]),
           child: Container(color: Colors.white, child: _buildImageContent(item)),
         ),
       ),
     );
   }
+
   Widget _buildImageContent(dynamic item) {
     if (item == null) return const Center(child: Icon(Icons.image, color: Colors.grey, size: 24));
     if (item is String) return Padding(padding: const EdgeInsets.all(4.0), child: Image.asset(item, fit: BoxFit.cover));

@@ -156,7 +156,7 @@ SPEC CHECKSUMS:
   firebase_core: 995454a784ff288be5689b796deb9e9fa3601818
   FirebaseCore: efb3893e5b94f32b86e331e3bd6dadf18b66568e
   FirebaseCoreInternal: 9afa45b1159304c963da48addb78275ef701c6b4
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_local_notifications: ad39620c743ea4c15127860f4b5641649a988100
   flutter_timezone: ee50ce7786b5fde27e2fe5375bbc8c9661ffc13f
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
