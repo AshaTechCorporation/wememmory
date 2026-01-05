@@ -89,7 +89,7 @@ class MonthDetailPage extends StatelessWidget {
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 48,
-                          fontWeight: FontWeight.w300,
+                          fontWeight: FontWeight.w100,
                           fontFamily: 'kanit',
                           // shadows: [
                           //   Shadow(
