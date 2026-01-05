@@ -1,5 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // ✅ จำเป็นสำหรับ SystemChrome
+
 // import 'package:google_fonts/google_fonts.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +17,11 @@ String? token;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ✅ เพิ่มส่วนนี้เพื่อล็อคหน้าจอเป็นแนวตั้ง
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
