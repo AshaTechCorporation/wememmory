@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -71,13 +72,17 @@ class _RecommendedState extends State<Recommended> {
   bool _isLoading = true;
 
   final Map<String, AlbumModel> _cachedAlbumMap = {};
-  
+
   // ✅ 1. เพิ่มตัวแปรเก็บข้อมูลที่เลือกค้างไว้ (Key คือชื่อเดือน, Value คือรายการรูป)
   final Map<String, List<MediaItem>> _draftSelections = {};
 
   Timer? _timer;
   DateTime? _targetDate;
   String _timeRemainingString = "7 วัน 00 ชม. 00 นาที 00 วิ";
+
+  // ✅ เพิ่มตัวแปรสำหรับจัดการ Drag (ลากแล้วขยับตามนิ้ว)
+  double _dragOffset = 0.0;
+  bool _isDragging = false;
 
   @override
   void initState() {
@@ -158,7 +163,7 @@ class _RecommendedState extends State<Recommended> {
       final String key = "$monthName $yearBE";
 
       final AlbumModel? album = _cachedAlbumMap[key];
-      
+
       List<MediaItem>? cardImageItems;
       int photoCount = album?.photos?.length ?? 0;
 
@@ -167,7 +172,7 @@ class _RecommendedState extends State<Recommended> {
       if (_draftSelections.containsKey(key)) {
         cardImageItems = _draftSelections[key];
         photoCount = cardImageItems!.length;
-      } 
+      }
       // 2. เช็คจาก Widget (กรณีรับค่ามาจากหน้าอื่นครั้งแรก)
       else if (widget.albumMonth != null && widget.albumItems != null) {
         if (widget.albumMonth!.trim() == key.trim()) {
@@ -199,7 +204,7 @@ class _RecommendedState extends State<Recommended> {
             backgroundImage: coverImageUrl == null ? 'assets/images/Hobby1.png' : null,
             showTextOverlay: true,
             monthIndex: i,
-            imageItems: cardImageItems, 
+            imageItems: cardImageItems,
           ),
         );
       }
@@ -211,9 +216,7 @@ class _RecommendedState extends State<Recommended> {
             topTitle: '$monthName\n$yearBE',
             mainTitle: _timeRemainingString,
             // ปรับข้อความ SubTitle
-            subTitle: photoCount == 11 
-                ? 'บันทึกครบ 11 ภาพแล้ว' 
-                : 'ขาดอีก ${11 - photoCount} ภาพ',
+            subTitle: photoCount == 11 ? 'บันทึกครบ 11 ภาพแล้ว' : 'ขาดอีก ${11 - photoCount} ภาพ',
             footerText: 'Ticket 10',
             currentProgress: photoCount,
             maxProgress: 11,
@@ -238,7 +241,7 @@ class _RecommendedState extends State<Recommended> {
             accentColor: const Color(0xFFFF7043),
             assetImages: ['assets/images/Hobby2.png', 'assets/images/Hobby3.png', 'assets/images/Hobby1.png'],
             monthIndex: i,
-            imageItems: cardImageItems, 
+            imageItems: cardImageItems,
           ),
         );
       }
@@ -247,7 +250,7 @@ class _RecommendedState extends State<Recommended> {
     setState(() {
       _items = tempItems;
       if (_items.isNotEmpty && _currentIndex >= _items.length) {
-         _currentIndex = 0;
+        _currentIndex = 0;
       }
     });
 
@@ -330,7 +333,7 @@ class _RecommendedState extends State<Recommended> {
     String monthNameOnly = cleanTitle.split(' ')[0];
 
     List<MediaItem>? currentItems;
-    
+
     // 3.1 ลองดึงจาก Draft ที่เพิ่งเลือก
     if (_draftSelections.containsKey(cleanTitle)) {
       currentItems = _draftSelections[cleanTitle];
@@ -347,15 +350,16 @@ class _RecommendedState extends State<Recommended> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.9,
-        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)), 
-          // ส่ง currentItems (รูปที่เลือกไว้) ไปด้วย
-          child: UploadPhotoPage(selectedMonth: cleanTitle, initialSelectedItems: currentItems)
-        ),
-      ),
+      builder:
+          (context) => Container(
+            height: MediaQuery.of(context).size.height * 0.9,
+            decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              // ส่ง currentItems (รูปที่เลือกไว้) ไปด้วย
+              child: UploadPhotoPage(selectedMonth: cleanTitle, initialSelectedItems: currentItems),
+            ),
+          ),
     );
 
     // 3.4 ถ้ามีข้อมูลส่งกลับมา (จากการกด Back หรือ กากบาท) ให้อัปเดต UI ทันที
@@ -364,15 +368,12 @@ class _RecommendedState extends State<Recommended> {
         _draftSelections[cleanTitle] = result;
       });
       _generateCards(); // สร้างการ์ดใหม่เพื่อแสดงจำนวนรูปล่าสุด
-    } 
+    }
   }
 
-  void _nextCard() {
-    if (_currentIndex < _items.length - 1) setState(() => _currentIndex++);
-  }
-
-  void _previousCard() {
-    if (_currentIndex > 0) setState(() => _currentIndex--);
+  // Helper สำหรับ Linear Interpolation
+  double _lerp(double a, double b, double t) {
+    return a + (b - a) * t;
   }
 
   @override
@@ -386,18 +387,54 @@ class _RecommendedState extends State<Recommended> {
     return SizedBox(
       height: 416,
       width: double.infinity,
-      child: Stack(
-        alignment: Alignment.center,
-        children:
-            _items
-                .asMap()
-                .entries
-                .map((entry) {
-                  return _buildCardItem(entry.key, entry.value);
-                })
-                .toList()
-                .reversed
-                .toList(),
+      // ✅ Wrap ด้วย GestureDetector เพื่อจับการลากที่ Parent
+      child: GestureDetector(
+        onHorizontalDragStart: (details) {
+          setState(() {
+            _isDragging = true;
+            _dragOffset = 0;
+          });
+        },
+        onHorizontalDragUpdate: (details) {
+          setState(() {
+            _dragOffset += details.delta.dx;
+          });
+        },
+        onHorizontalDragEnd: (details) {
+          // คำนวณว่าจะเปลี่ยนการ์ดหรือไม่
+          double velocity = details.primaryVelocity ?? 0;
+          double threshold = 100.0; // ระยะลากขั้นต่ำ
+
+          int newIndex = _currentIndex;
+
+          // ลากไปทางซ้าย (Next)
+          if (_dragOffset < -threshold || velocity < -500) {
+            if (_currentIndex < _items.length - 1) newIndex++;
+          }
+          // ลากไปทางขวา (Previous)
+          else if (_dragOffset > threshold || velocity > 500) {
+            if (_currentIndex > 0) newIndex--;
+          }
+
+          setState(() {
+            _isDragging = false;
+            _currentIndex = newIndex;
+            _dragOffset = 0; // Reset offset เพื่อให้ Animation ทำงานต่อจนจบ
+          });
+        },
+        child: Stack(
+          alignment: Alignment.center,
+          children:
+              _items
+                  .asMap()
+                  .entries
+                  .map((entry) {
+                    return _buildCardItem(entry.key, entry.value);
+                  })
+                  .toList()
+                  .reversed
+                  .toList(),
+        ),
       ),
     );
   }
@@ -408,59 +445,92 @@ class _RecommendedState extends State<Recommended> {
     final cardHeight = 330.0;
     final centerPosition = (screenWidth - cardWidth) / 1.8;
     final adjustedStartPosition = centerPosition - 25.0;
+    final dismissPosition = -350.0;
+    final spacing = 71.0;
 
-    double left;
-    double top;
-    double scale;
-    double opacity;
-    bool isAbsorbing;
-    Function(DragEndDetails)? onDragEnd;
+    // คำนวณ Progress การลาก (-1.0 ถึง 1.0)
+    // ใช้ 220.0 เป็นระยะทางอ้างอิงสำหรับการเปลี่ยนการ์ดเต็มใบ
+    double dragProgress = (_dragOffset / 220.0).clamp(-1.0, 1.0);
+
+    // ป้องกันการลากเกินขอบเขต
+    if (_currentIndex == 0 && dragProgress > 0) dragProgress *= 0.3; // Resistance effect
+    if (_currentIndex == _items.length - 1 && dragProgress < 0) dragProgress *= 0.3;
+
+    double left = adjustedStartPosition;
+    double top = 42;
+    double scale = 1.0;
+    double opacity = 1.0;
+    bool isAbsorbing = false;
     VoidCallback? onTapButton;
 
-    if (index < _currentIndex) {
-      left = -350;
-      top = 35;
-      scale = 0.9;
-      opacity = 0.0;
-      isAbsorbing = true;
-      onDragEnd = null;
-      onTapButton = null;
+    int relativeIndex = index - _currentIndex;
+
+    // --- Logic การคำนวณตำแหน่งแบบ Real-time ---
+    if (dragProgress < 0) {
+      // 🟢 กำลังลากไปทางซ้าย (Next)
+      double t = dragProgress.abs();
+
+      if (relativeIndex == 0) {
+        // การ์ดปัจจุบัน: เลื่อนออกไปทางซ้าย
+        left = _lerp(adjustedStartPosition, dismissPosition, t);
+        top = _lerp(42, 35, t);
+        scale = _lerp(1.0, 0.9, t);
+        opacity = _lerp(1.0, 0.0, t);
+      } else if (relativeIndex > 0) {
+        // การ์ดถัดไป: เลื่อนขึ้นมาแทนที่
+        double start = adjustedStartPosition + (relativeIndex * spacing);
+        double end = adjustedStartPosition + ((relativeIndex - 1) * spacing);
+        left = _lerp(start, end, t);
+        scale = _lerp(1.0 - (relativeIndex * 0.15), 1.0 - ((relativeIndex - 1) * 0.15), t);
+        opacity = _lerp(relativeIndex > 2 ? 0.0 : 1.0, (relativeIndex - 1) > 2 ? 0.0 : 1.0, t);
+      } else {
+        // การ์ดที่ผ่านไปแล้ว (relativeIndex < 0)
+        left = dismissPosition;
+        opacity = 0.0;
+      }
     } else {
-      final int relativeIndex = index - _currentIndex;
-      scale = 1.0 - (relativeIndex * 0.15);
-      final double rightShift = relativeIndex * 71.0;
-      left = adjustedStartPosition + rightShift;
-      top = 42;
-      opacity = relativeIndex > 2 ? 0.0 : 1.0;
-      isAbsorbing = relativeIndex > 0;
+      // 🟠 กำลังลากไปทางขวา (Previous)
+      double t = dragProgress;
 
-      onDragEnd = (details) {
-        if (details.primaryVelocity! < 0) {
-          _nextCard();
-        } else if (details.primaryVelocity! > 0) {
-          _previousCard();
-        }
-      };
+      if (relativeIndex == -1) {
+        // การ์ดก่อนหน้า: เลื่อนกลับเข้ามา
+        left = _lerp(dismissPosition, adjustedStartPosition, t);
+        top = _lerp(35, 42, t);
+        scale = _lerp(0.9, 1.0, t);
+        opacity = _lerp(0.0, 1.0, t);
+      } else if (relativeIndex >= 0) {
+        // การ์ดปัจจุบันและถัดไป: เลื่อนถอยหลังไปทางขวา
+        double start = adjustedStartPosition + (relativeIndex * spacing);
+        double end = adjustedStartPosition + ((relativeIndex + 1) * spacing);
+        left = _lerp(start, end, t);
+        scale = _lerp(1.0 - (relativeIndex * 0.15), 1.0 - ((relativeIndex + 1) * 0.15), t);
+        opacity = _lerp(relativeIndex > 2 ? 0.0 : 1.0, (relativeIndex + 1) > 2 ? 0.0 : 1.0, t);
+      } else {
+        // การ์ดที่ผ่านไปนานแล้ว (relativeIndex < -1)
+        left = dismissPosition;
+        opacity = 0.0;
+      }
+    }
 
+    // ตั้งค่าการกดปุ่มและการสัมผัส
+    if (index == _currentIndex) {
       onTapButton = () => _continueSelection(item.topTitle);
+      isAbsorbing = false;
+    } else {
+      isAbsorbing = true;
     }
 
     return AnimatedPositioned(
       key: ValueKey("${item.topTitle}_$index"),
-      duration: const Duration(milliseconds: 500),
+      // ✅ ถ้ากำลังลาก ให้ duration เป็น 0 เพื่อความลื่นไหล ถ้าปล่อยมือให้มี Animation
+      duration: _isDragging ? Duration.zero : const Duration(milliseconds: 300),
       curve: index < _currentIndex ? Curves.easeOutCubic : Curves.easeOutBack,
       top: top,
       left: left,
-      child: GestureDetector(
-        onHorizontalDragEnd: onDragEnd,
-        child: Transform.scale(
-          scale: scale,
-          alignment: Alignment.centerLeft,
-          child: Opacity(
-            opacity: opacity,
-            child: SizedBox(width: cardWidth, height: cardHeight, child: AbsorbPointer(absorbing: isAbsorbing, child: MemoryCard(data: item, onButtonTap: onTapButton))),
-          ),
-        ),
+      child: Transform.scale(
+        scale: scale,
+        alignment: Alignment.centerLeft,
+        child: Opacity(opacity: opacity, child: SizedBox(width: cardWidth, height: cardHeight, child: AbsorbPointer(absorbing: isAbsorbing, child: MemoryCard(data: item, onButtonTap: onTapButton)))),
       ),
     );
   }
