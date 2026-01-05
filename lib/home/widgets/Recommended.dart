@@ -185,7 +185,7 @@ class _RecommendedState extends State<Recommended> {
 
       // --- CASE 3: เกิน 11 รูป (หรือรูปที่ถูกบันทึกสมบูรณ์แล้วจริงๆ) ---
       // ปรับเงื่อนไขเป็น > 11 เพื่อให้ 11 รูปยังตกที่ Case 2
-      if (photoCount > 11) {
+      if (photoCount >= 11) {
         String? coverImageUrl;
         if (album != null && album.photos != null && album.photos!.isNotEmpty) {
           coverImageUrl = album.photos![0].image;
@@ -209,7 +209,7 @@ class _RecommendedState extends State<Recommended> {
         );
       }
       // --- CASE 2: กำลังทำ หรือ ครบ 11 รูป (Ticket Card) ---
-      else if (photoCount > 0 && photoCount <= 11) {
+      else if (photoCount > 0 && photoCount <= 10) {
         tempItems.add(
           MemoryCardData(
             type: CardType.ticket,
