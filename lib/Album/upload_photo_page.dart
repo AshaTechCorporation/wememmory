@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:video_player/video_player.dart';
 import 'package:wememmory/Album/album_layout_page.dart';
 import 'package:wememmory/home/firstPage.dart';
 import 'package:wememmory/models/media_item.dart';
@@ -9,14 +8,12 @@ import 'package:wememmory/models/media_item.dart';
 // หน้าการอัปโหลดรูปภาพจากอุปกรณ์
 class UploadPhotoPage extends StatefulWidget {
   final String selectedMonth;
-  
-  // ✅ 1. เพิ่มตัวแปรรับรูปภาพที่เคยเลือกไว้ (Optional)
-  final List<MediaItem>? initialSelectedItems; 
+  final List<MediaItem>? initialSelectedItems; // รับรูปที่เคยเลือกไว้
 
   const UploadPhotoPage({
-    super.key, 
+    super.key,
     required this.selectedMonth,
-    this.initialSelectedItems, // รับค่าตรงนี้
+    this.initialSelectedItems,
   });
 
   @override
@@ -24,9 +21,8 @@ class UploadPhotoPage extends StatefulWidget {
 }
 
 class _UploadPhotoPageState extends State<UploadPhotoPage> {
-  final List<MediaItem> mediaList = []; 
-  // ✅ 2. เอา final ออก หรือแก้ให้เป็น List ที่ add ข้อมูลได้
-  final List<MediaItem> selectedItems = []; 
+  final List<MediaItem> mediaList = [];
+  final List<MediaItem> selectedItems = [];
   
   final Map<String, Future<Uint8List?>> _thumbnailFutures = {};
 
@@ -36,9 +32,8 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   @override
   void initState() {
     super.initState();
-    
-    // ✅ 3. ใน initState: เช็คว่ามีรูปส่งมาไหม? ถ้ามีให้ยัดใส่ selectedItems ทันที
-    // ผลลัพธ์: เมื่อรูปโหลดเสร็จ มันจะขึ้นติ๊กถูกให้เองตาม ID ของรูป
+
+    // โหลดรูปเดิมที่เคยเลือกไว้ (ถ้ามี)
     if (widget.initialSelectedItems != null) {
       selectedItems.addAll(widget.initialSelectedItems!);
     }
@@ -108,8 +103,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     });
   }
 
-
-  
   void _toggleThisMonth(bool value) {
     setState(() {
       showThisMonthOnly = value;
@@ -119,14 +112,11 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
   void _toggleSelection(MediaItem item) {
     setState(() {
-      // ค้นหาว่ารูปนี้ (ดูจาก ID) เคยถูกเลือกหรือยัง
       final existingIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
 
       if (existingIndex != -1) {
-        // ถ้ามีอยู่แล้ว ให้ลบตัวเดิมออก (ใช้ index ลบ)
         selectedItems.removeAt(existingIndex);
       } else {
-        // ถ้ายังไม่มี ให้เพิ่มเข้าไป
         if (selectedItems.length < 11) {
           selectedItems.add(item);
         } else {
@@ -142,11 +132,10 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     });
   }
 
- void _onNextPressed() {
+  void _onNextPressed() {
     if (selectedItems.isEmpty) return;
 
     if (selectedItems.length == 11) {
-      // กรณีครบ 11 รูป -> ไปหน้า AlbumLayoutPage (เหมือนเดิม)
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -157,18 +146,13 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         ),
       );
     } else {
-      // -------------------------------------------------------
-      // ✅ แก้ไขตรงนี้: เลือกไม่ครบ 11 รูป
-      // ให้ไปที่ FirstPage (ซึ่งเป็นตัวที่มี NavBar) 
-      // และส่งข้อมูลรูปผ่าน Constructor ไป
-      // -------------------------------------------------------
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
           builder: (context) => FirstPage(
-            initialIndex: 0, // บังคับให้เปิด Tab 0 (หน้า Home)
-            newAlbumItems: selectedItems, // ส่งรูปที่เลือกไป
-            newAlbumMonth: widget.selectedMonth, // ส่งชื่อเดือนไป
+            initialIndex: 0,
+            newAlbumItems: selectedItems,
+            newAlbumMonth: widget.selectedMonth,
           ),
         ),
         (route) => false,
@@ -176,9 +160,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     }
   }
 
-  
-  // ปุ่ม Switch Widget
-  
   Widget _buildCustomSwitch() {
     return GestureDetector(
       onTap: () => _toggleThisMonth(!showThisMonthOnly),
@@ -189,31 +170,18 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         padding: const EdgeInsets.all(3.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          // พื้นหลัง: สีส้ม (เปิด) / สีเทาอ่อน (ปิด)
-          color: showThisMonthOnly
-              ? const Color(0xFFED7D31)
-              : const Color(0xFFE0E0E0),
+          color: showThisMonthOnly ? const Color(0xFFED7D31) : const Color(0xFFE0E0E0),
         ),
         child: AnimatedAlign(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeIn,
-          // สลับตำแหน่งซ้าย-ขวา
-          alignment:
-              showThisMonthOnly ? Alignment.centerRight : Alignment.centerLeft,
+          alignment: showThisMonthOnly ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
             width: 24,
             height: 24,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              // [แก้ไข]: วงกลมเป็นสีขาวเมื่อเปิด, เป็นสีเทาเมื่อปิด
-              color: showThisMonthOnly ? Colors.white : Color(0xFFC7C7C7), 
-              // boxShadow: [
-              //   BoxShadow(
-              //     color: const Color.fromARGB(255, 59, 59, 59).withOpacity(0.1),
-              //     blurRadius: 2,
-              //     offset: const Offset(0, 1),
-              //   ),
-              // ],
+              color: showThisMonthOnly ? Colors.white : const Color(0xFFC7C7C7),
             ),
           ),
         ),
@@ -223,246 +191,259 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.9,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: Column(
-        children: [
-          
-          // ปุ่มขีด Slide Indicator
-          const SizedBox(height: 12),
-          Container(
-            width: 61,
-            height: 5,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2.5),
-            ),
-          ),
-
-          // Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 13, 20, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    '${widget.selectedMonth.split(' ')[0]} : เลือก ${selectedItems.length} ของคุณ',
-                    style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Image.asset(
-                    'assets/icons/cross.png', // อ้างอิง Path ในโปรเจกต์
-                    width: 25,
-                    height: 25,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Steps (Process Bar)
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 7),
-            child: Row(
-              children: [
-                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true),
-                _StepItem(label: 'แก้ไขและจัดเรียง', isActive: false),
-                _StepItem(label: 'พรีวิวสุดท้าย', isActive: false, isLast: true),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Toggle
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('เลือกแสดงเฉพาะเดือนนี้',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                // เรียกใช้ Widget Custom Switch ที่สร้างไว้ด้านบน
-                _buildCustomSwitch(),
-              ],
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.0 , vertical: 3),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'เลือก 11 ภาพที่สะท้อนเรื่องราวและความทรงจำของเดือนนี้',
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+    // ✅ 1. ใช้ PopScope เพื่อดักจับปุ่ม Back ของ Android และส่งค่ากลับ
+    return PopScope(
+      canPop: false, // ปิดการ Pop อัตโนมัติ
+      onPopInvoked: (didPop) {
+        if (didPop) return;
+        // ส่ง selectedItems กลับไปที่หน้า Recommended เมื่อกด Back
+        Navigator.pop(context, selectedItems);
+      },
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.9,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            // Slide Indicator
+            const SizedBox(height: 12),
+            Container(
+              width: 61,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2.5),
               ),
             ),
-          ),
 
-          const SizedBox(height: 10),
+            // Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 13, 20, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${widget.selectedMonth.split(' ')[0]} : เลือก ${selectedItems.length} ของคุณ',
+                      style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  
+                  // ✅ 2. แก้ไขปุ่มกากบาท ให้ส่งค่ากลับเมื่อกดปิด
+                  GestureDetector(
+                    onTap: () {
+                      // ส่ง selectedItems กลับไป
+                      Navigator.pop(context, selectedItems);
+                    },
+                    child: Image.asset(
+                      'assets/icons/cross.png',
+                      width: 25,
+                      height: 25,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
-          // Media Grid
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : mediaList.isEmpty
-                    ? const Center(child: Text("ไม่พบรูปภาพ"))
-                    : GridView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                          childAspectRatio: 1.0,
-                        ),
-                        itemCount: mediaList.length,
-                        itemBuilder: (context, index) {
-                          final item = mediaList[index];
-                          final selectionIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
-                          final isSelected = selectionIndex != -1;
-                          final future = _thumbnailFutures[item.asset.id] ??=
-                          item.asset.thumbnailDataWithSize(
-                          const ThumbnailSize(200, 200));
-                          return GestureDetector(
-                            onTap: () => _toggleSelection(item),
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: FutureBuilder<Uint8List?>(
-                                    future: future,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData &&
-                                          snapshot.data != null) {
-                                        return Image.memory(
-                                          snapshot.data!,
-                                          fit: BoxFit.cover,
-                                        );
-                                      }
-                                      return Container(
-                                          color: Colors.grey.shade200);
-                                    },
+            const SizedBox(height: 16),
+
+            // Steps (Process Bar)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 7),
+              child: Row(
+                children: [
+                  _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true),
+                  _StepItem(label: 'แก้ไขและจัดเรียง', isActive: false),
+                  _StepItem(label: 'พรีวิวสุดท้าย', isActive: false, isLast: true),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Toggle & Description
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('เลือกแสดงเฉพาะเดือนนี้',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                  _buildCustomSwitch(),
+                ],
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 3),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'เลือก 11 ภาพที่สะท้อนเรื่องราวและความทรงจำของเดือนนี้',
+                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // Media Grid
+            Expanded(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : mediaList.isEmpty
+                      ? const Center(child: Text("ไม่พบรูปภาพ"))
+                      : GridView.builder(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                            childAspectRatio: 1.0,
+                          ),
+                          itemCount: mediaList.length,
+                          itemBuilder: (context, index) {
+                            final item = mediaList[index];
+                            final selectionIndex = selectedItems
+                                .indexWhere((s) => s.asset.id == item.asset.id);
+                            final isSelected = selectionIndex != -1;
+                            final future = _thumbnailFutures[item.asset.id] ??=
+                                item.asset.thumbnailDataWithSize(
+                                    const ThumbnailSize(200, 200));
+                            return GestureDetector(
+                              onTap: () => _toggleSelection(item),
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: FutureBuilder<Uint8List?>(
+                                      future: future,
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData &&
+                                            snapshot.data != null) {
+                                          return Image.memory(
+                                            snapshot.data!,
+                                            fit: BoxFit.cover,
+                                          );
+                                        }
+                                        return Container(
+                                            color: Colors.grey.shade200);
+                                      },
+                                    ),
                                   ),
-                                ),
-                                if (item.type == MediaType.video)
-                                  Positioned(
-                                    bottom: 6,
-                                    left: 6,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.7),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        _formatDuration(item.asset.duration),
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w500,
+                                  if (item.type == MediaType.video)
+                                    Positioned(
+                                      bottom: 6,
+                                      left: 6,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.7),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          _formatDuration(item.asset.duration),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                if (isSelected)
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withOpacity(0.3),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                          color: const Color(0xFF5AB6D8),
-                                          width: 3),
+                                  if (isSelected)
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.3),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                            color: const Color(0xFF5AB6D8),
+                                            width: 3),
+                                      ),
                                     ),
-                                  ),
-                                Positioned(
-                                  top: 8,
-                                  right: 8,
-                                  child: Container(
-                                    width: 24,
-                                    height: 24,
-                                    decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? const Color(0xFF5AB6D8)
-                                          : Colors.transparent,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                          color: Colors.white, width: 2),
-                                    ),
-                                    child: isSelected
-                                        ? Center(
-                                            child: Text(
-                                              '${selectionIndex + 1}',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: Container(
+                                      width: 24,
+                                      height: 24,
+                                      decoration: BoxDecoration(
+                                        color: isSelected
+                                            ? const Color(0xFF5AB6D8)
+                                            : Colors.transparent,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                            color: Colors.white, width: 2),
+                                      ),
+                                      child: isSelected
+                                          ? Center(
+                                              child: Text(
+                                                '${selectionIndex + 1}',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
-                                            ),
-                                          )
-                                        : null,
+                                            )
+                                          : null,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-          ),
-
-          // Bottom Bar
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 40, 16, 40),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.black12)),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
             ),
-            child: SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: selectedItems.isNotEmpty ? _onNextPressed : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: selectedItems.isNotEmpty
-                      ? const Color(0xFF5AB6D8)
-                      : Colors.grey[400],
-                  shape: const RoundedRectangleBorder(),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'ถัดไป: เพิ่มโน้ตรูปภาพ (${selectedItems.length}/11)',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+
+            // Bottom Bar
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 40, 16, 40),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(top: BorderSide(color: Colors.black12)),
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: selectedItems.isNotEmpty ? _onNextPressed : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: selectedItems.isNotEmpty
+                        ? const Color(0xFF5AB6D8)
+                        : Colors.grey[400],
+                    shape: const RoundedRectangleBorder(),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'ถัดไป: เพิ่มโน้ตรูปภาพ (${selectedItems.length}/11)',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-// _StepItem แทบ Processbar
+// _StepItem (คงเดิม ไม่เปลี่ยนแปลง)
 class _StepItem extends StatelessWidget {
   final String label;
   final bool isActive;
@@ -482,10 +463,8 @@ class _StepItem extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          // แถวของเส้นและวงกลม
           Row(
             children: [
-              // เส้นด้านซ้าย
               Expanded(
                 flex: 2,
                 child: Container(
@@ -495,9 +474,7 @@ class _StepItem extends StatelessWidget {
                       : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]),
                 ),
               ),
-              // ช่องว่างซ้าย (เพื่อให้เส้นไม่ติดจุด)
               const SizedBox(width: 40),
-              // วงกลม (ขนาด 11x11)
               Container(
                 width: 11,
                 height: 11,
@@ -506,9 +483,7 @@ class _StepItem extends StatelessWidget {
                   color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300],
                 ),
               ),
-              // ช่องว่างขวา (เพื่อให้เส้นไม่ติดจุด)
               const SizedBox(width: 40),
-              // เส้นด้านขวา
               Expanded(
                 flex: 2,
                 child: Container(
@@ -519,7 +494,6 @@ class _StepItem extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 5),
-          // ข้อความด้านล่าง
           Text(
             label,
             textAlign: TextAlign.center,

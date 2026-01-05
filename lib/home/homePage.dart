@@ -131,7 +131,9 @@ class _HomePageState extends State<HomePage> {
               ),
 
               // ส่วนเนื้อหาเดิม
-              SliverToBoxAdapter(child: Column(children: [Recommended(albumItems: _currentAlbumItems, albumMonth: _currentAlbumMonth), const SummaryStrip(), const SizedBox(height: 37)])),
+              SliverToBoxAdapter(child: Column(children: [
+                Recommended(albumItems: _currentAlbumItems, albumMonth: _currentAlbumMonth), 
+                const SummaryStrip(), const SizedBox(height: 37)])),
 
               const SliverFillRemaining(hasScrollBody: false, child: AchievementLayout()),
             ],

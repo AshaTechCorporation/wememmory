@@ -227,10 +227,10 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
                             style: TextStyle(
                               fontSize: 48,
                               fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                              shadows: [
-                                Shadow(blurRadius: 10, color: Colors.black45, offset: Offset(0, 2))
-                              ],
+                              color: Color.fromARGB(255, 0, 0, 0),
+                              // shadows: [
+                              //   Shadow(blurRadius: 10, color: Colors.black45, offset: Offset(0, 2))
+                              // ],
                             ),
                           ),
                           
@@ -241,7 +241,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
                             children: [
                               _buildWhiteTextItem('+ ความสม่ำเสมอของการสร้างอัลบั้มในแต่ละปี'),
                               const SizedBox(height: 8),
-                              _buildWhiteTextItem('+ สร้างอัลบั้มรูปครบ 18 รูป'),
+                              _buildWhiteTextItem('+ สร้างอัลบั้มรูปครบ 11 รูป'),
                               const SizedBox(height: 8),
                               _buildWhiteTextItem('+ สร้างอัลบั้มรูปตรงตามเวลาที่กำหนด'),
                             ],
