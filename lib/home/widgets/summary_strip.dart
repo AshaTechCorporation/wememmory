@@ -35,10 +35,10 @@ class SummaryStrip extends StatelessWidget {
               // -------------------------------------------------------
 
               // การ์ดที่ 3 (แบบ Background Image)
-              Padding(padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 10), child: BackgroundCard(backgroundImagePath: 'assets/images/buyone.png')),
+              Padding(padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 10), child: BackgroundCard(backgroundImagePath: 'assets/images/Input_0.png')),
 
               // การ์ดที่ 4 (แบบ Background Image)
-              Padding(padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 10), child: BackgroundCard(backgroundImagePath: 'assets/images/promotion.png')),
+              Padding(padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 10), child: BackgroundCard(backgroundImagePath: 'assets/images/Input-1_0.png')),
             ],
           ),
         ),
@@ -101,7 +101,7 @@ class SubscriptionCard extends StatelessWidget {
                         height: 1.0,
                       ),
                     ),
-                    
+
                     const SizedBox(width: 9), // ระยะห่าง
                     // แคปซูลคำว่า "เดือน"
                     Container(
@@ -149,7 +149,7 @@ class BackgroundCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(0),
         border: Border.all(color: const Color.fromARGB(255, 129, 129, 129).withOpacity(0.15), width: 2),
-        image: DecorationImage(image: AssetImage(backgroundImagePath), fit: BoxFit.cover),
+        image: DecorationImage(image: AssetImage(backgroundImagePath), fit: BoxFit.fill),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(25, 20, 35, 20),
