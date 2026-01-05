@@ -81,7 +81,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
     _controller.dispose();
     super.dispose();
   }
-
+  
   void _shareAndGoHome(BuildContext context) {
     print("Sharing content...");
     Navigator.pushAndRemoveUntil(
@@ -137,7 +137,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
                       ),
                       GestureDetector(
-                        onTap: () => Navigator.pop(context), 
+                        onTap: () => _shareAndGoHome(context),
                         child: Image.asset(
                           'assets/icons/cross.png', 
                           width: 25, height: 25, fit: BoxFit.contain,
@@ -213,8 +213,8 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
                           // ไอคอน Success
                           Image.asset(
                             'assets/icons/Success.png',
-                            width: 120,
-                            height: 120,
+                            width: 165,
+                            height: 161,
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) =>
                                 const Icon(Icons.celebration, size: 100, color: Colors.orange),
@@ -238,6 +238,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
 
                           // ✅ แก้ไขตรงนี้: เอา Container สีส้มออก เหลือแค่ข้อความ
                           Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildWhiteTextItem('+ ความสม่ำเสมอของการสร้างอัลบั้มในแต่ละปี'),
                               const SizedBox(height: 8),
@@ -262,11 +263,11 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
   Widget _buildWhiteTextItem(String text) {
     return Text(
       text,
-      textAlign: TextAlign.center,
+      textAlign: TextAlign.justify,
       style: const TextStyle(
         color: Colors.white, 
         fontSize: 14,
-        fontWeight: FontWeight.w500
+        fontWeight: FontWeight.w500,
       ),
     );
   }
