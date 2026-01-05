@@ -398,13 +398,142 @@ class _PaymentPageState extends State<PaymentPage> {
 class QRPaymentPage extends StatefulWidget {
   final double amount;
   const QRPaymentPage({super.key, required this.amount});
+
   @override
   State<QRPaymentPage> createState() => _QRPaymentPageState();
 }
+
 class _QRPaymentPageState extends State<QRPaymentPage> {
-  // ... (ส่วน Timer และ UI ของ QR ให้คงเดิม)
+  // ... (Logic หน้า QR เหมือนเดิมทุกอย่าง)
+  Duration duration = const Duration(hours: 12, minutes: 34, seconds: 56);
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        if (duration.inSeconds > 0) {
+          setState(() {
+            duration = Duration(seconds: duration.inSeconds - 1);
+          });
+        } else {
+          timer?.cancel();
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  String _printDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+  }
+
   @override
   Widget build(BuildContext context) {
-      return Scaffold(appBar: AppBar(title: const Text("QR Payment")), body: const Center(child: Text("QR UI Here")));
+    // ... (ส่วน UI QR เหมือนเดิม)
+    return Scaffold(
+      // ... (โค้ด UI QR)
+       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text('ชำระเงิน',
+            style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w400)),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('กำลังรอการชำระเงิน', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+                Text('฿ ${widget.amount.toStringAsFixed(0)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const Text('หมดอายุใน ', style: TextStyle(fontSize: 14, color: Colors.deepOrange)),
+                Text(_printDuration(duration), style: const TextStyle(fontSize: 14, color: Colors.deepOrange, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Container(
+              width: double.infinity,
+              height: 350,
+              decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(40.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(16)),
+                        child: Center(child: Icon(Icons.qr_code_2, size: 100, color: Colors.grey.shade500)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('บันทึก QR Code เรียบร้อย')));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey.shade400,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                ),
+                child: const Text('ดาวน์โหลด', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400)),
+              ),
+            ),
+            const SizedBox(height: 32),
+            const Text('ขั้นตอนการชำระเงินด้วยรหัส QR', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            _buildStep(1, 'แตะ "บันทึกรหัส QR" หรือ จับภาพหน้าจอ เพื่อเก็บรหัส QR ไว้ในโทรศัพท์ของคุณ'),
+            _buildStep(2, 'เปิดแอปธนาคาร หรือ E-Wallet ที่คุณต้องการใช้ชำระเงิน'),
+            _buildStep(3, 'อัปโหลดภาพรหัส QR ที่บันทึกไว้ หรือ สแกนรหัส QR โดยตรงผ่านแอปธนาคารหรือ E-Wallet'),
+            _buildStep(4, 'ตรวจสอบรายละเอียดการชำระเงินและยืนยันรายการเพื่อทำธุรกรรมให้เสร็จสมบูรณ์'),
+          ],
+        ),
+      ),
+    );
+  }
+   Widget _buildStep(int number, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('$number. ', style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black87)),
+          Expanded(child: Text(text, style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black87))),
+        ],
+      ),
+    );
   }
 }
