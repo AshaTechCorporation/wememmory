@@ -71,6 +71,10 @@ class _RecommendedState extends State<Recommended> {
   bool _isLoading = true;
 
   final Map<String, AlbumModel> _cachedAlbumMap = {};
+  
+  // ✅ 1. เพิ่มตัวแปรเก็บข้อมูลที่เลือกค้างไว้ (Key คือชื่อเดือน, Value คือรายการรูป)
+  final Map<String, List<MediaItem>> _draftSelections = {};
+
   Timer? _timer;
   DateTime? _targetDate;
   String _timeRemainingString = "7 วัน 00 ชม. 00 นาที 00 วิ";
@@ -78,7 +82,6 @@ class _RecommendedState extends State<Recommended> {
   @override
   void initState() {
     super.initState();
-    // ตั้งเวลาเป้าหมาย 7 วันนับจากเปิดหน้านี้ (หรือจะ Fix วันที่ก็ได้)
     _calculateTargetAndInitialString();
     _fetchRealAlbumData();
   }
@@ -97,7 +100,6 @@ class _RecommendedState extends State<Recommended> {
     super.dispose();
   }
 
-  // ✅ 1. ดึงข้อมูล API
   Future<void> _fetchRealAlbumData() async {
     setState(() => _isLoading = true);
     try {
@@ -144,7 +146,7 @@ class _RecommendedState extends State<Recommended> {
     return "";
   }
 
-  // ✅ 2. สร้างการ์ด (เดือน 12 -> 1)
+  // ✅ 2. แก้ไขฟังก์ชันสร้างการ์ด ให้เช็คข้อมูลจาก _draftSelections ก่อน
   void _generateCards() {
     final now = DateTime.now();
     List<MemoryCardData> tempItems = [];
@@ -156,19 +158,29 @@ class _RecommendedState extends State<Recommended> {
       final String key = "$monthName $yearBE";
 
       final AlbumModel? album = _cachedAlbumMap[key];
+      
+      List<MediaItem>? cardImageItems;
       int photoCount = album?.photos?.length ?? 0;
 
-      // ตรวจสอบข้อมูล Local (ถ้ามีการส่งค่ากลับมาจากหน้า Upload)
-      if (widget.albumMonth != null && widget.albumItems != null) {
+      // --- ลำดับการตรวจสอบข้อมูล ---
+      // 1. เช็คจาก Draft ก่อน
+      if (_draftSelections.containsKey(key)) {
+        cardImageItems = _draftSelections[key];
+        photoCount = cardImageItems!.length;
+      } 
+      // 2. เช็คจาก Widget (กรณีรับค่ามาจากหน้าอื่นครั้งแรก)
+      else if (widget.albumMonth != null && widget.albumItems != null) {
         if (widget.albumMonth!.trim() == key.trim()) {
           photoCount = widget.albumItems!.length;
+          cardImageItems = widget.albumItems;
         }
       }
 
       bool isCurrentMonth = (i == now.month);
 
-      // --- CASE 3: ครบ 11 รูป (Background Card) ---
-      if (photoCount >= 11) {
+      // --- CASE 3: เกิน 11 รูป (หรือรูปที่ถูกบันทึกสมบูรณ์แล้วจริงๆ) ---
+      // ปรับเงื่อนไขเป็น > 11 เพื่อให้ 11 รูปยังตกที่ Case 2
+      if (photoCount > 11) {
         String? coverImageUrl;
         if (album != null && album.photos != null && album.photos!.isNotEmpty) {
           coverImageUrl = album.photos![0].image;
@@ -187,24 +199,29 @@ class _RecommendedState extends State<Recommended> {
             backgroundImage: coverImageUrl == null ? 'assets/images/Hobby1.png' : null,
             showTextOverlay: true,
             monthIndex: i,
+            imageItems: cardImageItems, 
           ),
         );
       }
-      // --- CASE 2: กำลังทำ / ไม่ครบ (Ticket Card) ---
-      else if (photoCount > 0 && photoCount < 11) {
+      // --- CASE 2: กำลังทำ หรือ ครบ 11 รูป (Ticket Card) ---
+      else if (photoCount > 0 && photoCount <= 11) {
         tempItems.add(
           MemoryCardData(
             type: CardType.ticket,
             topTitle: '$monthName\n$yearBE',
-            mainTitle: _timeRemainingString, // ✅ แสดงเวลาทุกใบที่เป็น Ticket
-            subTitle: 'ขาดอีก ${11 - photoCount} ภาพ',
+            mainTitle: _timeRemainingString,
+            // ปรับข้อความ SubTitle
+            subTitle: photoCount == 11 
+                ? 'บันทึกครบ 11 ภาพแล้ว' 
+                : 'ขาดอีก ${11 - photoCount} ภาพ',
             footerText: 'Ticket 10',
-            currentProgress: photoCount, // ✅ แสดง Progress Bar
+            currentProgress: photoCount,
             maxProgress: 11,
             gradientColors: [],
             accentColor: const Color(0xFFFF7043),
             backgroundColor: const Color(0xFF111111),
             monthIndex: i,
+            imageItems: cardImageItems, // ส่งรูปเข้าไป
           ),
         );
       }
@@ -221,6 +238,7 @@ class _RecommendedState extends State<Recommended> {
             accentColor: const Color(0xFFFF7043),
             assetImages: ['assets/images/Hobby2.png', 'assets/images/Hobby3.png', 'assets/images/Hobby1.png'],
             monthIndex: i,
+            imageItems: cardImageItems, 
           ),
         );
       }
@@ -228,13 +246,11 @@ class _RecommendedState extends State<Recommended> {
 
     setState(() {
       _items = tempItems;
-      // ตั้งค่าเริ่มต้นเป็น 0 (Card ใบแรกคือเดือน 12)
-      if (_items.isNotEmpty) {
-        _currentIndex = 0;
+      if (_items.isNotEmpty && _currentIndex >= _items.length) {
+         _currentIndex = 0;
       }
     });
 
-    // เริ่ม Timer เพื่ออัปเดตเวลา
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _onTimerTick());
   }
@@ -242,7 +258,6 @@ class _RecommendedState extends State<Recommended> {
   void _calculateTargetAndInitialString() {
     final now = DateTime.now();
     if (_targetDate == null) {
-      // นับถอยหลัง 7 วันจากเวลาปัจจุบัน
       _targetDate = now.add(const Duration(days: 7));
     }
     _updateTimeStringInternal();
@@ -264,18 +279,16 @@ class _RecommendedState extends State<Recommended> {
     }
   }
 
-  // ✅ อัปเดตเวลา Realtime ให้กับทุก Card ที่เป็น Ticket
   void _onTimerTick() {
     if (_items.isEmpty) return;
 
-    _updateTimeStringInternal(); // คำนวณเวลาใหม่
+    _updateTimeStringInternal();
 
     if (!mounted) return;
 
     bool needsUpdate = false;
     List<MemoryCardData> updatedItems = List.from(_items);
 
-    // วนลูปเช็คทุกการ์ด ถ้าใบไหนเป็น Ticket ให้อัปเดตเวลา
     for (int i = 0; i < updatedItems.length; i++) {
       final item = updatedItems[i];
 
@@ -284,7 +297,7 @@ class _RecommendedState extends State<Recommended> {
           updatedItems[i] = MemoryCardData(
             type: item.type,
             topTitle: item.topTitle,
-            mainTitle: _timeRemainingString, // อัปเดตเวลาตรงนี้
+            mainTitle: _timeRemainingString,
             subTitle: item.subTitle,
             footerText: item.footerText,
             gradientColors: item.gradientColors,
@@ -311,30 +324,47 @@ class _RecommendedState extends State<Recommended> {
     }
   }
 
-  void _continueSelection(String fullTitle) {
+  // ✅ 3. แก้ไขฟังก์ชันนี้: ส่งข้อมูลเดิมไป และรับข้อมูลใหม่กลับมา
+  Future<void> _continueSelection(String fullTitle) async {
     String cleanTitle = fullTitle.replaceAll('\n', ' ').replaceAll('ของฉัน', '').trim();
     String monthNameOnly = cleanTitle.split(' ')[0];
 
     List<MediaItem>? currentItems;
-    int targetIndex = _items.indexWhere((item) => item.topTitle.contains(monthNameOnly));
-
-    if (targetIndex != -1) {
-      currentItems = _items[targetIndex].imageItems;
+    
+    // 3.1 ลองดึงจาก Draft ที่เพิ่งเลือก
+    if (_draftSelections.containsKey(cleanTitle)) {
+      currentItems = _draftSelections[cleanTitle];
+    } else {
+      // 3.2 ถ้าไม่มีให้ดึงจาก Card ปัจจุบัน
+      int targetIndex = _items.indexWhere((item) => item.topTitle.contains(monthNameOnly));
+      if (targetIndex != -1) {
+        currentItems = _items[targetIndex].imageItems;
+      }
     }
 
-    showModalBottomSheet(
+    // 3.3 เปิดหน้า Upload และรอผลลัพธ์ (await)
+    final result = await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder:
-          (context) => Container(
-            height: MediaQuery.of(context).size.height * 0.9,
-            decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-            child: ClipRRect(borderRadius: const BorderRadius.vertical(top: Radius.circular(20)), child: UploadPhotoPage(selectedMonth: cleanTitle, initialSelectedItems: currentItems)),
-          ),
-    ).then((_) {
-      _fetchRealAlbumData();
-    });
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.9,
+        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)), 
+          // ส่ง currentItems (รูปที่เลือกไว้) ไปด้วย
+          child: UploadPhotoPage(selectedMonth: cleanTitle, initialSelectedItems: currentItems)
+        ),
+      ),
+    );
+
+    // 3.4 ถ้ามีข้อมูลส่งกลับมา (จากการกด Back หรือ กากบาท) ให้อัปเดต UI ทันที
+    if (result != null && result is List<MediaItem>) {
+      setState(() {
+        _draftSelections[cleanTitle] = result;
+      });
+      _generateCards(); // สร้างการ์ดใหม่เพื่อแสดงจำนวนรูปล่าสุด
+    } 
   }
 
   void _nextCard() {

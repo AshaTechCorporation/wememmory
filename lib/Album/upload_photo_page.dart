@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:video_player/video_player.dart';
 import 'package:wememmory/Album/album_layout_page.dart';
 import 'package:wememmory/home/firstPage.dart';
 import 'package:wememmory/models/media_item.dart';
@@ -10,13 +9,13 @@ import 'package:wememmory/models/media_item.dart';
 class UploadPhotoPage extends StatefulWidget {
   final String selectedMonth;
   
-  // ✅ 1. เพิ่มตัวแปรรับรูปภาพที่เคยเลือกไว้ (Optional)
-  final List<MediaItem>? initialSelectedItems; 
+  // ✅ 1. ยังคงรับค่ารูปภาพที่เคยเลือกไว้
+  final List<MediaItem>? initialSelectedItems;
 
   const UploadPhotoPage({
-    super.key, 
+    super.key,
     required this.selectedMonth,
-    this.initialSelectedItems, // รับค่าตรงนี้
+    this.initialSelectedItems,
   });
 
   @override
@@ -24,9 +23,8 @@ class UploadPhotoPage extends StatefulWidget {
 }
 
 class _UploadPhotoPageState extends State<UploadPhotoPage> {
-  final List<MediaItem> mediaList = []; 
-  // ✅ 2. เอา final ออก หรือแก้ให้เป็น List ที่ add ข้อมูลได้
-  final List<MediaItem> selectedItems = []; 
+  final List<MediaItem> mediaList = [];
+  final List<MediaItem> selectedItems = [];
   
   final Map<String, Future<Uint8List?>> _thumbnailFutures = {};
 
@@ -36,9 +34,8 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   @override
   void initState() {
     super.initState();
-    
-    // ✅ 3. ใน initState: เช็คว่ามีรูปส่งมาไหม? ถ้ามีให้ยัดใส่ selectedItems ทันที
-    // ผลลัพธ์: เมื่อรูปโหลดเสร็จ มันจะขึ้นติ๊กถูกให้เองตาม ID ของรูป
+
+    // ✅ 2. ยังคงโหลดรูปเดิมมาใส่ใน selectedItems เพื่อให้แสดงติ๊กถูกตอนเปิดหน้า
     if (widget.initialSelectedItems != null) {
       selectedItems.addAll(widget.initialSelectedItems!);
     }
@@ -108,8 +105,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     });
   }
 
-
-  
   void _toggleThisMonth(bool value) {
     setState(() {
       showThisMonthOnly = value;
@@ -119,14 +114,13 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
   void _toggleSelection(MediaItem item) {
     setState(() {
-      // ค้นหาว่ารูปนี้ (ดูจาก ID) เคยถูกเลือกหรือยัง
       final existingIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
 
       if (existingIndex != -1) {
-        // ถ้ามีอยู่แล้ว ให้ลบตัวเดิมออก (ใช้ index ลบ)
+        // ถ้ามีอยู่แล้ว ให้ลบออก
         selectedItems.removeAt(existingIndex);
       } else {
-        // ถ้ายังไม่มี ให้เพิ่มเข้าไป
+        // ถ้ายังไม่มี ให้เพิ่มเข้าไป (ไม่เกิน 11 รูป)
         if (selectedItems.length < 11) {
           selectedItems.add(item);
         } else {
@@ -142,11 +136,14 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     });
   }
 
- void _onNextPressed() {
+  void _onNextPressed() {
     if (selectedItems.isEmpty) return;
 
+    // หมายเหตุ: ตรงนี้คือปุ่ม "ถัดไป" ซึ่งปกติจะถือว่าเป็นการ Confirm
+    // หากต้องการให้ปุ่มนี้ส่งค่ากลับไปบันทึก (Save) ก็ใช้โค้ดเดิมได้
+    // หรือถ้าจะไปหน้าอื่นต่อเลย ก็ใช้ Logic เดิมครับ
     if (selectedItems.length == 11) {
-      // กรณีครบ 11 รูป -> ไปหน้า AlbumLayoutPage (เหมือนเดิม)
+      // ไปหน้า AlbumLayoutPage
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -157,18 +154,16 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         ),
       );
     } else {
-      // -------------------------------------------------------
-      // ✅ แก้ไขตรงนี้: เลือกไม่ครบ 11 รูป
-      // ให้ไปที่ FirstPage (ซึ่งเป็นตัวที่มี NavBar) 
-      // และส่งข้อมูลรูปผ่าน Constructor ไป
-      // -------------------------------------------------------
+      // กรณีนี้คือเลือกไม่ครบ แล้วกด Next -> ถือว่า Save หรือไปต่อ
+      // หากต้องการให้ Save กลับไปที่หน้า Recommended ต้องใช้ Navigator.pop(context, selectedItems);
+      // แต่ในโค้ดเดิมคือไปหน้า FirstPage ซึ่งถือว่าเป็นการ "ไปต่อ" แบบ Flow ปกติ
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
           builder: (context) => FirstPage(
-            initialIndex: 0, // บังคับให้เปิด Tab 0 (หน้า Home)
-            newAlbumItems: selectedItems, // ส่งรูปที่เลือกไป
-            newAlbumMonth: widget.selectedMonth, // ส่งชื่อเดือนไป
+            initialIndex: 0,
+            newAlbumItems: selectedItems,
+            newAlbumMonth: widget.selectedMonth,
           ),
         ),
         (route) => false,
@@ -176,9 +171,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     }
   }
 
-  
-  // ปุ่ม Switch Widget
-  
   Widget _buildCustomSwitch() {
     return GestureDetector(
       onTap: () => _toggleThisMonth(!showThisMonthOnly),
@@ -189,7 +181,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         padding: const EdgeInsets.all(3.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          // พื้นหลัง: สีส้ม (เปิด) / สีเทาอ่อน (ปิด)
           color: showThisMonthOnly
               ? const Color(0xFFED7D31)
               : const Color(0xFFE0E0E0),
@@ -197,7 +188,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         child: AnimatedAlign(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeIn,
-          // สลับตำแหน่งซ้าย-ขวา
           alignment:
               showThisMonthOnly ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
@@ -205,15 +195,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
             height: 24,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              // [แก้ไข]: วงกลมเป็นสีขาวเมื่อเปิด, เป็นสีเทาเมื่อปิด
-              color: showThisMonthOnly ? Colors.white : Color(0xFFC7C7C7), 
-              // boxShadow: [
-              //   BoxShadow(
-              //     color: const Color.fromARGB(255, 59, 59, 59).withOpacity(0.1),
-              //     blurRadius: 2,
-              //     offset: const Offset(0, 1),
-              //   ),
-              // ],
+              color: showThisMonthOnly ? Colors.white : const Color(0xFFC7C7C7),
             ),
           ),
         ),
@@ -223,6 +205,8 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
   @override
   Widget build(BuildContext context) {
+    // ❌ เอา PopScope ออก เพื่อให้ Android Back Button ทำงานตามปกติ (คือปิดหน้าจอและ return null)
+    // ไม่มีการดักจับเพื่อส่งค่ากลับ
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: const BoxDecoration(
@@ -231,7 +215,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
       ),
       child: Column(
         children: [
-          
           // ปุ่มขีด Slide Indicator
           const SizedBox(height: 12),
           Container(
@@ -259,10 +242,14 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                
+                // ✅ 3. แก้ไขปุ่มกากบาท: ให้ปิดหน้าเฉยๆ (ไม่ส่งค่ากลับ)
                 GestureDetector(
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context); // ไม่ใส่ selectedItems -> return null -> ไม่ save
+                  },
                   child: Image.asset(
-                    'assets/icons/cross.png', // อ้างอิง Path ในโปรเจกต์
+                    'assets/icons/cross.png',
                     width: 25,
                     height: 25,
                     fit: BoxFit.contain,
@@ -297,13 +284,12 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                 const Text('เลือกแสดงเฉพาะเดือนนี้',
                     style:
                         TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                // เรียกใช้ Widget Custom Switch ที่สร้างไว้ด้านบน
                 _buildCustomSwitch(),
               ],
             ),
           ),
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.0 , vertical: 3),
+            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 3),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -333,11 +319,15 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                         itemCount: mediaList.length,
                         itemBuilder: (context, index) {
                           final item = mediaList[index];
+                          
+                          // เช็คว่ารูปนี้ถูกเลือกไว้หรือยัง
                           final selectionIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
                           final isSelected = selectionIndex != -1;
+                          
                           final future = _thumbnailFutures[item.asset.id] ??=
-                          item.asset.thumbnailDataWithSize(
-                          const ThumbnailSize(200, 200));
+                              item.asset.thumbnailDataWithSize(
+                                  const ThumbnailSize(200, 200));
+                                  
                           return GestureDetector(
                             onTap: () => _toggleSelection(item),
                             child: Stack(
@@ -462,7 +452,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   }
 }
 
-// _StepItem แทบ Processbar
+// _StepItem (คงเดิม)
 class _StepItem extends StatelessWidget {
   final String label;
   final bool isActive;
@@ -482,10 +472,8 @@ class _StepItem extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          // แถวของเส้นและวงกลม
           Row(
             children: [
-              // เส้นด้านซ้าย
               Expanded(
                 flex: 2,
                 child: Container(
@@ -495,9 +483,7 @@ class _StepItem extends StatelessWidget {
                       : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]),
                 ),
               ),
-              // ช่องว่างซ้าย (เพื่อให้เส้นไม่ติดจุด)
               const SizedBox(width: 40),
-              // วงกลม (ขนาด 11x11)
               Container(
                 width: 11,
                 height: 11,
@@ -506,9 +492,7 @@ class _StepItem extends StatelessWidget {
                   color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300],
                 ),
               ),
-              // ช่องว่างขวา (เพื่อให้เส้นไม่ติดจุด)
               const SizedBox(width: 40),
-              // เส้นด้านขวา
               Expanded(
                 flex: 2,
                 child: Container(
@@ -519,7 +503,6 @@ class _StepItem extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 5),
-          // ข้อความด้านล่าง
           Text(
             label,
             textAlign: TextAlign.center,
