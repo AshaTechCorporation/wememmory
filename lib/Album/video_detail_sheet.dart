@@ -1,3 +1,4 @@
+import 'dart:async'; // ✅ อย่าลืม import ตัวนี้เพิ่มครับ
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -6,9 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:video_player/video_player.dart';
+// ตรวจสอบ path import ให้ถูกต้อง
 import 'package:wememmory/models/media_item.dart';
 
-// หน้า รายละเอียดวิดีโอ
 class VideoDetailSheet extends StatefulWidget {
   final MediaItem item;
 
@@ -27,11 +28,16 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
 
   bool _isPlaying = false;
   bool _isInitialized = false;
-
-  // ✅ เพิ่มตัวแปรสำหรับล็อกการเลื่อนหน้าจอ
   bool _canScroll = true;
+  bool _isFilled = false;
+
+  // --- ตัวแปรสำหรับควบคุม Slider ---
+  bool _isDragging = false;
+  double _dragValue = 0.0;
+  bool _wasPlayingBeforeDrag = false; 
 
   Uint8List? _tempCapturedImage;
+  Uint8List? _thumbnailBytes;
 
   @override
   void initState() {
@@ -39,7 +45,19 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
     if (widget.item.capturedImage != null) {
       _tempCapturedImage = widget.item.capturedImage;
     }
+    _loadThumbnail();
     _initializeVideo();
+  }
+
+  Future<void> _loadThumbnail() async {
+    final bytes = await widget.item.asset.thumbnailDataWithSize(
+      const ThumbnailSize(1080, 1920),
+    );
+    if (mounted) {
+      setState(() {
+        _thumbnailBytes = bytes;
+      });
+    }
   }
 
   Future<void> _initializeVideo() async {
@@ -48,7 +66,16 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
       _controller = VideoPlayerController.file(file)
         ..initialize().then((_) {
           _controller!.addListener(() {
-            if (mounted) setState(() {});
+            if (mounted) {
+              // ✅ Logic สำคัญ: ถ้าลากอยู่ "ห้าม" อัปเดต Slider ตามวิดีโอเด็ดขาด
+              if (!_isDragging) {
+                setState(() {
+                  if (_controller != null) {
+                    _isPlaying = _controller!.value.isPlaying;
+                  }
+                });
+              }
+            }
           });
           setState(() {
             _isInitialized = true;
@@ -79,6 +106,13 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
         _controller!.play();
         _isPlaying = true;
       }
+    });
+  }
+
+  void _toggleFitMode() {
+    setState(() {
+      _isFilled = !_isFilled;
+      _transformationController.value = Matrix4.identity();
     });
   }
 
@@ -146,9 +180,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
     if (_tempCapturedImage != null) {
       widget.item.capturedImage = _tempCapturedImage;
     }
-
     if (_controller != null) _controller!.pause();
-
     Navigator.pop(context);
   }
 
@@ -163,6 +195,12 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
   Widget build(BuildContext context) {
     final duration = _controller?.value.duration ?? Duration.zero;
     final position = _controller?.value.position ?? Duration.zero;
+    final double maxDuration = duration.inMilliseconds.toDouble();
+
+    // คำนวณค่า Slider: ถ้ากำลังลากให้ใช้ค่าที่นิ้วลาก (_dragValue)
+    final double sliderValue = _isDragging
+        ? _dragValue
+        : position.inMilliseconds.toDouble().clamp(0.0, maxDuration);
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.92,
@@ -182,7 +220,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
             ),
           ),
 
-          // 1. Header
+          // Header
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 13, 16, 0),
             child: Row(
@@ -222,7 +260,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
 
           const SizedBox(height: 16),
 
-          // 2. Steps Indicator
+          // Steps
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 7.0),
             child: Row(
@@ -249,10 +287,9 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
 
           const SizedBox(height: 24),
 
-          // 3. Content Area
+          // Content Area
           Expanded(
             child: SingleChildScrollView(
-              // ✅ แก้ไข 1: ควบคุม Physics ให้ล็อกได้
               physics:
                   _canScroll
                       ? const ClampingScrollPhysics()
@@ -260,14 +297,10 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  // --- ส่วนแสดงวิดีโอ (Interactive & Capture) ---
-
-                  // ✅ แก้ไข 2: ใช้ Stack ซ้อน Grid ไว้นอก RepaintBoundary
-                  // เพื่อให้ Grid ไม่ติดไปตอนแคปภาพ
+                  // --- Video Stack ---
                   Stack(
                     alignment: Alignment.center,
                     children: [
-                      // ส่วนที่จะถูกบันทึกภาพ (วิดีโอ/ภาพแคป)
                       RepaintBoundary(
                         key: _captureKey,
                         child: ClipRRect(
@@ -276,73 +309,36 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                             height: 350,
                             width: double.infinity,
                             color: Colors.black,
-                            child: Listener(
-                              // ✅ แก้ไข 3: ใช้ Listener ครอบเพื่อดักจับการสัมผัส
-                              onPointerDown:
-                                  (_) => setState(() => _canScroll = false),
-                              onPointerUp:
-                                  (_) => setState(() => _canScroll = true),
-                              onPointerCancel:
-                                  (_) => setState(() => _canScroll = true),
-                              onPointerSignal: _onPointerSignal,
-                              child: InteractiveViewer(
-                                transformationController:
-                                    _transformationController,
-                                minScale: 1.0,
-                                maxScale: 4.0,
-                                boundaryMargin: const EdgeInsets.all(
-                                  double.infinity,
-                                ), // ✅ ลากได้ลื่นขึ้น
-                                panEnabled: true,
-                                scaleEnabled: true,
-                                trackpadScrollCausesScale: true,
-                                child:
-                                    _tempCapturedImage != null
-                                        ? Image.memory(
-                                          _tempCapturedImage!,
-                                          fit: BoxFit.cover,
-                                          width: double.infinity,
-                                          height: double.infinity,
-                                        )
-                                        : (_isInitialized &&
-                                            _controller != null)
-                                        ? AspectRatio(
-                                          aspectRatio:
-                                              _controller!.value.aspectRatio,
-                                          child: VideoPlayer(_controller!),
-                                        )
-                                        : FutureBuilder<Uint8List?>(
-                                          future: widget.item.asset
-                                              .thumbnailDataWithSize(
-                                                const ThumbnailSize(800, 800),
-                                              ),
-                                          builder: (context, snapshot) {
-                                            if (snapshot.data != null) {
-                                              return Image.memory(
-                                                snapshot.data!,
-                                                fit: BoxFit.cover,
-                                                width: double.infinity,
-                                                height: double.infinity,
-                                              );
-                                            }
-                                            return const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            );
-                                          },
-                                        ),
-                              ),
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                return Listener(
+                                  onPointerDown: (_) =>
+                                      setState(() => _canScroll = false),
+                                  onPointerUp: (_) =>
+                                      setState(() => _canScroll = true),
+                                  onPointerCancel: (_) =>
+                                      setState(() => _canScroll = true),
+                                  onPointerSignal: _onPointerSignal,
+                                  child: InteractiveViewer(
+                                    transformationController:
+                                        _transformationController,
+                                    minScale: 1.0,
+                                    maxScale: 4.0,
+                                    boundaryMargin: EdgeInsets.zero,
+                                    panEnabled: true,
+                                    scaleEnabled: true,
+                                    child: _buildVideoContent(constraints),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ),
                       ),
 
-                      // ✅ ย้าย Grid มาอยู่นอก RepaintBoundary
-                      // แต่ยังอยู่ใน Stack เดียวกัน และครอบด้วย IgnorePointer
                       Positioned.fill(
                         child: IgnorePointer(
                           child: ClipRRect(
-                            // Clip ให้ Grid โค้งตามรูป
                             borderRadius: BorderRadius.circular(12),
                             child: _buildGridOverlay(),
                           ),
@@ -353,38 +349,101 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
 
                   const SizedBox(height: 12),
 
-                  // --- ส่วน Timeline ---
+                  // --- Timeline (Slider) ---
                   if (_tempCapturedImage == null) ...[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _formatDuration(position),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
+                    if (_isInitialized &&
+                        _controller != null &&
+                        maxDuration > 0)
+                      SizedBox(
+                        height: 20,
+                        child: SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            trackHeight: 4.0,
+                            thumbShape: const RoundSliderThumbShape(
+                                enabledThumbRadius: 6.0),
+                            overlayShape: const RoundSliderOverlayShape(
+                                overlayRadius: 12.0),
+                            activeTrackColor: const Color(0xFFED7D31),
+                            inactiveTrackColor: Colors.grey[300],
+                            thumbColor: const Color(0xFFED7D31),
                           ),
-                        ),
-                        Text(
-                          _formatDuration(duration),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
+                          child: Slider(
+                            value: sliderValue,
+                            min: 0.0,
+                            max: maxDuration,
+                            
+                            onChangeStart: (value) {
+                              _wasPlayingBeforeDrag = _controller!.value.isPlaying;
+                              if (_wasPlayingBeforeDrag) {
+                                _controller!.pause();
+                              }
+                              setState(() {
+                                _isDragging = true;
+                                _dragValue = value;
+                              });
+                            },
+
+                            onChanged: (value) {
+                              setState(() {
+                                _dragValue = value;
+                              });
+                              // สั่ง Seek แบบไม่ต้อง await (Real-time scrubbing)
+                              _controller!
+                                  .seekTo(Duration(milliseconds: value.toInt()));
+                            },
+
+                            // ✅ แก้ไข: เพิ่ม Delay เพื่อรอให้ Video Player ย้ายตำแหน่งเสร็จจริง ๆ
+                            // ป้องกัน Slider ดีดกลับไปที่ 0 หรือจุดเริ่มต้น
+                            onChangeEnd: (value) async {
+                              final targetPosition = Duration(milliseconds: value.toInt());
+                              
+                              // 1. สั่งย้ายตำแหน่ง
+                              await _controller!.seekTo(targetPosition);
+                              
+                              // 2. ถ้าเดิมเล่นอยู่ ก็สั่งเล่นต่อ
+                              if (_wasPlayingBeforeDrag) {
+                                await _controller!.play();
+                                if(mounted) {
+                                  setState(() { _isPlaying = true; });
+                                }
+                              }
+                              
+                              // 3. (สำคัญ) รอ 500ms ก่อนจะปลดล็อค Slider
+                              // เพื่อให้ Controller อัปเดต position ให้ทันกับที่เราลาก
+                              Future.delayed(const Duration(milliseconds: 500), () {
+                                if (mounted) {
+                                  setState(() {
+                                    _isDragging = false;
+                                  });
+                                }
+                              });
+                            },
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    if (_isInitialized && _controller != null)
-                      VideoProgressIndicator(
-                        _controller!,
-                        allowScrubbing: true,
-                        colors: const VideoProgressColors(
-                          playedColor: Color(0xFFED7D31),
-                          bufferedColor: Color(0xFFEEEEEE),
-                          backgroundColor: Color(0xFFE0E0E0),
                         ),
                       ),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _formatDuration(position),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          Text(
+                            _formatDuration(duration),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ] else ...[
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 10),
@@ -400,21 +459,39 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
 
                   const SizedBox(height: 20),
 
-                  // --- ส่วนปุ่มควบคุม (Play/Pause) ---
+                  // --- Control Buttons ---
                   if (_tempCapturedImage == null)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // Dummy Left
+                        Opacity(
+                          opacity: 0.0,
+                          child: IconButton(
+                            icon: const Icon(Icons.zoom_in_map, size: 28),
+                            onPressed: null,
+                          ),
+                        ),
+
+                        const SizedBox(width: 15),
+
+                        // Previous
                         IconButton(
                           icon: const Icon(
                             Icons.skip_previous,
                             size: 36,
                             color: Colors.black54,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            final newPos =
+                                position - const Duration(seconds: 5);
+                            _controller!.seekTo(newPos);
+                          },
                         ),
+
                         const SizedBox(width: 30),
 
+                        // Play/Pause
                         GestureDetector(
                           onTap: _togglePlayPause,
                           child: Container(
@@ -432,8 +509,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                               ],
                             ),
                             child: Icon(
-                              _controller != null &&
-                                      _controller!.value.isPlaying
+                              _isPlaying 
                                   ? Icons.pause
                                   : Icons.play_arrow_rounded,
                               color: Colors.white,
@@ -443,20 +519,42 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                         ),
 
                         const SizedBox(width: 30),
+
+                        // Next
                         IconButton(
                           icon: const Icon(
                             Icons.skip_next,
                             size: 36,
                             color: Colors.black54,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            final newPos =
+                                position + const Duration(seconds: 5);
+                            _controller!.seekTo(newPos);
+                          },
+                        ),
+
+                        const SizedBox(width: 15),
+
+                        // Fit Icon
+                        IconButton(
+                          onPressed: _toggleFitMode,
+                          tooltip:
+                              _isFilled ? 'แสดงขนาดต้นฉบับ' : 'แสดงเต็มเฟรม',
+                          icon: Icon(
+                            _isFilled
+                                ? Icons.zoom_in_map
+                                : Icons.zoom_out_map,
+                            size: 28,
+                            color: Colors.black54,
+                          ),
                         ),
                       ],
                     ),
 
                   const SizedBox(height: 30),
 
-                  // --- ปุ่ม Action ---
+                  // --- Action Buttons ---
                   if (_tempCapturedImage == null)
                     SizedBox(
                       width: double.infinity,
@@ -535,6 +633,91 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildVideoContent(BoxConstraints constraints) {
+    if (_tempCapturedImage != null) {
+      return Image.memory(
+        _tempCapturedImage!,
+        fit: _isFilled ? BoxFit.cover : BoxFit.contain,
+        width: constraints.maxWidth,
+        height: constraints.maxHeight,
+      );
+    }
+
+    final double viewWidth = constraints.maxWidth;
+    final double viewHeight = constraints.maxHeight;
+
+    final double videoAspect =
+        _controller != null && _controller!.value.isInitialized
+            ? _controller!.value.aspectRatio
+            : 16 / 9;
+
+    final double viewAspect = viewWidth / viewHeight;
+
+    Widget videoWidget;
+    if (_isInitialized && _controller != null) {
+      if (_isFilled) {
+        double renderWidth;
+        double renderHeight;
+
+        if (videoAspect > viewAspect) {
+          renderHeight = viewHeight;
+          renderWidth = viewHeight * videoAspect;
+        } else {
+          renderWidth = viewWidth;
+          renderHeight = viewWidth / videoAspect;
+        }
+
+        videoWidget = Center(
+          child: SizedBox(
+            width: renderWidth,
+            height: renderHeight,
+            child: VideoPlayer(_controller!),
+          ),
+        );
+      } else {
+        videoWidget = SizedBox(
+          width: viewWidth,
+          height: viewHeight,
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: SizedBox(
+              width: _controller!.value.size.width,
+              height: _controller!.value.size.height,
+              child: VideoPlayer(_controller!),
+            ),
+          ),
+        );
+      }
+    } else {
+      videoWidget = Container(color: Colors.black);
+    }
+
+    Widget? thumbnailWidget;
+    if (_thumbnailBytes != null && !_isInitialized) {
+      thumbnailWidget = Container(
+        color: Colors.black,
+        width: viewWidth,
+        height: viewHeight,
+        child: Image.memory(
+          _thumbnailBytes!,
+          fit: _isFilled ? BoxFit.cover : BoxFit.contain,
+          width: viewWidth,
+          height: viewHeight,
+        ),
+      );
+    }
+
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        videoWidget,
+        if (thumbnailWidget != null) thumbnailWidget,
+        if (!_isInitialized && _thumbnailBytes == null)
+          const Center(child: CircularProgressIndicator(color: Colors.white)),
+      ],
     );
   }
 
