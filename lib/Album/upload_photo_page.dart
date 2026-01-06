@@ -1,15 +1,13 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+// ตรวจสอบ path import ให้ตรงกับโปรเจกต์ของคุณ
 import 'package:wememmory/Album/album_layout_page.dart';
 import 'package:wememmory/home/firstPage.dart';
 import 'package:wememmory/models/media_item.dart';
 
-// หน้าการอัปโหลดรูปภาพจากอุปกรณ์
 class UploadPhotoPage extends StatefulWidget {
   final String selectedMonth;
-  
-  // ✅ 1. ยังคงรับค่ารูปภาพที่เคยเลือกไว้
   final List<MediaItem>? initialSelectedItems;
 
   const UploadPhotoPage({
@@ -25,8 +23,11 @@ class UploadPhotoPage extends StatefulWidget {
 class _UploadPhotoPageState extends State<UploadPhotoPage> {
   final List<MediaItem> mediaList = [];
   final List<MediaItem> selectedItems = [];
-  
   final Map<String, Future<Uint8List?>> _thumbnailFutures = {};
+
+  // Album Variables
+  List<AssetPathEntity> albumList = [];
+  AssetPathEntity? currentAlbum;
 
   bool showThisMonthOnly = false;
   bool isLoading = true;
@@ -34,16 +35,12 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   @override
   void initState() {
     super.initState();
-
-    // ✅ 2. ยังคงโหลดรูปเดิมมาใส่ใน selectedItems เพื่อให้แสดงติ๊กถูกตอนเปิดหน้า
     if (widget.initialSelectedItems != null) {
       selectedItems.addAll(widget.initialSelectedItems!);
     }
-
-    _loadAllMediaFromDevice();
+    _initAndLoadAlbums();
   }
 
-  // ฟังก์ชันจัดรูปแบบเวลา
   String _formatDuration(int seconds) {
     final duration = Duration(seconds: seconds);
     final min = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
@@ -51,8 +48,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     return "$min:$sec";
   }
 
-  // ฟังก์ชันการดึงข้อมูลจากเครื่อง
-  Future<void> _loadAllMediaFromDevice() async {
+  Future<void> _initAndLoadAlbums() async {
     setState(() => isLoading = true);
     final ps = await PhotoManager.requestPermissionExtend();
     if (!ps.isAuth) {
@@ -63,7 +59,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
     final List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
       type: RequestType.common,
-      onlyAll: true,
+      hasAll: true,
       filterOption: FilterOptionGroup(
         orders: [const OrderOption(type: OrderOptionType.createDate, asc: false)],
       ),
@@ -77,10 +73,22 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
       return;
     }
 
-    final AssetPathEntity primaryAlbum = albums.first;
+    setState(() {
+      albumList = albums;
+      currentAlbum = albums.first;
+    });
+
+    _loadAssetsFromCurrentAlbum();
+  }
+
+  Future<void> _loadAssetsFromCurrentAlbum() async {
+    if (currentAlbum == null) return;
+
+    setState(() => isLoading = true);
+
     const int pageSize = 1000;
     List<AssetEntity> assets =
-        await primaryAlbum.getAssetListPaged(page: 0, size: pageSize);
+        await currentAlbum!.getAssetListPaged(page: 0, size: pageSize);
 
     if (showThisMonthOnly) {
       final now = DateTime.now();
@@ -109,18 +117,15 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     setState(() {
       showThisMonthOnly = value;
     });
-    _loadAllMediaFromDevice();
+    _loadAssetsFromCurrentAlbum();
   }
 
   void _toggleSelection(MediaItem item) {
     setState(() {
       final existingIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
-
       if (existingIndex != -1) {
-        // ถ้ามีอยู่แล้ว ให้ลบออก
         selectedItems.removeAt(existingIndex);
       } else {
-        // ถ้ายังไม่มี ให้เพิ่มเข้าไป (ไม่เกิน 11 รูป)
         if (selectedItems.length < 11) {
           selectedItems.add(item);
         } else {
@@ -139,11 +144,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   void _onNextPressed() {
     if (selectedItems.isEmpty) return;
 
-    // หมายเหตุ: ตรงนี้คือปุ่ม "ถัดไป" ซึ่งปกติจะถือว่าเป็นการ Confirm
-    // หากต้องการให้ปุ่มนี้ส่งค่ากลับไปบันทึก (Save) ก็ใช้โค้ดเดิมได้
-    // หรือถ้าจะไปหน้าอื่นต่อเลย ก็ใช้ Logic เดิมครับ
     if (selectedItems.length == 11) {
-      // ไปหน้า AlbumLayoutPage
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -154,9 +155,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         ),
       );
     } else {
-      // กรณีนี้คือเลือกไม่ครบ แล้วกด Next -> ถือว่า Save หรือไปต่อ
-      // หากต้องการให้ Save กลับไปที่หน้า Recommended ต้องใช้ Navigator.pop(context, selectedItems);
-      // แต่ในโค้ดเดิมคือไปหน้า FirstPage ซึ่งถือว่าเป็นการ "ไปต่อ" แบบ Flow ปกติ
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
@@ -169,6 +167,142 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         (route) => false,
       );
     }
+  }
+
+  // ✅ ฟังก์ชันแสดง Modal เลือกอัลบั้ม (ธีมสีขาว)
+  void _showIGStyleAlbumPicker() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.9,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          builder: (_, controller) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white, // ✅ พื้นหลังสีขาว
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                children: [
+                  // --- Drag Handle ---
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300], // ✅ สีเทาอ่อน
+                      borderRadius: BorderRadius.circular(2.5),
+                    ),
+                  ),
+                  
+                  // --- Header ---
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: const Text(
+                            "ยกเลิก",
+                            style: TextStyle(color: Colors.black87, fontSize: 16), // ✅ สีดำ
+                          ),
+                        ),
+                        const Text(
+                          "เลือกอัลบั้ม",
+                          style: TextStyle(
+                            color: Colors.black, // ✅ สีดำ
+                            fontSize: 18,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                        const SizedBox(width: 40),
+                      ],
+                    ),
+                  ),
+                  
+                  const Divider(color: Colors.grey, height: 1, thickness: 0.2), // ✅ เส้นแบ่งสีเทาจางๆ
+
+                  // --- Album Grid ---
+                  Expanded(
+                    child: GridView.builder(
+                      controller: controller,
+                      padding: const EdgeInsets.all(16),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 0.85,
+                      ),
+                      itemCount: albumList.length,
+                      itemBuilder: (context, index) {
+                        final album = albumList[index];
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              currentAlbum = album;
+                            });
+                            _loadAssetsFromCurrentAlbum();
+                            Navigator.pop(context);
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // รูปหน้าปกอัลบั้ม
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12), // ปรับให้มนสวยขึ้น
+                                  child: Container(
+                                    color: Colors.grey[200], // ✅ พื้นหลังรูปโหลดเป็นสีเทาอ่อน
+                                    child: _AlbumCover(album: album),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              // ชื่ออัลบั้ม
+                              Text(
+                                album.name,
+                                style: const TextStyle(
+                                  color: Colors.black87, // ✅ สีดำ
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              // จำนวนรูป
+                              FutureBuilder<int>(
+                                future: album.assetCountAsync,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    return Text(
+                                      "${snapshot.data}",
+                                      style: TextStyle(
+                                        color: Colors.grey[600], // ✅ สีเทาเข้มขึ้น
+                                        fontSize: 12,
+                                      ),
+                                    );
+                                  }
+                                  return const SizedBox();
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget _buildCustomSwitch() {
@@ -205,8 +339,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ❌ เอา PopScope ออก เพื่อให้ Android Back Button ทำงานตามปกติ (คือปิดหน้าจอและ return null)
-    // ไม่มีการดักจับเพื่อส่งค่ากลับ
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: const BoxDecoration(
@@ -215,7 +347,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
       ),
       child: Column(
         children: [
-          // ปุ่มขีด Slide Indicator
+          // Slide Indicator
           const SizedBox(height: 12),
           Container(
             width: 61,
@@ -242,11 +374,9 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                
-                // ✅ 3. แก้ไขปุ่มกากบาท: ให้ปิดหน้าเฉยๆ (ไม่ส่งค่ากลับ)
                 GestureDetector(
                   onTap: () {
-                    Navigator.pop(context); // ไม่ใส่ selectedItems -> return null -> ไม่ save
+                    Navigator.pop(context);
                   },
                   child: Image.asset(
                     'assets/icons/cross.png',
@@ -261,7 +391,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
           const SizedBox(height: 16),
 
-          // Steps (Process Bar)
+          // Steps
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 7),
             child: Row(
@@ -275,7 +405,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
           const SizedBox(height: 20),
 
-          // Toggle
+          // Toggle Switch
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Row(
@@ -299,7 +429,40 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
             ),
           ),
 
-          const SizedBox(height: 10),
+          // ปุ่มเลือกอัลบั้ม (เปิด Modal)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: GestureDetector(
+                onTap: albumList.isNotEmpty ? _showIGStyleAlbumPicker : null,
+                child: Container(
+                  height: 40,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        currentAlbum?.name ?? (isLoading ? "กำลังโหลด..." : "เลือกอัลบั้ม"),
+                        style: const TextStyle(
+                          color: Colors.black87, 
+                          fontSize: 14, 
+                          fontWeight: FontWeight.w600
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
 
           // Media Grid
           Expanded(
@@ -319,11 +482,8 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                         itemCount: mediaList.length,
                         itemBuilder: (context, index) {
                           final item = mediaList[index];
-                          
-                          // เช็คว่ารูปนี้ถูกเลือกไว้หรือยัง
                           final selectionIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
                           final isSelected = selectionIndex != -1;
-                          
                           final future = _thumbnailFutures[item.asset.id] ??=
                               item.asset.thumbnailDataWithSize(
                                   const ThumbnailSize(200, 200));
@@ -338,15 +498,10 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                                   child: FutureBuilder<Uint8List?>(
                                     future: future,
                                     builder: (context, snapshot) {
-                                      if (snapshot.hasData &&
-                                          snapshot.data != null) {
-                                        return Image.memory(
-                                          snapshot.data!,
-                                          fit: BoxFit.cover,
-                                        );
+                                      if (snapshot.hasData && snapshot.data != null) {
+                                        return Image.memory(snapshot.data!, fit: BoxFit.cover);
                                       }
-                                      return Container(
-                                          color: Colors.grey.shade200);
+                                      return Container(color: Colors.grey.shade200);
                                     },
                                   ),
                                 ),
@@ -355,19 +510,14 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                                     bottom: 6,
                                     left: 6,
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
                                         color: Colors.black.withOpacity(0.7),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(
                                         _formatDuration(item.asset.duration),
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                   ),
@@ -376,9 +526,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                                     decoration: BoxDecoration(
                                       color: Colors.black.withOpacity(0.3),
                                       borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                          color: const Color(0xFF5AB6D8),
-                                          width: 3),
+                                      border: Border.all(color: const Color(0xFF5AB6D8), width: 3),
                                     ),
                                   ),
                                 Positioned(
@@ -388,22 +536,15 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                                     width: 24,
                                     height: 24,
                                     decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? const Color(0xFF5AB6D8)
-                                          : Colors.transparent,
+                                      color: isSelected ? const Color(0xFF5AB6D8) : Colors.transparent,
                                       shape: BoxShape.circle,
-                                      border: Border.all(
-                                          color: Colors.white, width: 2),
+                                      border: Border.all(color: Colors.white, width: 2),
                                     ),
                                     child: isSelected
                                         ? Center(
                                             child: Text(
                                               '${selectionIndex + 1}',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                                             ),
                                           )
                                         : null,
@@ -452,7 +593,40 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   }
 }
 
-// _StepItem (คงเดิม)
+// Widget โหลดรูปปกอัลบั้ม (ปรับไอคอนสำหรับธีมขาว)
+class _AlbumCover extends StatelessWidget {
+  final AssetPathEntity album;
+
+  const _AlbumCover({required this.album});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<AssetEntity>>(
+      future: album.getAssetListRange(start: 0, end: 1),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          final asset = snapshot.data!.first;
+          return FutureBuilder<Uint8List?>(
+            future: asset.thumbnailDataWithSize(const ThumbnailSize(200, 200)),
+            builder: (context, thumbSnapshot) {
+              if (thumbSnapshot.hasData && thumbSnapshot.data != null) {
+                return Image.memory(
+                  thumbSnapshot.data!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                );
+              }
+              return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+            },
+          );
+        }
+        return const Icon(Icons.image_not_supported, color: Colors.grey); // ✅ ไอคอนสีเทา
+      },
+    );
+  }
+}
+
 class _StepItem extends StatelessWidget {
   final String label;
   final bool isActive;
