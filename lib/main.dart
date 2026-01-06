@@ -6,6 +6,7 @@ import 'package:flutter/services.dart'; // ✅ จำเป็นสำหรั
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wememmory/MemoryAnimationScreen.dart';
 import 'package:wememmory/firebase_options.dart';
 import 'package:wememmory/home/firstPage.dart';
 import 'package:wememmory/home/service/homeController.dart';
@@ -19,9 +20,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // ✅ เพิ่มส่วนนี้เพื่อล็อคหน้าจอเป็นแนวตั้ง
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
@@ -34,8 +33,8 @@ void main() async {
 
   // 1. เริ่มระบบ
   await NotificationHelper.init();
-  prefs = await SharedPreferences.getInstance();
-  token = prefs.getString('token');
+  // prefs = await SharedPreferences.getInstance();
+  // token = prefs.getString('token');
 
   runApp(const MyApp());
 }
@@ -76,7 +75,7 @@ class _MyAppState extends State<MyApp> {
           // textTheme: GoogleFonts.promptTextTheme(Theme.of(context).textTheme), colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)
         ),
         // ✅ กลับมาใช้หน้า Login ปกติ
-        home: token != null ? FirstPage() : OpenScreen(),
+        home: MemorySmoothScreen(),
       ),
     );
   }
