@@ -8,7 +8,6 @@ import 'package:wememmory/models/media_item.dart';
 
 class UploadPhotoPage extends StatefulWidget {
   final String selectedMonth;
-
   final List<MediaItem>? initialSelectedItems;
 
   const UploadPhotoPage({
@@ -24,10 +23,8 @@ class UploadPhotoPage extends StatefulWidget {
 class _UploadPhotoPageState extends State<UploadPhotoPage> {
   final List<MediaItem> mediaList = [];
   final List<MediaItem> selectedItems = [];
-
   final Map<String, Future<Uint8List?>> _thumbnailFutures = {};
 
-  // Album Variables
   List<AssetPathEntity> albumList = [];
   AssetPathEntity? currentAlbum;
 
@@ -63,9 +60,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
       type: RequestType.common,
       hasAll: true,
       filterOption: FilterOptionGroup(
-        orders: [
-          const OrderOption(type: OrderOptionType.createDate, asc: false),
-        ],
+        orders: [const OrderOption(type: OrderOptionType.createDate, asc: false)],
       ),
     );
 
@@ -91,28 +86,23 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     setState(() => isLoading = true);
 
     const int pageSize = 1000;
-
-    List<AssetEntity> assets = await currentAlbum!.getAssetListPaged(
-      page: 0,
-      size: pageSize,
-    );
+    List<AssetEntity> assets =
+        await currentAlbum!.getAssetListPaged(page: 0, size: pageSize);
 
     if (showThisMonthOnly) {
       final now = DateTime.now();
-      assets =
-          assets.where((a) {
-            final dt = a.createDateTime;
-            return dt.year == now.year && dt.month == now.month;
-          }).toList();
+      assets = assets.where((a) {
+        final dt = a.createDateTime;
+        return dt.year == now.year && dt.month == now.month;
+      }).toList();
     }
 
-    final List<MediaItem> temp =
-        assets.map((a) {
-          return MediaItem(
-            asset: a,
-            type: a.type == AssetType.video ? MediaType.video : MediaType.image,
-          );
-        }).toList();
+    final List<MediaItem> temp = assets.map((a) {
+      return MediaItem(
+        asset: a,
+        type: a.type == AssetType.video ? MediaType.video : MediaType.image,
+      );
+    }).toList();
 
     setState(() {
       mediaList.clear();
@@ -131,10 +121,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
   void _toggleSelection(MediaItem item) {
     setState(() {
-      final existingIndex = selectedItems.indexWhere(
-        (s) => s.asset.id == item.asset.id,
-      );
-
+      final existingIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
       if (existingIndex != -1) {
         selectedItems.removeAt(existingIndex);
       } else {
@@ -161,29 +148,27 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder:
-            (context) => AlbumLayoutPage(
-              selectedItems: selectedItems,
-              monthName: widget.selectedMonth,
-            ),
+        builder: (context) => AlbumLayoutPage(
+          selectedItems: selectedItems,
+          monthName: widget.selectedMonth,
+        ),
       );
     } else {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder:
-              (context) => FirstPage(
-                initialIndex: 0,
-                newAlbumItems: selectedItems,
-                newAlbumMonth: widget.selectedMonth,
-              ),
+          builder: (context) => FirstPage(
+            initialIndex: 0,
+            newAlbumItems: selectedItems,
+            newAlbumMonth: widget.selectedMonth,
+          ),
         ),
         (route) => false,
       );
     }
   }
 
-  // ✅ ฟังก์ชันแสดง Modal เลือกอัลบั้ม (ธีมสีขาว)
+  // ✅ ฟังก์ชันแสดง Modal เลือกอัลบั้ม (แก้ไข Layout)
   void _showIGStyleAlbumPicker() {
     showModalBottomSheet(
       context: context,
@@ -197,7 +182,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
           builder: (_, controller) {
             return Container(
               decoration: const BoxDecoration(
-                color: Colors.white, // ✅ พื้นหลังสีขาว
+                color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: Column(
@@ -208,17 +193,14 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                     width: 40,
                     height: 5,
                     decoration: BoxDecoration(
-                      color: Colors.grey[300], // ✅ สีเทาอ่อน
+                      color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(2.5),
                     ),
                   ),
-
+                  
                   // --- Header ---
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -226,16 +208,13 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                           onTap: () => Navigator.pop(context),
                           child: const Text(
                             "ยกเลิก",
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 16,
-                            ), // ✅ สีดำ
+                            style: TextStyle(color: Colors.black87, fontSize: 16),
                           ),
                         ),
                         const Text(
                           "เลือกอัลบั้ม",
                           style: TextStyle(
-                            color: Colors.black, // ✅ สีดำ
+                            color: Colors.black,
                             fontSize: 18,
                             fontWeight: FontWeight.w300,
                           ),
@@ -244,24 +223,20 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                       ],
                     ),
                   ),
+                  
+                  const Divider(color: Colors.grey, height: 1, thickness: 0.2),
 
-                  const Divider(
-                    color: Colors.grey,
-                    height: 1,
-                    thickness: 0.2,
-                  ), // ✅ เส้นแบ่งสีเทาจางๆ
                   // --- Album Grid ---
                   Expanded(
                     child: GridView.builder(
                       controller: controller,
                       padding: const EdgeInsets.all(16),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                            childAspectRatio: 0.85,
-                          ),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 0.85,
+                      ),
                       itemCount: albumList.length,
                       itemBuilder: (context, index) {
                         final album = albumList[index];
@@ -274,18 +249,16 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                             Navigator.pop(context);
                           },
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            // ✅ เพิ่ม stretch เพื่อให้รูปขยายเต็มความกว้าง
+                            crossAxisAlignment: CrossAxisAlignment.stretch, 
                             children: [
                               // รูปหน้าปกอัลบั้ม
                               Expanded(
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(
-                                    12,
-                                  ), // ปรับให้มนสวยขึ้น
+                                  borderRadius: BorderRadius.circular(12),
                                   child: Container(
-                                    color:
-                                        Colors
-                                            .grey[200], // ✅ พื้นหลังรูปโหลดเป็นสีเทาอ่อน
+                                    color: Colors.grey[200],
+                                    // เรียก Widget แสดงรูปปก
                                     child: _AlbumCover(album: album),
                                   ),
                                 ),
@@ -295,7 +268,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                               Text(
                                 album.name,
                                 style: const TextStyle(
-                                  color: Colors.black87, // ✅ สีดำ
+                                  color: Colors.black87,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w300,
                                 ),
@@ -310,8 +283,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                                     return Text(
                                       "${snapshot.data}",
                                       style: TextStyle(
-                                        color:
-                                            Colors.grey[600], // ✅ สีเทาเข้มขึ้น
+                                        color: Colors.grey[600],
                                         fontSize: 12,
                                       ),
                                     );
@@ -344,10 +316,9 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         padding: const EdgeInsets.all(3.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          color:
-              showThisMonthOnly
-                  ? const Color(0xFFED7D31)
-                  : const Color(0xFFE0E0E0),
+          color: showThisMonthOnly
+              ? const Color(0xFFED7D31)
+              : const Color(0xFFE0E0E0),
         ),
         child: AnimatedAlign(
           duration: const Duration(milliseconds: 200),
@@ -377,7 +348,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
       ),
       child: Column(
         children: [
-          // Slide Indicator
           const SizedBox(height: 12),
           Container(
             width: 61,
@@ -398,18 +368,15 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                   child: Text(
                     '${widget.selectedMonth.split(' ')[0]} : เลือก ${selectedItems.length} ของคุณ',
                     style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-
                 GestureDetector(
                   onTap: () {
-                    // ✅ แก้ไข: ต้องส่ง selectedItems กลับไป เพื่อให้ Recommended บันทึก
-                    Navigator.pop(context, selectedItems);
+                    Navigator.pop(context);
                   },
                   child: Image.asset(
                     'assets/icons/cross.png',
@@ -424,34 +391,27 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
           const SizedBox(height: 16),
 
-          // Steps
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 7),
             child: Row(
               children: [
                 _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true),
                 _StepItem(label: 'แก้ไขและจัดเรียง', isActive: false),
-                _StepItem(
-                  label: 'พรีวิวสุดท้าย',
-                  isActive: false,
-                  isLast: true,
-                ),
+                _StepItem(label: 'พรีวิวสุดท้าย', isActive: false, isLast: true),
               ],
             ),
           ),
 
           const SizedBox(height: 20),
 
-          // Toggle Switch
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'เลือกแสดงเฉพาะเดือนนี้',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
+                const Text('เลือกแสดงเฉพาะเดือนนี้',
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                 _buildCustomSwitch(),
               ],
             ),
@@ -467,7 +427,6 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
             ),
           ),
 
-          // ปุ่มเลือกอัลบั้ม (เปิด Modal)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
             child: Align(
@@ -486,19 +445,15 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        currentAlbum?.name ??
-                            (isLoading ? "กำลังโหลด..." : "เลือกอัลบั้ม"),
+                        currentAlbum?.name ?? (isLoading ? "กำลังโหลด..." : "เลือกอัลบั้ม"),
                         style: const TextStyle(
-                          color: Colors.black87,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                          color: Colors.black87, 
+                          fontSize: 14, 
+                          fontWeight: FontWeight.w600
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Icon(
-                        Icons.keyboard_arrow_down,
-                        color: Colors.black54,
-                      ),
+                      const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
                     ],
                   ),
                 ),
@@ -506,132 +461,98 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
             ),
           ),
 
-          // Media Grid
           Expanded(
-            child:
-                isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : mediaList.isEmpty
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : mediaList.isEmpty
                     ? const Center(child: Text("ไม่พบรูปภาพ"))
                     : GridView.builder(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 8,
-                            mainAxisSpacing: 8,
-                            childAspectRatio: 1.0,
-                          ),
-                      itemCount: mediaList.length,
-                      itemBuilder: (context, index) {
-                        final item = mediaList[index];
-                        final selectionIndex = selectedItems.indexWhere(
-                          (s) => s.asset.id == item.asset.id,
-                        );
-                        final isSelected = selectionIndex != -1;
-                        final future =
-                            _thumbnailFutures[item.asset.id] ??= item.asset
-                                .thumbnailDataWithSize(
-                                  const ThumbnailSize(200, 200),
-                                );
-
-                        return GestureDetector(
-                          onTap: () => _toggleSelection(item),
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: FutureBuilder<Uint8List?>(
-                                  future: future,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData &&
-                                        snapshot.data != null) {
-                                      return Image.memory(
-                                        snapshot.data!,
-                                        fit: BoxFit.cover,
-                                      );
-                                    }
-                                    return Container(
-                                      color: Colors.grey.shade200,
-                                    );
-                                  },
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                          childAspectRatio: 1.0,
+                        ),
+                        itemCount: mediaList.length,
+                        itemBuilder: (context, index) {
+                          final item = mediaList[index];
+                          final selectionIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
+                          final isSelected = selectionIndex != -1;
+                          final future = _thumbnailFutures[item.asset.id] ??=
+                              item.asset.thumbnailDataWithSize(
+                                  const ThumbnailSize(200, 200));
+                                  
+                          return GestureDetector(
+                            onTap: () => _toggleSelection(item),
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: FutureBuilder<Uint8List?>(
+                                    future: future,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData && snapshot.data != null) {
+                                        return Image.memory(snapshot.data!, fit: BoxFit.cover);
+                                      }
+                                      return Container(color: Colors.grey.shade200);
+                                    },
+                                  ),
                                 ),
-                              ),
-                              if (item.type == MediaType.video)
-                                Positioned(
-                                  bottom: 6,
-                                  left: 6,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withOpacity(0.7),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      _formatDuration(item.asset.duration),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w500,
+                                if (item.type == MediaType.video)
+                                  Positioned(
+                                    bottom: 6,
+                                    left: 6,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.7),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        _formatDuration(item.asset.duration),
+                                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                   ),
-                                ),
-                              if (isSelected)
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.3),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: const Color(0xFF5AB6D8),
-                                      width: 3,
+                                if (isSelected)
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: const Color(0xFF5AB6D8), width: 3),
                                     ),
                                   ),
-                                ),
-                              Positioned(
-                                top: 8,
-                                right: 8,
-                                child: Container(
-                                  width: 24,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        isSelected
-                                            ? const Color(0xFF5AB6D8)
-                                            : Colors.transparent,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 2,
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: isSelected ? const Color(0xFF5AB6D8) : Colors.transparent,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 2),
                                     ),
-                                  ),
-                                  child:
-                                      isSelected
-                                          ? Center(
+                                    child: isSelected
+                                        ? Center(
                                             child: Text(
                                               '${selectionIndex + 1}',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                                             ),
                                           )
-                                          : null,
+                                        : null,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
           ),
 
-          // Bottom Bar
           Container(
             padding: const EdgeInsets.fromLTRB(16, 40, 16, 40),
             decoration: const BoxDecoration(
@@ -644,10 +565,9 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
               child: ElevatedButton(
                 onPressed: selectedItems.isNotEmpty ? _onNextPressed : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      selectedItems.isNotEmpty
-                          ? const Color(0xFF5AB6D8)
-                          : Colors.grey[400],
+                  backgroundColor: selectedItems.isNotEmpty
+                      ? const Color(0xFF5AB6D8)
+                      : Colors.grey[400],
                   shape: const RoundedRectangleBorder(),
                   elevation: 0,
                 ),
@@ -668,7 +588,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   }
 }
 
-// Widget โหลดรูปปกอัลบั้ม (ปรับไอคอนสำหรับธีมขาว)
+// ✅ แก้ไข Widget นี้: ถ้าไม่มีรูป ให้แสดง Container เต็มช่อง
 class _AlbumCover extends StatelessWidget {
   final AssetPathEntity album;
 
@@ -692,16 +612,23 @@ class _AlbumCover extends StatelessWidget {
                   height: double.infinity,
                 );
               }
-              return const Center(
-                child: CircularProgressIndicator(strokeWidth: 2),
+              // รูปกำลังโหลด
+              return Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: Colors.grey[200],
+                child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
               );
             },
           );
         }
-        return const Icon(
-          Icons.image_not_supported,
-          color: Colors.grey,
-        ); // ✅ ไอคอนสีเทา
+        // ✅ อัลบั้มเปล่า: คืนค่าเป็น Container เต็มช่อง พร้อมไอคอน
+        return Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: Colors.grey[200], // สีพื้นหลังกล่องเปล่า
+          child: const Icon(Icons.image_not_supported_outlined, color: Colors.grey, size: 40),
+        );
       },
     );
   }
@@ -732,12 +659,9 @@ class _StepItem extends StatelessWidget {
                 flex: 2,
                 child: Container(
                   height: 2,
-                  color:
-                      isFirst
-                          ? Colors.transparent
-                          : (isActive
-                              ? const Color(0xFF5AB6D8)
-                              : Colors.grey[300]),
+                  color: isFirst
+                      ? Colors.transparent
+                      : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]),
                 ),
               ),
               const SizedBox(width: 40),
