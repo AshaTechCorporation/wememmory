@@ -62,8 +62,7 @@ class Recommended extends StatefulWidget {
   final List<MediaItem>? albumItems;
   final String? albumMonth;
 
-  const Recommended({Key? key, this.albumItems, this.albumMonth})
-    : super(key: key);
+  const Recommended({Key? key, this.albumItems, this.albumMonth}) : super(key: key);
 
   @override
   State<Recommended> createState() => _RecommendedState();
@@ -103,8 +102,7 @@ class _RecommendedState extends State<Recommended> {
   @override
   void didUpdateWidget(covariant Recommended oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.albumItems != oldWidget.albumItems ||
-        widget.albumMonth != oldWidget.albumMonth) {
+    if (widget.albumItems != oldWidget.albumItems || widget.albumMonth != oldWidget.albumMonth) {
       // เพิ่ม: ถ้ามีการส่งค่าใหม่เข้ามา ก็ให้ซิงค์ลงเครื่องด้วย
       _syncWidgetDataToDraft();
       _generateCards();
@@ -124,9 +122,10 @@ class _RecommendedState extends State<Recommended> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => CreateAlbumModal(
-        existingDrafts: _draftSelections, // ส่งสมุดจด Draft ให้ลูกเอาไปเช็ค
-      ),
+      builder:
+          (context) => CreateAlbumModal(
+            existingDrafts: _draftSelections, // ส่งสมุดจด Draft ให้ลูกเอาไปเช็ค
+          ),
     );
 
     // 2. รับค่ากลับมา (รูปแบบ Map ที่เราทำไว้ในข้อ 1)
@@ -140,16 +139,14 @@ class _RecommendedState extends State<Recommended> {
       setState(() {
         _draftSelections[month] = items;
       });
-      _saveDrafts();     // บันทึกลงเครื่อง
-      _generateCards();  // รีเฟรชหน้าจอการ์ด
+      _saveDrafts(); // บันทึกลงเครื่อง
+      _generateCards(); // รีเฟรชหน้าจอการ์ด
     }
   }
 
   // ฟังก์ชันใหม่สำหรับ Sync ข้อมูล
   void _syncWidgetDataToDraft() {
-    if (widget.albumMonth != null &&
-        widget.albumItems != null &&
-        widget.albumItems!.isNotEmpty) {
+    if (widget.albumMonth != null && widget.albumItems != null && widget.albumItems!.isNotEmpty) {
       // แปลง key ให้ตรงกับฟอร์แมตที่ใช้เก็บ (ลบช่องว่างส่วนเกิน)
       String cleanTitle = widget.albumMonth!.replaceAll('\n', ' ').trim();
 
@@ -265,21 +262,7 @@ class _RecommendedState extends State<Recommended> {
   }
 
   String _getThaiMonthName(int month) {
-    const List<String> thaiMonths = [
-      "",
-      "มกราคม",
-      "กุมภาพันธ์",
-      "มีนาคม",
-      "เมษายน",
-      "พฤษภาคม",
-      "มิถุนายน",
-      "กรกฎาคม",
-      "สิงหาคม",
-      "กันยายน",
-      "ตุลาคม",
-      "พฤศจิกายน",
-      "ธันวาคม",
-    ];
+    const List<String> thaiMonths = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
     if (month >= 1 && month <= 12) return thaiMonths[month];
     return "";
   }
@@ -330,8 +313,7 @@ class _RecommendedState extends State<Recommended> {
             gradientColors: [],
             accentColor: Colors.transparent,
             backgroundUrl: coverImageUrl,
-            backgroundImage:
-                coverImageUrl == null ? 'assets/images/Hobby1.png' : null,
+            backgroundImage: coverImageUrl == null ? 'assets/images/Hobby1.png' : null,
             showTextOverlay: true,
             monthIndex: i,
             imageItems: cardImageItems,
@@ -344,10 +326,7 @@ class _RecommendedState extends State<Recommended> {
             type: CardType.ticket,
             topTitle: '$monthName\n$yearBE',
             mainTitle: _timeRemainingString,
-            subTitle:
-                photoCount == 11
-                    ? 'บันทึกครบ 11 ภาพแล้ว'
-                    : 'ขาดอีก ${11 - photoCount} ภาพ',
+            subTitle: photoCount == 11 ? 'บันทึกครบ 11 ภาพแล้ว' : 'ขาดอีก ${11 - photoCount} ภาพ',
             footerText: 'Ticket 10',
             currentProgress: photoCount,
             maxProgress: 11,
@@ -365,18 +344,11 @@ class _RecommendedState extends State<Recommended> {
             type: CardType.standard,
             topTitle: '$monthName\n$yearBE',
             mainTitle: '',
-            subTitle:
-                isCurrentMonth
-                    ? 'เริ่มบันทึกความทรงจำเดือนนี้'
-                    : 'ยังไม่มีบันทึกความทรงจำ',
+            subTitle: isCurrentMonth ? 'เริ่มบันทึกความทรงจำเดือนนี้' : 'ยังไม่มีบันทึกความทรงจำ',
             footerText: 'Start Now',
             gradientColors: [const Color(0xFF424242), const Color(0xFF212121)],
             accentColor: const Color(0xFFFF7043),
-            assetImages: [
-              'assets/images/Hobby2.png',
-              'assets/images/Hobby3.png',
-              'assets/images/Hobby1.png',
-            ],
+            assetImages: ['assets/images/Hobby2.png', 'assets/images/Hobby3.png', 'assets/images/Hobby1.png'],
             monthIndex: i,
             imageItems: cardImageItems,
           ),
@@ -392,10 +364,7 @@ class _RecommendedState extends State<Recommended> {
     });
 
     _timer?.cancel();
-    _timer = Timer.periodic(
-      const Duration(seconds: 1),
-      (timer) => _onTimerTick(),
-    );
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _onTimerTick());
   }
 
   void _calculateTargetAndInitialString() {
@@ -465,8 +434,7 @@ class _RecommendedState extends State<Recommended> {
   }
 
   Future<void> _continueSelection(String fullTitle) async {
-    String cleanTitle =
-        fullTitle.replaceAll('\n', ' ').replaceAll('ของฉัน', '').trim();
+    String cleanTitle = fullTitle.replaceAll('\n', ' ').replaceAll('ของฉัน', '').trim();
     String monthNameOnly = cleanTitle.split(' ')[0];
 
     List<MediaItem>? currentItems;
@@ -474,9 +442,7 @@ class _RecommendedState extends State<Recommended> {
     if (_draftSelections.containsKey(cleanTitle)) {
       currentItems = _draftSelections[cleanTitle];
     } else {
-      int targetIndex = _items.indexWhere(
-        (item) => item.topTitle.contains(monthNameOnly),
-      );
+      int targetIndex = _items.indexWhere((item) => item.topTitle.contains(monthNameOnly));
       if (targetIndex != -1) {
         currentItems = _items[targetIndex].imageItems;
       }
@@ -489,19 +455,8 @@ class _RecommendedState extends State<Recommended> {
       builder:
           (context) => Container(
             height: MediaQuery.of(context).size.height * 0.9,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
-              ),
-              child: UploadPhotoPage(
-                selectedMonth: cleanTitle,
-                initialSelectedItems: currentItems,
-              ),
-            ),
+            decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+            child: ClipRRect(borderRadius: const BorderRadius.vertical(top: Radius.circular(20)), child: UploadPhotoPage(selectedMonth: cleanTitle, initialSelectedItems: currentItems)),
           ),
     );
 
@@ -524,10 +479,7 @@ class _RecommendedState extends State<Recommended> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const SizedBox(
-        height: 416,
-        child: Center(child: CircularProgressIndicator(color: Colors.orange)),
-      );
+      return const SizedBox(height: 416, child: Center(child: CircularProgressIndicator(color: Colors.orange)));
     }
 
     if (_items.isEmpty) return const SizedBox(height: 416);
@@ -594,8 +546,7 @@ class _RecommendedState extends State<Recommended> {
     double dragProgress = (_dragOffset / 220.0).clamp(-1.0, 1.0);
 
     if (_currentIndex == 0 && dragProgress > 0) dragProgress *= 0.3;
-    if (_currentIndex == _items.length - 1 && dragProgress < 0)
-      dragProgress *= 0.3;
+    if (_currentIndex == _items.length - 1 && dragProgress < 0) dragProgress *= 0.3;
 
     double left = adjustedStartPosition;
     double top = 42;
@@ -619,16 +570,8 @@ class _RecommendedState extends State<Recommended> {
         double start = adjustedStartPosition + (relativeIndex * spacing);
         double end = adjustedStartPosition + ((relativeIndex - 1) * spacing);
         left = _lerp(start, end, t);
-        scale = _lerp(
-          1.0 - (relativeIndex * 0.15),
-          1.0 - ((relativeIndex - 1) * 0.15),
-          t,
-        );
-        opacity = _lerp(
-          relativeIndex > 2 ? 0.0 : 1.0,
-          (relativeIndex - 1) > 2 ? 0.0 : 1.0,
-          t,
-        );
+        scale = _lerp(1.0 - (relativeIndex * 0.15), 1.0 - ((relativeIndex - 1) * 0.15), t);
+        opacity = _lerp(relativeIndex > 2 ? 0.0 : 1.0, (relativeIndex - 1) > 2 ? 0.0 : 1.0, t);
       } else {
         left = dismissPosition;
         opacity = 0.0;
@@ -646,16 +589,8 @@ class _RecommendedState extends State<Recommended> {
         double start = adjustedStartPosition + (relativeIndex * spacing);
         double end = adjustedStartPosition + ((relativeIndex + 1) * spacing);
         left = _lerp(start, end, t);
-        scale = _lerp(
-          1.0 - (relativeIndex * 0.15),
-          1.0 - ((relativeIndex + 1) * 0.15),
-          t,
-        );
-        opacity = _lerp(
-          relativeIndex > 2 ? 0.0 : 1.0,
-          (relativeIndex + 1) > 2 ? 0.0 : 1.0,
-          t,
-        );
+        scale = _lerp(1.0 - (relativeIndex * 0.15), 1.0 - ((relativeIndex + 1) * 0.15), t);
+        opacity = _lerp(relativeIndex > 2 ? 0.0 : 1.0, (relativeIndex + 1) > 2 ? 0.0 : 1.0, t);
       } else {
         left = dismissPosition;
         opacity = 0.0;
@@ -678,17 +613,7 @@ class _RecommendedState extends State<Recommended> {
       child: Transform.scale(
         scale: scale,
         alignment: Alignment.centerLeft,
-        child: Opacity(
-          opacity: opacity,
-          child: SizedBox(
-            width: cardWidth,
-            height: cardHeight,
-            child: AbsorbPointer(
-              absorbing: isAbsorbing,
-              child: MemoryCard(data: item, onButtonTap: onTapButton),
-            ),
-          ),
-        ),
+        child: Opacity(opacity: opacity, child: SizedBox(width: cardWidth, height: cardHeight, child: AbsorbPointer(absorbing: isAbsorbing, child: MemoryCard(data: item, onButtonTap: onTapButton)))),
       ),
     );
   }
@@ -701,8 +626,7 @@ class MemoryCard extends StatelessWidget {
   final MemoryCardData data;
   final VoidCallback? onButtonTap;
 
-  const MemoryCard({Key? key, required this.data, this.onButtonTap})
-    : super(key: key);
+  const MemoryCard({Key? key, required this.data, this.onButtonTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -721,13 +645,8 @@ class MemoryCard extends StatelessWidget {
                 CachedNetworkImage(
                   imageUrl: data.backgroundUrl!,
                   fit: BoxFit.cover,
-                  placeholder:
-                      (context, url) => Container(color: Colors.grey[900]),
-                  errorWidget:
-                      (context, url, error) => Image.asset(
-                        'assets/images/Hobby1.png',
-                        fit: BoxFit.cover,
-                      ),
+                  placeholder: (context, url) => Container(color: Colors.grey[900]),
+                  errorWidget: (context, url, error) => Image.asset('assets/images/Hobby1.png', fit: BoxFit.cover),
                 )
               else if (data.backgroundImage != null)
                 Image.asset(data.backgroundImage!, fit: BoxFit.cover)
@@ -738,12 +657,7 @@ class MemoryCard extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [
-                        Colors.black.withOpacity(0.6),
-                        Colors.transparent,
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.3),
-                      ],
+                      colors: [Colors.black.withOpacity(0.6), Colors.transparent, Colors.transparent, Colors.black.withOpacity(0.3)],
                       stops: const [0.0, 0.4, 0.7, 1.0],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
@@ -753,25 +667,9 @@ class MemoryCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        data.topTitle,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          height: 1.1,
-                        ),
-                      ),
+                      Text(data.topTitle, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold, height: 1.1)),
                       const SizedBox(height: 8),
-                      Text(
-                        data.mainTitle,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          height: 1.2,
-                        ),
-                      ),
+                      Text(data.mainTitle, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, height: 1.2)),
                     ],
                   ),
                 ),
@@ -785,11 +683,7 @@ class MemoryCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(0),
-        gradient: LinearGradient(
-          colors: data.gradientColors,
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
+        gradient: LinearGradient(colors: data.gradientColors, begin: Alignment.topCenter, end: Alignment.bottomCenter),
         border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
       child: ClipRRect(
@@ -799,16 +693,7 @@ class MemoryCard extends StatelessWidget {
             Positioned(
               top: -100,
               right: -50,
-              child: Container(
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [Colors.white.withOpacity(0.1), Colors.transparent],
-                  ),
-                ),
-              ),
+              child: Container(width: 300, height: 300, decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [Colors.white.withOpacity(0.1), Colors.transparent]))),
             ),
             Padding(
               padding: const EdgeInsets.all(24.0),
@@ -819,43 +704,14 @@ class MemoryCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        data.topTitle,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          height: 1.1,
-                        ),
-                      ),
-                      Text(
-                        data.footerText,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 12,
-                        ),
-                      ),
+                      Text(data.topTitle, style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold, height: 1.1)),
+                      Text(data.footerText, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    data.subTitle,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
-                      fontSize: 12,
-                    ),
-                  ),
+                  Text(data.subTitle, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
                   const Spacer(),
-                  Center(
-                    child: SizedBox(
-                      height: 138,
-                      width: 280,
-                      child: _PhotoStack(
-                        items: data.imageItems,
-                        assetImages: data.assetImages,
-                      ),
-                    ),
-                  ),
+                  Center(child: SizedBox(height: 138, width: 280, child: _PhotoStack(items: data.imageItems, assetImages: data.assetImages))),
                   const Spacer(),
                   const SizedBox(height: 16),
                   GestureDetector(
@@ -866,23 +722,10 @@ class MemoryCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: data.accentColor,
                         borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 4))],
                       ),
                       alignment: Alignment.center,
-                      child: const Text(
-                        "คัดสรรรูปภาพของคุณ",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: const Text("คัดสรรรูปภาพของคุณ", style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -900,23 +743,15 @@ class TicketMemoryCard extends StatelessWidget {
   final MemoryCardData data;
   final VoidCallback? onButtonTap;
 
-  const TicketMemoryCard({Key? key, required this.data, this.onButtonTap})
-    : super(key: key);
+  const TicketMemoryCard({Key? key, required this.data, this.onButtonTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final double progressPercent =
-        data.maxProgress > 0
-            ? (data.currentProgress / data.maxProgress).clamp(0.0, 1.0)
-            : 0.0;
+    final double progressPercent = data.maxProgress > 0 ? (data.currentProgress / data.maxProgress).clamp(0.0, 1.0) : 0.0;
 
     return Container(
       padding: const EdgeInsets.all(26),
-      decoration: BoxDecoration(
-        color: data.backgroundColor ?? const Color(0xFF111111),
-        borderRadius: BorderRadius.circular(0),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
-      ),
+      decoration: BoxDecoration(color: data.backgroundColor ?? const Color(0xFF111111), borderRadius: BorderRadius.circular(0), border: Border.all(color: Colors.white.withOpacity(0.1), width: 1)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -924,82 +759,32 @@ class TicketMemoryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                data.topTitle,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  height: 1.1,
-                ),
-              ),
-              Text(
-                data.footerText,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
-                  fontSize: 12,
-                ),
-              ),
+              Text(data.topTitle, style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold, height: 1.1)),
+              Text(data.footerText, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            data.subTitle,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
-              fontSize: 12,
-            ),
-          ),
+          Text(data.subTitle, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
           const Spacer(),
-          Center(
-            child: Text(
-              data.mainTitle,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 21,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
+          Center(child: Text(data.mainTitle, style: const TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.bold, letterSpacing: 0.5), textAlign: TextAlign.center)),
           const Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "ความคืบหน้า",
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-              Text(
-                "${data.currentProgress}/${data.maxProgress}",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              const Text("ความคืบหน้า", style: TextStyle(color: Colors.grey, fontSize: 14)),
+              Text("${data.currentProgress}/${data.maxProgress}", style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 8),
           Container(
             height: 31,
             width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xFF333333),
-              borderRadius: BorderRadius.circular(15),
-            ),
+            decoration: BoxDecoration(color: const Color(0xFF333333), borderRadius: BorderRadius.circular(15)),
             child: Stack(
               children: [
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    return Container(
-                      width: constraints.maxWidth * progressPercent,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF6797A9),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    );
+                    return Container(width: constraints.maxWidth * progressPercent, decoration: BoxDecoration(color: const Color(0xFF6797A9), borderRadius: BorderRadius.circular(15)));
                   },
                 ),
               ],
@@ -1014,23 +799,10 @@ class TicketMemoryCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: data.accentColor,
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 4))],
               ),
               alignment: Alignment.center,
-              child: const Text(
-                "คัดสรรรูปภาพของคุณ",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              child: const Text("คัดสรรรูปภาพของคุณ", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
             ),
           ),
         ],
@@ -1044,12 +816,7 @@ class AsyncImageLoader extends StatefulWidget {
   final MediaItem item;
   final BoxFit fit;
   final int quality;
-  const AsyncImageLoader({
-    Key? key,
-    required this.item,
-    this.fit = BoxFit.cover,
-    this.quality = 300,
-  }) : super(key: key);
+  const AsyncImageLoader({Key? key, required this.item, this.fit = BoxFit.cover, this.quality = 300}) : super(key: key);
   @override
   State<AsyncImageLoader> createState() => _AsyncImageLoaderState();
 }
@@ -1073,16 +840,13 @@ class _AsyncImageLoaderState extends State<AsyncImageLoader> {
       if (mounted) setState(() => _imageData = widget.item.capturedImage);
       return;
     }
-    final data = await widget.item.asset.thumbnailDataWithSize(
-      ThumbnailSize(widget.quality, widget.quality),
-    );
+    final data = await widget.item.asset.thumbnailDataWithSize(ThumbnailSize(widget.quality, widget.quality));
     if (mounted) setState(() => _imageData = data);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_imageData != null)
-      return Image.memory(_imageData!, fit: widget.fit, gaplessPlayback: true);
+    if (_imageData != null) return Image.memory(_imageData!, fit: widget.fit, gaplessPlayback: true);
     return Container(color: Colors.grey[200]);
   }
 }
@@ -1096,8 +860,7 @@ class _PhotoStack extends StatelessWidget {
   Widget build(BuildContext context) {
     dynamic getItem(int index) {
       if (items != null && index < items!.length) return items![index];
-      if (assetImages != null && index < assetImages!.length)
-        return assetImages![index];
+      if (assetImages != null && index < assetImages!.length) return assetImages![index];
       return null;
     }
 
@@ -1105,36 +868,14 @@ class _PhotoStack extends StatelessWidget {
       alignment: Alignment.center,
       clipBehavior: Clip.none,
       children: [
-        _buildPolaroid(
-          angle: -0.12,
-          offset: const Offset(-82, 4),
-          item: getItem(2),
-          color: Colors.grey[100],
-        ),
-        _buildPolaroid(
-          angle: 0.12,
-          offset: const Offset(81, 4),
-          item: getItem(1),
-          color: Colors.grey[200],
-        ),
-        _buildPolaroid(
-          angle: 0.0,
-          offset: const Offset(0, 0),
-          item: getItem(0),
-          isFront: true,
-          color: Colors.white,
-        ),
+        _buildPolaroid(angle: -0.12, offset: const Offset(-82, 4), item: getItem(2), color: Colors.grey[100]),
+        _buildPolaroid(angle: 0.12, offset: const Offset(81, 4), item: getItem(1), color: Colors.grey[200]),
+        _buildPolaroid(angle: 0.0, offset: const Offset(0, 0), item: getItem(0), isFront: true, color: Colors.white),
       ],
     );
   }
 
-  Widget _buildPolaroid({
-    required double angle,
-    required Offset offset,
-    bool isFront = false,
-    dynamic item,
-    Color? color,
-  }) {
+  Widget _buildPolaroid({required double angle, required Offset offset, bool isFront = false, dynamic item, Color? color}) {
     return Transform.translate(
       offset: offset,
       child: Transform.rotate(
@@ -1143,40 +884,17 @@ class _PhotoStack extends StatelessWidget {
           width: 90,
           height: 115,
           padding: const EdgeInsets.fromLTRB(2, 10, 2, 9),
-          decoration: BoxDecoration(
-            color: color ?? Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Container(
-            color: Colors.white,
-            child: _buildImageContent(item),
-          ),
+          decoration: BoxDecoration(color: color ?? Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 6, offset: const Offset(0, 3))]),
+          child: Container(color: Colors.white, child: _buildImageContent(item)),
         ),
       ),
     );
   }
 
   Widget _buildImageContent(dynamic item) {
-    if (item == null)
-      return const Center(
-        child: Icon(Icons.image, color: Colors.grey, size: 24),
-      );
-    if (item is String)
-      return Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Image.asset(item, fit: BoxFit.cover),
-      );
-    if (item is MediaItem)
-      return Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: AsyncImageLoader(item: item, fit: BoxFit.cover, quality: 300),
-      );
+    if (item == null) return const Center(child: Icon(Icons.image, color: Colors.grey, size: 24));
+    if (item is String) return Padding(padding: const EdgeInsets.all(4.0), child: Image.asset(item, fit: BoxFit.cover));
+    if (item is MediaItem) return Padding(padding: const EdgeInsets.all(4.0), child: AsyncImageLoader(item: item, fit: BoxFit.cover, quality: 300));
     return const SizedBox();
   }
 }

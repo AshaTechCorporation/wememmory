@@ -57,22 +57,22 @@ class _MemorySmoothScreenState extends State<MemorySmoothScreen> with SingleTick
                       children: [
                         Row(
                           children: [
-                            SmoothReveal(controller: _controller, startInterval: 0.0, direction: -1.0, child: _buildImageFileTile('assets/images/foot.jpg', 75, height: 75)),
+                            SmoothReveal(controller: _controller, startInterval: 0.0, direction: -1.0, child: _buildImageFileTile('assets/images/foot.jpg', 70, height: 70)),
                             const SizedBox(width: 8),
-                            SmoothReveal(controller: _controller, startInterval: 0.1, direction: 1.0, child: _buildImageFileTile('assets/images/baby.jpg', 75, height: 75)),
+                            SmoothReveal(controller: _controller, startInterval: 0.1, direction: 1.0, child: _buildImageFileTile('assets/images/baby.jpg', 70, height: 70)),
                           ],
                         ),
                         Row(
                           children: [
-                            SmoothReveal(controller: _controller, startInterval: 0.0, direction: -1.0, child: _buildImageFileTile('assets/images/checkhand.jpg', 75, height: 75)),
+                            SmoothReveal(controller: _controller, startInterval: 0.0, direction: -1.0, child: _buildImageFileTile('assets/images/checkhand.jpg', 70, height: 70)),
                             const SizedBox(width: 8),
-                            SmoothReveal(controller: _controller, startInterval: 0.1, direction: 1.0, child: _buildImageFileTile('assets/images/People.png', 75, height: 75)),
+                            SmoothReveal(controller: _controller, startInterval: 0.1, direction: 1.0, child: _buildImageFileTile('assets/images/People.png', 70, height: 70)),
                           ],
                         ),
                       ],
                     ),
                     const SizedBox(width: 8),
-                    Expanded(child: SmoothReveal(controller: _controller, startInterval: 0.1, direction: 1.0, child: _buildImageFileTile('assets/images/Hobby3.png', 0, height: 150))),
+                    Expanded(child: SmoothReveal(controller: _controller, startInterval: 0.1, direction: 1.0, child: _buildImageFileTile('assets/images/Hobby3.png', 0, height: 140))),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -90,12 +90,12 @@ class _MemorySmoothScreenState extends State<MemorySmoothScreen> with SingleTick
                       const SizedBox(height: 10),
                       Row(
                         children: [
-                          _buildImageFileWeTile('assets/images/image 8_0.png', 60, height: 60),
-                          _buildImageFileWeTile('assets/images/image 5_0.png', 60, height: 60),
-                          _buildImageFileWeTile('assets/images/image 6_0.png', 60, height: 60),
-                          _buildImageFileWeTile('assets/images/image 7_0.png', 60, height: 60),
-                          _buildImageFileWeTile('assets/images/image 4_0.png', 60, height: 60),
-                          _buildImageFileWeTile('assets/images/image 3_0.png', 60, height: 60),
+                          _buildImageFileWeTile('assets/images/image 8_0.png', 50, height: 50),
+                          _buildImageFileWeTile('assets/images/image 5_0.png', 50, height: 50),
+                          _buildImageFileWeTile('assets/images/image 6_0.png', 50, height: 50),
+                          _buildImageFileWeTile('assets/images/image 7_0.png', 50, height: 50),
+                          _buildImageFileWeTile('assets/images/image 4_0.png', 50, height: 50),
+                          _buildImageFileWeTile('assets/images/image 3_0.png', 50, height: 50),
                           // SmoothReveal(controller: _controller, startInterval: 0.0, direction: -1.0, child: _buildImageFileTile('assets/images/image 8_0.png', 60, height: 60)),
                           // SmoothReveal(controller: _controller, startInterval: 0.1, direction: 1.0, child: _buildImageFileTile('assets/images/image 5_0.png', 60, height: 60)),
                           // SmoothReveal(controller: _controller, startInterval: 0.0, direction: -1.0, child: _buildImageFileTile('assets/images/image 6_0.png', 60, height: 60)),
@@ -114,21 +114,21 @@ class _MemorySmoothScreenState extends State<MemorySmoothScreen> with SingleTick
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    Expanded(child: SmoothReveal(controller: _controller, startInterval: 0.3, direction: 1.0, child: _buildImageFileTile('assets/images/family.jpg', 60, height: 180))),
+                    Expanded(child: SmoothReveal(controller: _controller, startInterval: 0.3, direction: 1.0, child: _buildImageFileTile('assets/images/family.jpg', 0, height: 180))),
                     const SizedBox(width: 8),
-                    Expanded(child: SmoothReveal(controller: _controller, startInterval: 0.4, direction: -1.0, child: _buildImageFileTile('assets/images/Hobby2.png', 60, height: 180))),
+                    Expanded(child: SmoothReveal(controller: _controller, startInterval: 0.4, direction: -1.0, child: _buildImageFileTile('assets/images/Hobby2.png', 0, height: 180))),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Expanded(child: SmoothReveal(controller: _controller, startInterval: 0.3, direction: 1.0, child: _buildImageFileTile('assets/images/familyb.jpg', 60, height: 180))),
+                    Expanded(child: SmoothReveal(controller: _controller, startInterval: 0.3, direction: 1.0, child: _buildImageFileTile('assets/images/familyb.jpg', 0, height: 180))),
                     const SizedBox(width: 8),
-                    Expanded(child: SmoothReveal(controller: _controller, startInterval: 0.4, direction: -1.0, child: _buildImageFileTile('assets/images/Hobby1.png', 60, height: 180))),
+                    Expanded(child: SmoothReveal(controller: _controller, startInterval: 0.4, direction: -1.0, child: _buildImageFileTile('assets/images/Hobby1.png', 0, height: 180))),
                   ],
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
 
                 // --- ส่วน Logo และ ปุ่ม (แก้ไขใหม่: ให้ค่อยๆ ลอยขึ้นมาชัดๆ) ---
                 SmoothReveal(
@@ -166,13 +166,13 @@ class _MemorySmoothScreenState extends State<MemorySmoothScreen> with SingleTick
     );
   }
 
-  Widget _buildImageTile(String url, double width, {required double height}) {
-    return Container(
-      height: height,
-      width: width,
-      decoration: BoxDecoration(color: Colors.grey[800], image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover), border: Border.all(color: Colors.white, width: 2)),
-    );
-  }
+  // Widget _buildImageTile(String url, double width, {required double height}) {
+  //   return Container(
+  //     height: height,
+  //     width: width,
+  //     decoration: BoxDecoration(color: Colors.grey[800], image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover), border: Border.all(color: Colors.white, width: 2)),
+  //   );
+  // }
 
   Widget _buildImageFileTile(String url, double width, {required double height}) {
     return Container(

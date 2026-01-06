@@ -17,12 +17,7 @@ class FirstPage extends StatefulWidget {
   final List<MediaItem>? newAlbumItems;
   final String? newAlbumMonth;
 
-  const FirstPage({
-    super.key,
-    this.initialIndex = 0,
-    this.newAlbumItems,
-    this.newAlbumMonth,
-  });
+  const FirstPage({super.key, this.initialIndex = 0, this.newAlbumItems, this.newAlbumMonth});
 
   @override
   State<FirstPage> createState() => _FirstPageState();
@@ -32,8 +27,7 @@ class _FirstPageState extends State<FirstPage> {
   late int _currentIndex;
   late List<Widget> _pages;
 
-  final GlobalKey<CollectionPageState> _collectionPageKey =
-      GlobalKey<CollectionPageState>();
+  final GlobalKey<CollectionPageState> _collectionPageKey = GlobalKey<CollectionPageState>();
 
   // ✅ 1. เพิ่มตัวแปรเก็บ Draft (เหมือนใน Recommended)
   final Map<String, List<MediaItem>> _draftSelections = {};
@@ -44,16 +38,7 @@ class _FirstPageState extends State<FirstPage> {
     requestPermission();
     _currentIndex = widget.initialIndex;
 
-    _pages = [
-      HomePage(
-        newAlbumItems: widget.newAlbumItems,
-        newAlbumMonth: widget.newAlbumMonth,
-      ),
-      CollectionPage(key: _collectionPageKey),
-      const SizedBox(),
-      const ShopPage(),
-      const ProfilePage(),
-    ];
+    _pages = [HomePage(newAlbumItems: widget.newAlbumItems, newAlbumMonth: widget.newAlbumMonth), CollectionPage(key: _collectionPageKey), const SizedBox(), const ShopPage(), const ProfilePage()];
   }
 
   Future<bool> requestPermission() async {
@@ -80,10 +65,7 @@ class _FirstPageState extends State<FirstPage> {
           for (var id in ids) {
             final AssetEntity? asset = await AssetEntity.fromId(id);
             if (asset != null) {
-              MediaType itemType =
-                  asset.type == AssetType.video
-                      ? MediaType.video
-                      : MediaType.image;
+              MediaType itemType = asset.type == AssetType.video ? MediaType.video : MediaType.image;
               restoredItems.add(MediaItem(asset: asset, type: itemType));
             }
           }
@@ -104,11 +86,7 @@ class _FirstPageState extends State<FirstPage> {
       Map<String, List<String>> dataToSave = {};
 
       _draftSelections.forEach((key, items) {
-        List<String> assetIds =
-            items
-                .where((item) => item.asset != null)
-                .map((item) => item.asset.id)
-                .toList();
+        List<String> assetIds = items.where((item) => item.asset != null).map((item) => item.asset.id).toList();
         if (assetIds.isNotEmpty) {
           dataToSave[key] = assetIds;
         }
@@ -203,11 +181,7 @@ class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
 
-  const CustomBottomNavBar({
-    super.key,
-    required this.currentIndex,
-    required this.onTap,
-  });
+  const CustomBottomNavBar({super.key, required this.currentIndex, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -218,19 +192,7 @@ class CustomBottomNavBar extends StatelessWidget {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
-        Container(
-          height: 80,
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, -5),
-              ),
-            ],
-          ),
-        ),
+        Container(height: 80, decoration: BoxDecoration(color: Colors.transparent, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))])),
         ClipRRect(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
@@ -279,15 +241,8 @@ class CustomBottomNavBar extends StatelessWidget {
                               width: 44,
                               height: 44,
                               alignment: Alignment.center,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                              ),
-                              child: Image.asset(
-                                'assets/icons/btupload.png',
-                                width: 44,
-                                height: 44,
-                                fit: BoxFit.contain,
-                              ),
+                              decoration: const BoxDecoration(shape: BoxShape.circle),
+                              child: Image.asset('assets/icons/btupload.png', width: 44, height: 44, fit: BoxFit.contain),
                             ),
                           ),
                         ),
@@ -346,30 +301,9 @@ class CustomBottomNavBar extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            height: 28,
-            child: Center(
-              child: Image.asset(
-                iconPath,
-                width: width,
-                height: height,
-                color: isActive ? activeColor : inactiveColor,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
+          SizedBox(height: 28, child: Center(child: Image.asset(iconPath, width: width, height: height, color: isActive ? activeColor : inactiveColor, fit: BoxFit.contain))),
           const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-          ),
+          Text(label, style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.w500), maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
         ],
       ),
     );
