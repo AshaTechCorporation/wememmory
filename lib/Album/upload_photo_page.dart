@@ -10,11 +10,7 @@ class UploadPhotoPage extends StatefulWidget {
   final String selectedMonth;
   final List<MediaItem>? initialSelectedItems;
 
-  const UploadPhotoPage({
-    super.key,
-    required this.selectedMonth,
-    this.initialSelectedItems,
-  });
+  const UploadPhotoPage({super.key, required this.selectedMonth, this.initialSelectedItems});
 
   @override
   State<UploadPhotoPage> createState() => _UploadPhotoPageState();
@@ -59,9 +55,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     final List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
       type: RequestType.common,
       hasAll: true,
-      filterOption: FilterOptionGroup(
-        orders: [const OrderOption(type: OrderOptionType.createDate, asc: false)],
-      ),
+      filterOption: FilterOptionGroup(orders: [const OrderOption(type: OrderOptionType.createDate, asc: false)]),
     );
 
     if (albums.isEmpty) {
@@ -86,23 +80,21 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
     setState(() => isLoading = true);
 
     const int pageSize = 1000;
-    List<AssetEntity> assets =
-        await currentAlbum!.getAssetListPaged(page: 0, size: pageSize);
+    List<AssetEntity> assets = await currentAlbum!.getAssetListPaged(page: 0, size: pageSize);
 
     if (showThisMonthOnly) {
       final now = DateTime.now();
-      assets = assets.where((a) {
-        final dt = a.createDateTime;
-        return dt.year == now.year && dt.month == now.month;
-      }).toList();
+      assets =
+          assets.where((a) {
+            final dt = a.createDateTime;
+            return dt.year == now.year && dt.month == now.month;
+          }).toList();
     }
 
-    final List<MediaItem> temp = assets.map((a) {
-      return MediaItem(
-        asset: a,
-        type: a.type == AssetType.video ? MediaType.video : MediaType.image,
-      );
-    }).toList();
+    final List<MediaItem> temp =
+        assets.map((a) {
+          return MediaItem(asset: a, type: a.type == AssetType.video ? MediaType.video : MediaType.image);
+        }).toList();
 
     setState(() {
       mediaList.clear();
@@ -128,13 +120,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         if (selectedItems.length < 11) {
           selectedItems.add(item);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('เลือกได้สูงสุด 11 ไฟล์เท่านั้น'),
-              duration: Duration(seconds: 2),
-              backgroundColor: Colors.redAccent,
-            ),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('เลือกได้สูงสุด 11 ไฟล์เท่านั้น'), duration: Duration(seconds: 2), backgroundColor: Colors.redAccent));
         }
       }
     });
@@ -148,23 +134,10 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (context) => AlbumLayoutPage(
-          selectedItems: selectedItems,
-          monthName: widget.selectedMonth,
-        ),
+        builder: (context) => AlbumLayoutPage(selectedItems: selectedItems, monthName: widget.selectedMonth),
       );
     } else {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FirstPage(
-            initialIndex: 0,
-            newAlbumItems: selectedItems,
-            newAlbumMonth: widget.selectedMonth,
-          ),
-        ),
-        (route) => false,
-      );
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => FirstPage(initialIndex: 0, newAlbumItems: selectedItems, newAlbumMonth: widget.selectedMonth)), (route) => false);
     }
   }
 
@@ -181,49 +154,26 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
           maxChildSize: 0.95,
           builder: (_, controller) {
             return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
+              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
               child: Column(
                 children: [
                   // --- Drag Handle ---
                   const SizedBox(height: 12),
-                  Container(
-                    width: 40,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2.5),
-                    ),
-                  ),
-                  
+                  Container(width: 40, height: 5, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2.5))),
+
                   // --- Header ---
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: const Text(
-                            "ยกเลิก",
-                            style: TextStyle(color: Colors.black87, fontSize: 16),
-                          ),
-                        ),
-                        const Text(
-                          "เลือกอัลบั้ม",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
+                        GestureDetector(onTap: () => Navigator.pop(context), child: const Text("ยกเลิก", style: TextStyle(color: Colors.black87, fontSize: 16))),
+                        const Text("เลือกอัลบั้ม", style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w300)),
                         const SizedBox(width: 40),
                       ],
                     ),
                   ),
-                  
+
                   const Divider(color: Colors.grey, height: 1, thickness: 0.2),
 
                   // --- Album Grid ---
@@ -231,12 +181,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                     child: GridView.builder(
                       controller: controller,
                       padding: const EdgeInsets.all(16),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 0.85,
-                      ),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 16, mainAxisSpacing: 16, childAspectRatio: 0.85),
                       itemCount: albumList.length,
                       itemBuilder: (context, index) {
                         final album = albumList[index];
@@ -250,7 +195,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                           },
                           child: Column(
                             // ✅ เพิ่ม stretch เพื่อให้รูปขยายเต็มความกว้าง
-                            crossAxisAlignment: CrossAxisAlignment.stretch, 
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               // รูปหน้าปกอัลบั้ม
                               Expanded(
@@ -265,28 +210,13 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                               ),
                               const SizedBox(height: 8),
                               // ชื่ออัลบั้ม
-                              Text(
-                                album.name,
-                                style: const TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w300,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                              Text(album.name, style: const TextStyle(color: Colors.black87, fontSize: 14, fontWeight: FontWeight.w300), maxLines: 1, overflow: TextOverflow.ellipsis),
                               // จำนวนรูป
                               FutureBuilder<int>(
                                 future: album.assetCountAsync,
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData) {
-                                    return Text(
-                                      "${snapshot.data}",
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 12,
-                                      ),
-                                    );
+                                    return Text("${snapshot.data}", style: TextStyle(color: Colors.grey[600], fontSize: 12));
                                   }
                                   return const SizedBox();
                                 },
@@ -314,25 +244,12 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         width: 50,
         height: 30,
         padding: const EdgeInsets.all(3.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: showThisMonthOnly
-              ? const Color(0xFFED7D31)
-              : const Color(0xFFE0E0E0),
-        ),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: showThisMonthOnly ? const Color(0xFFED7D31) : const Color(0xFFE0E0E0)),
         child: AnimatedAlign(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeIn,
-          alignment:
-              showThisMonthOnly ? Alignment.centerRight : Alignment.centerLeft,
-          child: Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: showThisMonthOnly ? Colors.white : const Color(0xFFC7C7C7),
-            ),
-          ),
+          alignment: showThisMonthOnly ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(width: 24, height: 24, decoration: BoxDecoration(shape: BoxShape.circle, color: showThisMonthOnly ? Colors.white : const Color(0xFFC7C7C7))),
         ),
       ),
     );
@@ -342,21 +259,11 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       child: Column(
         children: [
           const SizedBox(height: 12),
-          Container(
-            width: 61,
-            height: 5,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2.5),
-            ),
-          ),
+          Container(width: 61, height: 5, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2.5))),
 
           // Header
           Padding(
@@ -367,23 +274,19 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                 Expanded(
                   child: Text(
                     '${widget.selectedMonth.split(' ')[0]} : เลือก ${selectedItems.length} ของคุณ',
-                    style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 GestureDetector(
                   onTap: () {
-                    Navigator.pop(context);
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => FirstPage(initialIndex: 0, newAlbumItems: selectedItems, newAlbumMonth: widget.selectedMonth)),
+                      (route) => false,
+                    );
                   },
-                  child: Image.asset(
-                    'assets/icons/cross.png',
-                    width: 25,
-                    height: 25,
-                    fit: BoxFit.contain,
-                  ),
+                  child: Image.asset('assets/icons/cross.png', width: 25, height: 25, fit: BoxFit.contain),
                 ),
               ],
             ),
@@ -408,23 +311,12 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('เลือกแสดงเฉพาะเดือนนี้',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                _buildCustomSwitch(),
-              ],
+              children: [const Text('เลือกแสดงเฉพาะเดือนนี้', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)), _buildCustomSwitch()],
             ),
           ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 3),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'เลือก 11 ภาพที่สะท้อนเรื่องราวและความทรงจำของเดือนนี้',
-                style: TextStyle(fontSize: 13, color: Colors.grey),
-              ),
-            ),
+            child: Align(alignment: Alignment.centerLeft, child: Text('เลือก 11 ภาพที่สะท้อนเรื่องราวและความทรงจำของเดือนนี้', style: TextStyle(fontSize: 13, color: Colors.grey))),
           ),
 
           Padding(
@@ -436,22 +328,11 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                 child: Container(
                   height: 40,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
+                  decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade300)),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        currentAlbum?.name ?? (isLoading ? "กำลังโหลด..." : "เลือกอัลบั้ม"),
-                        style: const TextStyle(
-                          color: Colors.black87, 
-                          fontSize: 14, 
-                          fontWeight: FontWeight.w600
-                        ),
-                      ),
+                      Text(currentAlbum?.name ?? (isLoading ? "กำลังโหลด..." : "เลือกอัลบั้ม"), style: const TextStyle(color: Colors.black87, fontSize: 14, fontWeight: FontWeight.w600)),
                       const SizedBox(width: 8),
                       const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
                     ],
@@ -462,123 +343,87 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
           ),
 
           Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : mediaList.isEmpty
+            child:
+                isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : mediaList.isEmpty
                     ? const Center(child: Text("ไม่พบรูปภาพ"))
                     : GridView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                          childAspectRatio: 1.0,
-                        ),
-                        itemCount: mediaList.length,
-                        itemBuilder: (context, index) {
-                          final item = mediaList[index];
-                          final selectionIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
-                          final isSelected = selectionIndex != -1;
-                          final future = _thumbnailFutures[item.asset.id] ??=
-                              item.asset.thumbnailDataWithSize(
-                                  const ThumbnailSize(200, 200));
-                                  
-                          return GestureDetector(
-                            onTap: () => _toggleSelection(item),
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: FutureBuilder<Uint8List?>(
-                                    future: future,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData && snapshot.data != null) {
-                                        return Image.memory(snapshot.data!, fit: BoxFit.cover);
-                                      }
-                                      return Container(color: Colors.grey.shade200);
-                                    },
-                                  ),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 1.0),
+                      itemCount: mediaList.length,
+                      itemBuilder: (context, index) {
+                        final item = mediaList[index];
+                        final selectionIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
+                        final isSelected = selectionIndex != -1;
+                        final future = _thumbnailFutures[item.asset.id] ??= item.asset.thumbnailDataWithSize(const ThumbnailSize(200, 200));
+
+                        return GestureDetector(
+                          onTap: () => _toggleSelection(item),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: FutureBuilder<Uint8List?>(
+                                  future: future,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData && snapshot.data != null) {
+                                      return Image.memory(snapshot.data!, fit: BoxFit.cover);
+                                    }
+                                    return Container(color: Colors.grey.shade200);
+                                  },
                                 ),
-                                if (item.type == MediaType.video)
-                                  Positioned(
-                                    bottom: 6,
-                                    left: 6,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.7),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        _formatDuration(item.asset.duration),
-                                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500),
-                                      ),
-                                    ),
-                                  ),
-                                if (isSelected)
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withOpacity(0.3),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: const Color(0xFF5AB6D8), width: 3),
-                                    ),
-                                  ),
+                              ),
+                              if (item.type == MediaType.video)
                                 Positioned(
-                                  top: 8,
-                                  right: 8,
+                                  bottom: 6,
+                                  left: 6,
                                   child: Container(
-                                    width: 24,
-                                    height: 24,
-                                    decoration: BoxDecoration(
-                                      color: isSelected ? const Color(0xFF5AB6D8) : Colors.transparent,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white, width: 2),
-                                    ),
-                                    child: isSelected
-                                        ? Center(
-                                            child: Text(
-                                              '${selectionIndex + 1}',
-                                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                                            ),
-                                          )
-                                        : null,
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(color: Colors.black.withOpacity(0.7), borderRadius: BorderRadius.circular(4)),
+                                    child: Text(_formatDuration(item.asset.duration), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500)),
                                   ),
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                              if (isSelected)
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.3),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: const Color(0xFF5AB6D8), width: 3),
+                                  ),
+                                ),
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? const Color(0xFF5AB6D8) : Colors.transparent,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white, width: 2),
+                                  ),
+                                  child: isSelected ? Center(child: Text('${selectionIndex + 1}', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))) : null,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
           ),
 
           Container(
             padding: const EdgeInsets.fromLTRB(16, 40, 16, 40),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.black12)),
-            ),
+            decoration: const BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: Colors.black12))),
             child: SizedBox(
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
                 onPressed: selectedItems.isNotEmpty ? _onNextPressed : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: selectedItems.isNotEmpty
-                      ? const Color(0xFF5AB6D8)
-                      : Colors.grey[400],
-                  shape: const RoundedRectangleBorder(),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'ถัดไป: เพิ่มโน้ตรูปภาพ (${selectedItems.length}/11)',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                style: ElevatedButton.styleFrom(backgroundColor: selectedItems.isNotEmpty ? const Color(0xFF5AB6D8) : Colors.grey[400], shape: const RoundedRectangleBorder(), elevation: 0),
+                child: Text('ถัดไป: เพิ่มโน้ตรูปภาพ (${selectedItems.length}/11)', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
           ),
@@ -605,20 +450,10 @@ class _AlbumCover extends StatelessWidget {
             future: asset.thumbnailDataWithSize(const ThumbnailSize(200, 200)),
             builder: (context, thumbSnapshot) {
               if (thumbSnapshot.hasData && thumbSnapshot.data != null) {
-                return Image.memory(
-                  thumbSnapshot.data!,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                );
+                return Image.memory(thumbSnapshot.data!, fit: BoxFit.cover, width: double.infinity, height: double.infinity);
               }
               // รูปกำลังโหลด
-              return Container(
-                width: double.infinity,
-                height: double.infinity,
-                color: Colors.grey[200],
-                child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-              );
+              return Container(width: double.infinity, height: double.infinity, color: Colors.grey[200], child: const Center(child: CircularProgressIndicator(strokeWidth: 2)));
             },
           );
         }
@@ -640,13 +475,7 @@ class _StepItem extends StatelessWidget {
   final bool isFirst;
   final bool isLast;
 
-  const _StepItem({
-    super.key,
-    required this.label,
-    required this.isActive,
-    this.isFirst = false,
-    this.isLast = false,
-  });
+  const _StepItem({super.key, required this.label, required this.isActive, this.isFirst = false, this.isLast = false});
 
   @override
   Widget build(BuildContext context) {
@@ -655,43 +484,18 @@ class _StepItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(
-                flex: 2,
-                child: Container(
-                  height: 2,
-                  color: isFirst
-                      ? Colors.transparent
-                      : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]),
-                ),
-              ),
+              Expanded(flex: 2, child: Container(height: 2, color: isFirst ? Colors.transparent : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]))),
               const SizedBox(width: 40),
-              Container(
-                width: 11,
-                height: 11,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300],
-                ),
-              ),
+              Container(width: 11, height: 11, decoration: BoxDecoration(shape: BoxShape.circle, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300])),
               const SizedBox(width: 40),
-              Expanded(
-                flex: 2,
-                child: Container(
-                  height: 2,
-                  color: isLast ? Colors.transparent : Colors.grey[300],
-                ),
-              ),
+              Expanded(flex: 2, child: Container(height: 2, color: isLast ? Colors.transparent : Colors.grey[300])),
             ],
           ),
           const SizedBox(height: 5),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400],
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-            ),
+            style: TextStyle(fontSize: 12, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400], fontWeight: isActive ? FontWeight.w600 : FontWeight.normal),
           ),
         ],
       ),
