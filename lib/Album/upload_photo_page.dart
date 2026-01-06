@@ -8,7 +8,7 @@ import 'package:wememmory/models/media_item.dart';
 // หน้าการอัปโหลดรูปภาพจากอุปกรณ์
 class UploadPhotoPage extends StatefulWidget {
   final String selectedMonth;
-  
+
   // ✅ 1. ยังคงรับค่ารูปภาพที่เคยเลือกไว้
   final List<MediaItem>? initialSelectedItems;
 
@@ -25,7 +25,7 @@ class UploadPhotoPage extends StatefulWidget {
 class _UploadPhotoPageState extends State<UploadPhotoPage> {
   final List<MediaItem> mediaList = [];
   final List<MediaItem> selectedItems = [];
-  
+
   final Map<String, Future<Uint8List?>> _thumbnailFutures = {};
 
   bool showThisMonthOnly = false;
@@ -65,7 +65,9 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
       type: RequestType.common,
       onlyAll: true,
       filterOption: FilterOptionGroup(
-        orders: [const OrderOption(type: OrderOptionType.createDate, asc: false)],
+        orders: [
+          const OrderOption(type: OrderOptionType.createDate, asc: false),
+        ],
       ),
     );
 
@@ -79,23 +81,27 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
     final AssetPathEntity primaryAlbum = albums.first;
     const int pageSize = 1000;
-    List<AssetEntity> assets =
-        await primaryAlbum.getAssetListPaged(page: 0, size: pageSize);
+    List<AssetEntity> assets = await primaryAlbum.getAssetListPaged(
+      page: 0,
+      size: pageSize,
+    );
 
     if (showThisMonthOnly) {
       final now = DateTime.now();
-      assets = assets.where((a) {
-        final dt = a.createDateTime;
-        return dt.year == now.year && dt.month == now.month;
-      }).toList();
+      assets =
+          assets.where((a) {
+            final dt = a.createDateTime;
+            return dt.year == now.year && dt.month == now.month;
+          }).toList();
     }
 
-    final List<MediaItem> temp = assets.map((a) {
-      return MediaItem(
-        asset: a,
-        type: a.type == AssetType.video ? MediaType.video : MediaType.image,
-      );
-    }).toList();
+    final List<MediaItem> temp =
+        assets.map((a) {
+          return MediaItem(
+            asset: a,
+            type: a.type == AssetType.video ? MediaType.video : MediaType.image,
+          );
+        }).toList();
 
     setState(() {
       mediaList.clear();
@@ -114,7 +120,9 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
   void _toggleSelection(MediaItem item) {
     setState(() {
-      final existingIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
+      final existingIndex = selectedItems.indexWhere(
+        (s) => s.asset.id == item.asset.id,
+      );
 
       if (existingIndex != -1) {
         // ถ้ามีอยู่แล้ว ให้ลบออก
@@ -148,10 +156,11 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (context) => AlbumLayoutPage(
-          selectedItems: selectedItems,
-          monthName: widget.selectedMonth,
-        ),
+        builder:
+            (context) => AlbumLayoutPage(
+              selectedItems: selectedItems,
+              monthName: widget.selectedMonth,
+            ),
       );
     } else {
       // กรณีนี้คือเลือกไม่ครบ แล้วกด Next -> ถือว่า Save หรือไปต่อ
@@ -160,11 +169,12 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => FirstPage(
-            initialIndex: 0,
-            newAlbumItems: selectedItems,
-            newAlbumMonth: widget.selectedMonth,
-          ),
+          builder:
+              (context) => FirstPage(
+                initialIndex: 0,
+                newAlbumItems: selectedItems,
+                newAlbumMonth: widget.selectedMonth,
+              ),
         ),
         (route) => false,
       );
@@ -181,9 +191,10 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         padding: const EdgeInsets.all(3.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          color: showThisMonthOnly
-              ? const Color(0xFFED7D31)
-              : const Color(0xFFE0E0E0),
+          color:
+              showThisMonthOnly
+                  ? const Color(0xFFED7D31)
+                  : const Color(0xFFE0E0E0),
         ),
         child: AnimatedAlign(
           duration: const Duration(milliseconds: 200),
@@ -236,17 +247,20 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                   child: Text(
                     '${widget.selectedMonth.split(' ')[0]} : เลือก ${selectedItems.length} ของคุณ',
                     style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                
+
                 // ✅ 3. แก้ไขปุ่มกากบาท: ให้ปิดหน้าเฉยๆ (ไม่ส่งค่ากลับ)
                 GestureDetector(
                   onTap: () {
-                    Navigator.pop(context); // ไม่ใส่ selectedItems -> return null -> ไม่ save
+                    Navigator.pop(
+                      context,
+                    ); // ไม่ใส่ selectedItems -> return null -> ไม่ save
                   },
                   child: Image.asset(
                     'assets/icons/cross.png',
@@ -268,7 +282,11 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
               children: [
                 _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true),
                 _StepItem(label: 'แก้ไขและจัดเรียง', isActive: false),
-                _StepItem(label: 'พรีวิวสุดท้าย', isActive: false, isLast: true),
+                _StepItem(
+                  label: 'พรีวิวสุดท้าย',
+                  isActive: false,
+                  isLast: true,
+                ),
               ],
             ),
           ),
@@ -281,9 +299,10 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('เลือกแสดงเฉพาะเดือนนี้',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                const Text(
+                  'เลือกแสดงเฉพาะเดือนนี้',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
                 _buildCustomSwitch(),
               ],
             ),
@@ -303,100 +322,113 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
           // Media Grid
           Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : mediaList.isEmpty
+            child:
+                isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : mediaList.isEmpty
                     ? const Center(child: Text("ไม่พบรูปภาพ"))
                     : GridView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                          childAspectRatio: 1.0,
-                        ),
-                        itemCount: mediaList.length,
-                        itemBuilder: (context, index) {
-                          final item = mediaList[index];
-                          
-                          // เช็คว่ารูปนี้ถูกเลือกไว้หรือยัง
-                          final selectionIndex = selectedItems.indexWhere((s) => s.asset.id == item.asset.id);
-                          final isSelected = selectionIndex != -1;
-                          
-                          final future = _thumbnailFutures[item.asset.id] ??=
-                              item.asset.thumbnailDataWithSize(
-                                  const ThumbnailSize(200, 200));
-                                  
-                          return GestureDetector(
-                            onTap: () => _toggleSelection(item),
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: FutureBuilder<Uint8List?>(
-                                    future: future,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData &&
-                                          snapshot.data != null) {
-                                        return Image.memory(
-                                          snapshot.data!,
-                                          fit: BoxFit.cover,
-                                        );
-                                      }
-                                      return Container(
-                                          color: Colors.grey.shade200);
-                                    },
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                            childAspectRatio: 1.0,
+                          ),
+                      itemCount: mediaList.length,
+                      itemBuilder: (context, index) {
+                        final item = mediaList[index];
+
+                        // เช็คว่ารูปนี้ถูกเลือกไว้หรือยัง
+                        final selectionIndex = selectedItems.indexWhere(
+                          (s) => s.asset.id == item.asset.id,
+                        );
+                        final isSelected = selectionIndex != -1;
+
+                        final future =
+                            _thumbnailFutures[item.asset.id] ??= item.asset
+                                .thumbnailDataWithSize(
+                                  const ThumbnailSize(200, 200),
+                                );
+
+                        return GestureDetector(
+                          onTap: () => _toggleSelection(item),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: FutureBuilder<Uint8List?>(
+                                  future: future,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData &&
+                                        snapshot.data != null) {
+                                      return Image.memory(
+                                        snapshot.data!,
+                                        fit: BoxFit.cover,
+                                      );
+                                    }
+                                    return Container(
+                                      color: Colors.grey.shade200,
+                                    );
+                                  },
+                                ),
+                              ),
+                              if (item.type == MediaType.video)
+                                Positioned(
+                                  bottom: 6,
+                                  left: 6,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.7),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      _formatDuration(item.asset.duration),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                if (item.type == MediaType.video)
-                                  Positioned(
-                                    bottom: 6,
-                                    left: 6,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.7),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        _formatDuration(item.asset.duration),
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
+                              if (isSelected)
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.3),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: const Color(0xFF5AB6D8),
+                                      width: 3,
                                     ),
                                   ),
-                                if (isSelected)
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withOpacity(0.3),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                          color: const Color(0xFF5AB6D8),
-                                          width: 3),
+                                ),
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        isSelected
+                                            ? const Color(0xFF5AB6D8)
+                                            : Colors.transparent,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 2,
                                     ),
                                   ),
-                                Positioned(
-                                  top: 8,
-                                  right: 8,
-                                  child: Container(
-                                    width: 24,
-                                    height: 24,
-                                    decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? const Color(0xFF5AB6D8)
-                                          : Colors.transparent,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                          color: Colors.white, width: 2),
-                                    ),
-                                    child: isSelected
-                                        ? Center(
+                                  child:
+                                      isSelected
+                                          ? Center(
                                             child: Text(
                                               '${selectionIndex + 1}',
                                               style: const TextStyle(
@@ -406,14 +438,14 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
                                               ),
                                             ),
                                           )
-                                        : null,
-                                  ),
+                                          : null,
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
           ),
 
           // Bottom Bar
@@ -429,9 +461,10 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
               child: ElevatedButton(
                 onPressed: selectedItems.isNotEmpty ? _onNextPressed : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: selectedItems.isNotEmpty
-                      ? const Color(0xFF5AB6D8)
-                      : Colors.grey[400],
+                  backgroundColor:
+                      selectedItems.isNotEmpty
+                          ? const Color(0xFF5AB6D8)
+                          : Colors.grey[400],
                   shape: const RoundedRectangleBorder(),
                   elevation: 0,
                 ),
@@ -478,9 +511,12 @@ class _StepItem extends StatelessWidget {
                 flex: 2,
                 child: Container(
                   height: 2,
-                  color: isFirst
-                      ? Colors.transparent
-                      : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]),
+                  color:
+                      isFirst
+                          ? Colors.transparent
+                          : (isActive
+                              ? const Color(0xFF5AB6D8)
+                              : Colors.grey[300]),
                 ),
               ),
               const SizedBox(width: 40),
