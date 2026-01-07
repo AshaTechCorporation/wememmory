@@ -271,10 +271,112 @@ class _RecommendedState extends State<Recommended> {
     return "";
   }
 
+  // void _generateCards() {
+  //   final now = DateTime.now();
+  //   List<MemoryCardData> tempItems = [];
+
+  //   for (int i = DateTime.now().month; i >= 1; i--) {
+  //     final monthName = _getThaiMonthName(i);
+  //     final yearBE = now.year + 543;
+  //     final String key = "$monthName $yearBE";
+
+  //     final AlbumModel? album = _cachedAlbumMap[key];
+
+  //     List<MediaItem>? cardImageItems;
+  //     int photoCount = album?.photos?.length ?? 0;
+
+  //     // 1. เช็คจาก Draft ก่อน
+  //     if (_draftSelections.containsKey(key)) {
+  //       cardImageItems = _draftSelections[key];
+  //       photoCount = cardImageItems!.length;
+  //     }
+  //     // 2. เช็คจาก Widget
+  //     else if (widget.albumMonth != null && widget.albumItems != null) {
+  //       if (widget.albumMonth!.trim() == key.trim()) {
+  //         photoCount = widget.albumItems!.length;
+  //         cardImageItems = widget.albumItems;
+  //       }
+  //     }
+
+  //     bool isCurrentMonth = (i == now.month);
+  //     bool isMonthSaved = albums.any((a) => a.month == (i + 1));
+
+  //     if (photoCount > 0 && photoCount <= 11 && !isCurrentMonth) {
+  //       tempItems.add(
+  //         // รูปแบบcard ภาพที่บันทึกยังไม่ครบ 11 ภาพ
+  //         MemoryCardData(
+  //           type: CardType.ticket,
+  //           topTitle: '$monthName\n$yearBE',
+  //           mainTitle: _timeRemainingString,
+  //           subTitle: photoCount == 11 ? 'บันทึกครบ 11 ภาพแล้ว' : 'ขาดอีก ${11 - photoCount} ภาพ',
+  //           footerText: 'Ticket 10',
+  //           currentProgress: photoCount,
+  //           maxProgress: 11,
+  //           gradientColors: [],
+  //           accentColor: const Color(0xFFFF7043),
+  //           backgroundColor: const Color(0xFF111111),
+  //           monthIndex: i,
+  //           imageItems: cardImageItems,
+  //         ),
+  //       );
+  //     } else if (photoCount >= 11 && isCurrentMonth) {
+  //       String? coverImageUrl;
+  //       if (album != null && album.photos != null && album.photos!.isNotEmpty) {
+  //         coverImageUrl = album.photos![0].image;
+  //       }
+
+  //       tempItems.add(
+  //         // รูปแบบบฟันทึกครบ 11 ภาพ
+  //         MemoryCardData(
+  //           type: CardType.backgroundImage,
+  //           topTitle: monthName,
+  //           mainTitle: 'ความทรงจำ\nที่สมบูรณ์',
+  //           subTitle: 'บันทึกครบ $photoCount ภาพ',
+  //           footerText: 'ปี $yearBE',
+  //           gradientColors: [],
+  //           accentColor: Colors.transparent,
+  //           backgroundUrl: coverImageUrl,
+  //           backgroundImage: coverImageUrl == null ? 'assets/images/Hobby1.png' : null,
+  //           showTextOverlay: true,
+  //           monthIndex: i,
+  //           imageItems: cardImageItems,
+  //         ),
+  //       );
+  //     } else {
+  //       tempItems.add(
+  //         // รูปแบบcardยังไม่ได้บันทึกภาพ
+  //         MemoryCardData(
+  //           type: CardType.standard,
+  //           topTitle: '$monthName\n$yearBE',
+  //           mainTitle: '',
+  //           subTitle: isCurrentMonth ? 'เริ่มบันทึกความทรงจำเดือนนี้' : 'ยังไม่มีบันทึกความทรงจำ',
+  //           footerText: 'Start Now',
+  //           gradientColors: [const Color(0xFF424242), const Color(0xFF212121)],
+  //           accentColor: const Color(0xFFFF7043),
+  //           assetImages: ['assets/images/Hobby2.png', 'assets/images/Hobby3.png', 'assets/images/Hobby1.png'],
+  //           monthIndex: i,
+  //           imageItems: cardImageItems,
+  //         ),
+  //       );
+  //     }
+  //   }
+
+  //   setState(() {
+  //     _items = tempItems;
+  //     if (_items.isNotEmpty && _currentIndex >= _items.length) {
+  //       _currentIndex = 0;
+  //     }
+  //   });
+
+  //   _timer?.cancel();
+  //   _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _onTimerTick());
+  // }
+
   void _generateCards() {
     final now = DateTime.now();
     List<MemoryCardData> tempItems = [];
 
+    // Loop ถอยหลังจากเดือนปัจจุบัน ลงไปหาเดือน 1
     for (int i = DateTime.now().month; i >= 1; i--) {
       final monthName = _getThaiMonthName(i);
       final yearBE = now.year + 543;
@@ -299,16 +401,42 @@ class _RecommendedState extends State<Recommended> {
       }
 
       bool isCurrentMonth = (i == now.month);
-      bool isMonthSaved = albums.any((a) => a.month == (i + 1));
 
-      if (photoCount >= 11 && isMonthSaved) {
+      // FIX: แก้จาก i + 1 เป็น i เพราะ i คือเดือนตาม Loop (1-12) อยู่แล้ว
+      bool isMonthSaved = albums.any((a) => a.month == i);
+
+      // --- เริ่มเช็คเงื่อนไขตามลำดับที่แจ้ง ---
+
+      if (photoCount == 0) {
+        // เงื่อนไข A: ถ้ายังไม่ได้เลือกรูป -> เข้าเงื่อนไขที่ 3 (Standard)
+        tempItems.add(
+          MemoryCardData(
+            type: CardType.standard,
+            topTitle: '$monthName\n$yearBE',
+            mainTitle: '',
+            subTitle: isCurrentMonth ? 'เริ่มบันทึกความทรงจำเดือนนี้' : 'ยังไม่มีบันทึกความทรงจำ',
+            footerText: 'Start Now',
+            gradientColors: [const Color(0xFF424242), const Color(0xFF212121)],
+            accentColor: const Color(0xFFFF7043),
+            assetImages: ['assets/images/Hobby2.png', 'assets/images/Hobby3.png', 'assets/images/Hobby1.png'],
+            monthIndex: i,
+            imageItems: cardImageItems,
+          ),
+        );
+      } else if (photoCount < 11) {
+        // เงื่อนไข B: ถ้าเลือกรูปไม่ครบ 11 -> เข้าเงื่อนไขที่ 1 (Ticket)
+        tempItems.add(_buildTicketCard(monthName, yearBE, photoCount, cardImageItems, i));
+      } else if (photoCount == 11 && !isMonthSaved) {
+        // เงื่อนไข C: ถ้าครบ 11 แต่ยังไม่มีเดือนที่สร้าง (ยังไม่ save) -> เข้าเงื่อนไขที่ 1 (Ticket)
+        tempItems.add(_buildTicketCard(monthName, yearBE, photoCount, cardImageItems, i));
+      } else if (photoCount == 11 && isMonthSaved) {
+        // เงื่อนไข D: มีครบ 11 และ Albums ถูกสร้างแล้ว -> เข้าเงื่อนไขที่ 2 (Complete)
         String? coverImageUrl;
         if (album != null && album.photos != null && album.photos!.isNotEmpty) {
           coverImageUrl = album.photos![0].image;
         }
 
         tempItems.add(
-          // รูปแบบบฟันทึกครบ 11 ภาพ
           MemoryCardData(
             type: CardType.backgroundImage,
             topTitle: monthName,
@@ -320,40 +448,6 @@ class _RecommendedState extends State<Recommended> {
             backgroundUrl: coverImageUrl,
             backgroundImage: coverImageUrl == null ? 'assets/images/Hobby1.png' : null,
             showTextOverlay: true,
-            monthIndex: i,
-            imageItems: cardImageItems,
-          ),
-        );
-      } else if (photoCount > 0 && photoCount <= 11) {
-        tempItems.add(
-          // รูปแบบcard ภาพที่บันทึกยังไม่ครบ 11 ภาพ
-          MemoryCardData(
-            type: CardType.ticket,
-            topTitle: '$monthName\n$yearBE',
-            mainTitle: _timeRemainingString,
-            subTitle: photoCount == 11 ? 'บันทึกครบ 11 ภาพแล้ว' : 'ขาดอีก ${11 - photoCount} ภาพ',
-            footerText: 'Ticket 10',
-            currentProgress: photoCount,
-            maxProgress: 11,
-            gradientColors: [],
-            accentColor: const Color(0xFFFF7043),
-            backgroundColor: const Color(0xFF111111),
-            monthIndex: i,
-            imageItems: cardImageItems,
-          ),
-        );
-      } else {
-        tempItems.add(
-          // รูปแบบcardยังไม่ได้บันทึกภาพ
-          MemoryCardData(
-            type: CardType.standard,
-            topTitle: '$monthName\n$yearBE',
-            mainTitle: '',
-            subTitle: isCurrentMonth ? 'เริ่มบันทึกความทรงจำเดือนนี้' : 'ยังไม่มีบันทึกความทรงจำ',
-            footerText: 'Start Now',
-            gradientColors: [const Color(0xFF424242), const Color(0xFF212121)],
-            accentColor: const Color(0xFFFF7043),
-            assetImages: ['assets/images/Hobby2.png', 'assets/images/Hobby3.png', 'assets/images/Hobby1.png'],
             monthIndex: i,
             imageItems: cardImageItems,
           ),
@@ -370,6 +464,24 @@ class _RecommendedState extends State<Recommended> {
 
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _onTimerTick());
+  }
+
+  // แยก Widget Ticket ออกมา เพื่อใช้ซ้ำในเงื่อนไข B และ C จะได้โค้ดไม่ซ้ำซ้อน
+  MemoryCardData _buildTicketCard(String monthName, int yearBE, int photoCount, List<MediaItem>? cardImageItems, int i) {
+    return MemoryCardData(
+      type: CardType.ticket,
+      topTitle: '$monthName\n$yearBE',
+      mainTitle: _timeRemainingString,
+      subTitle: photoCount == 11 ? 'บันทึกครบ 11 ภาพแล้ว' : 'ขาดอีก ${11 - photoCount} ภาพ',
+      footerText: 'Ticket 10',
+      currentProgress: photoCount,
+      maxProgress: 11,
+      gradientColors: [],
+      accentColor: const Color(0xFFFF7043),
+      backgroundColor: const Color(0xFF111111),
+      monthIndex: i,
+      imageItems: cardImageItems,
+    );
   }
 
   void _calculateTargetAndInitialString() {
