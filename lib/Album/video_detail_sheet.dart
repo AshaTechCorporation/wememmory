@@ -34,7 +34,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
   // --- ตัวแปรสำหรับควบคุม Slider ---
   bool _isDragging = false;
   double _dragValue = 0.0;
-  bool _wasPlayingBeforeDrag = false; 
+  bool _wasPlayingBeforeDrag = false;
 
   Uint8List? _tempCapturedImage;
   Uint8List? _thumbnailBytes;
@@ -198,9 +198,10 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
     final double maxDuration = duration.inMilliseconds.toDouble();
 
     // คำนวณค่า Slider: ถ้ากำลังลากให้ใช้ค่าที่นิ้วลาก (_dragValue)
-    final double sliderValue = _isDragging
-        ? _dragValue
-        : position.inMilliseconds.toDouble().clamp(0.0, maxDuration);
+    final double sliderValue =
+        _isDragging
+            ? _dragValue
+            : position.inMilliseconds.toDouble().clamp(0.0, maxDuration);
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.92,
@@ -238,9 +239,10 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                     const Text(
                       "รายละเอียดรูปภาพ",
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
                         color: Colors.black87,
+                        height: 16 / 20,
                       ),
                     ),
                   ],
@@ -312,12 +314,12 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                             child: LayoutBuilder(
                               builder: (context, constraints) {
                                 return Listener(
-                                  onPointerDown: (_) =>
-                                      setState(() => _canScroll = false),
-                                  onPointerUp: (_) =>
-                                      setState(() => _canScroll = true),
-                                  onPointerCancel: (_) =>
-                                      setState(() => _canScroll = true),
+                                  onPointerDown:
+                                      (_) => setState(() => _canScroll = false),
+                                  onPointerUp:
+                                      (_) => setState(() => _canScroll = true),
+                                  onPointerCancel:
+                                      (_) => setState(() => _canScroll = true),
                                   onPointerSignal: _onPointerSignal,
                                   child: InteractiveViewer(
                                     transformationController:
@@ -360,9 +362,11 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                           data: SliderTheme.of(context).copyWith(
                             trackHeight: 4.0,
                             thumbShape: const RoundSliderThumbShape(
-                                enabledThumbRadius: 6.0),
+                              enabledThumbRadius: 6.0,
+                            ),
                             overlayShape: const RoundSliderOverlayShape(
-                                overlayRadius: 12.0),
+                              overlayRadius: 12.0,
+                            ),
                             activeTrackColor: const Color(0xFFED7D31),
                             inactiveTrackColor: Colors.grey[300],
                             thumbColor: const Color(0xFFED7D31),
@@ -371,9 +375,10 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                             value: sliderValue,
                             min: 0.0,
                             max: maxDuration,
-                            
+
                             onChangeStart: (value) {
-                              _wasPlayingBeforeDrag = _controller!.value.isPlaying;
+                              _wasPlayingBeforeDrag =
+                                  _controller!.value.isPlaying;
                               if (_wasPlayingBeforeDrag) {
                                 _controller!.pause();
                               }
@@ -388,35 +393,43 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                                 _dragValue = value;
                               });
                               // สั่ง Seek แบบไม่ต้อง await (Real-time scrubbing)
-                              _controller!
-                                  .seekTo(Duration(milliseconds: value.toInt()));
+                              _controller!.seekTo(
+                                Duration(milliseconds: value.toInt()),
+                              );
                             },
 
                             // ✅ แก้ไข: เพิ่ม Delay เพื่อรอให้ Video Player ย้ายตำแหน่งเสร็จจริง ๆ
                             // ป้องกัน Slider ดีดกลับไปที่ 0 หรือจุดเริ่มต้น
                             onChangeEnd: (value) async {
-                              final targetPosition = Duration(milliseconds: value.toInt());
-                              
+                              final targetPosition = Duration(
+                                milliseconds: value.toInt(),
+                              );
+
                               // 1. สั่งย้ายตำแหน่ง
                               await _controller!.seekTo(targetPosition);
-                              
+
                               // 2. ถ้าเดิมเล่นอยู่ ก็สั่งเล่นต่อ
                               if (_wasPlayingBeforeDrag) {
                                 await _controller!.play();
-                                if(mounted) {
-                                  setState(() { _isPlaying = true; });
-                                }
-                              }
-                              
-                              // 3. (สำคัญ) รอ 500ms ก่อนจะปลดล็อค Slider
-                              // เพื่อให้ Controller อัปเดต position ให้ทันกับที่เราลาก
-                              Future.delayed(const Duration(milliseconds: 500), () {
                                 if (mounted) {
                                   setState(() {
-                                    _isDragging = false;
+                                    _isPlaying = true;
                                   });
                                 }
-                              });
+                              }
+
+                              // 3. (สำคัญ) รอ 500ms ก่อนจะปลดล็อค Slider
+                              // เพื่อให้ Controller อัปเดต position ให้ทันกับที่เราลาก
+                              Future.delayed(
+                                const Duration(milliseconds: 500),
+                                () {
+                                  if (mounted) {
+                                    setState(() {
+                                      _isDragging = false;
+                                    });
+                                  }
+                                },
+                              );
                             },
                           ),
                         ),
@@ -509,7 +522,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                               ],
                             ),
                             child: Icon(
-                              _isPlaying 
+                              _isPlaying
                                   ? Icons.pause
                                   : Icons.play_arrow_rounded,
                               color: Colors.white,
@@ -534,7 +547,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                           },
                         ),
 
-                        const SizedBox(width: 15),
+                        const SizedBox(width: 12),
 
                         // Fit Icon
                         IconButton(
@@ -542,10 +555,8 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                           tooltip:
                               _isFilled ? 'แสดงขนาดต้นฉบับ' : 'แสดงเต็มเฟรม',
                           icon: Icon(
-                            _isFilled
-                                ? Icons.zoom_in_map
-                                : Icons.zoom_out_map,
-                            size: 28,
+                            _isFilled ? Icons.zoom_in_map : Icons.zoom_out_map,
+                            size: 24,
                             color: Colors.black54,
                           ),
                         ),

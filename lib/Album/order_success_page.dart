@@ -20,18 +20,19 @@ class OrderSuccessPage extends StatefulWidget {
   State<OrderSuccessPage> createState() => _OrderSuccessPageState();
 }
 
-class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerProviderStateMixin {
+class _OrderSuccessPageState extends State<OrderSuccessPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _fadeAnimation;
-  
+
   // ตัวแปรเช็คว่าแสดง Animation เสร็จหรือยัง (ถ้าเสร็จแล้วจะซ่อนไปเลย)
   bool _showSuccessPopup = true;
 
   @override
   void initState() {
     super.initState();
-    
+
     // ตั้งค่า Controller (ความเร็วในการเด้งขึ้น)
     _controller = AnimationController(
       duration: const Duration(milliseconds: 600),
@@ -39,13 +40,14 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.5), 
+      begin: const Offset(0, 0.5),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     // เริ่มเล่น Animation
     _playAnimation();
@@ -55,17 +57,17 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
     try {
       // 1. เด้งขึ้นมา
       await _controller.forward();
-      
+
       // 2. ค้างไว้ 3 วินาที (เพิ่มเวลาให้อ่านทัน)
       await Future.delayed(const Duration(seconds: 3));
-      
+
       if (!mounted) return;
 
       // 3. จางหายไป (เล่นถอยหลัง)
       await _controller.reverse();
-      
+
       if (!mounted) return;
-      
+
       // 4. ซ่อน Widget ออกไปเลยเมื่อเสร็จ
       setState(() {
         _showSuccessPopup = false;
@@ -81,17 +83,18 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
     _controller.dispose();
     super.dispose();
   }
-  
+
   void _shareAndGoHome(BuildContext context) {
     print("Sharing content...");
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
-        builder: (context) => FirstPage(
-          initialIndex: 1,
-          newAlbumItems: widget.items,
-          newAlbumMonth: widget.monthName,
-        ),
+        builder:
+            (context) => FirstPage(
+              initialIndex: 1,
+              newAlbumItems: widget.items,
+              newAlbumMonth: widget.monthName,
+            ),
       ),
       (route) => false,
     );
@@ -125,7 +128,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
                     ),
                   ),
                 ),
-                
+
                 // --- Header ---
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 13, 20, 10),
@@ -134,41 +137,66 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
                     children: [
                       const Text(
                         'สั่งพิมพ์',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
                       ),
                       GestureDetector(
                         onTap: () => _shareAndGoHome(context),
                         child: Image.asset(
-                          'assets/icons/cross.png', 
-                          width: 25, height: 25, fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.close, color: Colors.black54),
-                        )
+                          'assets/icons/cross.png',
+                          width: 25,
+                          height: 25,
+                          fit: BoxFit.contain,
+                          errorBuilder:
+                              (context, error, stackTrace) => const Icon(
+                                Icons.close,
+                                color: Colors.black54,
+                              ),
+                        ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 9),
-                Divider(height: 1, color: Colors.grey.withOpacity(0.2), indent: 20, endIndent: 20),
+                Divider(
+                  height: 1,
+                  color: Colors.grey.withOpacity(0.2),
+                  indent: 20,
+                  endIndent: 20,
+                ),
 
                 // --- Content Scrollable ---
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _FullAlbumPreview(items: widget.items, monthName: widget.monthName),
+                          _FullAlbumPreview(
+                            items: widget.items,
+                            monthName: widget.monthName,
+                          ),
 
                           const SizedBox(height: 24),
-                          
+
                           const Text(
                             'ได้รับออเดอร์คุณแล้ว',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
-                          
+
                           const SizedBox(height: 24),
-                          
+
                           SizedBox(
                             width: double.infinity,
                             height: 50,
@@ -176,10 +204,19 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
                               onPressed: () => _shareAndGoHome(context),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFED7D31),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
                                 elevation: 0,
                               ),
-                              child: const Text('แชร์', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                              child: const Text(
+                                'แชร์',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
 
@@ -187,7 +224,11 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
 
                           const Text(
                             'ได้รับเพิ่ม 3 คะแนนเมื่อแชร์รูป',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
                         ],
                       ),
@@ -201,7 +242,12 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
             if (_showSuccessPopup)
               Positioned.fill(
                 child: Container(
-                  color: const Color.fromARGB(255, 188, 188, 188).withOpacity(0.6), // พื้นหลังจางๆ
+                  color: const Color.fromARGB(
+                    255,
+                    188,
+                    188,
+                    188,
+                  ).withOpacity(0.6), // พื้นหลังจางๆ
                   alignment: Alignment.center,
                   child: SlideTransition(
                     position: _slideAnimation,
@@ -216,11 +262,15 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
                             width: 165,
                             height: 161,
                             fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.celebration, size: 100, color: Colors.orange),
+                            errorBuilder:
+                                (context, error, stackTrace) => const Icon(
+                                  Icons.celebration,
+                                  size: 100,
+                                  color: Colors.orange,
+                                ),
                           ),
                           const SizedBox(height: 10),
-                          
+
                           // แต้ม Point
                           const Text(
                             '3 Point',
@@ -233,18 +283,24 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
                               // ],
                             ),
                           ),
-                          
+
                           const SizedBox(height: 20),
 
                           // ✅ แก้ไขตรงนี้: เอา Container สีส้มออก เหลือแค่ข้อความ
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildWhiteTextItem('+ ความสม่ำเสมอของการสร้างอัลบั้มในแต่ละปี'),
+                              _buildWhiteTextItem(
+                                '+ ความสม่ำเสมอของการสร้างอัลบั้มในแต่ละปี',
+                              ),
                               const SizedBox(height: 8),
-                              _buildWhiteTextItem('+ สร้างอัลบั้มรูปครบ 11 รูป'),
+                              _buildWhiteTextItem(
+                                '+ สร้างอัลบั้มรูปครบ 11 รูป',
+                              ),
                               const SizedBox(height: 8),
-                              _buildWhiteTextItem('+ สร้างอัลบั้มรูปตรงตามเวลาที่กำหนด'),
+                              _buildWhiteTextItem(
+                                '+ สร้างอัลบั้มรูปตรงตามเวลาที่กำหนด',
+                              ),
                             ],
                           ),
                         ],
@@ -265,7 +321,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage> with SingleTickerPr
       text,
       textAlign: TextAlign.justify,
       style: const TextStyle(
-        color: Colors.white, 
+        color: Colors.white,
         fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
@@ -281,7 +337,7 @@ class _FullAlbumPreview extends StatelessWidget {
   final List<MediaItem> items;
   final String monthName;
   const _FullAlbumPreview({required this.items, required this.monthName});
-  
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -309,17 +365,20 @@ class _FullAlbumPreview extends StatelessWidget {
                         child: Center(
                           child: Text(
                             monthName.split(' ')[0],
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)
-                          )
-                        )
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
                       for (int i = 0; i < 5; i++)
                         if (i < items.length)
                           _SimplePhotoSlot(item: items[i])
                         else
-                          const SizedBox()
-                    ]
-                  )
+                          const SizedBox(),
+                    ],
+                  ),
                 ),
                 const SizedBox(width: 20),
                 _buildPageContainer(
@@ -335,58 +394,64 @@ class _FullAlbumPreview extends StatelessWidget {
                         if ((i + 5) < items.length)
                           _SimplePhotoSlot(item: items[i + 5])
                         else
-                          const SizedBox()
-                    ]
-                  )
-                )
-              ]
-            )
-          )
-        )
-      )
+                          const SizedBox(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
-  
+
   Widget _buildPageContainer({required Widget child}) {
     return SizedBox(width: 160, height: 245, child: child);
   }
 }
 
 class _SimplePhotoSlot extends StatefulWidget {
-    final MediaItem item;
-    const _SimplePhotoSlot({required this.item});
-    @override
-    State<_SimplePhotoSlot> createState() => _SimplePhotoSlotState();
+  final MediaItem item;
+  const _SimplePhotoSlot({required this.item});
+  @override
+  State<_SimplePhotoSlot> createState() => _SimplePhotoSlotState();
 }
 
 class _SimplePhotoSlotState extends State<_SimplePhotoSlot> {
-    Uint8List? _imageData;
-    @override
-    void initState() { super.initState(); _loadImage(); }
-    
-    Future<void> _loadImage() async {
-        if (widget.item.capturedImage != null) { 
-          if (mounted) setState(() => _imageData = widget.item.capturedImage); 
-        } else { 
-          final data = await widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)); 
-          if (mounted) setState(() => _imageData = data); 
-        }
+  Uint8List? _imageData;
+  @override
+  void initState() {
+    super.initState();
+    _loadImage();
+  }
+
+  Future<void> _loadImage() async {
+    if (widget.item.capturedImage != null) {
+      if (mounted) setState(() => _imageData = widget.item.capturedImage);
+    } else {
+      final data = await widget.item.asset.thumbnailDataWithSize(
+        const ThumbnailSize(300, 300),
+      );
+      if (mounted) setState(() => _imageData = data);
     }
-    
-    @override
-    Widget build(BuildContext context) {
-        return Container(
-            decoration: const BoxDecoration(color: Colors.white),
-            padding: const EdgeInsets.all(4.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(6.0),
-              child: Container(
-                color: Colors.grey[200],
-                child: _imageData != null 
-                  ? Image.memory(_imageData!, fit: BoxFit.cover) 
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(color: Colors.white),
+      padding: const EdgeInsets.all(4.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(6.0),
+        child: Container(
+          color: Colors.grey[200],
+          child:
+              _imageData != null
+                  ? Image.memory(_imageData!, fit: BoxFit.cover)
                   : null,
-              ),
-            )
-        );
-    }
+        ),
+      ),
+    );
+  }
 }

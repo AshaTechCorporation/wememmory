@@ -48,9 +48,8 @@ class MonthDetailPage extends StatelessWidget {
                     ),
                   ),
                   // ✅ แสดงภาพพื้นหลังด้วย CachedNetworkImage
-                  child: bgItem != null
-                      ? _buildHeaderImage(bgItem)
-                      : Container(),
+                  child:
+                      bgItem != null ? _buildHeaderImage(bgItem) : Container(),
                 ),
                 Positioned(
                   top: 50,
@@ -103,7 +102,12 @@ class MonthDetailPage extends StatelessWidget {
                       const SizedBox(height: 8),
                       const Text(
                         "เก็บเรื่องราวกับครอบครัว",
-                        style: TextStyle(color: Colors.white, fontSize: 18,fontWeight: FontWeight.w400,fontFamily: 'kanit'),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'kanit',
+                        ),
                       ),
                     ],
                   ),
@@ -175,20 +179,20 @@ class MonthDetailPage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => MemorySlidePage(
-                                  monthName: monthName,
-                                  items: items,
-                                  
-                                ),
+                                builder:
+                                    (context) => MemorySlidePage(
+                                      monthName: monthName,
+                                      items: items,
+                                    ),
                               ),
                             );
                           },
                           child: _buildPolaroidStack(),
                         ),
                       ),
-                      
+
                       const SizedBox(width: 20),
-                      
+
                       // Card 2: Fan Image Stack
                       Expanded(
                         child: GestureDetector(
@@ -196,10 +200,11 @@ class MonthDetailPage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => FanStackDetailPage(
-                                  monthName: monthName,
-                                  items: items,
-                                ),
+                                builder:
+                                    (context) => FanStackDetailPage(
+                                      monthName: monthName,
+                                      items: items,
+                                    ),
                               ),
                             );
                           },
@@ -218,13 +223,14 @@ class MonthDetailPage extends StatelessWidget {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                             Navigator.push(
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => MemorySlidePage(
-                                  monthName: monthName,
-                                  items: [], 
-                                ),
+                                builder:
+                                    (context) => MemorySlidePage(
+                                      monthName: monthName,
+                                      items: [],
+                                    ),
                               ),
                             );
                           },
@@ -234,16 +240,18 @@ class MonthDetailPage extends StatelessWidget {
                               Text(
                                 "แท็กทั้งหมด",
                                 style: TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w500,
                                   fontSize: 16,
+                                  height: 2.0,
                                 ),
                               ),
-                              SizedBox(height: 4),
+                              SizedBox(height: 2),
                               Text(
                                 "#ครอบครัว #ความรัก #ความรัก ...",
                                 style: TextStyle(
                                   color: Color(0xFFED7D31),
                                   fontSize: 12,
+                                  fontWeight: FontWeight.w300,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -260,16 +268,18 @@ class MonthDetailPage extends StatelessWidget {
                             Text(
                               "การแชร์ของเดือนนี้",
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w500,
                                 fontSize: 16,
+                                height: 2.0,
                               ),
                             ),
-                            SizedBox(height: 4),
+                            SizedBox(height: 2),
                             Text(
                               "ผู้ที่เข้าชม 23+",
                               style: TextStyle(
-                                color: Colors.grey, 
-                                fontSize: 12
+                                color: Colors.grey,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w300,
                               ),
                             ),
                           ],
@@ -321,9 +331,7 @@ class MonthDetailPage extends StatelessWidget {
       children: [
         // 1. Card: ต่อเนื่อง 4 เดือน
         Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-          ),
+          decoration: const BoxDecoration(color: Colors.white),
           child: Row(
             children: [
               Image.asset(
@@ -335,10 +343,16 @@ class MonthDetailPage extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
-                  Text("ต่อเนื่อง 4 เดือน", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 36)),
-                  Text("สร้างอัลบั้มต่อเนื่องมาแล้ว 4 เดือนติด", style: TextStyle(color: Colors.grey, fontSize: 14)),
+                  Text(
+                    "ต่อเนื่อง 4 เดือน",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 36),
+                  ),
+                  Text(
+                    "สร้างอัลบั้มต่อเนื่องมาแล้ว 4 เดือนติด",
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  ),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -353,7 +367,11 @@ class MonthDetailPage extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2)),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
             ],
           ),
           child: Row(
@@ -362,8 +380,14 @@ class MonthDetailPage extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
-                  Text("ทุกภาพมีเรื่องเล่าของตัวเอง", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                  Text("คุณได้อธิบายภาพในเดือนนี้", style: TextStyle(color: Colors.grey, fontSize: 16)),
+                  Text(
+                    "ทุกภาพมีเรื่องเล่าของตัวเอง",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                  Text(
+                    "คุณได้อธิบายภาพในเดือนนี้",
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
                 ],
               ),
               // Circular Progress (76%)
@@ -371,7 +395,8 @@ class MonthDetailPage extends StatelessWidget {
                 alignment: Alignment.center,
                 children: [
                   const SizedBox(
-                    width: 68, height: 68,
+                    width: 68,
+                    height: 68,
                     child: CircularProgressIndicator(
                       value: 0.76,
                       backgroundColor: Color(0xFFE0E0E0),
@@ -379,7 +404,10 @@ class MonthDetailPage extends StatelessWidget {
                       strokeWidth: 6,
                     ),
                   ),
-                  const Text("76%", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
+                  const Text(
+                    "76%",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                  ),
                 ],
               ),
             ],
@@ -408,7 +436,7 @@ class MonthDetailPage extends StatelessWidget {
             children: [
               Column(
                 children: [
-                  const SizedBox(height: 2), 
+                  const SizedBox(height: 2),
                   _buildDashedGridLine(label: "100"),
                   const Spacer(),
                   _buildDashedGridLine(label: "50"),
@@ -416,18 +444,30 @@ class MonthDetailPage extends StatelessWidget {
                   _buildDashedGridLine(label: "25"),
                   const Spacer(),
                   _buildDashedGridLine(label: "0"),
-                  const SizedBox(height: 20), 
+                  const SizedBox(height: 20),
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 0, left: 25), 
+                padding: const EdgeInsets.only(bottom: 0, left: 25),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    _buildFixedBar(height: 160, label: "ความสม่ำเสมอ", color: const Color(0xFFED7D31)),
-                    _buildFixedBar(height: 86, label: "ตรงตามเวลา", color: const Color(0xFFED7D31)),
-                    _buildFixedBar(height: 86, label: "อัพรูปครบ", color: const Color(0xFFED7D31)),
+                    _buildFixedBar(
+                      height: 160,
+                      label: "ความสม่ำเสมอ",
+                      color: const Color(0xFFED7D31),
+                    ),
+                    _buildFixedBar(
+                      height: 86,
+                      label: "ตรงตามเวลา",
+                      color: const Color(0xFFED7D31),
+                    ),
+                    _buildFixedBar(
+                      height: 86,
+                      label: "อัพรูปครบ",
+                      color: const Color(0xFFED7D31),
+                    ),
                   ],
                 ),
               ),
@@ -463,55 +503,88 @@ class MonthDetailPage extends StatelessWidget {
                     children: [
                       const Text(
                         "เวลาในการสร้างอัลบั้ม",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black87),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Colors.black87,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       const Text(
                         "15.00 นาที",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.black),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                          color: Colors.black,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Container(
-                        padding: const EdgeInsets.only(top: 8), 
+                        padding: const EdgeInsets.only(top: 8),
                         decoration: const BoxDecoration(
-                          border: Border(top: BorderSide(color: Color(0xFFEEEEEE), width: 1)),
+                          border: Border(
+                            top: BorderSide(color: Color(0xFFEEEEEE), width: 1),
+                          ),
                         ),
-                        child: const Text("สูงสุด 30.00 นาที", style: TextStyle(color: Colors.grey, fontSize: 10)),
+                        child: const Text(
+                          "สูงสุด 30.00 นาที",
+                          style: TextStyle(color: Colors.grey, fontSize: 10),
+                        ),
                       ),
                     ],
                   ),
                   SizedBox(
-                    width: 120, height: 60,
+                    width: 120,
+                    height: 60,
                     child: Stack(
                       alignment: Alignment.bottomCenter,
                       children: [
                         Container(
-                          width: 120, height: 60,
+                          width: 120,
+                          height: 60,
                           decoration: const BoxDecoration(
-                            color: Color(0xFFFFF0E0), 
-                            borderRadius: BorderRadius.only(topLeft: Radius.circular(60), topRight: Radius.circular(60)),
+                            color: Color(0xFFFFF0E0),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(60),
+                              topRight: Radius.circular(60),
+                            ),
                           ),
                         ),
                         Positioned(
                           left: 0,
                           child: Container(
-                            width: 60, height: 60,
+                            width: 60,
+                            height: 60,
                             decoration: const BoxDecoration(
-                              color: Color(0xFFED7D31), 
-                              borderRadius: BorderRadius.only(topLeft: Radius.circular(60), topRight: Radius.circular(0)),
+                              color: Color(0xFFED7D31),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(60),
+                                topRight: Radius.circular(0),
+                              ),
                             ),
                           ),
                         ),
                         Container(
-                          width: 80, height: 40,
+                          width: 80,
+                          height: 40,
                           decoration: const BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.only(topLeft: Radius.circular(40), topRight: Radius.circular(40)),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(40),
+                              topRight: Radius.circular(40),
+                            ),
                           ),
                         ),
                         const Positioned(
                           bottom: 0,
-                          child: Text("15.00 นาที", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87)),
+                          child: Text(
+                            "15.00 นาที",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -519,11 +592,18 @@ class MonthDetailPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
-              const Text("เร็วกว่าค่าเฉลี่ย 15.00 นาที", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.black)),
+              const Text(
+                "เร็วกว่าค่าเฉลี่ย 15.00 นาที",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  color: Colors.black,
+                ),
+              ),
             ],
           ),
         ),
-        
+
         const SizedBox(height: 20),
 
         // 5. Card: Donut Chart
@@ -532,13 +612,27 @@ class MonthDetailPage extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(
-                width: 235, height: 235,
-                child: Image.asset('assets/icons/Frame 25.png', fit: BoxFit.contain),
+                width: 235,
+                height: 235,
+                child: Image.asset(
+                  'assets/icons/Frame 25.png',
+                  fit: BoxFit.contain,
+                ),
               ),
               const SizedBox(height: 20),
-              const Text("สร้างอัลบั้มวันที่ 1", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40)),
+              const Text(
+                "สร้างอัลบั้มวันที่ 1",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
+              ),
               const SizedBox(height: 20),
-              const Text("คุณสร้างอัลบั้มวันที่ 1 มากถึง 54%", style: TextStyle(color: Colors.grey, fontSize: 20, fontWeight: FontWeight.w800)),
+              const Text(
+                "คุณสร้างอัลบั้มวันที่ 1 มากถึง 54%",
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
               const SizedBox(height: 50),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -574,7 +668,9 @@ class MonthDetailPage extends StatelessWidget {
             builder: (context, constraints) {
               const dashWidth = 4.0;
               const dashSpace = 4.0;
-              final dashCount = (constraints.constrainWidth() / (dashWidth + dashSpace)).floor();
+              final dashCount =
+                  (constraints.constrainWidth() / (dashWidth + dashSpace))
+                      .floor();
               return Flex(
                 direction: Axis.horizontal,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -595,7 +691,11 @@ class MonthDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFixedBar({required double height, required String label, required Color color}) {
+  Widget _buildFixedBar({
+    required double height,
+    required String label,
+    required Color color,
+  }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -613,7 +713,7 @@ class MonthDetailPage extends StatelessWidget {
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: Colors.black87
+            color: Colors.black87,
           ),
         ),
       ],
@@ -623,20 +723,27 @@ class MonthDetailPage extends StatelessWidget {
   Widget _buildLegendItem(String label, Color color) {
     return Row(
       children: [
-        Container(width: 16, height: 16, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
         const SizedBox(width: 10),
-        Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
 
   Widget _buildPolaroidStack() {
     final mainItem = items.isNotEmpty ? items[0] : null;
-    const double cardWidth = 120; 
-    const double cardHeight = 154; 
+    const double cardWidth = 120;
+    const double cardHeight = 154;
 
     return SizedBox(
-      height: 200, 
+      height: 200,
       child: Stack(
         alignment: Alignment.center,
         clipBehavior: Clip.none,
@@ -664,23 +771,32 @@ class MonthDetailPage extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 10, offset: const Offset(0, 4)),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AspectRatio(
-                  aspectRatio: 1.0, 
+                  aspectRatio: 1.0,
                   // ✅ แสดงภาพด้วยฟังก์ชันที่รองรับ URL
-                  child: mainItem != null
-                      ? _buildImage(mainItem)
-                      : Container(color: Colors.grey[200]),
+                  child:
+                      mainItem != null
+                          ? _buildImage(mainItem)
+                          : Container(color: Colors.grey[200]),
                 ),
                 const Spacer(),
                 const Text(
                   "อากาศดี วิวสวย",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black87),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10,
+                    color: Colors.black87,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -691,7 +807,7 @@ class MonthDetailPage extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4), 
+                const SizedBox(height: 4),
               ],
             ),
           ),
@@ -706,7 +822,13 @@ class MonthDetailPage extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
         border: Border.all(color: Colors.grey.shade200),
       ),
     );
@@ -732,7 +854,7 @@ class MonthDetailPage extends StatelessWidget {
     const double cardHeight = 80.0;
     List<double> rotations = [0.08, -0.1, 0.08, -0.1];
     double angle = (index < rotations.length) ? rotations[index] : 0.0;
-    double leftOffset = index * 20.0; 
+    double leftOffset = index * 20.0;
 
     return Positioned(
       left: leftOffset + 8,
@@ -783,16 +905,16 @@ class MonthDetailPage extends StatelessWidget {
                       child: Center(
                         child: Text(
                           monthName.split(' ')[0],
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                     for (int i = 0; i < 5; i++)
                       if (i < items.length)
-                        _StaticPhotoSlot(
-                          item: items[i],
-                          monthName: monthName,
-                        )
+                        _StaticPhotoSlot(item: items[i], monthName: monthName)
                       else
                         const SizedBox(),
                   ],
@@ -853,16 +975,16 @@ class MonthDetailPage extends StatelessWidget {
   // ✅ Helper method สำหรับแสดงรูปภาพจาก URL
   Widget _buildImage(dynamic item) {
     // ดึง URL (ปรับตาม structure จริงของคุณ)
-    // ตรงนี้ถ้า item.image เป็น String ให้ใช้เลย 
+    // ตรงนี้ถ้า item.image เป็น String ให้ใช้เลย
     final String imageUrl = (item.image is String) ? item.image : "";
 
     return CachedNetworkImage(
       imageUrl: imageUrl,
       fit: BoxFit.cover,
       placeholder: (context, url) => Container(color: Colors.grey[200]),
-      errorWidget: (context, url, error) => const Center(
-        child: Icon(Icons.broken_image, color: Colors.grey),
-      ),
+      errorWidget:
+          (context, url, error) =>
+              const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
     );
   }
 }
@@ -872,10 +994,7 @@ class _StaticPhotoSlot extends StatelessWidget {
   final dynamic item;
   final String monthName;
 
-  const _StaticPhotoSlot({
-    required this.item,
-    required this.monthName,
-  });
+  const _StaticPhotoSlot({required this.item, required this.monthName});
 
   @override
   Widget build(BuildContext context) {
@@ -888,10 +1007,11 @@ class _StaticPhotoSlot extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AlbumPhotoViewPage(
-              item: item, // ส่ง dynamic item (PhotoModel)
-              monthName: monthName,
-            ),
+            builder:
+                (context) => AlbumPhotoViewPage(
+                  item: item, // ส่ง dynamic item (PhotoModel)
+                  monthName: monthName,
+                ),
           ),
         );
       },
@@ -907,8 +1027,10 @@ class _StaticPhotoSlot extends StatelessWidget {
               fit: BoxFit.cover,
               // ใช้ Placeholder เล็กๆ เพื่อ performance
               placeholder: (context, url) => Container(color: Colors.grey[200]),
-              errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
-            )
+              errorWidget:
+                  (context, url, error) =>
+                      const Center(child: Icon(Icons.error)),
+            ),
           ),
         ),
       ),

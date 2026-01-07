@@ -76,9 +76,22 @@ class _ProfilePageState extends State<ProfilePage> {
                   Align(
                     alignment: Alignment.centerLeft, // ✅ สั่งให้ชิดซ้าย
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                      decoration: BoxDecoration(color: const Color(0xFFFDF1E6), borderRadius: BorderRadius.circular(8)),
-                      child: const Text('1 Ticket ต่อการพิมพ์รูป 1 ครั้ง (11 รูป)', style: TextStyle(fontSize: 12, color: Colors.black87, fontWeight: FontWeight.w500)),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 16,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFDF1E6),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        '1 Ticket ต่อการพิมพ์รูป 1 ครั้ง (11 รูป)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -87,7 +100,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
                   // ส่วน Beginner
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween, // จัดชิดซ้าย-ขวา
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween, // จัดชิดซ้าย-ขวา
                     crossAxisAlignment: CrossAxisAlignment.end, // จัดชิดขอบล่าง
                     children: [
                       // 1. ส่วนรูปภาพ
@@ -95,7 +109,15 @@ class _ProfilePageState extends State<ProfilePage> {
                         'assets/images/wemorylogo.png',
                         height: 80,
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => const SizedBox(width: 50, height: 50, child: Icon(Icons.image_not_supported, color: Colors.grey)),
+                        errorBuilder:
+                            (context, error, stackTrace) => const SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: Icon(
+                                Icons.image_not_supported,
+                                color: Colors.grey,
+                              ),
+                            ),
                       ),
 
                       const SizedBox(width: 8),
@@ -103,7 +125,15 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerRight,
-                          child: Text('Beginner', style: TextStyle(fontSize: 45, fontWeight: FontWeight.w600, color: Color(0xFFEE743B), height: 1.0)),
+                          child: Text(
+                            'Beginner',
+                            style: TextStyle(
+                              fontSize: 45,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFEE743B),
+                              height: 1.0,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -137,25 +167,58 @@ class _ProfilePageState extends State<ProfilePage> {
                     onItemTap: (item, index) async {
                       switch (index) {
                         case 0:
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => CouponPage()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CouponPage(),
+                            ),
+                          );
                           break;
                         case 1:
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => PersonalSecurityPage()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PersonalSecurityPage(),
+                            ),
+                          );
                           break;
                         case 2:
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => AddressPage()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddressPage(),
+                            ),
+                          );
                           break;
                         case 3:
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => BankInfoPage()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BankInfoPage(),
+                            ),
+                          );
                           break;
                         case 4:
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => LanguageSelectionScreen()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LanguageSelectionScreen(),
+                            ),
+                          );
                           break;
                         case 5:
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => TermsAndServicesPage()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TermsAndServicesPage(),
+                            ),
+                          );
                           break;
                         case 6:
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => FAQPage()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => FAQPage()),
+                          );
                           break;
                         case 7:
                           final out = await showDialog(
@@ -174,7 +237,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           );
                           if (out == true) {
                             clearToken();
-                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginPage(),
+                              ),
+                              (route) => false,
+                            );
                           }
                           break;
                         case 8:
@@ -194,7 +263,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           );
                           if (out == true) {
                             clearToken();
-                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginPage(),
+                              ),
+                              (route) => false,
+                            );
                           }
                           break;
                       }
@@ -243,18 +318,39 @@ class _HeaderSection extends StatelessWidget {
             shape: BoxShape.circle,
             color: Colors.white24, // ใส่สีรองพื้นเผื่อรูปโหลดไม่ทัน
             image: DecorationImage(
-              image: user?.avatar != null ? NetworkImage('$baseUrl/public/${user?.avatar!}') : AssetImage('assets/icons/LogoWemory.jpg') as ImageProvider,
+              image:
+                  user?.avatar != null
+                      ? NetworkImage('$baseUrl/public/${user?.avatar!}')
+                      : AssetImage('assets/icons/LogoWemory.jpg')
+                          as ImageProvider,
               fit: BoxFit.cover,
-              onError: (exception, stackTrace) => Icon(Icons.image_not_supported, size: 50),
+              onError:
+                  (exception, stackTrace) =>
+                      Icon(Icons.image_not_supported, size: 50),
             ),
           ),
         ),
         const SizedBox(height: 12),
         // ✅ ชื่อแสดงตาม Server
-        Text(displayName, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 22)),
+        Text(
+          displayName,
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w600,
+            fontSize: 22,
+          ),
+        ),
         const SizedBox(height: 4),
         // ✅ รหัสผู้แนะนำ (ใช้ค่าเดิม ไม่ดึงจาก Server)
-        const Text('รหัสผู้แนะนำ 1234', style: TextStyle(fontFamily: 'Kanit', color: Color(0xFF5A5A5A), fontWeight: FontWeight.w400, fontSize: 16)),
+        const Text(
+          'รหัสผู้แนะนำ 1234',
+          style: TextStyle(
+            fontFamily: 'Kanit',
+            color: Color(0xFF5A5A5A),
+            fontWeight: FontWeight.w400,
+            fontSize: 16,
+          ),
+        ),
       ],
     );
   }
@@ -286,7 +382,13 @@ class _MemorableStoryCard extends StatelessWidget {
               width: cardWidth,
               height: cardHeight,
               margin: const EdgeInsets.only(right: 30, bottom: 20),
-              decoration: BoxDecoration(color: Colors.white, boxShadow: [const BoxShadow(color: Colors.black12, blurRadius: 4)], border: Border.all(color: Colors.white, width: 3)),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  const BoxShadow(color: Colors.black12, blurRadius: 4),
+                ],
+                border: Border.all(color: Colors.white, width: 3),
+              ),
             ),
           ),
           // --- กรอบหลังใบที่ 2 ---
@@ -296,7 +398,13 @@ class _MemorableStoryCard extends StatelessWidget {
               width: cardWidth,
               height: cardHeight,
               margin: const EdgeInsets.only(left: 30, bottom: 20),
-              decoration: BoxDecoration(color: Colors.white, boxShadow: [const BoxShadow(color: Colors.black12, blurRadius: 4)], border: Border.all(color: Colors.white, width: 3)),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  const BoxShadow(color: Colors.black12, blurRadius: 4),
+                ],
+                border: Border.all(color: Colors.white, width: 3),
+              ),
             ),
           ),
 
@@ -305,20 +413,43 @@ class _MemorableStoryCard extends StatelessWidget {
             width: cardWidth, // กว้างขึ้น (160)
             height: cardHeight, // สูงขึ้น (180)
             padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4), boxShadow: [const BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))]),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+              boxShadow: [
+                const BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
                   width: imageWidth,
                   height: imageHeight,
-                  child: ClipRRect(child: Image.asset('assets/images/exProfile.png', fit: BoxFit.cover, errorBuilder: (c, o, s) => Container(color: Colors.grey[200]))),
+                  child: ClipRRect(
+                    child: Image.asset(
+                      'assets/images/exProfile.png',
+                      fit: BoxFit.cover,
+                      errorBuilder:
+                          (c, o, s) => Container(color: Colors.grey[200]),
+                    ),
+                  ),
                 ),
 
                 const SizedBox(height: 12), // เพิ่มระยะห่างระหว่างรูปกับข้อความ
 
-                const Text('อากาศดี วิวสวย', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                const Text('#ครอบครัว #ความรัก', style: TextStyle(fontSize: 10, color: Color(0xFF58A3B6))),
+                const Text(
+                  'อากาศดี วิวสวย',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                const Text(
+                  '#ครอบครัว #ความรัก',
+                  style: TextStyle(fontSize: 10, color: Color(0xFF58A3B6)),
+                ),
               ],
             ),
           ),
@@ -332,7 +463,10 @@ class _MemorableStoryCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(24)),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(24),
+      ),
       child: Row(
         children: [
           _buildStackedImages(),
@@ -342,13 +476,25 @@ class _MemorableStoryCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text('เรื่องราวที่น่าจดจำ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Color(0xFF58A3B6))),
+                const Text(
+                  'เรื่องราวที่น่าจดจำ',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF58A3B6),
+                  ),
+                ),
                 const SizedBox(height: 4),
                 // ✅ แก้ไขตรงนี้: เปลี่ยน Text เป็น NumberAwareText เพื่อใช้ฟอนต์ wemory
                 const NumberAwareText(
                   '88',
                   numberFontFamily: 'wemory', // เรียกใช้ฟอนต์ดิจิทัล
-                  style: TextStyle(fontSize: 65, fontWeight: FontWeight.w400, color: Color(0xFF58A3B6), height: 1.0),
+                  style: TextStyle(
+                    fontSize: 65,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF58A3B6),
+                    height: 1.0,
+                  ),
                 ),
               ],
             ),
@@ -368,23 +514,54 @@ class _ProductStatusCard extends StatelessWidget {
     const double progress = completed / total;
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const AlbumHistoryPage()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AlbumHistoryPage()),
+        );
       },
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(color: const Color(0xFFEE743B), boxShadow: [BoxShadow(color: Colors.orange.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))]),
+        decoration: BoxDecoration(
+          color: const Color(0xFFEE743B),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.orange.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('สินค้าของฉัน', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+            const Text(
+              'สินค้าของฉัน',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
             const SizedBox(height: 12),
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: LinearProgressIndicator(value: progress, minHeight: 12, backgroundColor: const Color(0xFFEE743B), valueColor: const AlwaysStoppedAnimation<Color>(Colors.white)),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 12,
+                backgroundColor: const Color(0xFFEE743B),
+                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
             ),
             const SizedBox(height: 10),
-            const Text('จัดส่งสำเร็จ $completed/$total รายการ', style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w500)),
+            const Text(
+              'จัดส่งสำเร็จ $completed/$total รายการ',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
       ),
@@ -408,8 +585,26 @@ class _TicketCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Ticket', style: TextStyle(fontFamily: 'wemory', fontSize: 60, fontWeight: FontWeight.w400, color: const Color.fromARGB(168, 255, 255, 255), height: 1.0)),
-              NumberAwareText('10', numberFontFamily: 'Wemory', style: TextStyle(fontSize: 60, fontWeight: FontWeight.w600, color: Colors.white, height: 1.0)),
+              Text(
+                'Ticket',
+                style: TextStyle(
+                  fontFamily: 'wemory',
+                  fontSize: 60,
+                  fontWeight: FontWeight.w400,
+                  color: const Color.fromARGB(168, 255, 255, 255),
+                  height: 1.0,
+                ),
+              ),
+              NumberAwareText(
+                '10',
+                numberFontFamily: 'Wemory',
+                style: TextStyle(
+                  fontSize: 60,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  height: 1.0,
+                ),
+              ),
             ],
           ),
           Row(
@@ -417,15 +612,27 @@ class _TicketCard extends StatelessWidget {
               Expanded(
                 flex: 2, // <-- ปุ่มซ้ายเล็กกว่า (2 ส่วน)
                 child: ElevatedButton.icon(
-                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const MembershipPackagePage())),
+                  onPressed:
+                      () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const MembershipPackagePage(),
+                        ),
+                      ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE86A3E),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     elevation: 0,
                   ),
-                  icon: Image.asset('assets/icons/wallet-3.png', width: 24, height: 24, color: Colors.white),
+                  icon: Image.asset(
+                    'assets/icons/wallet-3.png',
+                    width: 24,
+                    height: 24,
+                    color: Colors.white,
+                  ),
                   label: const Text(
                     // ผมเติม const ให้เพื่อ performance ที่ดีขึ้นครับ
                     'Buy Ticket',
@@ -438,17 +645,34 @@ class _TicketCard extends StatelessWidget {
                 flex: 3, // <-- ปุ่มขวาใหญ่กว่า (3 ส่วน)
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipHistoryPage(type: HistoryType.subscription)));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => const MembershipHistoryPage(
+                              type: HistoryType.subscription,
+                            ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black87,
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     elevation: 0,
                   ),
-                  icon: const Icon(Icons.history, size: 20, color: Colors.black87),
-                  label: const Text('ดูประวัติทั้งหมด', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                  icon: const Icon(
+                    Icons.history,
+                    size: 20,
+                    color: Colors.black87,
+                  ),
+                  label: const Text(
+                    'ดูประวัติทั้งหมด',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                  ),
                 ),
               ),
             ],
@@ -475,8 +699,26 @@ class _PointCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
-              Text('Point', style: TextStyle(fontFamily: 'wemory', fontSize: 60, fontWeight: FontWeight.w400, color: Color.fromARGB(162, 255, 255, 255), height: 1.0)),
-              NumberAwareText('27', numberFontFamily: 'wemory', style: TextStyle(fontSize: 60, fontWeight: FontWeight.w600, color: Colors.white, height: 1.0)),
+              Text(
+                'Point',
+                style: TextStyle(
+                  fontFamily: 'wemory',
+                  fontSize: 60,
+                  fontWeight: FontWeight.w400,
+                  color: Color.fromARGB(162, 255, 255, 255),
+                  height: 1.0,
+                ),
+              ),
+              NumberAwareText(
+                '27',
+                numberFontFamily: 'wemory',
+                style: TextStyle(
+                  fontSize: 60,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  height: 1.0,
+                ),
+              ),
             ],
           ),
           Row(
@@ -485,17 +727,32 @@ class _PointCard extends StatelessWidget {
                 flex: 2, // <-- กำหนดเลขส่วนให้น้อยกว่า (ให้ปุ่มนี้เล็กกว่า)
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const BenefitsPage()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BenefitsPage(),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE86A3E),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     elevation: 0,
                   ),
-                  icon: Image.asset('assets/icons/gift.png', width: 25, height: 25, color: Colors.white),
-                  label: const Text('แลกรางวัล', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+                  icon: Image.asset(
+                    'assets/icons/gift.png',
+                    width: 25,
+                    height: 25,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    'แลกรางวัล',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -503,17 +760,34 @@ class _PointCard extends StatelessWidget {
                 flex: 3, // <-- กำหนดเลขส่วนให้มากกว่า (ให้ปุ่มนี้ใหญ่กว่า)
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipHistoryPage(type: HistoryType.point)));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => const MembershipHistoryPage(
+                              type: HistoryType.point,
+                            ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black87,
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     elevation: 0,
                   ),
-                  icon: const Icon(Icons.history, size: 20, color: Colors.black87),
-                  label: const Text('ดูประวัติทั้งหมด', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w400)),
+                  icon: const Icon(
+                    Icons.history,
+                    size: 20,
+                    color: Colors.black87,
+                  ),
+                  label: const Text(
+                    'ดูประวัติทั้งหมด',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+                  ),
                 ),
               ),
             ],
@@ -529,12 +803,18 @@ class _MetricBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const Color barColor = Color(0xFFEE743B);
-    const Color gridColor = Color(0xFFE0E0E0); // ปรับสีเส้นให้เข้มขึ้นเล็กน้อยเพื่อให้เห็นชัดบนพื้นขาว
+    const Color gridColor = Color(
+      0xFFE0E0E0,
+    ); // ปรับสีเส้นให้เข้มขึ้นเล็กน้อยเพื่อให้เห็นชัดบนพื้นขาว
 
     return Container(
       height: 320,
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
@@ -546,8 +826,11 @@ class _MetricBarChart extends StatelessWidget {
             show: true,
             drawVerticalLine: false,
             // 2. ให้แสดงเส้นที่ 25, 50 และ 75 (ซึ่งเส้น 75 นี้จะเป็นเส้นบนสุด)
-            checkToShowHorizontalLine: (value) => value == 25 || value == 50 || value == 75,
-            getDrawingHorizontalLine: (value) => FlLine(color: gridColor, strokeWidth: 1, dashArray: [5, 5]),
+            checkToShowHorizontalLine:
+                (value) => value == 25 || value == 50 || value == 75,
+            getDrawingHorizontalLine:
+                (value) =>
+                    FlLine(color: gridColor, strokeWidth: 1, dashArray: [5, 5]),
           ),
           titlesData: FlTitlesData(
             show: true,
@@ -567,7 +850,10 @@ class _MetricBarChart extends StatelessWidget {
                     text = '100';
                   }
 
-                  return Text(text, style: const TextStyle(color: Colors.grey, fontSize: 10));
+                  return Text(
+                    text,
+                    style: const TextStyle(color: Colors.grey, fontSize: 10),
+                  );
                 },
               ),
             ),
@@ -588,7 +874,17 @@ class _MetricBarChart extends StatelessWidget {
                       text = 'อัพรูปครบ';
                       break;
                   }
-                  return Padding(padding: const EdgeInsets.only(top: 8.0), child: Text(text, style: const TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w800)));
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      text,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  );
                 },
               ),
             ),
@@ -612,7 +908,12 @@ class _MetricBarChart extends StatelessWidget {
           toY: y,
           color: color,
           width: 60,
-          borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10), bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+            bottomLeft: Radius.circular(10),
+            bottomRight: Radius.circular(10),
+          ),
         ),
       ],
     );
@@ -641,7 +942,12 @@ class _UsageStatsSection extends StatelessWidget {
     height: 0.5,
   );
 
-  TextStyle get _headerThaiStyle => const TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.white, height: 1.2);
+  TextStyle get _headerThaiStyle => const TextStyle(
+    fontSize: 36,
+    fontWeight: FontWeight.bold,
+    color: Colors.white,
+    height: 1.2,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -659,7 +965,17 @@ class _UsageStatsSection extends StatelessWidget {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [Text('บันทึก', style: _headerThaiStyle), const Text('ความทรงจำแรก', style: TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.bold))],
+                  children: [
+                    Text('บันทึก', style: _headerThaiStyle),
+                    const Text(
+                      'ความทรงจำแรก',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Flexible(
@@ -667,8 +983,20 @@ class _UsageStatsSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     // ✅ แก้ไขตรงนี้: ใช้ NumberAwareText แทน Text เพื่อให้ตัวเลขเป็นดิจิทัล
-                    FittedBox(child: NumberAwareText('10 Jan', numberFontFamily: 'wemory', style: _digitalDateStyle.copyWith(fontSize: 40))),
-                    FittedBox(child: NumberAwareText('2025', numberFontFamily: 'wemory', style: _digitalDateStyle.copyWith(fontSize: 50))),
+                    FittedBox(
+                      child: NumberAwareText(
+                        '10 Jan',
+                        numberFontFamily: 'wemory',
+                        style: _digitalDateStyle.copyWith(fontSize: 40),
+                      ),
+                    ),
+                    FittedBox(
+                      child: NumberAwareText(
+                        '2025',
+                        numberFontFamily: 'wemory',
+                        style: _digitalDateStyle.copyWith(fontSize: 50),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -681,9 +1009,23 @@ class _UsageStatsSection extends StatelessWidget {
         // --- แถวที่ 1 ---
         Row(
           children: [
-            Expanded(child: _buildStatBlock(icon: Image.asset('assets/icons/calendar2.png'), title: 'เดือนที่ทำต่อเนื่อง', value: '7', isDigitalFont: true)),
+            Expanded(
+              child: _buildStatBlock(
+                icon: Image.asset('assets/icons/calendar2.png'),
+                title: 'เดือนที่ทำต่อเนื่อง',
+                value: '7',
+                isDigitalFont: true,
+              ),
+            ),
             const SizedBox(width: 12),
-            Expanded(child: _buildStatBlock(icon: Image.asset('assets/icons/qricon.png'), title: 'จำนวนคนที่ใช้โค้ด', value: '10', isDigitalFont: true)),
+            Expanded(
+              child: _buildStatBlock(
+                icon: Image.asset('assets/icons/qricon.png'),
+                title: 'จำนวนคนที่ใช้โค้ด',
+                value: '10',
+                isDigitalFont: true,
+              ),
+            ),
           ],
         ),
 
@@ -691,9 +1033,23 @@ class _UsageStatsSection extends StatelessWidget {
         // --- แถวที่ 2 ---
         Row(
           children: [
-            Expanded(child: _buildStatBlock(icon: Image.asset('assets/icons/share2.png'), title: 'แชร์อัลบั้มทั้งหมด', value: '20', isDigitalFont: true)),
+            Expanded(
+              child: _buildStatBlock(
+                icon: Image.asset('assets/icons/share2.png'),
+                title: 'แชร์อัลบั้มทั้งหมด',
+                value: '20',
+                isDigitalFont: true,
+              ),
+            ),
             const SizedBox(width: 12),
-            Expanded(child: _buildStatBlock(icon: Image.asset('assets/icons/Timer.png'), title: 'เวลาเลือกรูป(นาที)', value: '300.45', isDigitalFont: true)),
+            Expanded(
+              child: _buildStatBlock(
+                icon: Image.asset('assets/icons/Timer.png'),
+                title: 'เวลาเลือกรูป(นาที)',
+                value: '300.45',
+                isDigitalFont: true,
+              ),
+            ),
           ],
         ),
 
@@ -709,7 +1065,17 @@ class _UsageStatsSection extends StatelessWidget {
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [Text('บันทึก', style: _headerThaiStyle), const Text('เรื่องราว', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold))],
+                children: [
+                  Text('บันทึก', style: _headerThaiStyle),
+                  const Text(
+                    'เรื่องราว',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
               Flexible(
                 child: FittedBox(
@@ -737,7 +1103,14 @@ class _UsageStatsSection extends StatelessWidget {
         // --- แถวสุดท้าย ---
         Row(
           children: [
-            Expanded(child: _buildStatBlock(icon: Image.asset('assets/icons/carendar.png'), title: 'เดือนที่ทำทั้งหมด', value: '8', isDigitalFont: true)),
+            Expanded(
+              child: _buildStatBlock(
+                icon: Image.asset('assets/icons/carendar.png'),
+                title: 'เดือนที่ทำทั้งหมด',
+                value: '8',
+                isDigitalFont: true,
+              ),
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: _buildStatBlock(
@@ -755,7 +1128,14 @@ class _UsageStatsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildStatBlock({required dynamic icon, required String title, required String value, bool isDigitalFont = false, double iconSize = 40, double valueFontSize = 40}) {
+  Widget _buildStatBlock({
+    required dynamic icon,
+    required String title,
+    required String value,
+    bool isDigitalFont = false,
+    double iconSize = 40,
+    double valueFontSize = 40,
+  }) {
     // ... (ส่วนจัดการ Icon เหมือนเดิม) ...
     Widget iconWidget;
     if (icon is IconData) {
@@ -769,7 +1149,10 @@ class _UsageStatsSection extends StatelessWidget {
     return Container(
       height: 100,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      decoration: BoxDecoration(color: const Color(0xFF58A3B6), borderRadius: BorderRadius.circular(4)),
+      decoration: BoxDecoration(
+        color: const Color(0xFF58A3B6),
+        borderRadius: BorderRadius.circular(4),
+      ),
       child: Row(
         children: [
           iconWidget,
@@ -799,8 +1182,15 @@ class _UsageStatsSection extends StatelessWidget {
                       numberFontFamily: isDigitalFont ? 'wemory' : 'Kanit',
                       style:
                           isDigitalFont
-                              ? _digitalTextStyle.copyWith(fontSize: valueFontSize)
-                              : TextStyle(fontFamily: 'Kanit', fontSize: valueFontSize, fontWeight: FontWeight.bold, color: Colors.white),
+                              ? _digitalTextStyle.copyWith(
+                                fontSize: valueFontSize,
+                              )
+                              : TextStyle(
+                                fontFamily: 'Kanit',
+                                fontSize: valueFontSize,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                     ),
                   ),
                 ),

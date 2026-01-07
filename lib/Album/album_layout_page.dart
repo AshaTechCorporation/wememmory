@@ -2,9 +2,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/models/media_item.dart';
-import 'package:wememmory/Album/photo_detail_sheet.dart'; 
+import 'package:wememmory/Album/photo_detail_sheet.dart';
 import 'package:wememmory/Album/video_detail_sheet.dart';
-import 'package:wememmory/Album/final_preview_sheet.dart'; 
+import 'package:wememmory/Album/final_preview_sheet.dart';
 
 class PhotoDragData {
   final int index;
@@ -13,7 +13,7 @@ class PhotoDragData {
 
 class AlbumLayoutPage extends StatefulWidget {
   final List<MediaItem> selectedItems;
-  final String monthName; 
+  final String monthName;
 
   const AlbumLayoutPage({
     super.key,
@@ -26,11 +26,11 @@ class AlbumLayoutPage extends StatefulWidget {
 }
 
 class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
-  late List<MediaItem> _items; 
+  late List<MediaItem> _items;
   bool _isDragging = false;
 
-  final double _imageRadius = 6.0; 
-  final double _frameRadius = 0.0; 
+  final double _imageRadius = 6.0;
+  final double _frameRadius = 0.0;
 
   @override
   void initState() {
@@ -50,7 +50,7 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
   // ✅ แก้ไข: รอรับการกลับมาจากการแก้ไขรูป แล้วสั่ง setState
   Future<void> _handlePhotoTap(int index) async {
     final selectedItem = _items[index];
-    
+
     if (selectedItem.type == MediaType.video) {
       await showModalBottomSheet(
         context: context,
@@ -100,7 +100,16 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
               children: [
                 Text(
                   '$monthTitle : เลือก 11 ของคุณ',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: const TextStyle(
+                    fontFamily: "Kanit",
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500, // ตรงกับ Medium (500)
+                    height:
+                        16 /
+                        20, // คำนวณจาก Line-height (16) หารด้วย Font-size (20) = 0.8
+                    letterSpacing: 0, // 0%
+                    color: Colors.black87,
+                  ),
                 ),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
@@ -121,9 +130,22 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
             padding: EdgeInsets.symmetric(horizontal: 7.0),
             child: Row(
               children: [
-                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true, isCompleted: true),
-                _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true, isCompleted: false),
-                _StepItem(label: 'พรีวิวสุดท้าย', isActive: false, isLast: true),
+                _StepItem(
+                  label: 'เลือกรูปภาพ',
+                  isActive: true,
+                  isFirst: true,
+                  isCompleted: true,
+                ),
+                _StepItem(
+                  label: 'แก้ไขและจัดเรียง',
+                  isActive: true,
+                  isCompleted: false,
+                ),
+                _StepItem(
+                  label: 'พรีวิวสุดท้าย',
+                  isActive: false,
+                  isLast: true,
+                ),
               ],
             ),
           ),
@@ -134,9 +156,21 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
             TextSpan(
               style: TextStyle(fontSize: 13, color: Colors.grey),
               children: [
-                TextSpan(text: "แตะ", style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 121, 121, 121))),
+                TextSpan(
+                  text: "แตะ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 121, 121, 121),
+                  ),
+                ),
                 TextSpan(text: "เพื่อแก้ไข • "),
-                TextSpan(text: "ลาก", style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 121, 121, 121))),
+                TextSpan(
+                  text: "ลาก",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 121, 121, 121),
+                  ),
+                ),
                 TextSpan(text: "เพื่อจัดลำดับ"),
               ],
             ),
@@ -170,27 +204,40 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                                     mainAxisSpacing: 3,
                                     childAspectRatio: 1.0,
                                     shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
                                     children: [
                                       Container(
-                                        decoration: const BoxDecoration(color: Colors.white),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                        ),
                                         child: Center(
                                           child: Text(
                                             monthTitle,
-                                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black87,
+                                            ),
                                           ),
                                         ),
                                       ),
                                       for (int i = 0; i < 5; i++)
                                         if (i < _items.length)
                                           _ReorderableSlot(
-                                            key: ObjectKey(_items[i]), 
+                                            key: ObjectKey(_items[i]),
                                             item: _items[i],
                                             index: i,
                                             onDrop: _handlePhotoDrop,
                                             onTap: () => _handlePhotoTap(i),
-                                            onDragStart: () => setState(() => _isDragging = true),
-                                            onDragEnd: () => setState(() => _isDragging = false),
+                                            onDragStart:
+                                                () => setState(
+                                                  () => _isDragging = true,
+                                                ),
+                                            onDragEnd:
+                                                () => setState(
+                                                  () => _isDragging = false,
+                                                ),
                                             imageRadius: _imageRadius,
                                             frameRadius: _frameRadius,
                                           )
@@ -209,7 +256,8 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                                     mainAxisSpacing: 3,
                                     childAspectRatio: 1.0,
                                     shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
                                     children: [
                                       for (int i = 0; i < 6; i++)
                                         if ((i + 5) < _items.length)
@@ -219,8 +267,14 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                                             index: i + 5,
                                             onDrop: _handlePhotoDrop,
                                             onTap: () => _handlePhotoTap(i + 5),
-                                            onDragStart: () => setState(() => _isDragging = true),
-                                            onDragEnd: () => setState(() => _isDragging = false),
+                                            onDragStart:
+                                                () => setState(
+                                                  () => _isDragging = true,
+                                                ),
+                                            onDragEnd:
+                                                () => setState(
+                                                  () => _isDragging = false,
+                                                ),
                                             imageRadius: _imageRadius,
                                             frameRadius: _frameRadius,
                                           )
@@ -258,9 +312,7 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
           // Bottom Buttons
           Container(
             padding: const EdgeInsets.fromLTRB(20, 25, 20, 50),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-            ),
+            decoration: const BoxDecoration(color: Colors.white),
             child: Column(
               children: [
                 SizedBox(
@@ -273,18 +325,28 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                         context: context,
                         isScrollControlled: true,
                         backgroundColor: Colors.transparent,
-                        builder: (context) => FinalPreviewSheet(
-                          items: _items,
-                          monthName: widget.monthName,
-                        ),
+                        builder:
+                            (context) => FinalPreviewSheet(
+                              items: _items,
+                              monthName: widget.monthName,
+                            ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFED7D31),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(1),
+                      ),
                       elevation: 0,
                     ),
-                    child: const Text('บันทึก', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      'บันทึก',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -295,9 +357,18 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.grey[300],
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(1),
+                      ),
                     ),
-                    child: const Text('ย้อนกลับ', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      'ย้อนกลับ',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -309,19 +380,15 @@ class _AlbumLayoutPageState extends State<AlbumLayoutPage> {
   }
 
   Widget _buildPageContainer({required Widget child}) {
-    return SizedBox(
-      width: 160,
-      height: 245,
-      child: child,
-    );
+    return SizedBox(width: 160, height: 245, child: child);
   }
 }
 
 // ... (ส่วน _ReorderableSlot, _PhotoSlot, _StepItem เหมือนเดิม ไม่ต้องแก้)
-// ถ้าต้องการ ผมสามารถรวมส่วน Widget ย่อยทั้งหมดให้ในคำตอบเดียวได้ครับ 
+// ถ้าต้องการ ผมสามารถรวมส่วน Widget ย่อยทั้งหมดให้ในคำตอบเดียวได้ครับ
 // แต่เพื่อความกระชับ สามารถใช้ Widget ย่อยเดิมจากคำตอบก่อนหน้าได้เลย
 
-// _ReorderableSlot (ตัวจัดการการลาก) 
+// _ReorderableSlot (ตัวจัดการการลาก)
 class _ReorderableSlot extends StatelessWidget {
   final MediaItem item;
   final int index;
@@ -347,10 +414,10 @@ class _ReorderableSlot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final photoWidget = _PhotoSlot(
-      key: ValueKey(item), 
-      item: item, 
-      frameRadius: frameRadius, 
-      imageRadius: imageRadius
+      key: ValueKey(item),
+      item: item,
+      frameRadius: frameRadius,
+      imageRadius: imageRadius,
     );
 
     return DragTarget<PhotoDragData>(
@@ -362,7 +429,10 @@ class _ReorderableSlot extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(frameRadius),
-            border: isHovered ? Border.all(color: const Color(0xFF5AB6D8), width: 3) : null,
+            border:
+                isHovered
+                    ? Border.all(color: const Color(0xFF5AB6D8), width: 3)
+                    : null,
           ),
           child: LongPressDraggable<PhotoDragData>(
             data: PhotoDragData(index),
@@ -377,16 +447,15 @@ class _ReorderableSlot extends StatelessWidget {
             childWhenDragging: Opacity(opacity: 0.3, child: photoWidget),
             onDragStarted: onDragStart,
             onDragEnd: (_) => onDragEnd(),
-            child: GestureDetector(
-              onTap: onTap,
-              child: photoWidget,
-            ),
+            child: GestureDetector(onTap: onTap, child: photoWidget),
           ),
         );
       },
     );
   }
-}class _PhotoSlot extends StatefulWidget {
+}
+
+class _PhotoSlot extends StatefulWidget {
   final MediaItem item;
   final double frameRadius;
   final double imageRadius;
@@ -415,7 +484,8 @@ class _PhotoSlotState extends State<_PhotoSlot> {
   void didUpdateWidget(covariant _PhotoSlot oldWidget) {
     super.didUpdateWidget(oldWidget);
     // เช็คว่า item เปลี่ยน หรือ capturedImage เปลี่ยนหรือไม่ เพื่อโหลดใหม่
-    if (oldWidget.item != widget.item || oldWidget.item.capturedImage != widget.item.capturedImage) {
+    if (oldWidget.item != widget.item ||
+        oldWidget.item.capturedImage != widget.item.capturedImage) {
       _loadThumbnail();
     }
   }
@@ -423,17 +493,19 @@ class _PhotoSlotState extends State<_PhotoSlot> {
   void _loadThumbnail() {
     // ถ้ามีรูปที่ capture มาแล้ว (แก้ไขแล้ว) ไม่ต้องโหลด thumbnail เดิม
     if (widget.item.capturedImage != null) {
-      if (mounted) setState(() {}); 
+      if (mounted) setState(() {});
       return;
     }
 
-    widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)).then((data) {
-      if (mounted && data != null) {
-        setState(() {
-          _thumbnailData = data;
-        });
-      }
-    });
+    widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)).then(
+      (data) {
+        if (mounted && data != null) {
+          setState(() {
+            _thumbnailData = data;
+          });
+        }
+      },
+    );
   }
 
   @override
@@ -442,13 +514,12 @@ class _PhotoSlotState extends State<_PhotoSlot> {
     // [LOGIC ตรวจสอบสถานะ]: รูปนี้ถูกแก้ไขหรือยัง?
     // เช็คว่ามี capturedImage (รูปที่แต่งแล้ว) หรือมี caption (คำบรรยาย) หรือไม่
     // -----------------------------------------------------------------
-    bool isModified = widget.item.capturedImage != null || 
-                      (widget.item.caption != null && widget.item.caption!.isNotEmpty);
+    bool isModified =
+        widget.item.capturedImage != null ||
+        (widget.item.caption != null && widget.item.caption!.isNotEmpty);
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-      ),
+      decoration: const BoxDecoration(color: Colors.white),
       padding: const EdgeInsets.all(4.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(widget.imageRadius),
@@ -479,7 +550,7 @@ class _PhotoSlotState extends State<_PhotoSlot> {
                           color: Colors.black.withOpacity(0.2),
                           blurRadius: 2,
                           offset: const Offset(0, 1),
-                        )
+                        ),
                       ],
                     ),
                     child: Image.asset(
@@ -496,8 +567,6 @@ class _PhotoSlotState extends State<_PhotoSlot> {
     );
   }
 }
-
-
 
 class _StepItem extends StatelessWidget {
   final String label;
@@ -528,14 +597,17 @@ class _StepItem extends StatelessWidget {
                 child: Container(
                   height: 2,
                   // ถ้า Active เส้นซ้ายเป็นสีฟ้า
-                  color: isFirst
-                      ? Colors.transparent
-                      : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]),
+                  color:
+                      isFirst
+                          ? Colors.transparent
+                          : (isActive
+                              ? const Color(0xFF5AB6D8)
+                              : Colors.grey[300]),
                 ),
               ),
-              
+
               const SizedBox(width: 40),
-              
+
               // --- จุดวงกลม ---
               Container(
                 width: 11,
@@ -545,18 +617,21 @@ class _StepItem extends StatelessWidget {
                   color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300],
                 ),
               ),
-              
+
               const SizedBox(width: 40),
-              
+
               // --- เส้นขวา ---
               Expanded(
                 flex: 2,
                 child: Container(
                   height: 2,
                   // Logic: ถ้าไม่ใช่ตัวสุดท้าย และ isCompleted เป็นจริง ให้เป็นสีฟ้า
-                  color: isLast
-                      ? Colors.transparent
-                      : (isCompleted ? const Color(0xFF5AB6D8) : Colors.grey[300]),
+                  color:
+                      isLast
+                          ? Colors.transparent
+                          : (isCompleted
+                              ? const Color(0xFF5AB6D8)
+                              : Colors.grey[300]),
                 ),
               ),
             ],

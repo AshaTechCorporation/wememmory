@@ -121,8 +121,13 @@ class _PrintSheetState extends State<PrintSheet> {
                 const Text(
                   'สั่งพิมพ์',
                   style: TextStyle(
+                    fontFamily: "Kanit",
                     fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500, // ตรงกับ Medium (500)
+                    height:
+                        16 /
+                        20, // คำนวณจาก Line-height (16) หารด้วย Font-size (20) = 0.8
+                    letterSpacing: 0, // 0%
                     color: Colors.black87,
                   ),
                 ),
@@ -155,9 +160,13 @@ class _PrintSheetState extends State<PrintSheet> {
                 children: [
                   const Text(
                     "อัลบั้มรูปของคุณ",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      height: 16 / 20,
+                    ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 18),
 
                   // แสดง Preview (ใช้ Widget เดิม)
                   _PrintPreviewSection(
@@ -180,7 +189,7 @@ class _PrintSheetState extends State<PrintSheet> {
                         "ส่งของขวัญ",
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
                       _buildCustomSwitch(
@@ -284,7 +293,7 @@ class _PrintSheetState extends State<PrintSheet> {
                   const SizedBox(height: 24),
                   const Text(
                     "รายละเอียดการสั่งพิมพ์",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 12),
                   Row(
@@ -434,8 +443,8 @@ class _PrintSheetState extends State<PrintSheet> {
                       "สั่งพิมพ์",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -466,7 +475,7 @@ class _PrintSheetState extends State<PrintSheet> {
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 8),
         Container(

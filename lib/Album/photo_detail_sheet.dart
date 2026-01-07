@@ -139,12 +139,23 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        IconButton(icon: const Icon(Icons.arrow_back, color: Colors.black87), padding: EdgeInsets.zero, constraints: const BoxConstraints(), onPressed: () => Navigator.pop(context)),
-                        const SizedBox(width: 12),
-                        const Text("รายละเอียดรูปภาพ", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
-                      ],
+
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.black87),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      "รายละเอียดรูปภาพ",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                        height: 16 / 20,
+                      ),
+
                     ),
                     GestureDetector(onTap: () => Navigator.pop(context), child: Image.asset('assets/icons/cross.png', width: 25, height: 25, fit: BoxFit.contain)),
                   ],
