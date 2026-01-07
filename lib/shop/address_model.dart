@@ -1,39 +1,9 @@
-// address_model.dart
-// ไฟล์: address_data.dart หรือ address_model.dart
+// lib/shop/address_model.dart
+import 'package:flutter/material.dart';
 
-// --- ตัวแปรกลางสำหรับเก็บข้อมูล (จะไม่หายไปไหนตราบใดที่แอปยังเปิดอยู่) ---
-List<AddressInfo> globalAddressList = [
-  // ข้อมูลตัวอย่าง (ลบออกได้)
-  AddressInfo(
-    name: 'ชื่อ-นามสกุล',
-    phone: '099-999-9999',
-    province: 'กรุงเทพมหานคร',
-    district: 'ปทุมวัน',
-    subDistrict: 'ปทุมวัน',
-    detail: '',
-  ),
-];
-
-
-class AddressInfo {
-  final String name;
-  final String phone;
-  final String province;
-  final String district;
-  final String subDistrict;
-  final String detail;
-
-  const AddressInfo({
-    required this.name,
-    required this.phone,
-    this.province = '',
-    this.district = '',
-    this.subDistrict = '',
-    this.detail = '',
-  });
-}
-
-// ฟังก์ชันช่วยแปลงค่า (ไม่ว่า JSON จะมาเป็น String หรือ Int ก็รับได้หมด)
+// -----------------------------------------------------------------------------
+// Helper Functions
+// -----------------------------------------------------------------------------
 int _parseInt(dynamic value) {
   if (value is int) return value;
   if (value is String) return int.tryParse(value) ?? 0;
@@ -44,86 +14,134 @@ String _parseString(dynamic value) {
   return value?.toString() ?? '';
 }
 
+// -----------------------------------------------------------------------------
+// 1. Province
+// -----------------------------------------------------------------------------
 class Province {
-  final int id;
-  final int provinceCode;
+  final int id;      
+  final int code;    
   final String nameTh;
   final String nameEn;
 
-  Province({required this.id, required this.provinceCode, required this.nameTh, required this.nameEn});
+  Province({required this.id, required this.code, required this.nameTh, required this.nameEn});
 
   factory Province.fromJson(Map<String, dynamic> json) {
     return Province(
       id: _parseInt(json['id']),
-      provinceCode: _parseInt(json['provinceCode']),
-      nameTh: _parseString(json['nameTH']),
-      nameEn: _parseString(json['nameEn']),
+      code: _parseInt(json['province_code'] ?? json['provinceCode'] ?? json['code']),
+      nameTh: _parseString(json['name_th'] ?? json['nameTH']),
+      nameEn: _parseString(json['name_en'] ?? json['nameEn']),
     );
   }
-
+  
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Province && runtimeType == other.runtimeType && id == other.id;
-
+  String toString() => nameTh;
+  
+  @override
+  bool operator ==(Object other) => identical(this, other) || other is Province && id == other.id;
   @override
   int get hashCode => id.hashCode;
 }
 
+// -----------------------------------------------------------------------------
+// 2. District
+// -----------------------------------------------------------------------------
 class District {
-  final int id;
-  final int provinceCode;
-  final int districtCode;
+  final int id;           
+  final int code;         
+  final int provinceId;   
   final String nameTh;
   final String nameEn;
 
-  District({required this.id, required this.provinceCode, required this.districtCode, required this.nameTh, required this.nameEn});
+  District({required this.id, required this.code, required this.provinceId, required this.nameTh, required this.nameEn});
 
   factory District.fromJson(Map<String, dynamic> json) {
     return District(
       id: _parseInt(json['id']),
-      provinceCode: _parseInt(json['provinceCode']),
-      districtCode: _parseInt(json['districtCode']),
-      nameTh: _parseString(json['nameTH']),
-      nameEn: _parseString(json['nameEn']),
+      // ✅ แก้ไข: เพิ่มการเช็ค 'districtCode' และ 'amphure_code' ให้ครอบคลุม
+      code: _parseInt(json['districtCode'] ?? json['amphure_code'] ?? json['district_code'] ?? json['code']),
+      // ✅ แก้ไข: เช็ค provinceCode ให้ครอบคลุม
+      provinceId: _parseInt(json['province_id'] ?? json['provinceCode']),
+      nameTh: _parseString(json['name_th'] ?? json['nameTH']),
+      nameEn: _parseString(json['name_en'] ?? json['nameEn']),
     );
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is District && runtimeType == other.runtimeType && id == other.id;
+  String toString() => nameTh;
 
+  @override
+  bool operator ==(Object other) => identical(this, other) || other is District && id == other.id;
   @override
   int get hashCode => id.hashCode;
 }
 
+// -----------------------------------------------------------------------------
+// 3. Subdistrict
+// -----------------------------------------------------------------------------
 class Subdistrict {
   final int id;
-  final int districtCode;
-  final int? subdistrictCode;
+  final int districtId;  // FK ไปหา District
   final String nameTh;
   final String nameEn;
   final int postalCode;
 
-  Subdistrict({required this.id, required this.districtCode, this.subdistrictCode, required this.nameTh, required this.nameEn, required this.postalCode});
+  Subdistrict({required this.id, required this.districtId, required this.nameTh, required this.nameEn, required this.postalCode});
 
   factory Subdistrict.fromJson(Map<String, dynamic> json) {
     return Subdistrict(
       id: _parseInt(json['id']),
-      districtCode: _parseInt(json['districtCode']),
-      subdistrictCode: _parseInt(json['subdistrictCode']),
-      nameTh: _parseString(json['nameTH']),
-      nameEn: _parseString(json['nameEn']),
-      postalCode: _parseInt(json['postalCode']),
+      // ✅ แก้ไข: เช็ค districtCode ให้ครอบคลุม เพื่อให้ Link กับ District ได้ถูกต้อง
+      districtId: _parseInt(json['districtCode'] ?? json['amphure_id'] ?? json['district_id']),
+      nameTh: _parseString(json['name_th'] ?? json['nameTH']),
+      nameEn: _parseString(json['name_en'] ?? json['nameEn']),
+      postalCode: _parseInt(json['zip_code'] ?? json['postalCode']),
     );
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Subdistrict && runtimeType == other.runtimeType && id == other.id;
+  String toString() => nameTh;
 
+  @override
+  bool operator ==(Object other) => identical(this, other) || other is Subdistrict && id == other.id;
   @override
   int get hashCode => id.hashCode;
 }
+
+// -----------------------------------------------------------------------------
+// AddressInfo
+// -----------------------------------------------------------------------------
+class AddressInfo {
+  final String name;
+  final String phone;
+  final String province;
+  final String district;
+  final String subDistrict;
+  final String detail;
+  final String? postalCode;
+  
+  // ✅ เพิ่ม 2 ตัวแปรนี้
+  final double? lat; 
+  final double? lng;
+
+  const AddressInfo({
+    required this.name,
+    required this.phone,
+    this.province = '',
+    this.district = '',
+    this.subDistrict = '',
+    this.detail = '',
+    this.postalCode,
+    this.lat, // ✅ เพิ่มใน constructor
+    this.lng, // ✅ เพิ่มใน constructor
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is AddressInfo && name == other.name && detail == other.detail;
+  @override
+  int get hashCode => Object.hash(name, phone, detail);
+}
+
+// ✅ เพิ่มตัวแปร Global ตามที่ขอครับ
+List<AddressInfo> globalAddressList = [];
