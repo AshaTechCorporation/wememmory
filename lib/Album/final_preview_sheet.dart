@@ -14,7 +14,11 @@ class FinalPreviewSheet extends StatefulWidget {
   final List<MediaItem> items; //รับรูปภาพมาแสดง มาจาก album_layout_page.dart
   final String monthName; //รับตัวแปร ชื่อเดือนมา มาจาก album_layout_page.dart
 
-  const FinalPreviewSheet({super.key, required this.items, required this.monthName});
+  const FinalPreviewSheet({
+    super.key,
+    required this.items,
+    required this.monthName,
+  });
 
   @override
   State<FinalPreviewSheet> createState() => _FinalPreviewSheetState();
@@ -28,14 +32,24 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.95,
-      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       child: Column(
         children: [
           // ---------------------------------------------------------
           // Slide Indicator
           // ---------------------------------------------------------
           const SizedBox(height: 12),
-          Container(width: 61, height: 5, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2.5))),
+          Container(
+            width: 61,
+            height: 5,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2.5),
+            ),
+          ),
           // ---------------------------------------------------------
 
           // 1. Header
@@ -44,8 +58,23 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('พรีวิวสุดท้าย & ยืนยัน', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)),
-                GestureDetector(onTap: () => Navigator.pop(context), child: Image.asset('assets/icons/cross.png', width: 25, height: 25, fit: BoxFit.contain)),
+                const Text(
+                  'พรีวิวสุดท้าย & ยืนยัน',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Image.asset(
+                    'assets/icons/cross.png',
+                    width: 25,
+                    height: 25,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ],
             ),
           ),
@@ -58,9 +87,18 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
             child: Row(
               children: [
                 // Step 1: เลือกรูปภาพ
-                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true, isCompleted: true),
+                _StepItem(
+                  label: 'เลือกรูปภาพ',
+                  isActive: true,
+                  isFirst: true,
+                  isCompleted: true,
+                ),
                 // Step 2: แก้ไขและจัดเรียง
-                _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true, isCompleted: true),
+                _StepItem(
+                  label: 'แก้ไขและจัดเรียง',
+                  isActive: true,
+                  isCompleted: true,
+                ),
                 // Step 3: พรีวิวสุดท้าย
                 _StepItem(label: 'พรีวิวสุดท้าย', isActive: true, isLast: true),
               ],
@@ -74,9 +112,17 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
               children: [
-                _buildCustomToggle("พิมพ์พร้อมคำบรรยาย", _withCaption, (val) => setState(() => _withCaption = val)),
+                _buildCustomToggle(
+                  "พิมพ์พร้อมคำบรรยาย",
+                  _withCaption,
+                  (val) => setState(() => _withCaption = val),
+                ),
                 const SizedBox(height: 12),
-                _buildCustomToggle("พิมพ์พร้อมวันที่", _withDate, (val) => setState(() => _withDate = val)),
+                _buildCustomToggle(
+                  "พิมพ์พร้อมวันที่",
+                  _withDate,
+                  (val) => setState(() => _withDate = val),
+                ),
               ],
             ),
           ),
@@ -109,12 +155,29 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
                     width: double.infinity,
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: const Color(0xFFE0F2F7), borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFFB3E0EE))),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE0F2F7),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFB3E0EE)),
+                    ),
                     child: Column(
                       children: [
-                        const Text("พร้อมแบ่งปันความทรงจำแล้วหรือยัง?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87)),
+                        const Text(
+                          "พร้อมแบ่งปันความทรงจำแล้วหรือยัง?",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
+                        ),
                         const SizedBox(height: 4),
-                        Text("สร้างภาพสวยๆ เพื่อแชร์ลงโซเชียลมีเดียได้เลย!", style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                        Text(
+                          "สร้างภาพสวยๆ เพื่อแชร์ลงโซเชียลมีเดียได้เลย!",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -142,11 +205,28 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
                         context: context,
                         isScrollControlled: true,
                         backgroundColor: Colors.transparent,
-                        builder: (context) => PrintSheet(items: widget.items, monthName: widget.monthName),
+                        builder:
+                            (context) => PrintSheet(
+                              items: widget.items,
+                              monthName: widget.monthName,
+                            ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFED7D31), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)), elevation: 0),
-                    child: const Text('ยืนยัน', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFED7D31),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(1),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'ยืนยัน',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -155,8 +235,20 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
                   height: 50,
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
-                    style: TextButton.styleFrom(backgroundColor: Colors.grey[300], shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1))),
-                    child: const Text('ย้อนกลับ', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.grey[300],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(1),
+                      ),
+                    ),
+                    child: const Text(
+                      'ย้อนกลับ',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -167,7 +259,6 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
     );
   }
 
- 
   // ✅ ฟังก์ชัน Custom Toggle ที่ปรับปรุงให้ใช้ซ้ำได้
   Widget _buildCustomToggle(
     String label,
@@ -177,7 +268,10 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
         GestureDetector(
           onTap: () => onChanged(!value),
           child: AnimatedContainer(
@@ -247,10 +341,24 @@ class _AlbumPreviewSection extends StatelessWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         // Slot 0: ชื่อเดือน
-                        Container(decoration: const BoxDecoration(color: Colors.white), child: Center(child: Text(monthName.split(' ')[0], style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)))),
+                        Container(
+                          decoration: const BoxDecoration(color: Colors.white),
+                          child: Center(
+                            child: Text(
+                              monthName.split(' ')[0],
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
                         // Slot 1-5: รูปภาพ
                         for (int i = 0; i < 5; i++)
-                          if (i < items.length) _StaticPhotoSlot(item: items[i]) else const SizedBox(),
+                          if (i < items.length)
+                            _StaticPhotoSlot(item: items[i], allItems: items)
+                          else
+                            const SizedBox(),
                       ],
                     ),
                   ),
@@ -267,7 +375,13 @@ class _AlbumPreviewSection extends StatelessWidget {
                       children: [
                         // Slots 6-11: รูปภาพ
                         for (int i = 0; i < 6; i++)
-                          if ((i + 5) < items.length) _StaticPhotoSlot(item: items[i + 5]) else const SizedBox(),
+                          if ((i + 5) < items.length)
+                            _StaticPhotoSlot(
+                              item: items[i + 5],
+                              allItems: items,
+                            )
+                          else
+                            const SizedBox(),
                       ],
                     ),
                   ),
@@ -288,7 +402,14 @@ class _AlbumPreviewSection extends StatelessWidget {
 // _StaticPhotoSlot
 class _StaticPhotoSlot extends StatefulWidget {
   final MediaItem item;
-  const _StaticPhotoSlot({required this.item});
+  final List<MediaItem> allItems; // ✅ 1. เพิ่มตัวรับค่า List ทั้งหมด
+
+  // ✅ 2. อัปเดต Constructor
+  const _StaticPhotoSlot({
+    super.key,
+    required this.item,
+    required this.allItems,
+  });
 
   @override
   State<_StaticPhotoSlot> createState() => _StaticPhotoSlotState();
@@ -324,16 +445,35 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ เช็คว่ามีการแก้ไขหรือไม่ (มี caption หรือ tags)
     bool isEdited =
         widget.item.caption.isNotEmpty || widget.item.tags.isNotEmpty;
 
     return GestureDetector(
-      // ✅ ถ้ามีการแก้ไข ให้กดแล้วไปหน้า PhotoReadonlyPage
+      // ✅ 3. แก้ไข onTap ให้ส่ง List และ Index ไปยัง PhotoReadonlyPage
       onTap:
           isEdited
               ? () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => PhotoReadonlyPage(item: widget.item)));
+                // กรองเฉพาะรูปที่มีการแก้ไข
+                List<MediaItem> editedItems =
+                    widget.allItems.where((e) {
+                      return e.caption.isNotEmpty || e.tags.isNotEmpty;
+                    }).toList();
+
+                // หาตำแหน่งรูปปัจจุบัน
+                int initialIndex = editedItems.indexOf(widget.item);
+
+                if (initialIndex != -1) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => PhotoReadonlyPage(
+                            items: editedItems, // ส่ง List
+                            initialIndex: initialIndex, // ส่ง Index
+                          ),
+                    ),
+                  );
+                }
               }
               : null,
       child: Container(
@@ -346,10 +486,11 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                // แสดงรูปภาพ
-                if (_imageData != null) Image.memory(_imageData!, fit: BoxFit.cover) else Container(color: Colors.grey[200]),
+                if (_imageData != null)
+                  Image.memory(_imageData!, fit: BoxFit.cover)
+                else
+                  Container(color: Colors.grey[200]),
 
-                // ✅ แสดง Overlay "แตะเพื่ออ่าน" เฉพาะรูปที่มีการแก้ไข
                 if (isEdited)
                   Positioned(
                     bottom: 10,
@@ -362,11 +503,8 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(
-                            0.3,
-                          ), // พื้นหลังสีดำจางๆ
+                          color: Colors.black.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(20),
-                          // border: Border.all(color: Colors.white.withOpacity(0.5), width: 1),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -375,11 +513,17 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
                               'assets/icons/alert.png',
                               width: 11,
                               height: 11,
-                              color: Colors.white, // ใส่สีขาวเพื่อให้เห็นชัดบนพื้นดำ (ลบออกได้ถ้ารูปมีสีอยู่แล้ว)
+                              color: Colors.white,
                               fit: BoxFit.contain,
                             ),
-                            //  SizedBox(width: 2),
-                            Text("แตะเพื่ออ่าน", style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+                            const Text(
+                              "แตะเพื่ออ่าน",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -402,7 +546,14 @@ class _StepItem extends StatelessWidget {
   final bool isLast;
   final bool isCompleted;
 
-  const _StepItem({super.key, required this.label, required this.isActive, this.isFirst = false, this.isLast = false, this.isCompleted = false});
+  const _StepItem({
+    super.key,
+    required this.label,
+    required this.isActive,
+    this.isFirst = false,
+    this.isLast = false,
+    this.isCompleted = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -411,18 +562,51 @@ class _StepItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(flex: 2, child: Container(height: 2, color: isFirst ? Colors.transparent : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]))),
+              Expanded(
+                flex: 2,
+                child: Container(
+                  height: 2,
+                  color:
+                      isFirst
+                          ? Colors.transparent
+                          : (isActive
+                              ? const Color(0xFF5AB6D8)
+                              : Colors.grey[300]),
+                ),
+              ),
               const SizedBox(width: 40),
-              Container(width: 11, height: 11, decoration: BoxDecoration(shape: BoxShape.circle, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300])),
+              Container(
+                width: 11,
+                height: 11,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300],
+                ),
+              ),
               const SizedBox(width: 40),
-              Expanded(flex: 2, child: Container(height: 2, color: isLast ? Colors.transparent : (isCompleted ? const Color(0xFF5AB6D8) : Colors.grey[300]))),
+              Expanded(
+                flex: 2,
+                child: Container(
+                  height: 2,
+                  color:
+                      isLast
+                          ? Colors.transparent
+                          : (isCompleted
+                              ? const Color(0xFF5AB6D8)
+                              : Colors.grey[300]),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 5),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400], fontWeight: isActive ? FontWeight.w600 : FontWeight.normal),
+            style: TextStyle(
+              fontSize: 12,
+              color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400],
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+            ),
           ),
         ],
       ),
