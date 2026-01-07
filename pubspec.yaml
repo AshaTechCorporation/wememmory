@@ -58,6 +58,8 @@ dependencies:
   flutter_launcher_icons: ^0.14.4
   location: ^8.0.1
   google_maps_flutter: ^2.12.2
+  geocoding: ^2.1.0
+  geolocator: ^10.1.0
 
 dev_dependencies:
   flutter_test:

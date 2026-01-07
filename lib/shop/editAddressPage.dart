@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // จำเป็นสำหรับ TextInputFormatter
-import 'package:wememmory/shop/address_model.dart'; // ตรวจสอบ path ให้ถูกต้อง
-import 'package:wememmory/shop/addressDetailPage.dart'; // ตรวจสอบ path ให้ถูกต้อง
+import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:wememmory/shop/address_model.dart';
+import 'package:wememmory/shop/addressDetailPage.dart'; // ตรวจสอบว่าไฟล์ AddressPickerPage อยู่ที่ path นี้จริงหรือไม่
 
 class EditAddressPage extends StatefulWidget {
   final int? index;
@@ -20,6 +21,12 @@ class _EditAddressPageState extends State<EditAddressPage> {
   String district = '';
   String subDistrict = '';
   String postalCode = '';
+  
+  double? _lat;
+  double? _lng;
+
+  // ตัวแปร Controller แผนที่
+  GoogleMapController? _mapController;
 
   @override
   void initState() {
@@ -28,7 +35,6 @@ class _EditAddressPageState extends State<EditAddressPage> {
       final data = globalAddressList[widget.index!];
       _nameController = TextEditingController(text: data.name);
       
-      // ✅ จัดรูปแบบเบอร์โทรเดิม (0812345678 -> 081-234-5678) เพื่อแสดงผลตอนแก้ไข
       String formattedPhone = data.phone;
       if (data.phone.length == 10) {
         formattedPhone = '${data.phone.substring(0, 3)}-${data.phone.substring(3, 6)}-${data.phone.substring(6)}';
@@ -39,6 +45,10 @@ class _EditAddressPageState extends State<EditAddressPage> {
       province = data.province;
       district = data.district;
       subDistrict = data.subDistrict;
+      postalCode = data.postalCode ?? '';
+      
+      _lat = data.lat;
+      _lng = data.lng;
     } else {
       _nameController = TextEditingController();
       _phoneController = TextEditingController();
@@ -47,16 +57,17 @@ class _EditAddressPageState extends State<EditAddressPage> {
   }
 
   void _onSave() {
-    // ✅ ลบขีด (-) ออกจากเบอร์โทรศัพท์ก่อนบันทึกลงตัวแปร
     final cleanPhone = _phoneController.text.replaceAll('-', '');
-
     final newData = AddressInfo(
       name: _nameController.text,
-      phone: cleanPhone, // บันทึกเฉพาะตัวเลข
+      phone: cleanPhone,
       province: province,
       district: district,
       subDistrict: subDistrict,
       detail: _detailController.text,
+      postalCode: postalCode,
+      lat: _lat, 
+      lng: _lng, 
     );
 
     setState(() {
@@ -68,9 +79,9 @@ class _EditAddressPageState extends State<EditAddressPage> {
     });
     Navigator.pop(context);
   }
-
+  
   void _onDelete() {
-    showDialog(
+     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -99,8 +110,8 @@ class _EditAddressPageState extends State<EditAddressPage> {
                           setState(() {
                             globalAddressList.removeAt(widget.index!);
                           });
-                          Navigator.pop(context); // ปิด Dialog
-                          Navigator.pop(context); // กลับหน้าเดิม
+                          Navigator.pop(context); 
+                          Navigator.pop(context); 
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -163,8 +174,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('ชื่อ - นามสกุล',
-                style: TextStyle(fontWeight: FontWeight.w400,fontSize: 16)),
+            const Text('ชื่อ - นามสกุล', style: TextStyle(fontWeight: FontWeight.w400,fontSize: 16)),
             const SizedBox(height: 8),
             TextField(
               controller: _nameController,
@@ -176,61 +186,69 @@ class _EditAddressPageState extends State<EditAddressPage> {
                 filled: false,
                 border: borderStyle,
                 enabledBorder: borderStyle,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
-              style: const TextStyle(
-                fontFamily: 'Kanit',
-                fontSize: 16,
-                color: Colors.black,
-              ),
+              style: const TextStyle(fontFamily: 'Kanit', fontSize: 16, color: Colors.black),
             ),
             const SizedBox(height: 16),
-            const Text('หมายเลขโทรศัพท์',
-                style: TextStyle(fontWeight: FontWeight.w400,fontSize: 16)),
+            const Text('หมายเลขโทรศัพท์', style: TextStyle(fontWeight: FontWeight.w400,fontSize: 16)),
             const SizedBox(height: 8),
-
-            // ✅ TextField เบอร์โทรศัพท์ พร้อม Formatter
             TextField(
               controller: _phoneController,
               keyboardType: TextInputType.phone,
-              inputFormatters: [
-                // เรียกใช้ Class Formatter ที่เราสร้างด้านล่างสุด
-                ThaiPhoneNumberFormatter(),
-              ],
+              inputFormatters: [ThaiPhoneNumberFormatter()],
               decoration: InputDecoration(
-                hintText: '098-765-4321', // Hint แสดงตัวอย่างแบบมีขีด
+                hintText: '0XX-XXX-XXXX',
                 hintStyle: const TextStyle(color: Colors.grey),
                 filled: false,
                 border: borderStyle,
                 enabledBorder: borderStyle,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
             ),
 
             const SizedBox(height: 20),
-
-            const Text('จังหวัด, เขต/อำเภอ, แขวง/ตำบล',
-                style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16)),
+            const Text('จังหวัด, เขต/อำเภอ, แขวง/ตำบล', style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16)),
             const SizedBox(height: 12),
+            
+            // --- ส่วนเลือกที่อยู่ ---
             InkWell(
               onTap: () async {
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const AddressPickerPage()),
+                    // ✅ แก้ไขตรงนี้: ส่งค่าเดิมเข้าไปที่ AddressPickerPage
+                    builder: (context) => AddressPickerPage(
+                      initialProvince: province.isNotEmpty ? province : null,
+                      initialDistrict: district.isNotEmpty ? district : null,
+                      initialSubdistrict: subDistrict.isNotEmpty ? subDistrict : null,
+                      initialDetail: _detailController.text,
+                      initialLat: _lat, 
+                      initialLng: _lng,
+                    ),
+                  ),
                 );
 
                 if (result != null && result is Map) {
                   setState(() {
                     province = result['province'] ?? '';
                     district = result['district'] ?? result['amphure'] ?? '';
-                    subDistrict = result['subDistrict'] ??
-                        result['subdistrict'] ??
-                        result['tambon'] ??
-                        '';
+                    subDistrict = result['subDistrict'] ?? result['subdistrict'] ?? result['tambon'] ?? '';
                     postalCode = result['postalCode'] ?? '';
+
+                    if (result['detail'] != null) {
+                      _detailController.text = result['detail'];
+                    }
+                    
+                    if (result['lat'] != null && result['lng'] != null) {
+                      _lat = result['lat'];
+                      _lng = result['lng'];
+                      
+                      // ✅ สั่งย้ายกล้องมาที่ตำแหน่งใหม่ทันที
+                      _mapController?.moveCamera(
+                        CameraUpdate.newLatLngZoom(LatLng(_lat!, _lng!), 16)
+                      );
+                    }
                   });
                 }
               },
@@ -242,42 +260,60 @@ class _EditAddressPageState extends State<EditAddressPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (province.isEmpty)
-                        const Text('เลือกจังหวัด',
-                            style: TextStyle(color: Colors.grey)),
+                        const Text('เลือกจังหวัด', style: TextStyle(color: Colors.grey)),
                       if (province.isNotEmpty) ...[
-                        Text('จังหวัด $province',
-                            style: const TextStyle(fontSize: 15)),
+                        Text('จังหวัด $province', style: const TextStyle(fontSize: 15)),
                         const SizedBox(height: 4),
-                        Text('เขต/อำเภอ $district',
-                            style: const TextStyle(fontSize: 15)),
+                        Text('เขต/อำเภอ $district', style: const TextStyle(fontSize: 15)),
                         const SizedBox(height: 4),
-                        Text('แขวง/ตำบล $subDistrict $postalCode',
-                            style: const TextStyle(fontSize: 15)),
+                        Text('แขวง/ตำบล $subDistrict $postalCode', style: const TextStyle(fontSize: 15)),
                       ]
                     ],
                   ),
-                  const Icon(Icons.arrow_forward_ios,
-                      size: 16, color: Colors.grey),
+                  const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
                 ],
               ),
             ),
             const SizedBox(height: 16),
 
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                'assets/images/map.png',
+            // ✅ ส่วน Map Preview
+            if (_lat != null && _lng != null) ...[
+              Container(
                 height: 180,
                 width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (c, o, s) => Container(
-                  height: 180,
-                  color: Colors.grey[200],
-                  child:
-                      const Center(child: Icon(Icons.map, color: Colors.grey)),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: GoogleMap(
+                    onMapCreated: (controller) {
+                      _mapController = controller;
+                    },
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(_lat!, _lng!),
+                      zoom: 16,
+                    ),
+                    markers: {
+                      Marker(
+                        markerId: const MarkerId('selected-loc'),
+                        position: LatLng(_lat!, _lng!),
+                        infoWindow: const InfoWindow(title: 'ตำแหน่งจัดส่ง'),
+                      ),
+                    },
+                    zoomControlsEnabled: false,
+                    scrollGesturesEnabled: false,
+                    zoomGesturesEnabled: false,
+                    rotateGesturesEnabled: false,
+                    tiltGesturesEnabled: false,
+                    myLocationButtonEnabled: false,
+                    mapToolbarEnabled: false,
+                  ),
                 ),
               ),
-            ),
+            ],
+            
             const SizedBox(height: 100),
           ],
         ),
@@ -338,25 +374,16 @@ class ThaiPhoneNumberFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    // 1. กรองเอาเฉพาะตัวเลข
     final text = newValue.text.replaceAll(RegExp(r'\D'), '');
-
-    // 2. จำกัดความยาวสูงสุด 10 หลัก
     if (text.length > 10) return oldValue;
-
-    // 3. เริ่มจัดรูปแบบ
     final buffer = StringBuffer();
     for (int i = 0; i < text.length; i++) {
-      // เติมขีดที่ตำแหน่งหลังตัวที่ 3 และหลังตัวที่ 6 (0xx-xxx-xxxx)
       if (i == 3 || i == 6) {
         buffer.write('-');
       }
       buffer.write(text[i]);
     }
-
     final String formattedText = buffer.toString();
-
-    // 4. คืนค่ากลับไปที่ TextField พร้อมขยับ Cursor ไปท้ายสุด
     return TextEditingValue(
       text: formattedText,
       selection: TextSelection.collapsed(offset: formattedText.length),
