@@ -21,6 +21,7 @@ void main() async {
 
   // ✅ เพิ่มส่วนนี้เพื่อล็อคหน้าจอเป็นแนวตั้ง
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 

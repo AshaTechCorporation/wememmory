@@ -72,6 +72,7 @@ class _RecommendedState extends State<Recommended> {
   int _currentIndex = 0;
   List<MemoryCardData> _items = [];
   bool _isLoading = true;
+  List<AlbumModel> albums = [];
 
   final Map<String, AlbumModel> _cachedAlbumMap = {};
 
@@ -230,8 +231,11 @@ class _RecommendedState extends State<Recommended> {
       await Future.wait(
         yearsToFetch.map((year) async {
           try {
-            final albums = await HomeService.getAlbums(year: '$year');
-            for (var album in albums) {
+            final albums1 = await HomeService.getAlbums(year: '$year');
+            setState(() {
+              albums = albums1;
+            });
+            for (var album in albums1) {
               String monthName = _getThaiMonthNameFromData(album.month);
               int yearBE = int.parse(year.toString()) + 543;
               String key = "$monthName $yearBE";
@@ -295,8 +299,9 @@ class _RecommendedState extends State<Recommended> {
       }
 
       bool isCurrentMonth = (i == now.month);
+      bool isMonthSaved = albums.any((a) => a.month == (i + 1));
 
-      if (photoCount >= 11) {
+      if (photoCount >= 11 && isMonthSaved) {
         String? coverImageUrl;
         if (album != null && album.photos != null && album.photos!.isNotEmpty) {
           coverImageUrl = album.photos![0].image;
@@ -319,7 +324,7 @@ class _RecommendedState extends State<Recommended> {
             imageItems: cardImageItems,
           ),
         );
-      } else if (photoCount > 0 && photoCount <= 10) {
+      } else if (photoCount > 0 && photoCount <= 11) {
         tempItems.add(
           // รูปแบบcard ภาพที่บันทึกยังไม่ครบ 11 ภาพ
           MemoryCardData(
