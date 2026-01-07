@@ -161,9 +161,10 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                     const Text(
                       "รายละเอียดรูปภาพ",
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
                         color: Colors.black87,
+                        height: 16 / 20,
                       ),
                     ),
                   ],

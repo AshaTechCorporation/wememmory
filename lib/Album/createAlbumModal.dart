@@ -222,8 +222,8 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
                 const Text(
                   'สร้างอัลบั้มรูป',
                   style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
                     color: Colors.black87,
                   ),
                 ),

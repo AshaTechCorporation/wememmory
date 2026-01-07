@@ -63,7 +63,7 @@ class _ShopBody extends StatelessWidget {
               icon: Image.asset(
                 'assets/icons/trolley.png',
                 width: 20,
-                height: 20, 
+                height: 20,
                 fit: BoxFit.contain,
               ),
             ),
@@ -276,7 +276,10 @@ class _MembershipPackageSectionState extends State<_MembershipPackageSection> {
           const SizedBox(height: 4),
           const Text(
             'เลือกแพ็กเกจที่ใช่เพื่อเก็บช่วงเวลาให้มีความหมายยิ่งขึ้น',
-            style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 100, 100, 100)),
+            style: TextStyle(
+              fontSize: 14,
+              color: Color.fromARGB(255, 100, 100, 100),
+            ),
           ),
           const SizedBox(height: 30),
 
@@ -602,7 +605,11 @@ class _SpecialGiftHeader extends StatelessWidget {
           SizedBox(height: 4),
           Text(
             'แทนใจด้วยของขวัญที่บันทึกเรื่องราวที่อยากเก็บไว้ร่วมกัน',
-            style: TextStyle(fontSize: 15, color: Color.fromARGB(255, 100, 100, 100)),
+            style: TextStyle(
+              fontSize: 15,
+              color: Color.fromARGB(255, 100, 100, 100),
+              fontWeight: FontWeight.w300,
+            ),
           ),
         ],
       ),
@@ -644,7 +651,6 @@ class _GiftCardBanner extends StatelessWidget {
         'เก็บช่วงเวลาที่รักไว้\nติดตัวไปทุกที่',
         textAlignment,
         textAlign,
-        
       );
     } else {
       // --- การ์ดล่าง (PhotoFrame) ---
@@ -785,8 +791,8 @@ class _GiftCardBanner extends StatelessWidget {
           text,
           textAlign: textAlign,
           style: const TextStyle(
-            fontWeight: FontWeight.w400,
-            fontSize: 16,
+            fontWeight: FontWeight.w300,
+            fontSize: 14,
             height: 1.4,
             color: Colors.black87,
           ),

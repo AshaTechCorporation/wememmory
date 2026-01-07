@@ -61,8 +61,13 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
                 const Text(
                   'พรีวิวสุดท้าย & ยืนยัน',
                   style: TextStyle(
+                    fontFamily: "Kanit",
                     fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500, // ตรงกับ Medium (500)
+                    height:
+                        16 /
+                        20, // คำนวณจาก Line-height (16) หารด้วย Font-size (20) = 0.8
+                    letterSpacing: 0, // 0%
                     color: Colors.black87,
                   ),
                 ),
@@ -151,36 +156,36 @@ class _FinalPreviewSheetState extends State<FinalPreviewSheet> {
                   const SizedBox(height: 20),
 
                   // กล่องข้อความสีฟ้าอ่อน
-                  Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE0F2F7),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFB3E0EE)),
-                    ),
-                    child: Column(
-                      children: [
-                        const Text(
-                          "พร้อมแบ่งปันความทรงจำแล้วหรือยัง?",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "สร้างภาพสวยๆ เพื่อแชร์ลงโซเชียลมีเดียได้เลย!",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  // Container(
+                  //   width: double.infinity,
+                  //   margin: const EdgeInsets.symmetric(horizontal: 20),
+                  //   padding: const EdgeInsets.all(16),
+                  //   decoration: BoxDecoration(
+                  //     color: const Color(0xFFE0F2F7),
+                  //     borderRadius: BorderRadius.circular(8),
+                  //     border: Border.all(color: const Color(0xFFB3E0EE)),
+                  //   ),
+                  //   child: Column(
+                  //     children: [
+                  //       const Text(
+                  //         "พร้อมแบ่งปันความทรงจำแล้วหรือยัง?",
+                  //         style: TextStyle(
+                  //           fontWeight: FontWeight.bold,
+                  //           fontSize: 14,
+                  //           color: Colors.black87,
+                  //         ),
+                  //       ),
+                  //       const SizedBox(height: 4),
+                  //       Text(
+                  //         "สร้างภาพสวยๆ เพื่อแชร์ลงโซเชียลมีเดียได้เลย!",
+                  //         style: TextStyle(
+                  //           fontSize: 12,
+                  //           color: Colors.grey[600],
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                   const SizedBox(height: 20),
                 ],
               ),
