@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 // ✅ Import ไฟล์ FirstPage เข้ามา
-import 'package:wememmory/home/firstPage.dart'; 
-import 'package:wememmory/profile/historyPayment.dart'; 
+import 'package:wememmory/home/firstPage.dart';
+import 'package:wememmory/profile/historyPayment.dart';
 
 class MembershipPage extends StatefulWidget {
   const MembershipPage({super.key});
@@ -49,8 +49,9 @@ class _MembershipPageState extends State<MembershipPage> {
             child: Image.asset(
               'assets/images/membershipBackground.png',
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  Container(color: Colors.grey.shade900),
+              errorBuilder:
+                  (context, error, stackTrace) =>
+                      Container(color: Colors.grey.shade900),
             ),
           ),
 
@@ -79,8 +80,10 @@ class _MembershipPageState extends State<MembershipPage> {
               children: [
                 // --- Top Bar ---
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -88,16 +91,14 @@ class _MembershipPageState extends State<MembershipPage> {
                         backgroundColor: Colors.white.withOpacity(0.2),
                         radius: 20,
                         child: IconButton(
-                          icon: const Icon(Icons.close,
-                              color: Colors.white, size: 20),
-                         onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const FirstPage(),
+                          icon: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 20,
                           ),
-                        );
-                      },
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
                         ),
                       ),
                       GestureDetector(
@@ -105,14 +106,16 @@ class _MembershipPageState extends State<MembershipPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const MembershipHistoryPage(),
+                              builder:
+                                  (context) => const MembershipHistoryPage(),
                             ),
                           );
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF08336),
                             borderRadius: BorderRadius.circular(8),
@@ -147,10 +150,7 @@ class _MembershipPageState extends State<MembershipPage> {
                   child: Text(
                     'เลือกแพ็กเกจที่ใช่เพื่อเก็บช่วงเวลาให้มีความหมายยิ่งขึ้น',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                 ),
 
@@ -178,8 +178,8 @@ class _MembershipPageState extends State<MembershipPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     scrollDirection: Axis.horizontal,
                     itemCount: packages.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(width: 12),
+                    separatorBuilder:
+                        (context, index) => const SizedBox(width: 12),
                     itemBuilder: (context, index) {
                       final item = packages[index];
                       final isSelected = _selectedPackageIndex == index;
@@ -196,10 +196,13 @@ class _MembershipPageState extends State<MembershipPage> {
                           decoration: BoxDecoration(
                             color: const Color(0xFF1E1E1E),
                             borderRadius: BorderRadius.circular(12),
-                            border: isSelected
-                                ? Border.all(
-                                    color: const Color(0xFFF08336), width: 2)
-                                : Border.all(color: Colors.white12),
+                            border:
+                                isSelected
+                                    ? Border.all(
+                                      color: const Color(0xFFF08336),
+                                      width: 2,
+                                    )
+                                    : Border.all(color: Colors.white12),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,7 +250,7 @@ class _MembershipPageState extends State<MembershipPage> {
                                         fontSize: 12,
                                       ),
                                     ),
-                                  ]
+                                  ],
                                 ],
                               ),
                               Text(
@@ -270,8 +273,10 @@ class _MembershipPageState extends State<MembershipPage> {
 
                 // --- Confirm Button ---
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 10,
+                  ),
                   child: SizedBox(
                     width: double.infinity,
                     height: 55,
@@ -320,10 +325,7 @@ class _MembershipPageState extends State<MembershipPage> {
           const SizedBox(width: 12),
           Text(
             text,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 16,
-            ),
+            style: const TextStyle(color: Colors.white70, fontSize: 16),
           ),
         ],
       ),
