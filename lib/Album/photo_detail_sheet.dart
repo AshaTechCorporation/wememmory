@@ -21,7 +21,8 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
   bool _canScroll = true;
 
   final GlobalKey _cropKey = GlobalKey();
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
   BoxFit _currentFit = BoxFit.contain;
 
   Color _selectedTextColor = Colors.black;
@@ -53,7 +54,9 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
         _isLoadingImage = false;
       });
     } else {
-      final data = await widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(1000, 1000));
+      final data = await widget.item.asset.thumbnailDataWithSize(
+        const ThumbnailSize(1000, 1000),
+      );
       if (mounted) {
         setState(() {
           _imageData = data;
@@ -94,9 +97,12 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
   Future<void> _saveData() async {
     try {
       // จับภาพเฉพาะ RepaintBoundary (หุ้มแค่รูปภาพ ไม่รวมข้อความ Overlay)
-      RenderRepaintBoundary boundary = _cropKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      RenderRepaintBoundary boundary =
+          _cropKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
 
       if (byteData != null) {
         widget.item.capturedImage = byteData.buffer.asUint8List();
@@ -125,13 +131,25 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
       },
       child: Container(
         height: MediaQuery.of(context).size.height * 0.92,
-        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
         child: Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: Column(
             children: [
               const SizedBox(height: 12),
-              Container(width: 61, height: 5, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2.5))),
+              Container(
+                width: 61,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2.5),
+                ),
+              ),
 
               // 1. Header
               Padding(
@@ -139,25 +157,37 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.black87),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      onPressed: () => Navigator.pop(context),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.black87,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        const SizedBox(width: 12),
+                        const Text(
+                          "รายละเอียดรูปภาพ",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      "รายละเอียดรูปภาพ",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                        height: 16 / 20,
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Image.asset(
+                        'assets/icons/cross.png',
+                        width: 25,
+                        height: 25,
+                        fit: BoxFit.contain,
                       ),
-
                     ),
-                    GestureDetector(onTap: () => Navigator.pop(context), child: Image.asset('assets/icons/cross.png', width: 25, height: 25, fit: BoxFit.contain)),
                   ],
                 ),
               ),
@@ -169,9 +199,22 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                 padding: EdgeInsets.symmetric(horizontal: 7.0),
                 child: Row(
                   children: [
-                    _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true, isCompleted: true),
-                    _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true, isCompleted: false),
-                    _StepItem(label: 'พรีวิวสุดท้าย', isActive: false, isLast: true),
+                    _StepItem(
+                      label: 'เลือกรูปภาพ',
+                      isActive: true,
+                      isFirst: true,
+                      isCompleted: true,
+                    ),
+                    _StepItem(
+                      label: 'แก้ไขและจัดเรียง',
+                      isActive: true,
+                      isCompleted: false,
+                    ),
+                    _StepItem(
+                      label: 'พรีวิวสุดท้าย',
+                      isActive: false,
+                      isLast: true,
+                    ),
                   ],
                 ),
               ),
@@ -181,7 +224,10 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
               // 3. Content Area
               Expanded(
                 child: SingleChildScrollView(
-                  physics: _canScroll ? const BouncingScrollPhysics() : const NeverScrollableScrollPhysics(),
+                  physics:
+                      _canScroll
+                          ? const BouncingScrollPhysics()
+                          : const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -201,28 +247,48 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                                 child: Listener(
                                   // ✅ 1. ครอบด้วย Listener
                                   onPointerDown: (_) {
-                                    setState(() => _canScroll = false); // แตะรูปปุ๊บ ล็อกสกรอลปั๊บ
+                                    setState(
+                                      () => _canScroll = false,
+                                    ); // แตะรูปปุ๊บ ล็อกสกรอลปั๊บ
                                   },
                                   onPointerUp: (_) {
-                                    setState(() => _canScroll = true); // ปล่อยนิ้ว คืนค่าสกรอล
+                                    setState(
+                                      () => _canScroll = true,
+                                    ); // ปล่อยนิ้ว คืนค่าสกรอล
                                   },
                                   onPointerCancel: (_) {
                                     setState(() => _canScroll = true);
                                   },
                                   child: InteractiveViewer(
-                                    transformationController: _transformationController,
-                                    minScale: 1.0, // แนะนำให้ยอมให้ย่อได้นิดหน่อยเพื่อความสมจริง (เช่น 0.5) แต่ 1.0 ก็โอเค
+                                    transformationController:
+                                        _transformationController,
+                                    minScale:
+                                        1.0, // แนะนำให้ยอมให้ย่อได้นิดหน่อยเพื่อความสมจริง (เช่น 0.5) แต่ 1.0 ก็โอเค
                                     maxScale: 4.0,
                                     panEnabled: true, // ✅ ยืนยันว่าให้ลากได้
                                     scaleEnabled: true, // ✅ ยืนยันว่าให้ซูมได้
                                     // ✅ เพิ่ม boundaryMargin เพื่อให้ลากรูปได้ลื่นขึ้น ไม่ติดขอบ
-                                    boundaryMargin: const EdgeInsets.all(double.infinity),
+                                    boundaryMargin: const EdgeInsets.all(
+                                      double.infinity,
+                                    ),
                                     child:
                                         _isLoadingImage
-                                            ? const Center(child: CircularProgressIndicator())
+                                            ? const Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            )
                                             : _imageData != null
-                                            ? Image.memory(_imageData!, fit: _currentFit, width: double.infinity, height: double.infinity)
-                                            : const Center(child: Text("ไม่สามารถโหลดรูปภาพได้")),
+                                            ? Image.memory(
+                                              _imageData!,
+                                              fit: _currentFit,
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                            )
+                                            : const Center(
+                                              child: Text(
+                                                "ไม่สามารถโหลดรูปภาพได้",
+                                              ),
+                                            ),
                                   ),
                                 ),
                               ),
@@ -235,17 +301,31 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                                 child: IgnorePointer(
                                   child: Text(
                                     // ✅ ถ้า text ว่าง ให้แสดง placeholder, ถ้ามีข้อความ ให้แสดงข้อความ
-                                    _captionController.text.isEmpty ? "เขียนความรู้สึกหรือเรื่องราวเล็กๆ ที่ซ่อนอยู่หลังภาพนี้...." : _captionController.text,
+                                    _captionController.text.isEmpty
+                                        ? "เขียนความรู้สึกหรือเรื่องราวเล็กๆ ที่ซ่อนอยู่หลังภาพนี้...."
+                                        : _captionController.text,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       // ✅ ใช้สีที่เลือกจาก Dropdown (หรือจะปรับ Opacity ให้จางลงถ้าเป็น Placeholder ก็ทำได้ตรงนี้)
-                                      color: _selectedTextColor.withOpacity(_captionController.text.isEmpty ? 0.7 : 1.0),
+                                      color: _selectedTextColor.withOpacity(
+                                        _captionController.text.isEmpty
+                                            ? 0.7
+                                            : 1.0,
+                                      ),
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                       shadows: [
                                         Shadow(
                                           blurRadius: 2.0,
-                                          color: (_selectedTextColor == Colors.black) ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.5),
+                                          color:
+                                              (_selectedTextColor ==
+                                                      Colors.black)
+                                                  ? Colors.white.withOpacity(
+                                                    0.5,
+                                                  )
+                                                  : Colors.black.withOpacity(
+                                                    0.5,
+                                                  ),
                                           offset: const Offset(1.0, 1.0),
                                         ),
                                       ],
@@ -260,15 +340,63 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                                   children: [
                                     Column(
                                       children: [
-                                        Expanded(child: Container(decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
-                                        Expanded(child: Container(decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
+                                        Expanded(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              border: Border(
+                                                bottom: BorderSide(
+                                                  color: Colors.white
+                                                      .withOpacity(0.5),
+                                                  width: 1,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              border: Border(
+                                                bottom: BorderSide(
+                                                  color: Colors.white
+                                                      .withOpacity(0.5),
+                                                  width: 1,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                         Expanded(child: Container()),
                                       ],
                                     ),
                                     Row(
                                       children: [
-                                        Expanded(child: Container(decoration: BoxDecoration(border: Border(right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
-                                        Expanded(child: Container(decoration: BoxDecoration(border: Border(right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
+                                        Expanded(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              border: Border(
+                                                right: BorderSide(
+                                                  color: Colors.white
+                                                      .withOpacity(0.5),
+                                                  width: 1,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              border: Border(
+                                                right: BorderSide(
+                                                  color: Colors.white
+                                                      .withOpacity(0.5),
+                                                  width: 1,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                         Expanded(child: Container()),
                                       ],
                                     ),
@@ -291,8 +419,22 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                               height: 45,
                               child: ElevatedButton(
                                 onPressed: _toggleImageScale,
-                                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF67A5BA), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), elevation: 0),
-                                child: Text(_currentFit == BoxFit.contain ? "ขยายภาพเต็มจอ" : "แสดงภาพทั้งหมด", style: const TextStyle(color: Colors.white, fontSize: 16)),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF67A5BA),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: Text(
+                                  _currentFit == BoxFit.contain
+                                      ? "ขยายภาพเต็มจอ"
+                                      : "แสดงภาพทั้งหมด",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -302,9 +444,13 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                             child: LayoutBuilder(
                               builder: (context, constraints) {
                                 return PopupMenuButton<Color>(
-                                  constraints: BoxConstraints.tightFor(width: constraints.maxWidth),
+                                  constraints: BoxConstraints.tightFor(
+                                    width: constraints.maxWidth,
+                                  ),
                                   offset: const Offset(0, 50),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                   color: Colors.white,
                                   elevation: 4,
                                   onSelected: (Color value) {
@@ -319,12 +465,25 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                                           value: Colors.black,
                                           child: Row(
                                             children: [
-                                              const Text("สีดำ", style: TextStyle(fontSize: 14)),
+                                              const Text(
+                                                "สีดำ",
+                                                style: TextStyle(fontSize: 14),
+                                              ),
                                               const Spacer(),
                                               Container(
                                                 width: 21,
                                                 height: 20,
-                                                decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFF95989A), width: 1)),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  border: Border.all(
+                                                    color: const Color(
+                                                      0xFF95989A,
+                                                    ),
+                                                    width: 1,
+                                                  ),
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -333,12 +492,22 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                                           value: Colors.white,
                                           child: Row(
                                             children: [
-                                              const Text("สีขาว", style: TextStyle(fontSize: 14)),
+                                              const Text(
+                                                "สีขาว",
+                                                style: TextStyle(fontSize: 14),
+                                              ),
                                               const Spacer(),
                                               Container(
                                                 width: 21,
                                                 height: 20,
-                                                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey[300]!)),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  border: Border.all(
+                                                    color: Colors.grey[300]!,
+                                                  ),
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -346,16 +515,38 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                                       ],
                                   child: Container(
                                     height: 45,
-                                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), border: Border.all(color: Colors.grey[300]!), color: Colors.white),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                      color: Colors.white,
+                                    ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          _dropdownValue == null ? "เลือกสีฟอนต์" : (_dropdownValue == Colors.black ? "สีดำ" : "สีขาว"),
-                                          style: TextStyle(color: Colors.black87, fontSize: _dropdownValue == null ? 16 : 14),
+                                          _dropdownValue == null
+                                              ? "เลือกสีฟอนต์"
+                                              : (_dropdownValue == Colors.black
+                                                  ? "สีดำ"
+                                                  : "สีขาว"),
+                                          style: TextStyle(
+                                            color: Colors.black87,
+                                            fontSize:
+                                                _dropdownValue == null
+                                                    ? 16
+                                                    : 14,
+                                          ),
                                         ),
-                                        const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
+                                        const Icon(
+                                          Icons.keyboard_arrow_down,
+                                          color: Colors.grey,
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -370,15 +561,22 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
 
                       // ช่องพิมพ์ข้อความ
                       Container(
-                        decoration: BoxDecoration(border: Border.all(color: Colors.grey[200]!), borderRadius: BorderRadius.circular(4)),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey[200]!),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                         child: TextField(
                           controller: _captionController,
                           maxLines: 4,
                           style: const TextStyle(color: Colors.black),
                           keyboardType: TextInputType.text,
                           decoration: InputDecoration(
-                            hintText: "เขียนความรู้สึกหรือเรื่องราวเล็กๆ ที่ซ่อนอยู่หลังภาพนี้....",
-                            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
+                            hintText:
+                                "เขียนความรู้สึกหรือเรื่องราวเล็กๆ ที่ซ่อนอยู่หลังภาพนี้....",
+                            hintStyle: TextStyle(
+                              color: Colors.grey[400],
+                              fontSize: 13,
+                            ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.all(12),
                           ),
@@ -388,7 +586,12 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
 
                       const SizedBox(height: 16),
 
-                      Wrap(spacing: 8, runSpacing: 8, children: _allTags.map((tag) => _buildTagChip(tag)).toList()),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children:
+                            _allTags.map((tag) => _buildTagChip(tag)).toList(),
+                      ),
 
                       const SizedBox(height: 20),
                     ],
@@ -399,14 +602,29 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
               // 4. Bottom Button (Save)
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 13, 20, 38),
-                decoration: const BoxDecoration(border: Border(top: BorderSide(color: Colors.transparent))),
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: Colors.transparent)),
+                ),
                 child: SizedBox(
                   width: double.infinity,
                   height: 60,
                   child: ElevatedButton(
                     onPressed: _saveData,
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFED7D31), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)), elevation: 0),
-                    child: const Text("บันทึก", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFED7D31),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(1),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "บันทึก",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -425,11 +643,20 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          border: Border.all(color: isSelected ? const Color(0xFFED7D31) : Colors.grey[300]!),
+          border: Border.all(
+            color: isSelected ? const Color(0xFFED7D31) : Colors.grey[300]!,
+          ),
           borderRadius: BorderRadius.circular(20),
           color: isSelected ? const Color(0xFFED7D31) : Colors.white,
         ),
-        child: Text(label, style: TextStyle(color: isSelected ? Colors.white : Colors.grey[600], fontSize: 13, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.grey[600],
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
       ),
     );
   }
@@ -443,7 +670,14 @@ class _StepItem extends StatelessWidget {
   final bool isLast;
   final bool isCompleted;
 
-  const _StepItem({super.key, required this.label, required this.isActive, this.isFirst = false, this.isLast = false, this.isCompleted = false});
+  const _StepItem({
+    super.key,
+    required this.label,
+    required this.isActive,
+    this.isFirst = false,
+    this.isLast = false,
+    this.isCompleted = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -452,18 +686,51 @@ class _StepItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(flex: 2, child: Container(height: 2, color: isFirst ? Colors.transparent : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]))),
+              Expanded(
+                flex: 2,
+                child: Container(
+                  height: 2,
+                  color:
+                      isFirst
+                          ? Colors.transparent
+                          : (isActive
+                              ? const Color(0xFF5AB6D8)
+                              : Colors.grey[300]),
+                ),
+              ),
               const SizedBox(width: 40),
-              Container(width: 11, height: 11, decoration: BoxDecoration(shape: BoxShape.circle, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300])),
+              Container(
+                width: 11,
+                height: 11,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300],
+                ),
+              ),
               const SizedBox(width: 40),
-              Expanded(flex: 2, child: Container(height: 2, color: isLast ? Colors.transparent : (isCompleted ? const Color(0xFF5AB6D8) : Colors.grey[300]))),
+              Expanded(
+                flex: 2,
+                child: Container(
+                  height: 2,
+                  color:
+                      isLast
+                          ? Colors.transparent
+                          : (isCompleted
+                              ? const Color(0xFF5AB6D8)
+                              : Colors.grey[300]),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 5),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400], fontWeight: isActive ? FontWeight.w600 : FontWeight.normal),
+            style: TextStyle(
+              fontSize: 12,
+              color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400],
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+            ),
           ),
         ],
       ),

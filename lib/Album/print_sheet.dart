@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart'; // ✅ จำเป็นต้อง import ตัวนี้
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wememmory/Album/order_success_page.dart';
 import 'package:wememmory/Album/photo_readonly_page.dart';
@@ -16,7 +17,7 @@ import 'package:wememmory/widgets/dialog.dart';
 
 class PrintSheet extends StatefulWidget {
   final List<MediaItem> items;
-  final String monthName; // ค่าที่รับมาเช่น "มกราคม 2566"
+  final String monthName;
 
   const PrintSheet({super.key, required this.items, required this.monthName});
 
@@ -27,47 +28,37 @@ class PrintSheet extends StatefulWidget {
 class _PrintSheetState extends State<PrintSheet> {
   bool _isGift = false;
 
-  // ✅ 1. ฟังก์ชันแกะปีและแปลงเป็น ค.ศ.
-  int _getYearFromMonthName(String monthNameString) {
-    print("--- DEBUG: เริ่มแกะปี ---");
-    print("1. ข้อความที่ได้รับ: '$monthNameString'");
+  // ✅ Helper Function: เขียน Bytes ลงไฟล์ชั่วคราว (เพื่อส่ง API)
+  Future<File> _writeBytesToTempFile(Uint8List bytes, int index) async {
+    final tempDir = await getTemporaryDirectory();
+    // ตั้งชื่อไฟล์ไม่ให้ซ้ำกันด้วย timestamp และ index
+    final tempFile = File(
+      '${tempDir.path}/upload_temp_${DateTime.now().millisecondsSinceEpoch}_$index.jpg',
+    );
+    return await tempFile.writeAsBytes(bytes);
+  }
 
+  int _getYearFromMonthName(String monthNameString) {
     try {
-      // ใช้ Regex หาตัวเลข 4 หลัก (เช่น 2566, 2023)
       final RegExp yearRegex = RegExp(r'\d{4}');
       final Iterable<Match> matches = yearRegex.allMatches(monthNameString);
 
       if (matches.isNotEmpty) {
-        // เอาตัวเลขชุดสุดท้ายที่เจอ (เผื่อมีตัวเลขอื่นปน)
         String yearStr = matches.last.group(0)!;
         int yearVal = int.parse(yearStr);
-        print("2. ตัวเลขปีที่เจอ: $yearVal");
 
-        // ถ้าค่ามากกว่า 2400 (เช่น 2566) แสดงว่าเป็น พ.ศ. -> ลบ 543
         if (yearVal > 2400) {
-          int yearAD = yearVal - 543;
-          print("3. แปลงเป็น ค.ศ.: $yearAD");
-          return yearAD;
-        }
-        // ถ้าค่าน้อยกว่า (เช่น 2023) คือ ค.ศ. อยู่แล้ว
-        else if (yearVal > 2000) {
-          print("3. ใช้ค่า ค.ศ. นี้เลย: $yearVal");
+          return yearVal - 543;
+        } else if (yearVal > 2000) {
           return yearVal;
         }
-      } else {
-        print("2. ไม่เจอตัวเลข 4 หลักในข้อความนี้!");
       }
     } catch (e) {
       print("Error parsing year: $e");
     }
-
-    // ถ้าหาไม่เจอจริงๆ ให้ใช้ปีปัจจุบัน
-    int currentYear = DateTime.now().year;
-    print("⚠️ Warning: หาปีไม่เจอ ใช้ปีปัจจุบันแทน ($currentYear)");
-    return currentYear;
+    return DateTime.now().year;
   }
 
-  // ฟังก์ชันแปลงชื่อเดือนเป็นตัวเลข 1-12
   int thaiMonthToNumber(String monthName) {
     const List<String> months = [
       'มกราคม',
@@ -83,13 +74,12 @@ class _PrintSheetState extends State<PrintSheet> {
       'พฤศจิกายน',
       'ธันวาคม',
     ];
-    // ตรวจสอบว่า string มีชื่อเดือนไหนอยู่บ้าง
     for (int i = 0; i < months.length; i++) {
       if (monthName.contains(months[i])) {
         return i + 1;
       }
     }
-    return 1; // Default มกราคม
+    return 1;
   }
 
   @override
@@ -123,11 +113,9 @@ class _PrintSheetState extends State<PrintSheet> {
                   style: TextStyle(
                     fontFamily: "Kanit",
                     fontSize: 20,
-                    fontWeight: FontWeight.w500, // ตรงกับ Medium (500)
-                    height:
-                        16 /
-                        20, // คำนวณจาก Line-height (16) หารด้วย Font-size (20) = 0.8
-                    letterSpacing: 0, // 0%
+                    fontWeight: FontWeight.w500,
+                    height: 16 / 20,
+                    letterSpacing: 0,
                     color: Colors.black87,
                   ),
                 ),
@@ -168,7 +156,6 @@ class _PrintSheetState extends State<PrintSheet> {
                   ),
                   const SizedBox(height: 18),
 
-                  // แสดง Preview (ใช้ Widget เดิม)
                   _PrintPreviewSection(
                     items: widget.items,
                     monthName: widget.monthName,
@@ -369,29 +356,80 @@ class _PrintSheetState extends State<PrintSheet> {
                   height: 48,
                   child: ElevatedButton(
                     onPressed: () async {
+                      // -------------------------------------------------------------
+                      // ✅ START: แก้ไข Logic การอัปโหลดไฟล์ (ป้องกัน Video Error 500)
+                      // -------------------------------------------------------------
                       try {
                         LoadingDialog.open(context);
 
-                        // ... (ส่วน loop รูปภาพ photoAPI คงเดิม) ...
                         List<PhotoItem> photoAPI = [];
                         if (widget.items.isNotEmpty) {
-                          // ... โค้ดเดิม ...
                           for (var i = 0; i < widget.items.length; i++) {
-                            File? resultFile = await widget.items[i].asset.file;
-                            final photoupload = await LoginService.addImage(
-                              file: resultFile,
-                              path: 'images/asset/',
-                            );
-                            final imageData = PhotoItem(
-                              seq: i + 1,
-                              image: photoupload,
-                              caption: widget.items[i].caption,
-                            );
-                            photoAPI.add(imageData);
+                            final item = widget.items[i];
+                            File? fileToUpload;
+
+                            // LOGIC 1: มีรูปที่แคปมาแล้ว (หรือรูปแต่ง) -> ใช้รูปนั้น
+                            if (item.capturedImage != null) {
+                              fileToUpload = await _writeBytesToTempFile(
+                                item.capturedImage!,
+                                i,
+                              );
+                            }
+                            // LOGIC 2: เป็นวิดีโอ และยังไม่ได้แคปรูป (capturedImage == null)
+                            // -> ให้ดึง Thumbnail คุณภาพสูงมาสร้างไฟล์แทน
+                            else if (item.type == MediaType.video) {
+                              print(
+                                "Generating auto-thumbnail for video item $i",
+                              );
+                              final Uint8List? videoThumb = await item.asset
+                                  .thumbnailDataWithSize(
+                                    const ThumbnailSize(
+                                      1080,
+                                      1920,
+                                    ), // ขอขนาดใหญ่สุด
+                                    quality: 90,
+                                  );
+
+                              if (videoThumb != null) {
+                                fileToUpload = await _writeBytesToTempFile(
+                                  videoThumb,
+                                  i,
+                                );
+                              } else {
+                                print(
+                                  "⚠️ Warning: Failed to generate thumbnail for video",
+                                );
+                              }
+                            }
+                            // LOGIC 3: เป็นรูปภาพปกติ (ไม่ได้แต่ง) -> ใช้ไฟล์ต้นฉบับ
+                            else {
+                              fileToUpload = await item.asset.file;
+                            }
+
+                            // ทำการอัปโหลดเมื่อได้ไฟล์แล้ว
+                            if (fileToUpload != null) {
+                              final photoupload = await LoginService.addImage(
+                                file: fileToUpload,
+                                path: 'images/asset/',
+                              );
+
+                              final imageData = PhotoItem(
+                                seq: i + 1,
+                                image: photoupload,
+                                caption: item.caption,
+                              );
+                              photoAPI.add(imageData);
+                            } else {
+                              print(
+                                "❌ Error: File to upload is null at index $i",
+                              );
+                            }
                           }
                         }
+                        // -------------------------------------------------------------
+                        // ✅ END: จบส่วนแก้ไข Logic
+                        // -------------------------------------------------------------
 
-                        // ✅ เรียกฟังก์ชัน Debug
                         int yearToSend = _getYearFromMonthName(
                           widget.monthName,
                         );
@@ -399,10 +437,7 @@ class _PrintSheetState extends State<PrintSheet> {
 
                         print("🚀 --- FINAL SENDING TO API ---");
                         print("Month: $monthToSend");
-                        print(
-                          "Year: $yearToSend",
-                        ); // 👈 ต้องเป็น 2023 (ถ้าเลือก 2566)
-                        print("-----------------------------");
+                        print("Year: $yearToSend");
 
                         await HomeService.createOrder(
                           year: yearToSend,
@@ -410,24 +445,20 @@ class _PrintSheetState extends State<PrintSheet> {
                           note: '',
                           photos: photoAPI,
                         );
+
+                        if (!mounted) return;
                         LoadingDialog.close(context);
 
-                        if (mounted) {
-                          // เช็ค mounted เพื่อความชัวร์ก่อนใช้ context
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled:
-                                true, // สำคัญมาก! เพื่อให้ Sheet สูง 95% ตามที่เราเขียน
-                            backgroundColor:
-                                Colors
-                                    .transparent, // สำคัญมาก! เพื่อให้เห็นขอบมน
-                            builder:
-                                (context) => OrderSuccessPage(
-                                  items: widget.items,
-                                  monthName: widget.monthName,
-                                ),
-                          );
-                        }
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder:
+                              (context) => OrderSuccessPage(
+                                items: widget.items,
+                                monthName: widget.monthName,
+                              ),
+                        );
                       } catch (e) {
                         if (!mounted) return;
                         LoadingDialog.close(context);
@@ -457,7 +488,6 @@ class _PrintSheetState extends State<PrintSheet> {
     );
   }
 
-  // ... (ส่วน Helper Widgets อื่นๆ: _showErrorDialog, _buildAddressCard, _buildCustomSwitch คงเดิม) ...
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(
       context: context,
@@ -535,8 +565,7 @@ class _PrintSheetState extends State<PrintSheet> {
   }
 }
 
-// ... _PrintPreviewSection & _StaticPhotoSlot (ใช้โค้ดเดิมได้เลย) ...
-// (คัดลอกส่วน _PrintPreviewSection และ _StaticPhotoSlot จากโค้ดเดิมมาต่อท้ายได้เลยครับ)
+// ... _PrintPreviewSection & _StaticPhotoSlot & _StepItem (คงเดิมไม่ต้องแก้)
 class _PrintPreviewSection extends StatelessWidget {
   final List<MediaItem> items;
   final String monthName;
@@ -578,7 +607,6 @@ class _PrintPreviewSection extends StatelessWidget {
                       ),
                       for (int i = 0; i < 5; i++)
                         if (i < items.length)
-                          // ✅ ส่ง items ทั้งหมดเข้าไปด้วย เพื่อให้รู้ว่ามีรูปอะไรบ้าง
                           _StaticPhotoSlot(item: items[i], allItems: items)
                         else
                           const SizedBox(),
@@ -597,7 +625,6 @@ class _PrintPreviewSection extends StatelessWidget {
                     children: [
                       for (int i = 0; i < 6; i++)
                         if ((i + 5) < items.length)
-                          // ✅ ส่ง items ทั้งหมดเข้าไปด้วย
                           _StaticPhotoSlot(item: items[i + 5], allItems: items)
                         else
                           const SizedBox(),
@@ -619,12 +646,12 @@ class _PrintPreviewSection extends StatelessWidget {
 
 class _StaticPhotoSlot extends StatefulWidget {
   final MediaItem item;
-  final List<MediaItem> allItems; // ✅ เพิ่มตัวรับค่า List ทั้งหมด
+  final List<MediaItem> allItems;
 
   const _StaticPhotoSlot({
     super.key,
     required this.item,
-    required this.allItems, // ✅ รับค่ามา
+    required this.allItems,
   });
 
   @override
@@ -652,7 +679,6 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
 
   @override
   Widget build(BuildContext context) {
-    // เช็คว่ารูปนี้มีการแก้ไข (มี caption หรือ tags) หรือไม่
     bool isEdited =
         widget.item.caption.isNotEmpty || widget.item.tags.isNotEmpty;
 
@@ -660,17 +686,14 @@ class _StaticPhotoSlotState extends State<_StaticPhotoSlot> {
       onTap:
           isEdited
               ? () {
-                // ✅ 1. กรองเอาเฉพาะรูปที่มีการแก้ไข (Text หรือ Tag) เท่านั้น
                 List<MediaItem> editedItems =
                     widget.allItems.where((e) {
                       return e.caption.isNotEmpty || e.tags.isNotEmpty;
                     }).toList();
 
-                // ✅ 2. หา Index ของรูปปัจจุบันใน List ที่กรองแล้ว
                 int initialIndex = editedItems.indexOf(widget.item);
 
                 if (initialIndex != -1) {
-                  // ✅ 3. ส่ง List ที่กรองแล้ว และ Index ไปยังหน้า PhotoReadonlyPage
                   Navigator.push(
                     context,
                     MaterialPageRoute(
