@@ -32,6 +32,8 @@
 	<string>แอพต้องการบันทึกรูปภาพลงในอุปกรณ์ของคุณ</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>แอพต้องการเข้าถึงคลังภาพเพื่อเลือกรูปภาพและวิดีโอสำหรับสร้างอัลบั้ม</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need location access to get Wi-Fi information.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

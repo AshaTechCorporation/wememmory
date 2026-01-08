@@ -23,8 +23,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
   VideoPlayerController? _controller;
 
   final GlobalKey _captureKey = GlobalKey();
-  final TransformationController _transformationController =
-      TransformationController();
+  final TransformationController _transformationController = TransformationController();
 
   bool _isPlaying = false;
   bool _isInitialized = false;
@@ -50,9 +49,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
   }
 
   Future<void> _loadThumbnail() async {
-    final bytes = await widget.item.asset.thumbnailDataWithSize(
-      const ThumbnailSize(1080, 1920),
-    );
+    final bytes = await widget.item.asset.thumbnailDataWithSize(const ThumbnailSize(1080, 1920));
     if (mounted) {
       setState(() {
         _thumbnailBytes = bytes;
@@ -146,13 +143,9 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
     try {
       await Future.delayed(const Duration(milliseconds: 100));
 
-      RenderRepaintBoundary boundary =
-          _captureKey.currentContext!.findRenderObject()
-              as RenderRepaintBoundary;
+      RenderRepaintBoundary boundary = _captureKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      ByteData? byteData = await image.toByteData(
-        format: ui.ImageByteFormat.png,
-      );
+      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
 
       if (byteData != null) {
         Uint8List pngBytes = byteData.buffer.asUint8List();
@@ -163,12 +156,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
         });
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("บันทึกภาพหน้าจอเรียบร้อย"),
-              duration: Duration(seconds: 1),
-            ),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("บันทึกภาพหน้าจอเรียบร้อย"), duration: Duration(seconds: 1)));
         }
       }
     } catch (e) {
@@ -198,28 +186,15 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
     final double maxDuration = duration.inMilliseconds.toDouble();
 
     // คำนวณค่า Slider: ถ้ากำลังลากให้ใช้ค่าที่นิ้วลาก (_dragValue)
-    final double sliderValue =
-        _isDragging
-            ? _dragValue
-            : position.inMilliseconds.toDouble().clamp(0.0, maxDuration);
+    final double sliderValue = _isDragging ? _dragValue : position.inMilliseconds.toDouble().clamp(0.0, maxDuration);
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.92,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
+      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
       child: Column(
         children: [
           const SizedBox(height: 12),
-          Container(
-            width: 61,
-            height: 5,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2.5),
-            ),
-          ),
+          Container(width: 61, height: 5, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2.5))),
 
           // Header
           Padding(
@@ -229,33 +204,12 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
               children: [
                 Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.black87),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      onPressed: () => Navigator.pop(context),
-                    ),
+                    IconButton(icon: const Icon(Icons.arrow_back, color: Colors.black87), padding: EdgeInsets.zero, constraints: const BoxConstraints(), onPressed: () => Navigator.pop(context)),
                     const SizedBox(width: 12),
-                    const Text(
-                      "รายละเอียดรูปภาพ",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                        height: 16 / 20,
-                      ),
-                    ),
+                    const Text("รายละเอียดรูปภาพ", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.black87, height: 16 / 20)),
                   ],
                 ),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Image.asset(
-                    'assets/icons/cross.png',
-                    width: 25,
-                    height: 25,
-                    fit: BoxFit.contain,
-                  ),
-                ),
+                GestureDetector(onTap: () => Navigator.pop(context), child: Image.asset('assets/icons/cross.png', width: 25, height: 25, fit: BoxFit.contain)),
               ],
             ),
           ),
@@ -267,22 +221,9 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
             padding: EdgeInsets.symmetric(horizontal: 7.0),
             child: Row(
               children: [
-                _StepItem(
-                  label: 'เลือกรูปภาพ',
-                  isActive: true,
-                  isFirst: true,
-                  isCompleted: true,
-                ),
-                _StepItem(
-                  label: 'แก้ไขและจัดเรียง',
-                  isActive: true,
-                  isCompleted: false,
-                ),
-                _StepItem(
-                  label: 'พรีวิวสุดท้าย',
-                  isActive: false,
-                  isLast: true,
-                ),
+                _StepItem(label: 'เลือกรูปภาพ', isActive: true, isFirst: true, isCompleted: true),
+                _StepItem(label: 'แก้ไขและจัดเรียง', isActive: true, isCompleted: false),
+                _StepItem(label: 'พรีวิวสุดท้าย', isActive: false, isLast: true),
               ],
             ),
           ),
@@ -292,10 +233,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
           // Content Area
           Expanded(
             child: SingleChildScrollView(
-              physics:
-                  _canScroll
-                      ? const ClampingScrollPhysics()
-                      : const NeverScrollableScrollPhysics(),
+              physics: _canScroll ? const ClampingScrollPhysics() : const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
@@ -314,16 +252,12 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                             child: LayoutBuilder(
                               builder: (context, constraints) {
                                 return Listener(
-                                  onPointerDown:
-                                      (_) => setState(() => _canScroll = false),
-                                  onPointerUp:
-                                      (_) => setState(() => _canScroll = true),
-                                  onPointerCancel:
-                                      (_) => setState(() => _canScroll = true),
+                                  onPointerDown: (_) => setState(() => _canScroll = false),
+                                  onPointerUp: (_) => setState(() => _canScroll = true),
+                                  onPointerCancel: (_) => setState(() => _canScroll = true),
                                   onPointerSignal: _onPointerSignal,
                                   child: InteractiveViewer(
-                                    transformationController:
-                                        _transformationController,
+                                    transformationController: _transformationController,
                                     minScale: 1.0,
                                     maxScale: 4.0,
                                     boundaryMargin: EdgeInsets.zero,
@@ -338,14 +272,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                         ),
                       ),
 
-                      Positioned.fill(
-                        child: IgnorePointer(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: _buildGridOverlay(),
-                          ),
-                        ),
-                      ),
+                      Positioned.fill(child: IgnorePointer(child: ClipRRect(borderRadius: BorderRadius.circular(12), child: _buildGridOverlay()))),
                     ],
                   ),
 
@@ -353,20 +280,14 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
 
                   // --- Timeline (Slider) ---
                   if (_tempCapturedImage == null) ...[
-                    if (_isInitialized &&
-                        _controller != null &&
-                        maxDuration > 0)
+                    if (_isInitialized && _controller != null && maxDuration > 0)
                       SizedBox(
                         height: 20,
                         child: SliderTheme(
                           data: SliderTheme.of(context).copyWith(
                             trackHeight: 4.0,
-                            thumbShape: const RoundSliderThumbShape(
-                              enabledThumbRadius: 6.0,
-                            ),
-                            overlayShape: const RoundSliderOverlayShape(
-                              overlayRadius: 12.0,
-                            ),
+                            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
+                            overlayShape: const RoundSliderOverlayShape(overlayRadius: 12.0),
                             activeTrackColor: const Color(0xFFED7D31),
                             inactiveTrackColor: Colors.grey[300],
                             thumbColor: const Color(0xFFED7D31),
@@ -377,8 +298,7 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                             max: maxDuration,
 
                             onChangeStart: (value) {
-                              _wasPlayingBeforeDrag =
-                                  _controller!.value.isPlaying;
+                              _wasPlayingBeforeDrag = _controller!.value.isPlaying;
                               if (_wasPlayingBeforeDrag) {
                                 _controller!.pause();
                               }
@@ -393,17 +313,13 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                                 _dragValue = value;
                               });
                               // สั่ง Seek แบบไม่ต้อง await (Real-time scrubbing)
-                              _controller!.seekTo(
-                                Duration(milliseconds: value.toInt()),
-                              );
+                              _controller!.seekTo(Duration(milliseconds: value.toInt()));
                             },
 
                             // ✅ แก้ไข: เพิ่ม Delay เพื่อรอให้ Video Player ย้ายตำแหน่งเสร็จจริง ๆ
                             // ป้องกัน Slider ดีดกลับไปที่ 0 หรือจุดเริ่มต้น
                             onChangeEnd: (value) async {
-                              final targetPosition = Duration(
-                                milliseconds: value.toInt(),
-                              );
+                              final targetPosition = Duration(milliseconds: value.toInt());
 
                               // 1. สั่งย้ายตำแหน่ง
                               await _controller!.seekTo(targetPosition);
@@ -420,16 +336,13 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
 
                               // 3. (สำคัญ) รอ 500ms ก่อนจะปลดล็อค Slider
                               // เพื่อให้ Controller อัปเดต position ให้ทันกับที่เราลาก
-                              Future.delayed(
-                                const Duration(milliseconds: 500),
-                                () {
-                                  if (mounted) {
-                                    setState(() {
-                                      _isDragging = false;
-                                    });
-                                  }
-                                },
-                              );
+                              Future.delayed(const Duration(milliseconds: 500), () {
+                                if (mounted) {
+                                  setState(() {
+                                    _isDragging = false;
+                                  });
+                                }
+                              });
                             },
                           ),
                         ),
@@ -440,34 +353,13 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            _formatDuration(position),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          Text(
-                            _formatDuration(duration),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
-                          ),
+                          Text(_formatDuration(position), style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                          Text(_formatDuration(duration), style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                         ],
                       ),
                     ),
                   ] else ...[
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Text(
-                        "นี่คือภาพที่คุณเลือกจากวิดีโอ",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                    const Padding(padding: EdgeInsets.symmetric(vertical: 10), child: Text("นี่คือภาพที่คุณเลือกจากวิดีโอ", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold))),
                   ],
 
                   const SizedBox(height: 20),
@@ -475,29 +367,24 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                   // --- Control Buttons ---
                   if (_tempCapturedImage == null)
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      // mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // Dummy Left
-                        Opacity(
-                          opacity: 0.0,
-                          child: IconButton(
-                            icon: const Icon(Icons.zoom_in_map, size: 28),
-                            onPressed: null,
-                          ),
+                        // Opacity(opacity: 0.0, child: IconButton(icon: const Icon(Icons.zoom_in_map, size: 28), onPressed: null)),
+                        // Fit Icon
+                        IconButton(
+                          onPressed: _toggleFitMode,
+                          tooltip: _isFilled ? 'แสดงขนาดต้นฉบับ' : 'แสดงเต็มเฟรม',
+                          icon: Icon(_isFilled ? Icons.zoom_in_map : Icons.zoom_out_map, size: 24, color: Colors.black54),
                         ),
 
-                        const SizedBox(width: 15),
+                        // const SizedBox(width: 15),
 
                         // Previous
                         IconButton(
-                          icon: const Icon(
-                            Icons.skip_previous,
-                            size: 36,
-                            color: Colors.black54,
-                          ),
+                          icon: const Icon(Icons.skip_previous, size: 36, color: Colors.black54),
                           onPressed: () {
-                            final newPos =
-                                position - const Duration(seconds: 5);
+                            final newPos = position - const Duration(seconds: 5);
                             _controller!.seekTo(newPos);
                           },
                         ),
@@ -510,24 +397,8 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                           child: Container(
                             width: 64,
                             height: 64,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFED7D31),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Icon(
-                              _isPlaying
-                                  ? Icons.pause
-                                  : Icons.play_arrow_rounded,
-                              color: Colors.white,
-                              size: 40,
-                            ),
+                            decoration: const BoxDecoration(color: Color(0xFFED7D31), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))]),
+                            child: Icon(_isPlaying ? Icons.pause : Icons.play_arrow_rounded, color: Colors.white, size: 40),
                           ),
                         ),
 
@@ -535,30 +406,11 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
 
                         // Next
                         IconButton(
-                          icon: const Icon(
-                            Icons.skip_next,
-                            size: 36,
-                            color: Colors.black54,
-                          ),
+                          icon: const Icon(Icons.skip_next, size: 36, color: Colors.black54),
                           onPressed: () {
-                            final newPos =
-                                position + const Duration(seconds: 5);
+                            final newPos = position + const Duration(seconds: 5);
                             _controller!.seekTo(newPos);
                           },
-                        ),
-
-                        const SizedBox(width: 12),
-
-                        // Fit Icon
-                        IconButton(
-                          onPressed: _toggleFitMode,
-                          tooltip:
-                              _isFilled ? 'แสดงขนาดต้นฉบับ' : 'แสดงเต็มเฟรม',
-                          icon: Icon(
-                            _isFilled ? Icons.zoom_in_map : Icons.zoom_out_map,
-                            size: 24,
-                            color: Colors.black54,
-                          ),
                         ),
                       ],
                     ),
@@ -572,21 +424,8 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                       height: 50,
                       child: ElevatedButton(
                         onPressed: _isInitialized ? _captureFrame : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF67A5BA),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(1),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          "แคปหน้าจอ",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF67A5BA), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)), elevation: 0),
+                        child: const Text("แคปหน้าจอ", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     )
                   else
@@ -595,20 +434,8 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                       height: 50,
                       child: OutlinedButton(
                         onPressed: _undoCapture,
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xFFED7D31)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(1),
-                          ),
-                        ),
-                        child: const Text(
-                          "ยกเลิกภาพนี้",
-                          style: TextStyle(
-                            color: Color(0xFFED7D31),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFED7D31)), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1))),
+                        child: const Text("ยกเลิกภาพนี้", style: TextStyle(color: Color(0xFFED7D31), fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     ),
 
@@ -619,21 +446,8 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: _saveAndClose,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFED7D31),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(1),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        "บันทึก & ถัดไป",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFED7D31), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)), elevation: 0),
+                      child: const Text("บันทึก & ถัดไป", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
 
@@ -649,21 +463,13 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
 
   Widget _buildVideoContent(BoxConstraints constraints) {
     if (_tempCapturedImage != null) {
-      return Image.memory(
-        _tempCapturedImage!,
-        fit: _isFilled ? BoxFit.cover : BoxFit.contain,
-        width: constraints.maxWidth,
-        height: constraints.maxHeight,
-      );
+      return Image.memory(_tempCapturedImage!, fit: _isFilled ? BoxFit.cover : BoxFit.contain, width: constraints.maxWidth, height: constraints.maxHeight);
     }
 
     final double viewWidth = constraints.maxWidth;
     final double viewHeight = constraints.maxHeight;
 
-    final double videoAspect =
-        _controller != null && _controller!.value.isInitialized
-            ? _controller!.value.aspectRatio
-            : 16 / 9;
+    final double videoAspect = _controller != null && _controller!.value.isInitialized ? _controller!.value.aspectRatio : 16 / 9;
 
     final double viewAspect = viewWidth / viewHeight;
 
@@ -681,25 +487,12 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
           renderHeight = viewWidth / videoAspect;
         }
 
-        videoWidget = Center(
-          child: SizedBox(
-            width: renderWidth,
-            height: renderHeight,
-            child: VideoPlayer(_controller!),
-          ),
-        );
+        videoWidget = Center(child: SizedBox(width: renderWidth, height: renderHeight, child: VideoPlayer(_controller!)));
       } else {
         videoWidget = SizedBox(
           width: viewWidth,
           height: viewHeight,
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: SizedBox(
-              width: _controller!.value.size.width,
-              height: _controller!.value.size.height,
-              child: VideoPlayer(_controller!),
-            ),
-          ),
+          child: FittedBox(fit: BoxFit.contain, child: SizedBox(width: _controller!.value.size.width, height: _controller!.value.size.height, child: VideoPlayer(_controller!))),
         );
       }
     } else {
@@ -712,23 +505,13 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
         color: Colors.black,
         width: viewWidth,
         height: viewHeight,
-        child: Image.memory(
-          _thumbnailBytes!,
-          fit: _isFilled ? BoxFit.cover : BoxFit.contain,
-          width: viewWidth,
-          height: viewHeight,
-        ),
+        child: Image.memory(_thumbnailBytes!, fit: _isFilled ? BoxFit.cover : BoxFit.contain, width: viewWidth, height: viewHeight),
       );
     }
 
     return Stack(
       alignment: Alignment.center,
-      children: [
-        videoWidget,
-        if (thumbnailWidget != null) thumbnailWidget,
-        if (!_isInitialized && _thumbnailBytes == null)
-          const Center(child: CircularProgressIndicator(color: Colors.white)),
-      ],
+      children: [videoWidget, if (thumbnailWidget != null) thumbnailWidget, if (!_isInitialized && _thumbnailBytes == null) const Center(child: CircularProgressIndicator(color: Colors.white))],
     );
   }
 
@@ -740,48 +523,15 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
             children: [
               Expanded(
                 child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 1,
-                      ),
-                      right: BorderSide(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 1,
-                      ),
-                    ),
-                  ),
+                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1), right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))),
                 ),
               ),
               Expanded(
                 child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 1,
-                      ),
-                      right: BorderSide(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 1,
-                      ),
-                    ),
-                  ),
+                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1), right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))),
                 ),
               ),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              Expanded(child: Container(decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
             ],
           ),
         ),
@@ -790,78 +540,23 @@ class _VideoDetailSheetState extends State<VideoDetailSheet> {
             children: [
               Expanded(
                 child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 1,
-                      ),
-                      right: BorderSide(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 1,
-                      ),
-                    ),
-                  ),
+                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1), right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))),
                 ),
               ),
               Expanded(
                 child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 1,
-                      ),
-                      right: BorderSide(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 1,
-                      ),
-                    ),
-                  ),
+                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1), right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))),
                 ),
               ),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              Expanded(child: Container(decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
             ],
           ),
         ),
         Expanded(
           child: Row(
             children: [
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white.withOpacity(0.5),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              Expanded(child: Container(decoration: BoxDecoration(border: Border(right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
+              Expanded(child: Container(decoration: BoxDecoration(border: Border(right: BorderSide(color: Colors.white.withOpacity(0.5), width: 1))))),
               Expanded(child: Container()),
             ],
           ),
@@ -878,14 +573,7 @@ class _StepItem extends StatelessWidget {
   final bool isLast;
   final bool isCompleted;
 
-  const _StepItem({
-    super.key,
-    required this.label,
-    required this.isActive,
-    this.isFirst = false,
-    this.isLast = false,
-    this.isCompleted = false,
-  });
+  const _StepItem({super.key, required this.label, required this.isActive, this.isFirst = false, this.isLast = false, this.isCompleted = false});
 
   @override
   Widget build(BuildContext context) {
@@ -894,51 +582,18 @@ class _StepItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(
-                flex: 2,
-                child: Container(
-                  height: 2,
-                  color:
-                      isFirst
-                          ? Colors.transparent
-                          : (isActive
-                              ? const Color(0xFF5AB6D8)
-                              : Colors.grey[300]),
-                ),
-              ),
+              Expanded(flex: 2, child: Container(height: 2, color: isFirst ? Colors.transparent : (isActive ? const Color(0xFF5AB6D8) : Colors.grey[300]))),
               const SizedBox(width: 40),
-              Container(
-                width: 11,
-                height: 11,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300],
-                ),
-              ),
+              Container(width: 11, height: 11, decoration: BoxDecoration(shape: BoxShape.circle, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[300])),
               const SizedBox(width: 40),
-              Expanded(
-                flex: 2,
-                child: Container(
-                  height: 2,
-                  color:
-                      isLast
-                          ? Colors.transparent
-                          : (isCompleted
-                              ? const Color(0xFF5AB6D8)
-                              : Colors.grey[300]),
-                ),
-              ),
+              Expanded(flex: 2, child: Container(height: 2, color: isLast ? Colors.transparent : (isCompleted ? const Color(0xFF5AB6D8) : Colors.grey[300]))),
             ],
           ),
           const SizedBox(height: 5),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400],
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-            ),
+            style: TextStyle(fontSize: 12, color: isActive ? const Color(0xFF5AB6D8) : Colors.grey[400], fontWeight: isActive ? FontWeight.w600 : FontWeight.normal),
           ),
         ],
       ),

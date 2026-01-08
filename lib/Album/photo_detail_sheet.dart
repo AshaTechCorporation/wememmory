@@ -139,24 +139,9 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.black87),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      onPressed: () => Navigator.pop(context),
-                    ),
+                    IconButton(icon: const Icon(Icons.arrow_back, color: Colors.black87), padding: EdgeInsets.zero, constraints: const BoxConstraints(), onPressed: () => Navigator.pop(context)),
                     const SizedBox(width: 12),
-                    const Text(
-                      "รายละเอียดรูปภาพ",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                        height: 16 / 20,
-                      ),
-
-                    ),
+                    const Text("รายละเอียดรูปภาพ", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.black87, height: 16 / 20)),
                     GestureDetector(onTap: () => Navigator.pop(context), child: Image.asset('assets/icons/cross.png', width: 25, height: 25, fit: BoxFit.contain)),
                   ],
                 ),
@@ -240,7 +225,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                                     style: TextStyle(
                                       // ✅ ใช้สีที่เลือกจาก Dropdown (หรือจะปรับ Opacity ให้จางลงถ้าเป็น Placeholder ก็ทำได้ตรงนี้)
                                       color: _selectedTextColor.withOpacity(_captionController.text.isEmpty ? 0.7 : 1.0),
-                                      fontSize: 14,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       shadows: [
                                         Shadow(
@@ -292,11 +277,11 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                               child: ElevatedButton(
                                 onPressed: _toggleImageScale,
                                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF67A5BA), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), elevation: 0),
-                                child: Text(_currentFit == BoxFit.contain ? "ขยายภาพเต็มจอ" : "แสดงภาพทั้งหมด", style: const TextStyle(color: Colors.white, fontSize: 16)),
+                                child: Text(_currentFit == BoxFit.contain ? "ขยายภาพเต็มจอ" : "แสดงภาพทั้งหมด", style: const TextStyle(color: Colors.white, fontSize: 14)),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 5),
                           Expanded(
                             flex: 2,
                             child: LayoutBuilder(
@@ -353,7 +338,7 @@ class _PhotoDetailSheetState extends State<PhotoDetailSheet> {
                                       children: [
                                         Text(
                                           _dropdownValue == null ? "เลือกสีฟอนต์" : (_dropdownValue == Colors.black ? "สีดำ" : "สีขาว"),
-                                          style: TextStyle(color: Colors.black87, fontSize: _dropdownValue == null ? 16 : 14),
+                                          style: TextStyle(color: Colors.black87, fontSize: _dropdownValue == null ? 14 : 12),
                                         ),
                                         const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
                                       ],
